@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'react-hot-toast'
 
@@ -35,67 +36,134 @@ export default function LoginPage() {
     }
   }
 
+  const handleGoogleSignIn = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001'}/auth/callback`,
+        },
+      })
+      
+      if (error) throw error
+    } catch (error: any) {
+      toast.error(error.message || 'Google sign in failed')
+    }
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
-            Sign in to Cargo Guard
-          </h2>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
+    <div className="cont flex justify-between flex-nowrap">
+      {/* Left Side - Login Form */}
+      <div className="sign-in-cont w-[40%] h-screen p-[2%_3%] relative">
+        <Image
+          src="/auth/logo.png"
+          alt="Cargo Guard Logo"
+          width={154}
+          height={40}
+          className="logo-img absolute"
+          priority
+        />
+        
+        <div className="gen-cont w-full h-full flex items-center">
+          <div className="sign-in w-[78%] mx-auto gap-7 flex flex-col">
+            <div className="header">
+              <h1 className="font-medium mb-1.5 text-[28px]">Sign in</h1>
+              <p className="subtitle text-[#515151] text-[14px]">
+                Sign in to enjoy the feature of Cargo Guard
+              </p>
             </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
+            
+            <form onSubmit={handleLogin}>
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                className="google-btn bg-transparent border border-[#E6E8E7] rounded-[6px] w-full items-center flex justify-center gap-2 p-1.5 text-[14px] font-medium hover:border-[#cecfce] transition-all duration-200 cursor-pointer"
+              >
+                <p>Continue with Google</p>
+                <Image
+                  src="/auth/google.png"
+                  alt="Google"
+                  width={24}
+                  height={24}
+                />
+              </button>
+              
+              <div className="or-cont flex items-center justify-between py-3">
+                <div className="or-line w-[43%] bg-[#E6E8E7] h-[0.5px]"></div>
+                <p className="text-[#6E6E6E] text-[14px] font-medium">or</p>
+                <div className="or-line w-[43%] bg-[#E6E8E7] h-[0.5px]"></div>
+              </div>
+              
+              <label className="text-[#9A9A9A] text-[14px]">
+                Email <br />
+                <input
+                  type="email"
+                  placeholder="jonas_kahnwald@gmail.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="block mt-2 mb-3 w-full px-3 py-2 border border-[#E6E8E7] rounded-[6px] text-[14px] text-[#232323] transition-all duration-200 cursor-pointer hover:border-[#cecfce] focus:outline-none focus:border-[#367AFF]"
+                />
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-              {loading ? 'Signing in...' : 'Sign in'}
-            </button>
-          </div>
-
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
-              <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
-                Sign up
+              
+              <label className="text-[#9A9A9A] text-[14px]">
+                Password <br />
+                <input
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="block mt-2 mb-3 w-full px-3 py-2 border border-[#E6E8E7] rounded-[6px] text-[14px] text-[#232323] transition-all duration-200 cursor-pointer hover:border-[#cecfce] focus:outline-none focus:border-[#367AFF]"
+                />
+              </label>
+              
+              <button
+                type="submit"
+                disabled={loading}
+                className="sign-in-btn w-full bg-[#367affc7] px-3 py-2.5 border-none rounded-[6px] text-white text-[16px] font-medium transition-all duration-200 cursor-pointer mt-3 hover:bg-[#367AFF] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? 'Signing in...' : 'Login'}
+              </button>
+            </form>
+            
+            <p className="cta text-[14px] text-center text-[#6C6C6C]">
+              Need an account?{' '}
+              <Link href="/signup" className="font-medium text-[#367AFF] hover:underline">
+                Create One
               </Link>
             </p>
           </div>
-        </form>
+        </div>
+      </div>
+      
+      {/* Right Side - Background Image & Review */}
+      <div 
+        className="sign-img-cont w-[60%] h-screen bg-cover bg-center relative"
+        style={{ backgroundImage: 'url(/auth/backimg.png)' }}
+      >
+        <div className="review-cont pt-16">
+          <div className="container-rev w-[80%] mx-auto">
+            <p className="review text-white text-[24px] mb-6">
+              "Cargo Guard makes cargo insurance fast, transparent, 
+              and effortless — we can secure every shipment in minutes,
+              without endless calls or paperwork."
+            </p>
+            <div className="review-person flex gap-2 items-center">
+              <Image
+                src="/auth/person.png"
+                alt="Alex Rivera"
+                width={44}
+                height={44}
+                className="rounded-full"
+              />
+              <div className="review-person-info">
+                <p className="person-name text-white text-[16px]">Alex Rivera</p>
+                <p className="person-info text-[#FBFBFB] text-[14px]">Portfolio Manager</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
