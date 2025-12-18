@@ -79,7 +79,7 @@ const handleSignUp = async (e: React.FormEvent) => {
   return (
     <div className="cont flex justify-between flex-nowrap">
       {/* Left Side - Sign Up Form */}
-      <div className="sign-in-cont w-[40%] h-screen p-[2%_3%] relative">
+      <div className="sign-in-cont w-[40%] h-[115vh] p-[2%_3%] relative">
         <Image
           src="/auth/logo.png"
           alt="Cargo Guard Logo"
@@ -177,7 +177,7 @@ const handleSignUp = async (e: React.FormEvent) => {
       
       {/* Right Side - Background Image & Review */}
       <div 
-        className="sign-img-cont w-[60%] h-screen bg-cover bg-center relative"
+        className="sign-img-cont w-[60%] h-[115vh] bg-cover bg-center relative"
         style={{ backgroundImage: 'url(/auth/backimg.png)' }}
       >
         <div className="review-cont pt-16">
