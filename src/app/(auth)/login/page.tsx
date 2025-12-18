@@ -56,7 +56,7 @@ export default function LoginPage() {
       {/* Left Side - Login Form */}
       <div className="sign-in-cont w-[40%] h-[115vh] p-[2%_3%] relative">
         <Image
-          src="/auth/logo.png"
+          src="/auth/logo.svg"
           alt="Cargo Guard Logo"
           width={154}
           height={40}
