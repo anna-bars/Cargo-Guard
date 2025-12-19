@@ -54,7 +54,7 @@ export default function LoginPage() {
   return (
     <div className="cont flex justify-between flex-nowrap">
       {/* Left Side - Login Form */}
-      <div className="sign-in-cont w-[40%] h-[115vh] p-[2%_3%] relative">
+      <div className="sign-in-cont w-[40%] h-[108vh] p-[2%_3%] relative">
         <Image
           src="/auth/logo.svg"
           alt="Cargo Guard Logo"
@@ -139,8 +139,8 @@ export default function LoginPage() {
       
       {/* Right Side - Background Image & Review */}
       <div 
-        className="sign-img-cont w-[60%] h-[115vh] bg-cover bg-center relative"
-        style={{ backgroundImage: 'url(/auth/backimg.png)' }}
+        className="sign-img-cont w-[60%] h-[108vh] bg-cover bg-center relative"
+        style={{ backgroundImage: 'url(/auth/backimg.avif)' }}
       >
         <div className="review-cont pt-16">
           <div className="container-rev w-[80%] mx-auto">
