@@ -72,7 +72,8 @@ body {
   }
 }
 /* app/globals.css */
-@keyframes fadeInUp {
+/* Add these styles for mobile menu */
+@keyframes fadeInUpFast {
   from {
     opacity: 0;
     transform: translateY(8px);
@@ -83,6 +84,28 @@ body {
   }
 }
 
-.animate-fadeInUp {
-  animation: fadeInUp 0.25s ease forwards;
+.animate-fadeInUpFast {
+  animation: fadeInUpFast 0.25s ease forwards;
+}
+
+/* Mobile specific styles */
+@media (max-width: 768px) {
+  body.menu-open {
+    overflow: hidden;
+  }
+  
+  /* Ensure toolbar fades correctly */
+  body.menu-open .tb {
+    opacity: 0.3;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+}
+@media screen and (max-width: 768px) {
+  .container {
+    width: 88% !important;
+  }
+  .tb {
+    padding: 24px 0 16px 0 !important;
+  }
 }
