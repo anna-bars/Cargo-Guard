@@ -80,15 +80,16 @@ const handleSignUp = async (e: React.FormEvent) => {
     <div className="cont flex justify-between flex-nowrap">
       {/* Left Side - Sign Up Form */}
       <div className="sign-in-cont w-[40%] h-[108vh] p-[2%_3%] relative">
-        <Image
-          src="/auth/logo.svg"
-          alt="Cargo Guard Logo"
-          width={154}
-          height={40}
-          className="logo-img absolute"
-          priority
-        />
-        
+        <Link href="/">
+          <Image
+            src="/auth/logo.svg"
+            alt="Cargo Guard Logo"
+            width={154}
+            height={40}
+            className="logo-img absolute"
+            priority
+          />
+        </Link>
         <div className="gen-cont w-full h-full flex items-center">
           <div className="sign-in w-[78%] mx-auto gap-7 flex flex-col">
             <div className="header">
