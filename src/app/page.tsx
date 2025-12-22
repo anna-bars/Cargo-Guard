@@ -133,6 +133,134 @@ export default async function HomePage() {
             />
           </div>
       </header>
+      <section className="features bg-white py-16 lg:py-[72px]">
+  <div className="container w-[96%] mx-auto lg:w-[88%]">
+    {/* Title with text-left and responsive font sizes */}
+    <h2 className="sect-title text-[#4C4C4C] text-[24px] lg:text-[32px] font-normal leading-normal lg:leading-[46px] mb-8 text-left">
+      Stop Losing Time. <br /> Start Securing Cargo.
+    </h2>
+    
+    <div className="features-cont flex flex-col lg:flex-row justify-between gap-4 lg:gap-4">
+      {/* Old Way */}
+      <div className="old-way w-full lg:w-[49.5%] rounded-[16px] p-4 lg:p-6 flex flex-col gap-4 lg:gap-[22px] border border-white shadow-[0px_0px_2px_#0000ff1a] bg-[#fcfcfc]">
+        <div className="features-item-header">
+          <h2 className="features-item-header-title text-[#2c2c2c] text-[20px] lg:text-[24px] font-normal">
+            The Old Way
+          </h2>
+          <p className="features-item-header-subtitle text-[#575757] text-sm lg:text-base font-light">
+            Delays & Uncertainty
+          </p>
+        </div>
+        
+        <div className="features-item-cont flex flex-col gap-4 lg:gap-[22px]">
+          {/* Feature 1 */}
+          <div className="feat-it flex justify-start gap-4 rounded-[16px] p-3 lg:p-4 items-start transition-all duration-250 ease-in border border-[#0000001f] bg-white hover:bg-[#fcecec] hover:-translate-y-1">
+            <img 
+              src="/landing/features/slow.svg" 
+              alt="Slow Quotes" 
+              className="mt-[6px] w-4 h-4 lg:w-6 lg:h-6"
+            />
+            <div className="feat-it-text">
+              <h4 className="text-[#b45353] text-[16px] lg:text-[20px] font-normal mb-1">Slow Quotes</h4>
+              <p className="text-[#AFAFAF] text-sm lg:text-base font-light">
+                Takes days to get a quote.
+              </p>
+            </div>
+          </div>
+          
+          {/* Feature 2 */}
+          <div className="feat-it flex justify-start gap-4 rounded-[16px] p-3 lg:p-4 items-start transition-all duration-250 ease-in border border-[#0000001f] bg-white hover:bg-[#fcecec] hover:-translate-y-1">
+            <img 
+              src="/landing/features/paperwork.svg" 
+              alt="Paperwork Overload" 
+              className="mt-[6px] w-4 h-4 lg:w-6 lg:h-6"
+            />
+            <div className="feat-it-text">
+              <h4 className="text-[#b45353] text-[16px] lg:text-[20px] font-normal mb-1">Paperwork Overload</h4>
+              <p className="text-[#AFAFAF] text-sm lg:text-base font-light">
+                Endless forms and manual data entry.
+              </p>
+            </div>
+          </div>
+          
+          {/* Feature 3 */}
+          <div className="feat-it flex justify-start gap-4 rounded-[16px] p-3 lg:p-4 items-start transition-all duration-250 ease-in border border-[#0000001f] bg-white hover:bg-[#fcecec] hover:-translate-y-1">
+            <img 
+              src="/landing/features/fees.svg" 
+              alt="Hidden Fees" 
+              className="mt-[6px] w-4 h-4 lg:w-6 lg:h-6"
+            />
+            <div className="feat-it-text">
+              <h4 className="text-[#b45353] text-[16px] lg:text-[20px] font-normal mb-1">Hidden Fees</h4>
+              <p className="text-[#AFAFAF] text-sm lg:text-base font-light">
+                Non-transparent pricing and surprise charges.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* New Way */}
+      <div className="new-way w-full lg:w-[49.5%] rounded-[16px] p-4 lg:p-6 flex flex-col gap-4 lg:gap-[22px] border border-white shadow-[0px_0px_2px_#0000ff1a] bg-[#fcfcfc] lg:mt-0 mt-4">
+        <div className="features-item-header">
+          <h2 className="features-item-header-title text-black text-[20px] lg:text-[24px] font-normal">
+            The New Way
+          </h2>
+          <p className="features-item-header-subtitle text-[#575757] text-sm lg:text-base font-light">
+            Instant & Digital
+          </p>
+        </div>
+        
+        <div className="features-item-cont flex flex-col gap-4 lg:gap-[22px]">
+          {/* Feature 1 */}
+          <div className="feat-it flex justify-start gap-4 rounded-[16px] p-3 lg:p-4 items-start transition-all duration-250 ease-in border border-[#0000001f] bg-white hover:bg-[#eafff1] hover:-translate-y-1">
+            <img 
+              src="/landing/features/instant.svg" 
+              alt="Instant Quotes" 
+              className="mt-[6px] w-4 h-4 lg:w-6 lg:h-6"
+            />
+            <div className="feat-it-text">
+              <h4 className="text-[#53b475] text-[16px] lg:text-[20px] font-normal mb-1">Instant Quotes</h4>
+              <p className="text-[#AFAFAF] text-sm lg:text-base font-light">
+                Real-time pricing based on your cargo details.
+              </p>
+            </div>
+          </div>
+          
+          {/* Feature 2 */}
+          <div className="feat-it flex justify-start gap-4 rounded-[16px] p-3 lg:p-4 items-start transition-all duration-250 ease-in border border-[#0000001f] bg-white hover:bg-[#eafff1] hover:-translate-y-1">
+            <img 
+              src="/landing/features/zero-paperwork.svg" 
+              alt="Zero Paperwork" 
+              className="mt-[6px] w-4 h-4 lg:w-6 lg:h-6"
+            />
+            <div className="feat-it-text">
+              <h4 className="text-[#53b475] text-[16px] lg:text-[20px] font-normal mb-1">Zero Paperwork</h4>
+              <p className="text-[#AFAFAF] text-sm lg:text-base font-light">
+                Fully digital documents & automated compliance.
+              </p>
+            </div>
+          </div>
+          
+          {/* Feature 3 */}
+          <div className="feat-it flex justify-start gap-4 rounded-[16px] p-3 lg:p-4 items-start transition-all duration-250 ease-in border border-[#0000001f] bg-white hover:bg-[#eafff1] hover:-translate-y-1">
+            <img 
+              src="/landing/features/premium.svg" 
+              alt="Transparent Premium" 
+              className="mt-[6px] w-4 h-4 lg:w-6 lg:h-6"
+            />
+            <div className="feat-it-text">
+              <h4 className="text-[#53b475] text-[16px] lg:text-[20px] font-normal mb-1">Transparent Premium</h4>
+              <p className="text-[#AFAFAF] text-sm lg:text-base font-light">
+                One-screen confirmation, no hidden costs.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
     </div>
   )
 }
