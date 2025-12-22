@@ -260,6 +260,73 @@ export default async function HomePage() {
       </div>
     </div>
   </div>
+      </section>
+      <section className="process bg-white pb-16 lg:pb-[72px]">
+  <div className="container w-[96%] mx-auto lg:w-[88%]">
+    {/* Header */}
+    <div className="process-header mb-8 lg:mb-[46px]">
+      <h2 className="process-header-title text-[#4C4C4C] text-[24px] lg:text-[32px] font-normal leading-normal lg:leading-[46px] mb-2">
+        Your Cargo Secure in 3 Simple Steps
+      </h2>
+      <p className="process-header-subtitle text-[#4C4C4C] text-sm lg:text-base">
+        No calls, no waiting. Get covered in minutes, not days.
+      </p>
+    </div>
+    
+    {/* Process Items Container */}
+    <div className="process-cont flex flex-col md:flex-row flex-wrap justify-between gap-y-8 lg:gap-y-0">
+      {/* Step 1 */}
+      <div className="process-item w-full md:w-[49.5%] lg:w-[32.5%] rounded-[16px] mt-0 md:mt-0 lg:mt-0">
+        <img 
+          src="landing/process/01.svg" 
+          alt="Step 1: Enter Cargo & Route" 
+          className="w-50px h-auto"
+        />
+        <div className="process-item-cont mt-4 lg:mt-[18px]">
+          <h3 className="process-item-title text-[#2F2F2F] text-lg lg:text-[20px] font-normal mb-2 lg:mb-2">
+            Enter Cargo & Route
+          </h3>
+          <div className="process-item-text text-[#848484] text-sm lg:text-base font-light w-[85%] lg:w-[75%]">
+            Input your cargo value, type, and route in our simplified form
+          </div>
+        </div>
+      </div>
+      
+      {/* Step 2 */}
+      <div className="process-item w-full md:w-[49.5%] lg:w-[32.5%] rounded-[16px] mt-8 md:mt-0 lg:mt-0">
+        <img 
+          src="landing/process/02.svg" 
+          alt="Step 2: Get Instant Quote" 
+          className="w-50px h-auto"
+        />
+        <div className="process-item-cont mt-4 lg:mt-[18px]">
+          <h3 className="process-item-title text-[#2F2F2F] text-lg lg:text-[20px] font-normal mb-2 lg:mb-2">
+            Get Instant Quote
+          </h3>
+          <div className="process-item-text text-[#848484] text-sm lg:text-base font-light w-[85%] lg:w-[75%]">
+            Cargo Guard instantly calculates your premium using real-time data.
+          </div>
+        </div>
+      </div>
+      
+      {/* Step 3 - Special handling for tablet (1024px breakpoint) */}
+      <div className="process-item w-full md:w-full lg:w-[32.5%] rounded-[16px] mt-8 md:mt-8 lg:mt-0">
+        <img 
+          src="landing/process/03.svg" 
+          alt="Step 3: Confirm & Activate" 
+          className="w-50px h-auto"
+        />
+        <div className="process-item-cont mt-4 lg:mt-[18px]">
+          <h3 className="process-item-title text-[#2F2F2F] text-lg lg:text-[20px] font-normal mb-2 lg:mb-2">
+            Confirm & Activate
+          </h3>
+          <div className="process-item-text text-[#848484] text-sm lg:text-base font-light w-[85%] lg:w-[75%]">
+            Review the quote, pay, and your policy is instantly active — ready for shipment.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
     </div>
   )
