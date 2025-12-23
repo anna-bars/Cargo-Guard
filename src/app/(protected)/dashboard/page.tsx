@@ -117,7 +117,7 @@ export default function DashboardPage() {
               <span className="absolute top-4 right-[19px] bg-[#f86464] w-[6px] h-[6px] rounded-full"></span>
             </div>
             
-            <div className="hidden xl:block w-[54px] h-[54px] bg-[#f7f7f7] rounded-lg border border-white/22 flex items-center justify-center relative">
+            <div className="hidden xl:flex w-[54px] h-[54px] bg-[#f7f7f7] rounded-lg border border-white/22 flex items-center justify-center relative">
               <img 
                 src="https://c.animaapp.com/mjiggi0jSqvoj5/img/bell-1.png" 
                 alt="Notifications"
@@ -274,7 +274,7 @@ export default function DashboardPage() {
                     <div className="font-montserrat text-[46px] xl:text-[46px] font-normal text-black flex items-baseline relative metric-value">
                       <span className="text-black tracking-[1.28px]">84.</span>
                       <span className="text-[#c7c7c7] tracking-[1.28px]">5k</span>
-                      <span className="absolute -left-5 top-1.5 text-[12px]">$</span>
+                      <span className="absolute -left-5 top-3 text-[12px]">$</span>
                     </div>
                   </div>
                   <p className="font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
@@ -285,10 +285,13 @@ export default function DashboardPage() {
                 {/* Active Policies */}
                 <div className="w-[43%] xl:w-[12%] metric-card-item">
                   <div className="relative">
-                    <div className="font-montserrat text-[46px] xl:text-[46px] font-normal text-black flex items-baseline relative metric-value2">
+                    <div className="font-montserrat relative w-fit text-[46px] xl:text-[46px] font-normal text-black flex items-baseline relative metric-value2">
                       <span className="text-black tracking-[1.28px]">8.</span>
                       <span className="text-[#c7c7c7] tracking-[1.28px]">47</span>
-                      <span className="absolute -left-5 top-1.5 text-[12px]">%</span>
+                      <span className="absolute -left-5 top-3 text-[12px]">%</span>
+                      <span className="absolute -right-5 top-3 text-[12px]">
+                      <img src="/dashboard/top-arrow.svg" alt="" />
+                    </span>
                     </div>
                   </div>
                   <p className="font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
@@ -298,14 +301,18 @@ export default function DashboardPage() {
                 
                 {/* Quotes Awaiting Approval */}
                 <div className="w-[43%] xl:w-[12%] metric-card-item">
-                  <div className="font-montserrat text-[46px] xl:text-[46px] font-normal text-black flex items-baseline metric-value">
+                  <div className="font-montserrat relative w-fit text-[46px] xl:text-[46px] font-normal text-black flex items-baseline metric-value">
                     <span className="text-black tracking-[1.28px]">3.</span>
                     <img 
                       className="w-7 ml-1.5 metric-arrow" 
-                      src="/arrow.svg" 
+                      src="/dashboard/arrow.svg" 
                       alt="Arrow" 
                       style={{ width: '28px', marginLeft: '6px' }}
                     />
+                    <span className="absolute -left-5 top-3 text-[12px]">%</span>
+                    <span className="absolute -right-5 top-3 text-[12px]">
+                      <img src="/dashboard/top-arrow.svg" alt="" />
+                    </span>
                   </div>
                   <p className="font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
                     Quotes Awaiting Approval
@@ -314,14 +321,18 @@ export default function DashboardPage() {
                 
                 {/* Contracts Due to Expire */}
                 <div className="w-[43%] xl:w-[12%] metric-card-item">
-                  <div className="font-montserrat text-[46px] xl:text-[46px] font-normal text-black flex items-baseline metric-value">
+                  <div className="font-montserrat relative w-fit text-[46px] xl:text-[46px] font-normal text-black flex items-baseline metric-value">
                     <span className="text-black tracking-[1.28px]">2.</span>
                     <img 
                       className="w-7 ml-1.5 metric-arrow" 
-                      src="/arrow.svg" 
+                      src="/dashboard/arrow.svg" 
                       alt="Arrow"
                       style={{ width: '28px', marginLeft: '6px' }}
                     />
+                    <span className="absolute -left-5 top-3 text-[12px]">%</span>
+                    <span className="absolute -right-5 top-3 text-[12px]">
+                      <img src="/dashboard/top-arrow.svg" alt="" />
+                    </span>
                   </div>
                   <p className="font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
                     Contracts Due to Expire
@@ -330,14 +341,18 @@ export default function DashboardPage() {
                 
                 {/* Required Document Uploads */}
                 <div className="w-[43%] xl:w-[12%] metric-card-item">
-                  <div className="font-montserrat text-[46px] xl:text-[46px] font-normal text-black flex items-baseline metric-value">
+                  <div className="font-montserrat relative w-fit text-[46px] xl:text-[46px] font-normal text-black flex items-baseline metric-value">
                     <span className="text-black tracking-[1.28px]">1.</span>
                     <img 
                       className="w-7 ml-1.5 metric-arrow" 
-                      src="/arrow.svg" 
+                      src="/dashboard/arrow.svg" 
                       alt="Arrow"
                       style={{ width: '28px', marginLeft: '6px' }}
                     />
+                    <span className="absolute -left-5 top-3 text-[12px]">%</span>
+                    <span className="absolute -right-5 top-3 text-[12px]">
+                      <img src="/dashboard/top-arrow.svg" alt="" />
+                    </span>
                   </div>
                   <p className="font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
                     Required Document Uploads
@@ -405,7 +420,7 @@ export default function DashboardPage() {
               </div>
               
               {/* Desktop Table Header */}
-              <div className="hidden xl:grid grid-cols-[120px_120px_1fr_200px_150px_130px] gap-2 pb-2 border-b border-gray-200 mb-2 table-header">
+              <div className="hidden xl:grid grid-cols-[120px_120px_1fr_200px_150px_140px] gap-2 pb-2 border-b border-gray-200 mb-2 table-header">
                 {['Type', 'ID', 'Cargo / Value', 'Status / Due Date', 'Last Update', 'Action'].map((header, idx) => (
                   <div key={idx} className="flex items-center gap-2 font-poppins text-sm font-normal text-[#606068]">
                     <span>{header}</span>
@@ -464,7 +479,7 @@ export default function DashboardPage() {
                     button: { text: 'View Details', variant: 'secondary' }
                   }
                 ].map((row, idx) => (
-                  <div key={idx} className="xl:grid xl:grid-cols-[120px_120px_1fr_200px_150px_130px] gap-2 p-3 xl:p-3 bg-[#f8fafd] xl:bg-[#f8fafd] rounded-lg xl:rounded-lg flex flex-wrap items-center table-row">
+                  <div key={idx} className="xl:grid xl:grid-cols-[120px_120px_1fr_200px_150px_140px] gap-2 p-3 xl:p-3 bg-[#f8fafd] xl:bg-[#f8fafd] rounded-lg xl:rounded-lg flex flex-wrap items-center table-row">
                     {/* Mobile/Desktop Layout */}
                     <div className="w-[45%] xl:w-auto font-poppins text-sm text-black truncate row-cell">{row.type}</div>
                     <div className="w-[45%] xl:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link">{row.id}</div>
@@ -477,7 +492,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="w-[45%] xl:w-auto font-poppins text-sm text-black truncate mt-2 xl:mt-0 row-cell">{row.date}</div>
                     <div className="w-full xl:w-auto mt-2 xl:mt-0 row-cell">
-                      <button className={`h-9 px-4 rounded-lg font-poppins text-sm font-normal transition-colors w-full xl:w-[130px] ${
+                      <button className={`h-9 px-4 rounded-lg font-poppins text-sm font-normal transition-colors w-full xl:w-[140px] ${
                         row.button.variant === 'primary' 
                           ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]' 
                           : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f3f4f6]'
@@ -605,7 +620,7 @@ export default function DashboardPage() {
                   
                   <div className="flex items-end gap-1 overflow-hidden">
                     {/* Top bars */}
-                    <div className="flex gap-1">
+                    <div className="flex gap-1 items-baseline">
                       {Array.from({ length: 22 }).map((_, i) => (
                         <div 
                           key={`top-${i}`} 
@@ -615,7 +630,7 @@ export default function DashboardPage() {
                     </div>
                     
                     {/* Bottom bars */}
-                    <div className="flex gap-1">
+                    <div className="flex gap-1 items-baseline">
                       {Array.from({ length: 44 }).map((_, i) => (
                         <div 
                           key={`bottom-${i}`} 
