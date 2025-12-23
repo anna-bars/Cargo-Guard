@@ -1078,6 +1078,8 @@ export default function DashboardPage() {
         @media screen and (max-width: 768px) {
             .metric-value, .metric-value2 {
                 font-size: 32px;
+                font-weight: 200;
+                height: 38px;
             }
 
             .metrics-grid {
