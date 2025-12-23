@@ -567,7 +567,7 @@ export default function DashboardPage() {
                 </p>
               </div>
               
-              <div className="flex justify-between items-end">
+              <div className="block justify-between items-end">
                 <div className="w-full">
                   <div className="flex justify-between mb-1.5">
                     <div>
@@ -584,7 +584,7 @@ export default function DashboardPage() {
                     </div>
                   </div>
                   
-                  <div className="flex items-end gap-1">
+                  <div className="flex items-end gap-1 overflow-hidden">
                     {/* Top bars */}
                     <div className="flex gap-1">
                       {Array.from({ length: 22 }).map((_, i) => (
