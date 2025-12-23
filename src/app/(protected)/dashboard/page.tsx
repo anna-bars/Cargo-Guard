@@ -57,7 +57,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-[#f3f3f6] font-montserrat">
       {/* Fixed width container */}
-      <div className="max-w-[96%] mx-auto pt-4">
+      <div className="max-w-[88%] sm:max-w-[96%] mx-auto pt-4">
         {/* Header */}
         <header className="flex justify-between items-center h-[68px] mb-4">
           <div className="flex items-center gap-3">
@@ -66,9 +66,10 @@ export default function DashboardPage() {
               alt="Cargo Guard Logo" 
               className="w-[22px] h-[29px] object-cover"
             />
-            <h1 className="font-montserrat text-[24px] font-normal text-[#0a3d62]">
-              Cargo Guard
-            </h1>
+            <h2 className="font-montserrat text-[18px] sm:text-[24px] font-normal text-[#0a3d62]">
+  Cargo Guard
+</h2>
+
           </div>
           
           {/* Desktop Navigation */}
@@ -108,7 +109,7 @@ export default function DashboardPage() {
           
           {/* Header Actions */}
           <div className="flex items-center gap-2.5">
-            <div className="w-[54px] h-[54px] bg-[#f7f7f7] rounded-lg border border-white/22 flex items-center justify-center relative xl:hidden">
+            <div className="w-[44px] h-[44px] sm:w-[54px] sm:h-[54px] bg-[#f7f7f7] rounded-lg border border-white/22 flex items-center justify-center relative xl:hidden">
               <img 
                 src="https://c.animaapp.com/mjiggi0jSqvoj5/img/bell-1.png" 
                 alt="Notifications"
@@ -155,7 +156,7 @@ export default function DashboardPage() {
             
             {/* Desktop User Info */}
             <div className="hidden xl:flex items-center gap-4 ml-4">
-              <span className="text-gray-700">{user?.email}</span>
+              {/* <span className="text-gray-700">{user?.email}</span> */}
               <LogoutButton />
             </div>
           </div>
@@ -238,7 +239,7 @@ export default function DashboardPage() {
 
         {/* Mobile Header for Activity Section */}
         <div className="flex gap-2 items-center mb-4 xl:hidden">
-          <img src="/hashtag.svg" alt="" className="w-5 h-5" />
+          <img src="/dashboard/hashtag.svg" alt="" className="w-5 h-5" />
           <h4 className="font-normal text-base">Dashboard</h4>
         </div>
 
@@ -641,10 +642,10 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 
-                <div className="hidden xl:block text-right ml-4">
-                  <div className="text-[13px] text-[#C8C8C8]">Conversion Rate</div>
-                  <div className="text-[26px] text-black font-normal">65</div>
-                </div>
+             <div className="rate-mob-hid hidden md:block text-right mt-4">
+  <div className="text-[13px] text-[#C8C8C8]">Conversion Rate</div>
+  <div className="text-[26px] text-black font-normal">65</div>
+</div>
               </div>
               
               {/* Mobile conversion rate */}
@@ -964,7 +965,9 @@ export default function DashboardPage() {
             .welcome-widget, .action-center {
                 display: none;
             }
-            
+            .rate-mob-hid {
+              display: none !important;
+            }
             .quote-conversion.performance-section {
                 width: 100%;
                 min-height: 195px;
