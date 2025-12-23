@@ -465,6 +465,39 @@ export default async function HomePage() {
       </div>
     </div>
   </div>
+      </section>
+      <section className="cta-sect">
+  <div className="container w-[96%] mx-auto lg:w-[88%]">
+    <div className="cta mb-16 lg:mb-[72px] py-12 lg:py-[72px] rounded-[16px] bg-[url('/landing/cta/back-img.png')] bg-cover text-center">
+      <div className="container w-full mx-auto">
+        <div className="cta-header flex flex-col gap-3 lg:gap-3">
+          <p className="mean-text uppercase text-white text-sm lg:text-base font-medium">
+            GET STARTED WITH CARGO GUARD FOR FREE
+          </p>
+          <h2 className="cta-title text-white text-[32px] lg:text-[48px] font-normal leading-[44px] lg:leading-[64px] w-[80%] lg:w-[95%] xl:w-[64%] 2xl:w-[52%] mx-auto">
+            Stop losing time & start insuring cargo digitally.
+          </h2>
+          <p className="cta-subtitle text-white text-sm lg:text-base font-normal w-[80%] lg:w-[80%] xl:w-[56%] 2xl:w-[38%] mx-auto">
+            Ready to take control of your cargo security?
+            Join the digital platform built by logistics experts․
+          </p>
+        </div>
+        <div className="cta-footer pt-6 lg:pt-6">
+          <div className="cta-btn-cont">
+            <button className="cta-main-btn text-black text-sm lg:text-base py-3 px-9 lg:py-3 lg:px-9 bg-white rounded-lg border border-[rgba(255,255,255,0.269)] hover:bg-gray-50 transition-all duration-250 ease-in cursor-pointer">
+              Start Your Free Account
+            </button>
+            <button className="cta-second-btn bg-transparent border-none text-white text-sm lg:text-base ml-0 lg:ml-8 hidden lg:inline-block hover:text-gray-200 transition-all duration-250 ease-in cursor-pointer">
+              See Cargo Guard in action
+            </button>
+          </div>
+          <h6 className="text-white text-xs font-normal mt-3 lg:mt-3">
+            No credit card required. Start in seconds.
+          </h6>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
     </div>
   )
