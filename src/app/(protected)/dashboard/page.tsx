@@ -591,7 +591,7 @@ export default function DashboardPage() {
 
             {/* Quote Conversion Rate */}
             <div className="bg-[#fafcff]/80 rounded-2xl p-6 h-auto min-h-[203px] w-full quote-conversion performance-section">
-              <div className="mb-4">
+              <div className="">
                 <h3 className="font-montserrat text-[18px] font-medium text-black action-title">
                   Quote Conversion Rate
                 </h3>
@@ -968,7 +968,7 @@ export default function DashboardPage() {
             }
             .quote-conversion.performance-section {
                 width: 100%;
-                min-height: 195px;
+                min-height: 170px;
             }
             
             .action-title, .section-title {
