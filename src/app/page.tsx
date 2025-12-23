@@ -65,10 +65,10 @@ export default async function HomePage() {
               </div>
             </div>
             
-            {/* Mobile Hamburger Button - Client Component */}
-            <ClientMobileMenu />
+            
           </div>
-          
+          {/* Mobile Hamburger Button - Client Component */}
+            <ClientMobileMenu />
           {/* Hero Section */}
           <div className="py-10 flex flex-col gap-4 md:py-[40px] md:gap-[16px]">
             <div className="flex flex-col gap-3 md:gap-[12px]">

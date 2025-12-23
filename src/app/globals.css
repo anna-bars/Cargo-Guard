@@ -89,18 +89,17 @@ body {
 }
 
 /* Mobile specific styles */
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   body.menu-open {
     overflow: hidden;
   }
   
-  /* Ensure toolbar fades correctly */
   body.menu-open .tb {
     opacity: 0.3;
     pointer-events: none;
     transition: opacity 0.15s ease;
   }
-}
+} */
 @media screen and (max-width: 768px) {
   .container {
     width: 88% !important;
@@ -108,4 +107,10 @@ body {
   .tb {
     padding: 24px 0 16px 0 !important;
   }
+}
+.hamburger-menu-btn {
+    position: absolute;
+    top: 26px;
+    right: 4%;
+    z-index: 1458245;
 }

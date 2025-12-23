@@ -48,7 +48,7 @@ export default function ClientMobileMenu() {
     <>
       {/* Hamburger Button */}
       <button
-        className="md:hidden flex flex-col justify-between w-[30px] h-[21px] bg-transparent border-none cursor-pointer p-0 z-[1001] relative transition-opacity duration-150"
+        className="hamburger-menu-btn md:hidden flex flex-col justify-between w-[30px] h-[21px] bg-transparent border-none cursor-pointer p-0 z-[1001] relative transition-opacity duration-150"
         onClick={toggleMenu}
         aria-label="Toggle menu"
       >
@@ -71,7 +71,7 @@ export default function ClientMobileMenu() {
 
       {/* Mobile Menu Overlay */}
       <div 
-        className={`mobile-menu fixed inset-0 w-full h-screen bg-[#FBFBFF] transition-all duration-200 z-[999] md:hidden ${
+        className={`mobile-menu fixed inset-0 w-full h-screen bg-[#FBFBFF] transition-all duration-200 z-[98999] md:hidden ${
           isMenuOpen 
             ? 'opacity-100 visible' 
             : 'opacity-0 invisible'
