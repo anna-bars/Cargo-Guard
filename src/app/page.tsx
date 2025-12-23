@@ -310,7 +310,7 @@ export default async function HomePage() {
       </div>
       
       {/* Step 3 - Special handling for tablet (1024px breakpoint) */}
-      <div className="process-item w-full md:w-full lg:w-[32.5%] rounded-[16px] mt-8 md:mt-8 lg:mt-0">
+      <div className="process-item w-full md:w-[49.5%] lg:w-[32.5%] rounded-[16px] mt-8 md:mt-8 lg:mt-0">
         <img 
           src="landing/process/03.svg" 
           alt="Step 3: Confirm & Activate" 
@@ -328,86 +328,141 @@ export default async function HomePage() {
     </div>
   </div>
       </section>
-<section className="perform bg-white pb-16 lg:pb-[72px]">
-  <div className="container w-[96%] mx-auto lg:w-[88%]">
-    {/* Հատվածի վերնագիր */}
-    <div className="perform-header mb-8 lg:mb-[46px]">
-      <h2 className="perform-title text-[#4C4C4C] text-[24px] md:text-[28px] lg:text-[32px] font-normal leading-normal mb-2 lg:mb-2">
-        Trusted by Thousands. <br /> Proven by Results.
-      </h2>
-      <p className="perform-subtitle text-[#4C4C4C] text-sm lg:text-base w-full lg:w-[56%] xl:w-[37%]">
-        Cargo Guard helps businesses insure cargo in minutes — with higher conversion rates, faster quotes, and zero paperwork.
-      </p>
-    </div>
+      <section className="perform bg-white pb-16 lg:pb-[72px]">
+        <div className="container w-[96%] mx-auto lg:w-[88%]">
+          {/* Հատվածի վերնագիր */}
+          <div className="perform-header mb-8 lg:mb-[46px]">
+            <h2 className="perform-title text-[#4C4C4C] text-[24px] md:text-[28px] lg:text-[32px] font-normal leading-normal mb-2 lg:mb-2">
+              Trusted by Thousands. <br /> Proven by Results.
+            </h2>
+            <p className="perform-subtitle text-[#4C4C4C] text-sm lg:text-base w-full lg:w-[56%] xl:w-[37%]">
+              Cargo Guard helps businesses insure cargo in minutes — with higher conversion rates, faster quotes, and zero paperwork.
+            </p>
+          </div>
 
-    {/* Առաջին շարք (երկու ցուցանիշ) */}
-    <div className="perform-cont flex flex-col lg:flex-row justify-between gap-2 mb-2">
-      {/* Ցուցանիշ 1 */}
-      <div className="perform-item w-full lg:w-[49.8%] bg-[#F9F9F9] rounded-[16px] p-6 lg:p-[50px_40px] text-center">
-        <div className="count text-[#2F2F2F] text-4xl lg:text-[48px] font-normal relative w-fit mx-auto 
-          before:content-[''] before:absolute before:top-[8px] before:-left-[20px] before:!w-3 before:!h-3 before:bg-[url('/landing/perform/percent.svg')] before:bg-no-repeat before:bg-contain
-          after:content-[''] after:absolute after:top-[8px] after:-right-[20px] after:!w-3 after:!h-3 after:bg-[url('/landing/perform/arrow.svg')] after:bg-no-repeat after:bg-contain">
-          +55.<span className="text-[#B2B2B2]">3</span>
-        </div>
-        <p className="text-[#AFAFAF] text-xs lg:text-sm font-light mt-2">
-          Manual Reporting Reduced
-        </p>
-      </div>
+          {/* Առաջին շարք (երկու ցուցանիշ) */}
+          <div className="perform-cont flex flex-col lg:flex-row justify-between gap-2 mb-2">
+            {/* Ցուցանիշ 1 */}
+            <div className="perform-item w-full lg:w-[49.8%] bg-[#F9F9F9] rounded-[16px] p-6 lg:p-[50px_40px] text-center">
+              <div className="count text-[#2F2F2F] text-4xl lg:text-[48px] font-normal relative w-fit mx-auto 
+                before:content-[''] before:absolute before:top-[8px] before:-left-[20px] before:!w-3 before:!h-3 before:bg-[url('/landing/perform/percent.svg')] before:bg-no-repeat before:bg-contain
+                after:content-[''] after:absolute after:top-[8px] after:-right-[20px] after:!w-3 after:!h-3 after:bg-[url('/landing/perform/arrow.svg')] after:bg-no-repeat after:bg-contain">
+                +55.<span className="text-[#B2B2B2]">3</span>
+              </div>
+              <p className="text-[#AFAFAF] text-xs lg:text-sm font-light mt-2">
+                Manual Reporting Reduced
+              </p>
+            </div>
 
-      {/* Ցուցանիշ 2 */}
-      <div className="perform-item w-full lg:w-[49.8%] bg-[#F9F9F9] rounded-[16px] p-6 lg:p-[50px_40px] text-center mt-2 lg:mt-0">
-        <div className="count text-[#2F2F2F] text-4xl lg:text-[48px] font-normal relative w-fit mx-auto
-          before:content-[''] before:absolute before:top-[8px] before:-left-[26px] before:!w-3 before:!h-3 before:bg-[url('/landing/perform/percent.svg')] before:bg-no-repeat before:bg-contain
-          after:content-[''] after:absolute after:top-[8px] after:-right-[26px] after:!w-3 after:!h-3 after:bg-[url('/landing/perform/arrow.svg')] after:bg-no-repeat after:bg-contain">
-          +72.<span className="text-[#B2B2B2]">8</span>
-        </div>
-        <p className="text-[#AFAFAF] text-xs lg:text-sm font-light mt-2">
-          Faster Quote Conversion
-        </p>
-      </div>
-    </div>
+            {/* Ցուցանիշ 2 */}
+            <div className="perform-item w-full lg:w-[49.8%] bg-[#F9F9F9] rounded-[16px] p-6 lg:p-[50px_40px] text-center mt-2 lg:mt-0">
+              <div className="count text-[#2F2F2F] text-4xl lg:text-[48px] font-normal relative w-fit mx-auto
+                before:content-[''] before:absolute before:top-[8px] before:-left-[26px] before:!w-3 before:!h-3 before:bg-[url('/landing/perform/percent.svg')] before:bg-no-repeat before:bg-contain
+                after:content-[''] after:absolute after:top-[8px] after:-right-[26px] after:!w-3 after:!h-3 after:bg-[url('/landing/perform/arrow.svg')] after:bg-no-repeat after:bg-contain">
+                +72.<span className="text-[#B2B2B2]">8</span>
+              </div>
+              <p className="text-[#AFAFAF] text-xs lg:text-sm font-light mt-2">
+                Faster Quote Conversion
+              </p>
+            </div>
+          </div>
 
-    {/* Երկրորդ շարք (ցուցանիշ + ակնարկ) */}
-    <div className="perform-cont flex flex-col lg:flex-row justify-between gap-2">
-      {/* Ցուցանիշ 3 */}
-      <div className="perform-item w-full lg:w-[49.8%] bg-[#F9F9F9] rounded-[16px] p-6 lg:p-[50px_40px] text-center">
-        <div className="count text-[#2F2F2F] text-4xl lg:text-[48px] font-normal relative w-fit mx-auto
-          before:content-[''] before:absolute before:top-[8px] before:-left-[26px] before:!w-3 before:!h-3 before:bg-[url('/landing/perform/percent.svg')] before:bg-no-repeat before:bg-contain
-          after:content-[''] after:absolute after:top-[8px] after:-right-[26px] after:!w-3 after:!h-3 after:bg-[url('/landing/perform/arrow.svg')] after:bg-no-repeat after:bg-contain">
-          +65.<span className="text-[#B2B2B2]">0</span>
-        </div>
-        <p className="text-[#AFAFAF] text-xs lg:text-sm font-light mt-2">
-          Average Conversion Rate
-        </p>
-      </div>
+          {/* Երկրորդ շարք (ցուցանիշ + ակնարկ) */}
+          <div className="perform-cont flex flex-col lg:flex-row justify-between gap-2">
+            {/* Ցուցանիշ 3 */}
+            <div className="perform-item w-full lg:w-[49.8%] bg-[#F9F9F9] rounded-[16px] p-6 lg:p-[50px_40px] text-center">
+              <div className="count text-[#2F2F2F] text-4xl lg:text-[48px] font-normal relative w-fit mx-auto
+                before:content-[''] before:absolute before:top-[8px] before:-left-[26px] before:!w-3 before:!h-3 before:bg-[url('/landing/perform/percent.svg')] before:bg-no-repeat before:bg-contain
+                after:content-[''] after:absolute after:top-[8px] after:-right-[26px] after:!w-3 after:!h-3 after:bg-[url('/landing/perform/arrow.svg')] after:bg-no-repeat after:bg-contain">
+                +65.<span className="text-[#B2B2B2]">0</span>
+              </div>
+              <p className="text-[#AFAFAF] text-xs lg:text-sm font-light mt-2">
+                Average Conversion Rate
+              </p>
+            </div>
 
-      {/* Ակնարկի բլոկ */}
-      <div className="perform-item review-perform-item w-full lg:w-[49.8%] bg-[#F9F9F9] rounded-[16px] p-6 lg:p-[24px_40px] flex flex-col justify-center items-start">
-        <div className="review text-sm lg:text-base text-left font-medium lg:font-medium mb-4 lg:mb-4">
-          Cargo Guard makes cargo insurance fast, transparent, and effortless — we can secure every shipment in minutes, without endless calls or paperwork.
-        </div>
-        <div className="rev-person flex gap-3 lg:gap-[12px] items-center">
-          <img
-            src="/landing/perform/rev.png"
-            alt="Alex Rivera Portrait"
-            className="w-11 lg:w-[44px] h-auto"
-          />
-          <div className="rev-person-info">
-            <h3 className="text-base text-left font-normal">Alex Rivera</h3>
-            <h4 className="text-xs lg:text-[13px] text-[#AFAFAF] font-normal">Portfolio Manager</h4>
+            {/* Ակնարկի բլոկ */}
+            <div className="perform-item review-perform-item w-full lg:w-[49.8%] bg-[#F9F9F9] rounded-[16px] p-6 lg:p-[24px_40px] flex flex-col justify-center items-start">
+              <div className="review text-sm lg:text-base text-left font-medium lg:font-medium mb-4 lg:mb-4">
+                Cargo Guard makes cargo insurance fast, transparent, and effortless — we can secure every shipment in minutes, without endless calls or paperwork.
+              </div>
+              <div className="rev-person flex gap-3 lg:gap-[12px] items-center">
+                <img
+                  src="/landing/perform/rev.png"
+                  alt="Alex Rivera Portrait"
+                  className="w-11 lg:w-[44px] h-auto"
+                />
+                <div className="rev-person-info">
+                  <h3 className="text-base text-left font-normal">Alex Rivera</h3>
+                  <h4 className="text-xs lg:text-[13px] text-[#AFAFAF] font-normal">Portfolio Manager</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Գործողությունների կոչ */}
+          <div className="perform-cta pt-6 lg:pt-7 text-center">
+            <button className="text-white bg-[#2563EB] border-none px-6 py-1.5 lg:px-6 lg:py-1.5 text-sm lg:text-base rounded-lg mb-2 hover:bg-[#043fc1] transition-all duration-250 ease-in cursor-pointer">
+              Join 12,500+ Active Users
+            </button>
+            <p className="text-[#878787] text-xs lg:text-xs">
+              It only takes 60 seconds to set up your account.
+            </p>
           </div>
         </div>
-      </div>
-    </div>
-
-    {/* Գործողությունների կոչ */}
-    <div className="perform-cta pt-6 lg:pt-7 text-center">
-      <button className="text-white bg-[#2563EB] border-none px-6 py-1.5 lg:px-6 lg:py-1.5 text-sm lg:text-base rounded-lg mb-2 hover:bg-[#043fc1] transition-all duration-250 ease-in cursor-pointer">
-        Join 12,500+ Active Users
-      </button>
-      <p className="text-[#878787] text-xs lg:text-xs">
-        It only takes 60 seconds to set up your account.
+      </section>
+      <section className="power bg-white pb-16 lg:pb-[72px]">
+  <div className="container w-[96%] mx-auto lg:w-[88%]">
+    {/* Power Header */}
+    <div className="power-header mb-6 lg:mb-[42px]">
+      <h2 className="power-header-title text-[#4C4C4C] text-[24px] lg:text-[32px] font-normal mb-2 lg:mb-2">
+        The Power Behind the Platform
+      </h2>
+      <p className="power-header-subtitle text-[#4C4C4C] text-sm lg:text-base w-[99%] lg:w-[75%] xl:w-auto">
+        Built on three pillars of logistics assurance: Speed, Transparency, and Control.
       </p>
+    </div>
+    
+    {/* Power Items Container */}
+    <div className="power-cont flex flex-col md:flex-row flex-wrap justify-between lg:justify-between gap-7 lg:gap-0">
+      {/* Item 1: Transparency */}
+      <div className="power-item w-full md:w-[49.5%] lg:w-[32.5%] flex flex-col gap-6 lg:gap-6">
+        <div className="power-item-text w-full bg-gradient-to-r from-[#F9F9F9] to-[#FBFBFF] border border-[rgba(255,255,255,0.489)] rounded-[16px] p-4 lg:p-4">
+          <h4 className="text-[#2F2F2F] text-lg lg:text-[20px] font-normal mb-1 lg:mb-1">Transparency</h4>
+          <p className="text-[#9D9D9D] text-sm lg:text-sm">Smart Compliance Dashboard</p>
+        </div>
+        <img 
+          src="/landing/power/01.png" 
+          alt="Transparency" 
+          className="w-full md:w-[100%] lg:w-[75%] mx-auto block"
+        />
+      </div>
+      
+      {/* Item 2: Control - Special handling */}
+      <div className="power-item w-full md:w-[49.5%] lg:w-[32.5%] flex flex-col gap-6 lg:gap-6 md:flex-col-reverse lg:flex-col">
+        <div className="power-item-text w-full bg-gradient-to-r from-[#F9F9F9] to-[#FBFBFF] border border-[rgba(255,255,255,0.489)] rounded-[16px] p-4 lg:p-4">
+          <h4 className="text-[#2F2F2F] text-lg lg:text-[20px] font-normal mb-1 lg:mb-1">Control</h4>
+          <p className="text-[#9D9D9D] text-sm lg:text-sm">Dynamic Policy Management</p>
+        </div>
+        <img 
+          src="/landing/power/02.png" 
+          alt="Control" 
+          className="w-full md:w-[100%] lg:w-[75%] mx-auto block"
+        />
+      </div>
+      
+      {/* Item 3: Speed */}
+      <div className="power-item w-full md:w-[49.5%] lg:w-[32.5%] flex flex-col gap-6 lg:gap-6">
+        <div className="power-item-text w-full bg-gradient-to-r from-[#F9F9F9] to-[#FBFBFF] border border-[rgba(255,255,255,0.489)] rounded-[16px] p-4 lg:p-4">
+          <h4 className="text-[#2F2F2F] text-lg lg:text-[20px] font-normal mb-1 lg:mb-1">Speed</h4>
+          <p className="text-[#9D9D9D] text-sm lg:text-sm">Instant Claims & Quick Actions</p>
+        </div>
+        <img 
+          src="/landing/power/03.png" 
+          alt="Speed" 
+          className="w-full md:w-[100%] lg:w-[75%] mx-auto block"
+        />
+      </div>
     </div>
   </div>
 </section>
