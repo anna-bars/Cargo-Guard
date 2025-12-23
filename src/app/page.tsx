@@ -328,7 +328,7 @@ export default async function HomePage() {
     </div>
   </div>
       </section>
-      <section className="perform bg-white pb-16 lg:pb-[72px]">
+<section className="perform bg-white pb-16 lg:pb-[72px]">
   <div className="container w-[96%] mx-auto lg:w-[88%]">
     {/* Հատվածի վերնագիր */}
     <div className="perform-header mb-8 lg:mb-[46px]">
@@ -345,8 +345,8 @@ export default async function HomePage() {
       {/* Ցուցանիշ 1 */}
       <div className="perform-item w-full lg:w-[49.8%] bg-[#F9F9F9] rounded-[16px] p-6 lg:p-[50px_40px] text-center">
         <div className="count text-[#2F2F2F] text-4xl lg:text-[48px] font-normal relative w-fit mx-auto 
-          before:content-[''] before:absolute before:top-[17px] before:-left-6 before:w-4 before:h-4 before:bg-[url('/landing/perform/percent.svg')] before:bg-no-repeat before:bg-contain
-          after:content-[''] after:absolute after:top-[17px] after:-right-6 after:w-4 after:h-4 after:bg-[url('/landing/perform/arrow.svg')] after:bg-no-repeat after:bg-contain">
+          before:content-[''] before:absolute before:top-[8px] before:-left-[20px] before:!w-3 before:!h-3 before:bg-[url('/landing/perform/percent.svg')] before:bg-no-repeat before:bg-contain
+          after:content-[''] after:absolute after:top-[8px] after:-right-[20px] after:!w-3 after:!h-3 after:bg-[url('/landing/perform/arrow.svg')] after:bg-no-repeat after:bg-contain">
           +55.<span className="text-[#B2B2B2]">3</span>
         </div>
         <p className="text-[#AFAFAF] text-xs lg:text-sm font-light mt-2">
@@ -357,8 +357,8 @@ export default async function HomePage() {
       {/* Ցուցանիշ 2 */}
       <div className="perform-item w-full lg:w-[49.8%] bg-[#F9F9F9] rounded-[16px] p-6 lg:p-[50px_40px] text-center mt-2 lg:mt-0">
         <div className="count text-[#2F2F2F] text-4xl lg:text-[48px] font-normal relative w-fit mx-auto
-          before:content-[''] before:absolute before:top-[17px] before:-left-6 before:w-4 before:h-4 before:bg-[url('/landing/perform/percent.svg')] before:bg-no-repeat before:bg-contain
-          after:content-[''] after:absolute after:top-[17px] after:-right-6 after:w-4 after:h-4 after:bg-[url('/landing/perform/arrow.svg')] after:bg-no-repeat after:bg-contain">
+          before:content-[''] before:absolute before:top-[8px] before:-left-[26px] before:!w-3 before:!h-3 before:bg-[url('/landing/perform/percent.svg')] before:bg-no-repeat before:bg-contain
+          after:content-[''] after:absolute after:top-[8px] after:-right-[26px] after:!w-3 after:!h-3 after:bg-[url('/landing/perform/arrow.svg')] after:bg-no-repeat after:bg-contain">
           +72.<span className="text-[#B2B2B2]">8</span>
         </div>
         <p className="text-[#AFAFAF] text-xs lg:text-sm font-light mt-2">
@@ -372,8 +372,8 @@ export default async function HomePage() {
       {/* Ցուցանիշ 3 */}
       <div className="perform-item w-full lg:w-[49.8%] bg-[#F9F9F9] rounded-[16px] p-6 lg:p-[50px_40px] text-center">
         <div className="count text-[#2F2F2F] text-4xl lg:text-[48px] font-normal relative w-fit mx-auto
-          before:content-[''] before:absolute before:top-[17px] before:-left-6 before:w-4 before:h-4 before:bg-[url('/landing/perform/percent.svg')] before:bg-no-repeat before:bg-contain
-          after:content-[''] after:absolute after:top-[17px] after:-right-6 after:w-4 after:h-4 after:bg-[url('/landing/perform/arrow.svg')] after:bg-no-repeat after:bg-contain">
+          before:content-[''] before:absolute before:top-[8px] before:-left-[26px] before:!w-3 before:!h-3 before:bg-[url('/landing/perform/percent.svg')] before:bg-no-repeat before:bg-contain
+          after:content-[''] after:absolute after:top-[8px] after:-right-[26px] after:!w-3 after:!h-3 after:bg-[url('/landing/perform/arrow.svg')] after:bg-no-repeat after:bg-contain">
           +65.<span className="text-[#B2B2B2]">0</span>
         </div>
         <p className="text-[#AFAFAF] text-xs lg:text-sm font-light mt-2">
