@@ -367,9 +367,7 @@ export default function DashboardPage() {
               <h3 className="text-lg font-normal">Recent Activity</h3>
               <div className="flex gap-2">
                 {[1, 2, 3, 4].map((num) => (
-                  <button key={num} className="w-[44px] h-[44px] p-0 border-none bg-transparent">
-                    <img src={`/btn/0${num}.svg`} alt="" className="w-[132%] h-[132%]" />
-                  </button>
+                  <img key={num} src={`dashboard/btn/0${num}.svg`} alt="" className="w-[44px] h-[44px] p-0 border-none"  />
                 ))}
               </div>
             </div>
@@ -649,7 +647,7 @@ export default function DashboardPage() {
               </div>
               
               {/* Mobile conversion rate */}
-              <div className="xl:hidden text-right mt-4">
+              <div className="conv-rate xl:hidden text-right mt-4">
                 <div className="text-[13px] text-[#C8C8C8]">Conversion Rate</div>
                 <div className="text-[26px] text-black font-normal">65</div>
               </div>
@@ -962,7 +960,7 @@ export default function DashboardPage() {
         }
 
         @media screen and (max-width: 1024px) {
-            .welcome-widget, .action-center {
+            .welcome-widget, .action-center, .conv-rate {
                 display: none;
             }
             .rate-mob-hid {
@@ -1014,11 +1012,13 @@ export default function DashboardPage() {
                 background-color: rgba(250, 252, 255, 0.8);
                 border-radius: 16px;
                 flex-wrap: wrap;
-                gap: 22px;
+                gap: 12px;
                 justify-content: space-between;
                 padding: 16px;
             }
-            
+            .table-row button {
+              width: 100%;
+            }
             .logo-text {
                 display: none;
             }
@@ -1111,6 +1111,12 @@ export default function DashboardPage() {
             width: 28px;
             margin-left: 6px;
         }
+
+
+
+            .btn-primary {
+    width: 100%;
+}
       `}</style>
     </div>
   )
