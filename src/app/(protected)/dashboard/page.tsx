@@ -243,14 +243,14 @@ export default function DashboardPage() {
         </div>
 
         {/* Main Content Grid - Exact same as CSS */}
-        <main className="grid grid-cols-1 xl:grid-cols-[75%_25%] gap-4 items-stretch">
+        <main className="grid grid-cols-1 xl:grid-cols-[75%_25%] gap-4 items-stretch main-content">
           {/* Left Column - 75% */}
           <div className="flex flex-col gap-4">
             {/* Performance Overview */}
-            <section className="bg-[#fafcff]/80 rounded-2xl p-6 h-auto">
-              <div className="flex justify-between items-start mb-7">
+            <section className="bg-[#fafcff]/80 rounded-2xl p-6 h-auto performance-section">
+              <div className="flex justify-between items-start mb-7 section-header">
                 <div>
-                  <h2 className="font-montserrat text-[20px] font-medium text-black">
+                  <h2 className="font-montserrat text-[20px] font-medium text-black section-title">
                     Performance Overview
                   </h2>
                 </div>
@@ -267,11 +267,11 @@ export default function DashboardPage() {
               </div>
               
               {/* Metrics Grid - Exact spacing */}
-              <div className="flex justify-around flex-wrap xl:flex-nowrap gap-8 xl:gap-2">
+              <div className="flex justify-around flex-wrap xl:flex-nowrap gap-8 xl:gap-2 metrics-grid">
                 {/* Total Insured Amount */}
-                <div className="w-[43%] xl:w-[12%]">
+                <div className="w-[43%] xl:w-[12%] metric-card-item">
                   <div className="relative">
-                    <div className="font-montserrat text-[46px] xl:text-[46px] font-normal text-black flex items-baseline relative">
+                    <div className="font-montserrat text-[46px] xl:text-[46px] font-normal text-black flex items-baseline relative metric-value">
                       <span className="text-black tracking-[1.28px]">84.</span>
                       <span className="text-[#c7c7c7] tracking-[1.28px]">5k</span>
                       <span className="absolute -left-5 top-1.5 text-[12px]">$</span>
@@ -283,9 +283,9 @@ export default function DashboardPage() {
                 </div>
                 
                 {/* Active Policies */}
-                <div className="w-[43%] xl:w-[12%]">
+                <div className="w-[43%] xl:w-[12%] metric-card-item">
                   <div className="relative">
-                    <div className="font-montserrat text-[46px] xl:text-[46px] font-normal text-black flex items-baseline relative">
+                    <div className="font-montserrat text-[46px] xl:text-[46px] font-normal text-black flex items-baseline relative metric-value2">
                       <span className="text-black tracking-[1.28px]">8.</span>
                       <span className="text-[#c7c7c7] tracking-[1.28px]">47</span>
                       <span className="absolute -left-5 top-1.5 text-[12px]">%</span>
@@ -297,10 +297,15 @@ export default function DashboardPage() {
                 </div>
                 
                 {/* Quotes Awaiting Approval */}
-                <div className="w-[43%] xl:w-[12%]">
-                  <div className="font-montserrat text-[46px] xl:text-[46px] font-normal text-black flex items-baseline">
+                <div className="w-[43%] xl:w-[12%] metric-card-item">
+                  <div className="font-montserrat text-[46px] xl:text-[46px] font-normal text-black flex items-baseline metric-value">
                     <span className="text-black tracking-[1.28px]">3.</span>
-                    <img className="w-7 ml-1.5" src="/arrow.svg" alt="" />
+                    <img 
+                      className="w-7 ml-1.5 metric-arrow" 
+                      src="/arrow.svg" 
+                      alt="Arrow" 
+                      style={{ width: '28px', marginLeft: '6px' }}
+                    />
                   </div>
                   <p className="font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
                     Quotes Awaiting Approval
@@ -308,10 +313,15 @@ export default function DashboardPage() {
                 </div>
                 
                 {/* Contracts Due to Expire */}
-                <div className="w-[43%] xl:w-[12%]">
-                  <div className="font-montserrat text-[46px] xl:text-[46px] font-normal text-black flex items-baseline">
+                <div className="w-[43%] xl:w-[12%] metric-card-item">
+                  <div className="font-montserrat text-[46px] xl:text-[46px] font-normal text-black flex items-baseline metric-value">
                     <span className="text-black tracking-[1.28px]">2.</span>
-                    <img className="w-7 ml-1.5" src="/arrow.svg" alt="" />
+                    <img 
+                      className="w-7 ml-1.5 metric-arrow" 
+                      src="/arrow.svg" 
+                      alt="Arrow"
+                      style={{ width: '28px', marginLeft: '6px' }}
+                    />
                   </div>
                   <p className="font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
                     Contracts Due to Expire
@@ -319,10 +329,15 @@ export default function DashboardPage() {
                 </div>
                 
                 {/* Required Document Uploads */}
-                <div className="w-[43%] xl:w-[12%]">
-                  <div className="font-montserrat text-[46px] xl:text-[46px] font-normal text-black flex items-baseline">
+                <div className="w-[43%] xl:w-[12%] metric-card-item">
+                  <div className="font-montserrat text-[46px] xl:text-[46px] font-normal text-black flex items-baseline metric-value">
                     <span className="text-black tracking-[1.28px]">1.</span>
-                    <img className="w-7 ml-1.5" src="/arrow.svg" alt="" />
+                    <img 
+                      className="w-7 ml-1.5 metric-arrow" 
+                      src="/arrow.svg" 
+                      alt="Arrow"
+                      style={{ width: '28px', marginLeft: '6px' }}
+                    />
                   </div>
                   <p className="font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
                     Required Document Uploads
@@ -332,7 +347,7 @@ export default function DashboardPage() {
             </section>
 
             {/* Mobile Activity Header */}
-            <div className="xl:hidden flex items-center justify-between">
+            <div className="xl:hidden flex items-center justify-between activity-mobile-header activity-section-mob-hd">
               <h3 className="text-lg font-normal">Recent Activity</h3>
               <div className="flex gap-2">
                 {[1, 2, 3, 4].map((num) => (
@@ -344,9 +359,9 @@ export default function DashboardPage() {
             </div>
 
             {/* Recent Activity Table */}
-            <section className="bg-[#fafcff]/80 rounded-2xl p-6 xl:bg-[#fafcff]/80 xl:p-6">
+            <section className="activity-section bg-[#fafcff]/80 rounded-2xl p-6 xl:p-6">
               {/* Desktop Filters */}
-              <div className="hidden xl:flex justify-between items-center mb-6">
+              <div className="hidden xl:flex justify-between items-center mb-6 activity-header activity-filters">
                 <div className="flex items-center gap-1.5">
                   <img 
                     src="https://c.animaapp.com/mjiggi0jSqvoj5/img/filter-1.png" 
@@ -358,7 +373,7 @@ export default function DashboardPage() {
                   </span>
                 </div>
                 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 showin-result-ittle-info">
                   <div className="w-36 h-[38px] border-b border-[#c7c7c7]/51 flex items-center justify-between px-3 py-2">
                     <input 
                       type="text" 
@@ -390,7 +405,7 @@ export default function DashboardPage() {
               </div>
               
               {/* Desktop Table Header */}
-              <div className="hidden xl:grid grid-cols-[120px_120px_1fr_200px_150px_130px] gap-2 pb-2 border-b border-gray-200 mb-2">
+              <div className="hidden xl:grid grid-cols-[120px_120px_1fr_200px_150px_130px] gap-2 pb-2 border-b border-gray-200 mb-2 table-header">
                 {['Type', 'ID', 'Cargo / Value', 'Status / Due Date', 'Last Update', 'Action'].map((header, idx) => (
                   <div key={idx} className="flex items-center gap-2 font-poppins text-sm font-normal text-[#606068]">
                     <span>{header}</span>
@@ -406,7 +421,7 @@ export default function DashboardPage() {
               </div>
 
               {/* Table Rows */}
-              <div className="space-y-2">
+              <div className="space-y-2 activity-table">
                 {[
                   {
                     type: 'Quote',
@@ -449,19 +464,19 @@ export default function DashboardPage() {
                     button: { text: 'View Details', variant: 'secondary' }
                   }
                 ].map((row, idx) => (
-                  <div key={idx} className="xl:grid xl:grid-cols-[120px_120px_1fr_200px_150px_130px] gap-2 p-3 xl:p-3 bg-[#f8fafd] xl:bg-[#f8fafd] rounded-lg xl:rounded-lg flex flex-wrap items-center">
+                  <div key={idx} className="xl:grid xl:grid-cols-[120px_120px_1fr_200px_150px_130px] gap-2 p-3 xl:p-3 bg-[#f8fafd] xl:bg-[#f8fafd] rounded-lg xl:rounded-lg flex flex-wrap items-center table-row">
                     {/* Mobile/Desktop Layout */}
-                    <div className="w-[45%] xl:w-auto font-poppins text-sm text-black truncate">{row.type}</div>
-                    <div className="w-[45%] xl:w-auto font-poppins text-sm text-[#2563eb] underline truncate">{row.id}</div>
-                    <div className="w-[45%] xl:w-auto font-poppins text-sm text-black truncate mt-2 xl:mt-0">{row.cargo}</div>
-                    <div className="w-[45%] xl:w-auto mt-2 xl:mt-0">
+                    <div className="w-[45%] xl:w-auto font-poppins text-sm text-black truncate row-cell">{row.type}</div>
+                    <div className="w-[45%] xl:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link">{row.id}</div>
+                    <div className="w-[45%] xl:w-auto font-poppins text-sm text-black truncate mt-2 xl:mt-0 row-cell">{row.cargo}</div>
+                    <div className="w-[45%] xl:w-auto mt-2 xl:mt-0 row-cell">
                       <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${row.status.dot}`}></span>
                         {row.status.text}
                       </span>
                     </div>
-                    <div className="w-[45%] xl:w-auto font-poppins text-sm text-black truncate mt-2 xl:mt-0">{row.date}</div>
-                    <div className="w-full xl:w-auto mt-2 xl:mt-0">
+                    <div className="w-[45%] xl:w-auto font-poppins text-sm text-black truncate mt-2 xl:mt-0 row-cell">{row.date}</div>
+                    <div className="w-full xl:w-auto mt-2 xl:mt-0 row-cell">
                       <button className={`h-9 px-4 rounded-lg font-poppins text-sm font-normal transition-colors w-full xl:w-[130px] ${
                         row.button.variant === 'primary' 
                           ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]' 
@@ -477,24 +492,24 @@ export default function DashboardPage() {
           </div>
 
           {/* Right Column - 25% with exact 400px on desktop */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 right">
             {/* Welcome Widget */}
-            <div className="relative h-[449px] rounded-2xl overflow-hidden w-full">
+            <div className="relative h-[449px] rounded-2xl overflow-hidden w-full welcome-widget">
               <img 
                 src="https://c.animaapp.com/mjiggi0jSqvoj5/img/frame-76.png" 
                 alt="Background" 
                 className="absolute inset-0 w-full h-full object-cover"
               />
-              <div className="relative z-10 p-6 h-full flex flex-col">
-                <h2 className="font-montserrat text-[20px] font-normal text-white mb-3">
+              <div className="relative z-10 p-6 h-full flex flex-col action-content">
+                <h2 className="font-montserrat text-[20px] font-normal text-white mb-3 welcome-title">
                   Welcome back, Lucas!
                 </h2>
-                <p className="font-montserrat text-[14px] font-normal text-white mb-auto max-w-[224px]">
+                <p className="font-montserrat text-[14px] font-normal text-white mb-auto max-w-[224px] welcome-subtitle action-subtitle">
                   Everything's under control — let's make this day productive.
                 </p>
                 
-                <div className="flex items-end justify-between gap-[82px]">
-                  <h3 className="font-montserrat text-[32px] font-medium text-white leading-[38px] tracking-[0.64px] max-w-[224px]">
+                <div className="flex items-end justify-between gap-[82px] action-buttons">
+                  <h3 className="font-montserrat text-[32px] font-medium text-white leading-[38px] tracking-[0.64px] max-w-[224px] cta-title">
                     Get Your New Quote Instantly
                   </h3>
                   <img 
@@ -507,24 +522,28 @@ export default function DashboardPage() {
             </div>
 
             {/* Action Center */}
-            <div className="bg-[#fafcff]/80 rounded-2xl p-6 relative overflow-hidden h-[203px] w-full">
-              <img 
-                src="https://c.animaapp.com/mjiggi0jSqvoj5/img/vector-148.svg" 
-                alt="Background" 
-                className="absolute -top-10 -left-[274px] w-[796px] h-[270px]"
-              />
-              <div className="relative z-10 h-full flex">
+            <div className="action-center bg-[#fafcff]/80 rounded-2xl p-6 relative overflow-hidden h-[203px] w-full">
+              <div 
+                className="absolute inset-0 w-full h-full action-bg"
+                style={{
+                  backgroundImage: 'url(https://c.animaapp.com/mjiggi0jSqvoj5/img/vector-148.svg)',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat'
+                }}
+              ></div>
+              <div className="relative z-10 h-full flex action-content">
                 <div className="flex flex-col justify-between h-full">
                   <div>
-                    <h3 className="font-montserrat text-[18px] font-medium text-black mb-1">
+                    <h3 className="font-montserrat text-[18px] font-medium text-black mb-1 action-title">
                       Action Center
                     </h3>
-                    <p className="font-montserrat text-[12px] font-normal text-[#c7c7c7] max-w-[159px]">
+                    <p className="font-montserrat text-[12px] font-normal text-[#c7c7c7] max-w-[159px] action-subtitle">
                       Your latest quotes and policies. Act now on pending items to proceed.
                     </p>
                   </div>
                   
-                  <div className="flex flex-col gap-1.5">
+                  <div className="flex flex-col gap-1.5 action-buttons">
                     <button className="flex items-center gap-2 px-3 py-2.5 bg-white/20 border border-white/30 rounded-lg backdrop-blur font-montserrat text-[16px] font-normal text-[#1e293b] hover:bg-white/30 transition-colors w-full">
                       <img 
                         src="https://c.animaapp.com/mjiggi0jSqvoj5/img/group-118-1.svg" 
@@ -557,9 +576,9 @@ export default function DashboardPage() {
             </div>
 
             {/* Quote Conversion Rate */}
-            <div className="bg-[#fafcff]/80 rounded-2xl p-6 h-auto min-h-[203px] w-full">
+            <div className="bg-[#fafcff]/80 rounded-2xl p-6 h-auto min-h-[203px] w-full quote-conversion performance-section">
               <div className="mb-4">
-                <h3 className="font-montserrat text-[18px] font-medium text-black">
+                <h3 className="font-montserrat text-[18px] font-medium text-black action-title">
                   Quote Conversion Rate
                 </h3>
                 <p className="font-montserrat text-[12px] font-normal text-[#c7c7c7]">
@@ -623,176 +642,456 @@ export default function DashboardPage() {
         </main>
       </div>
 
-      {/* Responsive CSS for 1280px and below */}
       <style jsx>{`
+        /* Hamburger Menu Styles */
+        .hamburger-menu {
+            display: none;
+        }
+
+        .hamburger-btn {
+            width: 44px;
+            height: 44px;
+            background-color: #f7f7f7;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        .hamburger-line {
+            width: 20px;
+            height: 2px;
+            background-color: #000000;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-btn.active .hamburger-line:nth-child(1) {
+            transform: translateY(6px) rotate(45deg);
+        }
+
+        .hamburger-btn.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-btn.active .hamburger-line:nth-child(3) {
+            transform: translateY(-6px) rotate(-45deg);
+        }
+
+        /* Mobile Navigation Overlay */
+        .mobile-nav-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-nav-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .mobile-nav-container {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100%;
+            background-color: #ffffff;
+            padding: 20px;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .mobile-nav-overlay.active .mobile-nav-container {
+            transform: translateX(0);
+        }
+
+        .mobile-nav-header {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 30px;
+        }
+
+        .mobile-close-btn {
+            width: 44px;
+            height: 44px;
+            background-color: #f7f7f7;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 24px;
+            color: #000000;
+        }
+
+        .mobile-nav-search {
+            width: 100%;
+            height: 44px;
+            background-color: #f7f7f7;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            margin-bottom: 20px;
+        }
+
+        .mobile-nav-search input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: #000000;
+            outline: none;
+        }
+
+        .mobile-nav-search img {
+            width: 18px;
+            height: 18px;
+        }
+
+        .mobile-nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .mobile-nav-link {
+            padding: 12px 16px;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            color: #000000;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        .mobile-nav-link.active {
+            background-color: #f7f7f7;
+        }
+
+        .mobile-nav-link:hover {
+            background-color: #f0f0f0;
+        }
+
+        .mobile-nav-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .mobile-action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background-color: #f7f7f7;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: #000000;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .mobile-action-btn:hover {
+            background-color: #e9e9e9;
+        }
+
+        .mobile-action-btn img {
+            width: 20px;
+            height: 20px;
+        }
+
+        @media screen and (max-width: 1336px) {
+            .activity-header {
+                display: block;
+            }
+            
+            .activity-filters {
+                justify-content: flex-end;
+            }
+            
+            .action-content {
+                display: block;
+                height: 100%;
+            }
+            
+            .action-subtitle {
+                max-width: 100%;
+            }
+            
+            .action-center {
+                height: 254px;
+            }
+            
+            .action-bg {
+                top: 0;
+            }
+
+            .action-buttons {
+                max-width: 100%;
+            }
+            
+            .welcome-widget {
+                height: 352px;
+            }
+            
+            .cta-title {
+                font-size: 26px;
+                font-weight: 500;
+                line-height: 33px;
+                letter-spacing: 0.64px;
+                max-width: 224px;
+            }
+        }
+
         @media screen and (max-width: 1280px) {
-          .main-content {
-            display: flex !important;
-            flex-direction: column-reverse !important;
-          }
-          
-          .right {
-            display: flex !important;
-            flex-direction: row !important;
-            width: 100% !important;
-            gap: 16px;
-          }
-          
-          .welcome-widget {
-            height: 260px !important;
-            width: 36% !important;
-          }
-          
-          .action-center {
-            height: auto !important;
-            width: 40% !important;
-          }
-          
-          .quote-conversion {
-            width: 36% !important;
-          }
-          
-          .navigation {
-            display: none !important;
-          }
-          
-          .activity-mobile-header {
-            display: flex !important;
-            margin-bottom: 16px;
-          }
-          
-          .activity-section-mob-hd {
-            display: flex !important;
-          }
-          
-          .showin-result-ittle-info {
-            display: none !important;
-          }
-          
-          .activity-table {
-            margin-top: -12px !important;
-          }
+            .main-content {
+                display: flex;
+                flex-direction: column-reverse;
+            }
+            
+            .right {
+                display: flex;
+                flex-direction: row;
+                width: 100%;
+                gap: 16px;
+            }
+            
+            .action-center {
+                height: 100%;
+                width: 40%;
+            }
+            
+            .action-bg {
+                width: 840px;
+                height: 328px !important;
+            }
+
+            .welcome-title {
+                font-size: 18px;
+                margin-bottom: 6px;
+            }
+            
+            .welcome-subtitle {
+                max-width: 100%;
+                font-size: 12px;
+            }
+            
+            .cta-title {
+                font-size: 22px;
+                line-height: 28px;
+            }
+
+            .quote-conversion.performance-section {
+                width: 36%;
+                position: relative;
+                justify-content: space-between;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .navigation {
+                display: none;
+            }
+            
+            .activity-mobile-header {
+                display: flex;
+                margin-bottom: 16px;
+            }
+            
+            .activity-section-mob-hd {
+                display: flex;
+            }
+            
+            .welcome-widget {
+                height: 260px;
+                width: 36%;
+            }
+            
+            .showin-result-ittle-info {
+                display: none;
+            }
+            
+            .activity-table {
+                margin-top: -12px;
+            }
+            
+            .hamburger-menu {
+                display: block;
+            }
+            
+            /* Hide desktop navigation completely */
+            .navigation {
+                display: none;
+            }
         }
-        
+
         @media screen and (max-width: 1024px) {
-          .welcome-widget,
-          .action-center {
-            display: none !important;
-          }
-          
-          .quote-conversion {
-            width: 100% !important;
-            min-height: 195px !important;
-          }
-          
-          .action-title, .section-title {
-            font-size: 16px !important;
-          }
-          
-          .metrics-grid {
-            display: flex !important;
-            flex-wrap: wrap !important;
-            gap: 35px !important;
-            padding-left: 20px !important;
-          }
-          
-          .metric-card-item {
-            width: 43% !important;
-          }
-          
-          .section-header {
-            align-items: center !important;
-          }
-          
-          .activity-header {
-            display: none !important;
-          }
-          
-          .table-header {
-            display: none !important;
-          }
-          
-          .activity-table {
-            margin-top: 0px !important;
-          }
-          
-          .table-row {
-            min-width: 100% !important;
-            display: flex !important;
-            background-color: rgba(250, 252, 255, 0.8) !important;
-            border-radius: 16px !important;
-            flex-wrap: wrap !important;
-            gap: 22px !important;
-            justify-content: space-between !important;
-            padding: 16px !important;
-          }
-          
-          .logo-text {
-            display: none !important;
-          }
-          
-          .id-link {
-            color: #2563eb !important;
-          }
-          
-          .activity-section {
-            padding: 0 !important;
-            background-color: transparent !important;
-            margin-top: -12px !important;
-          }
-          
-          .row-cell {
-            width: 45.5% !important;
-            gap: 8px !important;
-          }
-          
-          .container {
-            max-width: 94% !important;
-            display: block !important;
-          }
-          
-          .header {
-            margin-bottom: 16px !important;
-          }
-          
-          .user-avatar img {
-            width: 44px !important;
-            height: 44px !important;
-          }
+            .welcome-widget, .action-center {
+                display: none;
+            }
+            
+            .quote-conversion.performance-section {
+                width: 100%;
+                min-height: 195px;
+            }
+            
+            .action-title, .section-title {
+                font-size: 16px;
+            }
+            
+            .action-subtitle {
+                margin-bottom: 0px;
+            }
+            
+            .metrics-grid {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 35px;
+                padding-left: 20px;
+            }
+            
+            .metric-card-item {
+                width: 43%;
+            }
+            
+            .section-header {
+                align-items: center;
+            }
+            
+            .activity-header {
+                display: none;
+            }
+            
+            .table-header {
+                display: none;
+            }
+            
+            .activity-table {
+                margin-top: 0px;
+            }
+            
+            .table-row {
+                min-width: 100%;
+                display: flex;
+                background-color: rgba(250, 252, 255, 0.8);
+                border-radius: 16px;
+                flex-wrap: wrap;
+                gap: 22px;
+                justify-content: space-between;
+                padding: 16px;
+            }
+            
+            .logo-text {
+                display: none;
+            }
+            
+            .id-link {
+                color: #2563eb !important;
+            }
+            
+            .activity-section {
+                padding: 0;
+                background-color: transparent;
+                margin-top: -12px;
+            }
+            
+            .row-cell {
+                font-family: 'Poppins', sans-serif;
+                font-size: 14px;
+                color: #000000;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                width: 45.5%;
+                gap: 8px;
+            }
+            
+            .container {
+                max-width: 94% !important;
+                display: block;
+            }
+            
+            .header {
+                margin-bottom: 16px;
+            }
+            
+            .user-avatar img {
+                width: 44px;
+                height: 44px;
+            }
 
-          .notification-wrapper {
-            width: 44px !important;
-            height: 44px !important;
-          }
+            .notification-wrapper {
+                width: 44px;
+                height: 44px;
+            }
 
-          .notification-icon img {
-            width: 18px !important;
-          }
+            .notification-icon img {
+                width: 18px;
+            }
 
-          .notification-badge {
-            top: 12px !important;
-            right: 13px !important;
-            width: 6px !important;
-            height: 6px !important;
-          }
+            .notification-badge {
+                top: 12px;
+                right: 13px;
+                width: 6px;
+                height: 6px;
+            }
         }
-        
-        @media screen and (max-width: 768px) {
-          .metric-value, .metric-value2 {
-            font-size: 32px !important;
-          }
 
-          .metrics-grid {
-            gap: 22px !important;
-          }
-          
-          .performance-section {
-            padding: 16px !important;
-          }
-          
-          .action-title, .section-title {
-            font-size: 14px !important;
-          }
+        @media screen and (max-width: 768px) {
+            .metric-value, .metric-value2 {
+                font-size: 32px;
+            }
+
+            .metrics-grid {
+                gap: 22px;
+            }
+            
+            .performance-section {
+                padding: 16px;
+            }
+            
+            .action-title, .section-title {
+                font-size: 14px;
+            }
+            
+            .mobile-nav-container {
+                width: 100%;
+            }
+            
+            .hamburger-btn {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        /* Prevent scrolling when menu is open */
+        body.menu-open {
+            overflow: hidden;
+        }
+
+        .metric-arrow {
+            width: 28px;
+            margin-left: 6px;
         }
       `}</style>
     </div>
