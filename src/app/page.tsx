@@ -466,9 +466,9 @@ export default async function HomePage() {
     </div>
   </div>
       </section>
-      <section className="cta-sect">
+      <section className="cta-sect bg-white">
   <div className="container w-[96%] mx-auto lg:w-[88%]">
-    <div className="cta mb-16 lg:mb-[72px] py-12 lg:py-[72px] rounded-[16px] bg-[url('/landing/cta/back-img.png')] bg-cover text-center">
+    <div className="cta py-12 lg:py-[72px] rounded-[16px] bg-[url('/landing/cta/back-img.png')] bg-cover text-center">
       <div className="container w-full mx-auto">
         <div className="cta-header flex flex-col gap-3 lg:gap-3">
           <p className="mean-text uppercase text-white text-sm lg:text-base font-medium">
@@ -498,7 +498,145 @@ export default async function HomePage() {
       </div>
     </div>
   </div>
-</section>
+      </section>
+      <footer className="bg-white pt-16 pb-16 lg:pt-[72px] lg:pb-[72px]">
+  <div className="container w-[96%] mx-auto lg:w-[88%]">
+    {/* Footer Header */}
+    <div className="footer-header-info flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 lg:gap-0 mb-11 lg:mb-[72px]">
+      <div className="cont1 w-full lg:w-[26%]">
+        <img 
+          src="/landing/footer/logo-icon.png" 
+          alt="Cargo Guard Logo" 
+          width={44}
+          height={44}
+          className="mb-1"
+        />
+        <p className="text-[#123148] text-sm lg:text-base mt-3 lg:mt-3">
+          Cargo Guard is the first fully digital cargo insurance platform,
+          helping logistics partners secure their global freight instantly and transparently.
+        </p>
+      </div>
+      <button className="bg-[#2563EB] text-white text-sm lg:text-base py-1.5 lg:py-1.5 px-6 lg:px-6 rounded-lg border-none hover:bg-[#043fc1] transition-all duration-250 ease-in cursor-pointer w-full lg:w-auto">
+        Sign Up For Free
+      </button>
+    </div>
+    
+    {/* Footer Navigation */}
+    <div className="footer-nav-container flex flex-col lg:flex-row justify-between gap-8 lg:gap-0 mb-8 lg:mb-0">
+      {/* PRODUCT */}
+      <div className="footer-nav-item w-fit flex flex-col gap-4 lg:gap-4">
+        <h4 className="footer-nav-item-title text-[#535353] text-base lg:text-[18px] font-medium">
+          PRODUCT
+        </h4>
+        <div className="footer-nav-cont flex flex-col gap-3 lg:gap-3">
+          <a href="#" className="footer-nav-item-nav text-[#747474] text-sm lg:text-base no-underline hover:text-[#2563EB] transition-colors duration-250">
+            Pricing
+          </a>
+          <a href="#" className="footer-nav-item-nav text-[#747474] text-sm lg:text-base no-underline hover:text-[#2563EB] transition-colors duration-250">
+            Demo Request
+          </a>
+          <a href="#" className="footer-nav-item-nav text-[#747474] text-sm lg:text-base no-underline hover:text-[#2563EB] transition-colors duration-250">
+            Our Roadmap
+          </a>
+          <a href="#" className="footer-nav-item-nav text-[#747474] text-sm lg:text-base no-underline hover:text-[#2563EB] transition-colors duration-250">
+            Alternatives
+          </a>
+        </div>
+      </div>
+      
+      {/* FEATURES */}
+      <div className="footer-nav-item w-fit flex flex-col gap-4 lg:gap-4">
+        <h4 className="footer-nav-item-title text-[#535353] text-base lg:text-[18px] font-medium">
+          FEATURES
+        </h4>
+        <div className="footer-nav-cont flex flex-col gap-3 lg:gap-3">
+          <a href="#" className="footer-nav-item-nav text-[#747474] text-sm lg:text-base no-underline hover:text-[#2563EB] transition-colors duration-250">
+            Quotes
+          </a>
+          <a href="#" className="footer-nav-item-nav text-[#747474] text-sm lg:text-base no-underline hover:text-[#2563EB] transition-colors duration-250">
+            Policies
+          </a>
+          <a href="#" className="footer-nav-item-nav text-[#747474] text-sm lg:text-base no-underline hover:text-[#2563EB] transition-colors duration-250">
+            Claims
+          </a>
+          <a href="#" className="footer-nav-item-nav text-[#747474] text-sm lg:text-base no-underline hover:text-[#2563EB] transition-colors duration-250">
+            Compliance
+          </a>
+        </div>
+      </div>
+      
+      {/* RESOURCES */}
+      <div className="footer-nav-item w-fit flex flex-col gap-4 lg:gap-4">
+        <h4 className="footer-nav-item-title text-[#535353] text-base lg:text-[18px] font-medium">
+          RESOURCES
+        </h4>
+        <div className="footer-nav-cont flex flex-col gap-3 lg:gap-3">
+          <a href="#" className="footer-nav-item-nav text-[#747474] text-sm lg:text-base no-underline hover:text-[#2563EB] transition-colors duration-250">
+            Blog / News
+          </a>
+          <a href="#" className="footer-nav-item-nav text-[#747474] text-sm lg:text-base no-underline hover:text-[#2563EB] transition-colors duration-250">
+            Help Center / FAQ
+          </a>
+          <a href="#" className="footer-nav-item-nav text-[#747474] text-sm lg:text-base no-underline hover:text-[#2563EB] transition-colors duration-250">
+            Glossary
+          </a>
+          <a href="#" className="footer-nav-item-nav text-[#747474] text-sm lg:text-base no-underline hover:text-[#2563EB] transition-colors duration-250">
+            Contact Sales
+          </a>
+        </div>
+      </div>
+      
+      {/* MY ACCOUNT */}
+      <div className="footer-nav-item w-fit flex flex-col gap-4 lg:gap-4">
+        <h4 className="footer-nav-item-title text-[#535353] text-base lg:text-[18px] font-medium">
+          MY ACCOUNT
+        </h4>
+        <div className="footer-nav-cont flex flex-col gap-3 lg:gap-3">
+          <a href="#" className="footer-nav-item-nav text-[#747474] text-sm lg:text-base no-underline hover:text-[#2563EB] transition-colors duration-250">
+            Profile Settings
+          </a>
+          <a href="#" className="footer-nav-item-nav text-[#747474] text-sm lg:text-base no-underline hover:text-[#2563EB] transition-colors duration-250">
+            Billing & Payments
+          </a>
+          <a href="#" className="footer-nav-item-nav text-[#747474] text-sm lg:text-base no-underline hover:text-[#2563EB] transition-colors duration-250">
+            User Management
+          </a>
+          <a href="#" className="footer-nav-item-nav text-[#747474] text-sm lg:text-base no-underline hover:text-[#2563EB] transition-colors duration-250">
+            Security & Login
+          </a>
+        </div>
+      </div>
+      
+      {/* POLICIES */}
+      <div className="footer-nav-item w-fit flex flex-col gap-4 lg:gap-4">
+        <h4 className="footer-nav-item-title text-[#535353] text-base lg:text-[18px] font-medium">
+          POLICIES
+        </h4>
+        <div className="footer-nav-cont flex flex-col gap-3 lg:gap-3">
+          <a href="#" className="footer-nav-item-nav text-[#747474] text-sm lg:text-base no-underline hover:text-[#2563EB] transition-colors duration-250">
+            Privacy Policy
+          </a>
+          <a href="#" className="footer-nav-item-nav text-[#747474] text-sm lg:text-base no-underline hover:text-[#2563EB] transition-colors duration-250">
+            Terms of Service
+          </a>
+          <a href="#" className="footer-nav-item-nav text-[#747474] text-sm lg:text-base no-underline hover:text-[#2563EB] transition-colors duration-250">
+            Legal Notices
+          </a>
+          <a href="#" className="footer-nav-item-nav text-[#747474] text-sm lg:text-base no-underline hover:text-[#2563EB] transition-colors duration-250">
+            Cookie Settings
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    {/* Footer Bottom */}
+    <div className="ft pt-16 lg:pt-[72px]">
+      <p className="text-[#747474] text-xs lg:text-sm font-light">
+        © Copyright 2025 Cargo Guard. All rights reserved.
+      </p>
+    </div>
+  </div>
+</footer>
     </div>
   )
 }
