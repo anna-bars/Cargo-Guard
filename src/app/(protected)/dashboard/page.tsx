@@ -46,6 +46,17 @@ export default function DashboardPage() {
     document.body.classList.remove('overflow-hidden')
   }
 
+  const handleProfileSetting = () => {
+    // Add profile setting logic here
+    console.log('Navigate to profile settings')
+    closeMobileMenu()
+  }
+
+  const handleLogout = () => {
+    closeMobileMenu()
+    // Logout will be handled by LogoutButton component
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#f3f3f6] flex items-center justify-center">
@@ -67,9 +78,8 @@ export default function DashboardPage() {
               className="w-[22px] h-[29px] object-cover"
             />
             <h2 className="font-montserrat text-[18px] sm:text-[24px] font-normal text-[#0a3d62]">
-  Cargo Guard
-</h2>
-
+              Cargo Guard
+            </h2>
           </div>
           
           {/* Desktop Navigation */}
@@ -156,13 +166,12 @@ export default function DashboardPage() {
             
             {/* Desktop User Info */}
             <div className="hidden xl:flex items-center gap-4 ml-4">
-              {/* <span className="text-gray-700">{user?.email}</span> */}
               <LogoutButton />
             </div>
           </div>
         </header>
 
-        {/* Mobile Navigation Menu */}
+        {/* Mobile Navigation Menu - Updated with User Settings */}
         <div className={`fixed inset-0 z-50 transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
           <div 
             className="absolute inset-0 bg-black/50"
@@ -178,20 +187,23 @@ export default function DashboardPage() {
               </button>
             </div>
             
-            <div className="mb-5">
-              <div className="w-full h-[44px] bg-[#f7f7f7] rounded-lg border border-white/22 flex items-center px-3">
-                <input 
-                  type="text" 
-                  placeholder="Search..."
-                  className="flex-1 border-none bg-transparent font-inter text-sm text-black outline-none"
-                />
-                <img 
-                  src="https://c.animaapp.com/mjiggi0jSqvoj5/img/search-interface-symbol-1.png" 
-                  alt="Search"
-                  className="w-[18px] h-[18px]"
-                />
+            {/* User Info Section */}
+            <div className="flex items-center gap-3 mb-6 p-3 bg-[#f7f7f7] rounded-lg">
+              <img 
+                src="https://c.animaapp.com/mjiggi0jSqvoj5/img/898887d89ce7b428ae8824c896050271-1.png" 
+                alt="User Avatar"
+                className="w-10 h-10 rounded-lg object-cover"
+              />
+              <div>
+                <div className="font-inter text-sm font-medium text-black">
+                  {user?.email?.split('@')[0] || 'User'}
+                </div>
+                <div className="font-inter text-xs text-gray-600 truncate max-w-[180px]">
+                  {user?.email || 'user@example.com'}
+                </div>
               </div>
             </div>
+          
             
             <nav className="flex flex-col gap-3 mb-7">
               <a href="#" className="px-4 py-3 font-inter text-base text-black no-underline rounded-lg bg-[#f7f7f7]">
@@ -208,35 +220,28 @@ export default function DashboardPage() {
               </a>
             </nav>
             
-            <div className="flex flex-col gap-3">
-              <button className="flex items-center gap-2 px-4 py-3 bg-[#f7f7f7] border border-white/22 rounded-lg font-inter text-sm text-black cursor-pointer hover:bg-gray-100 transition-colors">
-                <img 
-                  src="https://c.animaapp.com/mjiggi0jSqvoj5/img/group-118-1.svg" 
-                  alt="Quote"
-                  className="w-5 h-5"
-                />
-                Get New Quote
+           
+            
+            {/* User Settings Section - Added */}
+            <div className="mt-auto pt-5 border-t border-gray-200">
+              <button 
+                onClick={handleProfileSetting}
+                className="flex items-center gap-3 px-4 py-3 w-full rounded-lg hover:bg-gray-100 transition-colors cursor-pointer mb-3"
+              >
+                <div className="w-8 h-8 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <span className="font-inter text-sm font-medium text-gray-800">Profile Setting</span>
               </button>
-              <button className="flex items-center gap-2 px-4 py-3 bg-[#f7f7f7] border border-white/22 rounded-lg font-inter text-sm text-black cursor-pointer hover:bg-gray-100 transition-colors">
-                <img 
-                  src="https://c.animaapp.com/mjiggi0jSqvoj5/img/upload-1.png" 
-                  alt="Upload"
-                  className="w-5 h-5"
-                />
-                Upload Document
-              </button>
-              <button className="flex items-center gap-2 px-4 py-3 bg-[#f7f7f7] border border-white/22 rounded-lg font-inter text-sm text-black cursor-pointer hover:bg-gray-100 transition-colors">
-                <img 
-                  src="https://c.animaapp.com/mjiggi0jSqvoj5/img/upload-1-1.png" 
-                  alt="Renew"
-                  className="w-5 h-5"
-                />
-                Renew Policy
-              </button>
+              
+              <div onClick={handleLogout}>
+                <LogoutButton mobileVersion />
+              </div>
             </div>
           </div>
         </div>
-
         {/* Mobile Header for Activity Section */}
         <div className="flex gap-2 items-center mb-4 xl:hidden">
           <img src="/dashboard/hashtag.svg" alt="" className="w-5 h-5" />
@@ -1079,7 +1084,6 @@ export default function DashboardPage() {
             .metric-value, .metric-value2 {
                 font-size: 32px;
                 font-weight: 200;
-                height: 38px;
             }
 
             .metrics-grid {
