@@ -370,7 +370,7 @@ export default function DashboardPage() {
             {/* Mobile Activity Header */}
             <div className="xl:hidden flex items-center justify-between activity-mobile-header activity-section-mob-hd">
               <h3 className="text-lg font-normal">Recent Activity</h3>
-              <div className="flex gap-2">
+              <div className="flex ">
                 {[1, 2, 3, 4].map((num) => (
                   <img key={num} src={`dashboard/btn/0${num}.svg`} alt="" className="w-[44px] h-[44px] p-0 border-none"  />
                 ))}
