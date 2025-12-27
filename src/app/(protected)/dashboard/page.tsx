@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
 import { redirect } from 'next/navigation'
 import LogoutButton from './LogoutButton'
+import Notifications from './Notifications' 
+import { usePathname } from 'next/navigation'
 
 interface User {
   id: string
@@ -15,6 +17,66 @@ export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [activeNavItem, setActiveNavItem] = useState('Dashboard')
+  const pathname = usePathname()
+  
+  // Ավելացրեք notifications state-երը
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
+  const [notifications, setNotifications] = useState([
+    {
+      id: '1',
+      title: 'New Quote Request',
+      message: 'You have a new quote request from Global Shipping Ltd.',
+      type: 'info' as const,
+      read: false,
+      created_at: new Date(Date.now() - 3600000).toISOString()
+    },
+    {
+      id: '2',
+      title: 'Policy Expiring Soon',
+      message: 'Policy #P-020 expires in 15 days. Consider renewal.',
+      type: 'warning' as const,
+      read: false,
+      created_at: new Date(Date.now() - 7200000).toISOString()
+    },
+    {
+      id: '3',
+      title: 'Document Approved',
+      message: 'Your uploaded document has been approved.',
+      type: 'success' as const,
+      read: true,
+      created_at: new Date(Date.now() - 86400000).toISOString()
+    },
+    {
+      id: '4',
+      title: 'Payment Received',
+      message: 'Payment of $2,500 has been processed successfully.',
+      type: 'success' as const,
+      read: true,
+      created_at: new Date(Date.now() - 172800000).toISOString()
+    }
+  ])
+  
+  const [unreadCount, setUnreadCount] = useState(0)
+
+  useEffect(() => {
+    const count = notifications.filter(n => !n.read).length
+    setUnreadCount(count)
+  }, [notifications])
+
+  const markAsRead = (id: string) => {
+    setNotifications(prev => 
+      prev.map(notification => 
+        notification.id === id ? { ...notification, read: true } : notification
+      )
+    )
+  }
+
+  const markAllAsRead = () => {
+    setNotifications(prev => 
+      prev.map(notification => ({ ...notification, read: true }))
+    )
+  }
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -57,6 +119,19 @@ export default function DashboardPage() {
     // Logout will be handled by LogoutButton component
   }
 
+  const navItems = [
+    { id: 'dashboard', label: 'Dashboard' },
+    { id: 'quotes', label: 'Quotes' },
+    { id: 'shipments', label: 'Shipments' },
+    { id: 'documents', label: 'Documents' }
+  ]
+
+  const handleNavClick = (itemId: string, itemLabel: string) => {
+    setActiveNavItem(itemLabel)
+    closeMobileMenu()
+    // Այստեղ կարող եք ավելացնել նաև նավիգացիայի տրամաբանությունը
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#f3f3f6] flex items-center justify-center">
@@ -92,29 +167,20 @@ export default function DashboardPage() {
               />
             </div>
             
-            <div className="h-[54px] flex items-center justify-center px-9 bg-white rounded-lg">
-              <a href="#" className="font-inter text-[16px] font-normal text-black no-underline">
-                Dashboard
-              </a>
-            </div>
-            
-            <div className="h-[54px] flex items-center justify-center px-9 bg-[#f7f7f7] rounded-lg border border-white/22">
-              <a href="#" className="font-inter text-[16px] font-normal text-black no-underline">
-                Quotes
-              </a>
-            </div>
-            
-            <div className="h-[54px] flex items-center justify-center px-9 bg-[#f7f7f7] rounded-lg border border-white/22">
-              <a href="#" className="font-inter text-[16px] font-normal text-black no-underline">
-                Shipments
-              </a>
-            </div>
-            
-            <div className="h-[54px] flex items-center justify-center px-9 bg-[#f7f7f7] rounded-lg border border-white/22">
-              <a href="#" className="font-inter text-[16px] font-normal text-black no-underline">
-                Documents
-              </a>
-            </div>
+            {navItems.map((item) => (
+              <div 
+                key={item.id}
+                className={`h-[54px] flex items-center justify-center px-9 rounded-lg transition-all duration-300 cursor-pointer group ${activeNavItem === item.label ? 'bg-white shadow-sm' : 'bg-[#f7f7f7] border border-white/22 hover:bg-white'}`}
+                onClick={() => handleNavClick(item.id, item.label)}
+              >
+                <a 
+                  href="#" 
+                  className={`font-inter text-[16px] font-normal no-underline transition-all duration-300 ${activeNavItem === item.label ? 'text-black' : 'text-black group-hover:text-black/80'}`}
+                >
+                  {item.label}
+                </a>
+              </div>
+            ))}
           </nav>
           
           {/* Header Actions */}
@@ -128,20 +194,37 @@ export default function DashboardPage() {
               <span className="absolute top-4 right-[19px] bg-[#f86464] w-[6px] h-[6px] rounded-full"></span>
             </div>
             
-            <div className="hidden xl:flex w-[54px] h-[54px] bg-[#f7f7f7] rounded-lg border border-white/22 flex items-center justify-center relative">
-              <img 
-                src="https://c.animaapp.com/mjiggi0jSqvoj5/img/bell-1.png" 
-                alt="Notifications"
-                className="w-[24px]"
+            <div className="relative">
+              <button 
+                className="w-[44px] h-[44px] sm:w-[54px] sm:h-[54px] bg-[#f7f7f7] rounded-lg border border-white/22 flex items-center justify-center relative cursor-pointer hover:bg-white transition-colors duration-300"
+                onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                aria-label="Notifications"
+              >
+                <img 
+                  src="https://c.animaapp.com/mjiggi0jSqvoj5/img/bell-1.png" 
+                  alt="Notifications"
+                  className="w-[24px]"
+                />
+                {unreadCount > 0 && (
+                  <span className="absolute top-4 right-[19px] bg-[#f86464] w-[6px] h-[6px] rounded-full"></span>
+                )}
+              </button>
+              
+              <Notifications 
+                isOpen={isNotificationsOpen}
+                onClose={() => setIsNotificationsOpen(false)}
+                notifications={notifications}
+                unreadCount={unreadCount}
+                onMarkAsRead={markAsRead}
+                onMarkAllAsRead={markAllAsRead}
               />
-              <span className="absolute top-4 right-[19px] bg-[#f86464] w-[6px] h-[6px] rounded-full"></span>
             </div>
             
             <div className="hidden xl:block">
               <img 
                 src="https://c.animaapp.com/mjiggi0jSqvoj5/img/898887d89ce7b428ae8824c896050271-1.png" 
                 alt="User Avatar"
-                className="w-[54px] h-[54px] rounded-lg object-cover"
+                className="w-[54px] h-[54px] rounded-lg object-cover hover:opacity-90 transition-opacity duration-300 cursor-pointer"
               />
             </div>
             
@@ -155,7 +238,7 @@ export default function DashboardPage() {
             
             {/* Hamburger Menu Button */}
             <button 
-              className="xl:hidden w-[44px] h-[44px] bg-[#f7f7f7] rounded-lg border border-white/22 flex flex-col justify-center items-center gap-1 p-2.5 cursor-pointer"
+              className="xl:hidden w-[44px] h-[44px] bg-[#f7f7f7] rounded-lg border border-white/22 flex flex-col justify-center items-center gap-1 p-2.5 cursor-pointer hover:bg-white transition-colors duration-300"
               onClick={toggleMobileMenu}
               aria-label="Toggle menu"
             >
@@ -180,7 +263,7 @@ export default function DashboardPage() {
           <div className={`absolute top-0 right-0 w-[300px] h-full bg-white p-5 transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
             <div className="flex justify-end mb-7">
               <button 
-                className="w-[44px] h-[44px] bg-[#f7f7f7] rounded-lg border border-white/22 flex items-center justify-center cursor-pointer text-2xl text-black"
+                className="w-[44px] h-[44px] bg-[#f7f7f7] rounded-lg border border-white/22 flex items-center justify-center cursor-pointer text-2xl text-black hover:bg-gray-100 transition-colors duration-300"
                 onClick={closeMobileMenu}
               >
                 ×
@@ -188,7 +271,7 @@ export default function DashboardPage() {
             </div>
             
             {/* User Info Section */}
-            <div className="flex items-center gap-3 mb-6 p-3 bg-[#f7f7f7] rounded-lg">
+            <div className="flex items-center gap-3 mb-6 p-3 bg-[#f7f7f7] rounded-lg hover:bg-gray-50 transition-colors duration-300 cursor-pointer">
               <img 
                 src="https://c.animaapp.com/mjiggi0jSqvoj5/img/898887d89ce7b428ae8824c896050271-1.png" 
                 alt="User Avatar"
@@ -204,29 +287,25 @@ export default function DashboardPage() {
               </div>
             </div>
           
-            
+            {/* Mobile Navigation Links with Hover Effect */}
             <nav className="flex flex-col gap-3 mb-7">
-              <a href="#" className="px-4 py-3 font-inter text-base text-black no-underline rounded-lg bg-[#f7f7f7]">
-                Dashboard
-              </a>
-              <a href="#" className="px-4 py-3 font-inter text-base text-black no-underline rounded-lg hover:bg-gray-100 transition-colors">
-                Quotes
-              </a>
-              <a href="#" className="px-4 py-3 font-inter text-base text-black no-underline rounded-lg hover:bg-gray-100 transition-colors">
-                Shipments
-              </a>
-              <a href="#" className="px-4 py-3 font-inter text-base text-black no-underline rounded-lg hover:bg-gray-100 transition-colors">
-                Documents
-              </a>
+              {navItems.map((item) => (
+                <a 
+                  key={item.id}
+                  href="#" 
+                  className={`px-4 py-3 font-inter text-base no-underline rounded-lg transition-all duration-300 ${activeNavItem === item.label ? 'bg-white text-black font-medium shadow-sm' : 'text-black hover:bg-[#f7f7f7]'}`}
+                  onClick={() => handleNavClick(item.id, item.label)}
+                >
+                  {item.label}
+                </a>
+              ))}
             </nav>
-            
-           
             
             {/* User Settings Section - Added */}
             <div className="mt-auto pt-5 border-t border-gray-200">
               <button 
                 onClick={handleProfileSetting}
-                className="flex items-center gap-3 px-4 py-3 w-full rounded-lg hover:bg-gray-100 transition-colors cursor-pointer mb-3"
+                className="flex items-center gap-3 px-4 py-3 w-full rounded-lg hover:bg-gray-100 transition-colors duration-300 cursor-pointer mb-3"
               >
                 <div className="w-8 h-8 flex items-center justify-center">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
@@ -242,6 +321,8 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+        
+        {/* ... rest of your existing code remains exactly the same ... */}
         {/* Mobile Header for Activity Section */}
         <div className="flex gap-2 items-center mb-4 xl:hidden">
           <img src="/dashboard/hashtag.svg" alt="" className="w-5 h-5" />
@@ -260,7 +341,7 @@ export default function DashboardPage() {
                     Performance Overview
                   </h2>
                 </div>
-                <div className="flex items-center gap-3 px-3 py-2 rounded-lg border border-[#c7c7c7]/51">
+                <div className="flex items-center gap-3 px-3 py-2 rounded-lg border border-[#c7c7c7]/51 hover:border-[#a0a0a0]/51 transition-colors duration-300">
                   <span className="font-montserrat text-[12px] font-normal text-[#7b7b7b]">
                     This Month
                   </span>
@@ -393,7 +474,7 @@ export default function DashboardPage() {
                 </div>
                 
                 <div className="flex items-center gap-4 showin-result-ittle-info">
-                  <div className="w-36 h-[38px] border-b border-[#c7c7c7]/51 flex items-center justify-between px-3 py-2">
+                  <div className="w-36 h-[38px] border-b border-[#c7c7c7]/51 flex items-center justify-between px-3 py-2 hover:border-[#a0a0a0]/51 transition-colors duration-300">
                     <input 
                       type="text" 
                       placeholder="Search by..."
@@ -407,7 +488,7 @@ export default function DashboardPage() {
                   </div>
                   
                   {['All Activity', 'Last 30 days', 'Sort by', 'Status'].map((text, idx) => (
-                    <div key={idx} className="h-[38px] flex items-center gap-3 px-3 py-2 rounded-lg border border-[#c7c7c7]/51 font-montserrat text-xs text-[#7b7b7b]">
+                    <div key={idx} className="h-[38px] flex items-center gap-3 px-3 py-2 rounded-lg border border-[#c7c7c7]/51 font-montserrat text-xs text-[#7b7b7b] hover:border-[#a0a0a0]/51 transition-colors duration-300">
                       <span>{text}</span>
                       <img 
                         src="https://c.animaapp.com/mjiggi0jSqvoj5/img/arrow-3-1.svg" 
@@ -417,7 +498,7 @@ export default function DashboardPage() {
                     </div>
                   ))}
                   
-                  <button className="bg-[#2563eb] text-white px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#1d4ed8] transition-colors">
+                  <button className="bg-[#2563eb] text-white px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#1d4ed8] transition-colors duration-300">
                     Get New Quote
                   </button>
                 </div>
@@ -483,10 +564,10 @@ export default function DashboardPage() {
                     button: { text: 'View Details', variant: 'secondary' }
                   }
                 ].map((row, idx) => (
-                  <div key={idx} className="xl:grid xl:grid-cols-[120px_120px_1fr_200px_150px_140px] gap-2 p-3 xl:p-3 bg-[#f8fafd] xl:bg-[#f8fafd] rounded-lg xl:rounded-lg flex flex-wrap items-center table-row">
+                  <div key={idx} className="xl:grid xl:grid-cols-[120px_120px_1fr_200px_150px_140px] gap-2 p-3 xl:p-3 bg-[#f8fafd] xl:bg-[#f8fafd] rounded-lg xl:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
                     {/* Mobile/Desktop Layout */}
                     <div className="w-[45%] xl:w-auto font-poppins text-sm text-black truncate row-cell">{row.type}</div>
-                    <div className="w-[45%] xl:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link">{row.id}</div>
+                    <div className="w-[45%] xl:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">{row.id}</div>
                     <div className="w-[45%] xl:w-auto font-poppins text-sm text-black truncate mt-2 xl:mt-0 row-cell">{row.cargo}</div>
                     <div className="w-[45%] xl:w-auto mt-2 xl:mt-0 row-cell">
                       <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor}`}>
@@ -496,10 +577,10 @@ export default function DashboardPage() {
                     </div>
                     <div className="w-[45%] xl:w-auto font-poppins text-sm text-black truncate mt-2 xl:mt-0 row-cell">{row.date}</div>
                     <div className="w-full xl:w-auto mt-2 xl:mt-0 row-cell">
-                      <button className={`h-9 px-4 rounded-lg font-poppins text-sm font-normal transition-colors w-full xl:w-[140px] ${
+                      <button className={`h-9 px-4 rounded-lg font-poppins text-sm font-normal transition-colors duration-300 w-full xl:w-[140px] ${
                         row.button.variant === 'primary' 
                           ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]' 
-                          : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f3f4f6]'
+                          : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f3f4f6] hover:border-[#d1d5db]'
                       }`}>
                         {row.button.text}
                       </button>
@@ -513,7 +594,7 @@ export default function DashboardPage() {
           {/* Right Column - 25% with exact 400px on desktop */}
           <div className="flex flex-col gap-4 right">
             {/* Welcome Widget */}
-            <div className="relative h-[449px] rounded-2xl overflow-hidden w-full welcome-widget">
+            <div className="relative h-[449px] rounded-2xl overflow-hidden w-full welcome-widget hover:shadow-lg transition-shadow duration-300">
               <img 
                 src="https://c.animaapp.com/mjiggi0jSqvoj5/img/frame-76.png" 
                 alt="Background" 
@@ -534,14 +615,14 @@ export default function DashboardPage() {
                   <img 
                     src="https://c.animaapp.com/mjiggi0jSqvoj5/img/group-84.png" 
                     alt="Arrow" 
-                    className="w-[42px] h-[42px]"
+                    className="w-[42px] h-[42px] hover:scale-110 transition-transform duration-300"
                   />
                 </div>
               </div>
             </div>
 
             {/* Action Center */}
-            <div className="action-center bg-[#fafcff]/80 rounded-2xl p-6 relative overflow-hidden h-[203px] w-full">
+            <div className="action-center bg-[#fafcff]/80 rounded-2xl p-6 relative overflow-hidden h-[203px] w-full hover:shadow-sm transition-shadow duration-300">
               <div 
                 className="absolute inset-0 w-full h-full action-bg"
                 style={{
@@ -563,7 +644,7 @@ export default function DashboardPage() {
                   </div>
                   
                   <div className="flex flex-col gap-1.5 action-buttons">
-                    <button className="flex items-center gap-2 px-3 py-2.5 bg-white/20 border border-white/30 rounded-lg backdrop-blur font-montserrat text-[16px] font-normal text-[#1e293b] hover:bg-white/30 transition-colors w-full">
+                    <button className="flex items-center gap-2 px-3 py-2.5 bg-white/20 border border-white/30 rounded-lg backdrop-blur font-montserrat text-[16px] font-normal text-[#1e293b] hover:bg-white/30 hover:border-white/40 transition-all duration-300 w-full">
                       <img 
                         src="https://c.animaapp.com/mjiggi0jSqvoj5/img/group-118-1.svg" 
                         alt="Quote"
@@ -572,7 +653,7 @@ export default function DashboardPage() {
                       <span className="text-[14px]">Get New Quote</span>
                     </button>
                     
-                    <button className="flex items-center gap-2 px-3 py-2.5 bg-white/20 border border-white/30 rounded-lg backdrop-blur font-montserrat text-[16px] font-normal text-[#1e293b] hover:bg-white/30 transition-colors w-full">
+                    <button className="flex items-center gap-2 px-3 py-2.5 bg-white/20 border border-white/30 rounded-lg backdrop-blur font-montserrat text-[16px] font-normal text-[#1e293b] hover:bg-white/30 hover:border-white/40 transition-all duration-300 w-full">
                       <img 
                         src="https://c.animaapp.com/mjiggi0jSqvoj5/img/upload-1.png" 
                         alt="Upload"
@@ -581,7 +662,7 @@ export default function DashboardPage() {
                       <span className="text-[14px]">Upload Document</span>
                     </button>
                     
-                    <button className="flex items-center gap-2 px-3 py-2.5 bg-white/20 border border-white/30 rounded-lg backdrop-blur font-montserrat text-[16px] font-normal text-[#1e293b] hover:bg-white/30 transition-colors w-full">
+                    <button className="flex items-center gap-2 px-3 py-2.5 bg-white/20 border border-white/30 rounded-lg backdrop-blur font-montserrat text-[16px] font-normal text-[#1e293b] hover:bg-white/30 hover:border-white/40 transition-all duration-300 w-full">
                       <img 
                         src="https://c.animaapp.com/mjiggi0jSqvoj5/img/upload-1-1.png" 
                         alt="Renew"
@@ -595,7 +676,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Quote Conversion Rate */}
-            <div className="bg-[#fafcff]/80 rounded-2xl p-6 h-auto min-h-[203px] w-full quote-conversion performance-section">
+            <div className="bg-[#fafcff]/80 rounded-2xl p-6 h-auto min-h-[203px] w-full quote-conversion performance-section hover:shadow-sm transition-shadow duration-300">
               <div className="">
                 <h3 className="font-montserrat text-[18px] font-medium text-black action-title">
                   Quote Conversion Rate
@@ -806,7 +887,7 @@ export default function DashboardPage() {
         }
 
         .mobile-nav-link:hover {
-            background-color: #f0f0f0;
+            background-color: #ffffff !important;
         }
 
         .mobile-nav-actions {
