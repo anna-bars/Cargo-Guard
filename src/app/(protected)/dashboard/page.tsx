@@ -18,6 +18,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [activeNavItem, setActiveNavItem] = useState('Dashboard')
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false) // Ավելացրեք այս state-ը
   const pathname = usePathname()
   
   // Ավելացրեք notifications state-երը
@@ -112,10 +113,12 @@ export default function DashboardPage() {
     // Add profile setting logic here
     console.log('Navigate to profile settings')
     closeMobileMenu()
+    setIsUserDropdownOpen(false)
   }
 
   const handleLogout = () => {
     closeMobileMenu()
+    setIsUserDropdownOpen(false)
     // Logout will be handled by LogoutButton component
   }
 
@@ -131,6 +134,38 @@ export default function DashboardPage() {
     closeMobileMenu()
     // Այստեղ կարող եք ավելացնել նաև նավիգացիայի տրամաբանությունը
   }
+
+  // Ավելացրեք user dropdown-ը փակելու ֆունկցիա
+  const closeUserDropdown = () => {
+    setIsUserDropdownOpen(false)
+  }
+
+  // Ավելացրեք dropdown-ը բացելու/փակելու ֆունկցիա
+  const toggleUserDropdown = () => {
+    setIsUserDropdownOpen(!isUserDropdownOpen)
+  }
+
+  // Ավելացրեք dropdown-ը դրսից կլիկ անելուց փակելու լսում
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const dropdown = document.getElementById('user-dropdown')
+      const avatar = document.getElementById('user-avatar')
+      
+      if (dropdown && avatar && 
+          !dropdown.contains(event.target as Node) && 
+          !avatar.contains(event.target as Node)) {
+        setIsUserDropdownOpen(false)
+      }
+    }
+
+    if (isUserDropdownOpen) {
+      document.addEventListener('click', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [isUserDropdownOpen])
 
   if (loading) {
     return (
@@ -220,12 +255,73 @@ export default function DashboardPage() {
               />
             </div>
             
-            <div className="hidden xl:block">
-              <img 
-                src="https://c.animaapp.com/mjiggi0jSqvoj5/img/898887d89ce7b428ae8824c896050271-1.png" 
-                alt="User Avatar"
-                className="w-[54px] h-[54px] rounded-lg object-cover hover:opacity-90 transition-opacity duration-300 cursor-pointer"
-              />
+            {/* Desktop User Avatar with Dropdown */}
+            <div className="hidden xl:block relative">
+              <div 
+                id="user-avatar"
+                className="relative cursor-pointer"
+                onClick={toggleUserDropdown}
+              >
+                <img 
+                  src="https://c.animaapp.com/mjiggi0jSqvoj5/img/898887d89ce7b428ae8824c896050271-1.png" 
+                  alt="User Avatar"
+                  className="w-[54px] h-[54px] rounded-lg object-cover hover:opacity-90 transition-opacity duration-300"
+                />
+                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center border border-gray-200">
+                  <svg 
+                    className={`w-3 h-3 text-gray-600 transition-transform duration-200 ${isUserDropdownOpen ? 'rotate-180' : ''}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24" 
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+              
+              {/* User Dropdown Menu */}
+              {isUserDropdownOpen && (
+                <div 
+                  id="user-dropdown"
+                  className="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-100 z-50 py-2"
+                  style={{ 
+                    boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.08)',
+                    borderRadius: '12px'
+                  }}
+                >
+                  {/* User Info */}
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <div className="font-inter text-sm font-medium text-gray-900">
+                      {user?.email?.split('@')[0] || 'User'}
+                    </div>
+                    <div className="font-inter text-xs text-gray-500 truncate">
+                      {user?.email || 'user@example.com'}
+                    </div>
+                  </div>
+                  
+                  {/* Profile Setting Button */}
+                  <button 
+                    onClick={handleProfileSetting}
+                    className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors duration-200 text-left"
+                  >
+                    <div className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-lg">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <span className="font-inter text-sm font-medium text-gray-800">Profile Setting</span>
+                  </button>
+                  
+                  {/* Logout Button */}
+                  <div 
+                    onClick={handleLogout}
+                    className="border-t border-gray-100"
+                  >
+                    <LogoutButton desktopVersion />
+                  </div>
+                </div>
+              )}
             </div>
             
             <div className="xl:hidden">
@@ -246,11 +342,6 @@ export default function DashboardPage() {
               <span className={`w-5 h-0.5 bg-black transition-all duration-300 ${isMobileMenuOpen ? 'opacity-0' : ''}`}></span>
               <span className={`w-5 h-0.5 bg-black transition-all duration-300 ${isMobileMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`}></span>
             </button>
-            
-            {/* Desktop User Info */}
-            <div className="hidden xl:flex items-center gap-4 ml-4">
-              <LogoutButton />
-            </div>
           </div>
         </header>
 
@@ -918,6 +1009,15 @@ export default function DashboardPage() {
         .mobile-action-btn img {
             width: 20px;
             height: 20px;
+        }
+
+        /* User Dropdown Styles */
+        .user-dropdown-arrow {
+            transition: transform 0.2s ease;
+        }
+
+        .user-dropdown-arrow.open {
+            transform: rotate(180deg);
         }
 
         @media screen and (max-width: 1336px) {
