@@ -263,7 +263,7 @@ export default function DashboardPage() {
                 onClick={toggleUserDropdown}
               >
                 <img 
-                  src="https://c.animaapp.com/mjiggi0jSqvoj5/img/898887d89ce7b428ae8824c896050271-1.png" 
+                  src="/dashboard/avatar-img.png" 
                   alt="User Avatar"
                   className="w-[54px] h-[54px] rounded-lg object-cover hover:opacity-90 transition-opacity duration-300"
                 />
@@ -326,7 +326,7 @@ export default function DashboardPage() {
             
             <div className="xl:hidden">
               <img 
-                src="https://c.animaapp.com/mjiggi0jSqvoj5/img/898887d89ce7b428ae8824c896050271-1.png" 
+                src="/dashboard/avatar-img.png" 
                 alt="User Avatar"
                 className="w-[44px] h-[44px] rounded-lg object-cover"
               />
@@ -364,7 +364,7 @@ export default function DashboardPage() {
             {/* User Info Section */}
             <div className="flex items-center gap-3 mb-6 p-3 bg-[#f7f7f7] rounded-lg hover:bg-gray-50 transition-colors duration-300 cursor-pointer">
               <img 
-                src="https://c.animaapp.com/mjiggi0jSqvoj5/img/898887d89ce7b428ae8824c896050271-1.png" 
+                src="/dashboard/avatar-img.png" 
                 alt="User Avatar"
                 className="w-10 h-10 rounded-lg object-cover"
               />
