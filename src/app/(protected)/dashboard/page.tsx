@@ -220,15 +220,6 @@ export default function DashboardPage() {
           
           {/* Header Actions */}
           <div className="flex items-center gap-2.5">
-            <div className="w-[44px] h-[44px] sm:w-[54px] sm:h-[54px] bg-[#f7f7f7] rounded-lg border border-white/22 flex items-center justify-center relative xl:hidden">
-              <img 
-                src="https://c.animaapp.com/mjiggi0jSqvoj5/img/bell-1.png" 
-                alt="Notifications"
-                className="w-[24px]"
-              />
-              <span className="absolute top-4 right-[19px] bg-[#f86464] w-[6px] h-[6px] rounded-full"></span>
-            </div>
-            
             <div className="relative">
               <button 
                 className="w-[44px] h-[44px] sm:w-[54px] sm:h-[54px] bg-[#f7f7f7] rounded-lg border border-white/22 flex items-center justify-center relative cursor-pointer hover:bg-white transition-colors duration-300"
