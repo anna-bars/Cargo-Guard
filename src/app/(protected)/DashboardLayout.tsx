@@ -41,7 +41,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     <div className="min-h-screen bg-[#f3f3f6] font-montserrat">
       <DashboardHeader userEmail={user?.email} />
       
-      <main className="max-w-[88%] sm:max-w-[96%] mx-auto pt-4">
+      <main className="max-w-[88%] sm:max-w-[96%] mx-auto">
         {children}
       </main>
     </div>

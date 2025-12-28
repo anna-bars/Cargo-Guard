@@ -185,7 +185,7 @@ export default function DashboardPage() {
 
           <div className='infarkt'>
       {/* Fixed width container */}
-      <div className="max-w-[88%] min-w-full sm:max-w-[96%] mx-auto pt-4">
+      <div className="max-w-[88%] min-w-full sm:max-w-[96%] mx-auto">
         {/* Header */}
        
         
@@ -489,7 +489,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Action Center */}
-            <div className="action-center bg-[#fafcff]/80 rounded-2xl p-6 relative overflow-hidden h-[203px] w-full hover:shadow-sm transition-shadow duration-300">
+            {/* <div className="action-center bg-[#fafcff]/80 rounded-2xl p-6 relative overflow-hidden h-[203px] w-full hover:shadow-sm transition-shadow duration-300">
               <div 
                 className="absolute inset-0 w-full h-full action-bg"
                 style={{
@@ -513,24 +513,6 @@ export default function DashboardPage() {
                   <div className="flex flex-col gap-1.5 action-buttons">
                     <button className="flex items-center gap-2 px-3 py-2.5 bg-white/20 border border-white/30 rounded-lg backdrop-blur font-montserrat text-[16px] font-normal text-[#1e293b] hover:bg-white/30 hover:border-white/40 transition-all duration-300 w-full">
                       <img 
-                        src="https://c.animaapp.com/mjiggi0jSqvoj5/img/group-118-1.svg" 
-                        alt="Quote"
-                        className="w-4 h-4"
-                      />
-                      <span className="text-[14px]">Get New Quote</span>
-                    </button>
-                    
-                    <button className="flex items-center gap-2 px-3 py-2.5 bg-white/20 border border-white/30 rounded-lg backdrop-blur font-montserrat text-[16px] font-normal text-[#1e293b] hover:bg-white/30 hover:border-white/40 transition-all duration-300 w-full">
-                      <img 
-                        src="https://c.animaapp.com/mjiggi0jSqvoj5/img/upload-1.png" 
-                        alt="Upload"
-                        className="w-4 h-4"
-                      />
-                      <span className="text-[14px]">Upload Document</span>
-                    </button>
-                    
-                    <button className="flex items-center gap-2 px-3 py-2.5 bg-white/20 border border-white/30 rounded-lg backdrop-blur font-montserrat text-[16px] font-normal text-[#1e293b] hover:bg-white/30 hover:border-white/40 transition-all duration-300 w-full">
-                      <img 
                         src="https://c.animaapp.com/mjiggi0jSqvoj5/img/upload-1-1.png" 
                         alt="Renew"
                         className="w-4 h-4"
@@ -540,7 +522,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Quote Conversion Rate */}
             <div className="bg-[#fafcff]/80 rounded-2xl p-6 h-auto min-h-[203px] w-full quote-conversion performance-section hover:shadow-sm transition-shadow duration-300">
