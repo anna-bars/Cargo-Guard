@@ -138,3 +138,32 @@ body {
 }
 
         }
+
+/* 🍭 */
+/* Global Scrollbar Styles */
+/* style jsx-ում ավելացրեք */
+/* Ultra minimal scrollbar - just a thin line */
+/* Ultra minimal scrollbar - just a thin line */
+*::-webkit-scrollbar {
+  width: 4px; /* կամ 1px եթե շատ բարակ եք ուզում */
+  margin-left: 4px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #d5e3fa7c; /* Մոխրագույն */
+  /* Եթե border-radius ուզում եք, ավելացրեք */
+  border-radius: 48px; /* 0px - ուղիղ գիծ, 1px - մի փոքր կլորացված */
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #669cee86; /* Մուգ մոխրագույն hover-ի ժամանակ */
+}
+
+*::-webkit-scrollbar-button,
+*::-webkit-scrollbar-corner {
+  display: none;
+}
