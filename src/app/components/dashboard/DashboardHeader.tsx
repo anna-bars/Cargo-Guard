@@ -128,7 +128,7 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
   return (
     <>
       {/* Fixed width container */}
-      <div className="max-w-[88%] sm:max-w-[96%] mx-auto pt-4">
+      <div className="max-w-[88%] sm:max-w-[96%] mx-auto pt-3">
         {/* Header */}
         <header className="flex justify-between items-center h-[68px] mb-4">
           <div className="flex items-center gap-3">

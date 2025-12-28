@@ -199,7 +199,7 @@ export default function DashboardPage() {
         {/* Main Content Grid - Exact same as CSS */}
         <main className="grid grid-cols-1 xl:grid-cols-[75%_24%] gap-4 items-stretch main-content">
           {/* Left Column - 75% */}
-          <div className="max-h-[86%] flex flex-col gap-4">
+          <div className="max-h-[87.5%] flex flex-col gap-4">
             {/* Performance Overview */}
             <section className="block-1 bg-[#fafcff]/80 rounded-2xl p-4 h-auto performance-section">
               <div className="flex justify-between items-start mb-2 section-header">
@@ -461,7 +461,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Right Column - 25% with exact 400px on desktop */}
-          <div className="flex max-h-[86%] flex-col gap-4 right">
+          <div className="flex max-h-[87.5%] flex-col gap-4 right">
             {/* Welcome Widget */}
             <div className="relative h-[380px] rounded-2xl overflow-hidden w-full welcome-widget hover:shadow-lg transition-shadow duration-300">
               <img 
