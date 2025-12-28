@@ -201,7 +201,7 @@ export default function DashboardPage() {
           {/* Left Column - 75% */}
           <div className="flex flex-col gap-4">
             {/* Performance Overview */}
-            <section className="bg-[#fafcff]/80 rounded-2xl p-6 h-auto performance-section">
+            <section className="bg-[#fafcff]/80 rounded-2xl p-4 h-auto performance-section">
               <div className="flex justify-between items-start mb-7 section-header">
                 <div>
                   <h2 className="font-montserrat text-[20px] font-medium text-black section-title">
@@ -326,7 +326,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Recent Activity Table */}
-            <section className="activity-section bg-[#fafcff]/80 rounded-2xl p-6 xl:p-6">
+            <section className="activity-section bg-[#fafcff]/80 rounded-2xl p-4 xl:p-4">
               {/* Desktop Filters */}
               <div className="hidden xl:flex justify-between items-center mb-6 activity-header activity-filters">
                 <div className="flex items-center gap-1.5">
@@ -461,13 +461,13 @@ export default function DashboardPage() {
           {/* Right Column - 25% with exact 400px on desktop */}
           <div className="flex flex-col gap-4 right">
             {/* Welcome Widget */}
-            <div className="relative h-[449px] rounded-2xl overflow-hidden w-full welcome-widget hover:shadow-lg transition-shadow duration-300">
+            <div className="relative h-[380px] rounded-2xl overflow-hidden w-full welcome-widget hover:shadow-lg transition-shadow duration-300">
               <img 
                 src="https://c.animaapp.com/mjiggi0jSqvoj5/img/frame-76.png" 
                 alt="Background" 
                 className="absolute inset-0 w-full h-full object-cover"
               />
-              <div className="relative z-10 p-6 h-full flex flex-col action-content">
+              <div className="relative z-10 p-4 h-full flex flex-col action-content">
                 <h2 className="font-montserrat text-[20px] font-normal text-white mb-3 welcome-title">
                   Welcome back, Lucas!
                 </h2>
@@ -525,8 +525,8 @@ export default function DashboardPage() {
             </div> */}
 
             {/* Quote Conversion Rate */}
-            <div className="bg-[#fafcff]/80 rounded-2xl p-6 h-auto min-h-[203px] w-full quote-conversion performance-section hover:shadow-sm transition-shadow duration-300">
-              <div className="">
+            <div className="bg-[#fafcff]/80 rounded-2xl p-4 h-auto min-h-[203px] w-full quote-conversion performance-section hover:shadow-sm transition-shadow duration-300">
+              <div className="mb-[24px]">
                 <h3 className="font-montserrat text-[18px] font-medium text-black action-title">
                   Quote Conversion Rate
                 </h3>
@@ -575,17 +575,17 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 
-             <div className="rate-mob-hid hidden md:block text-right mt-4">
+             {/* <div className="rate-mob-hid hidden md:block text-right mt-4">
   <div className="text-[13px] text-[#C8C8C8]">Conversion Rate</div>
   <div className="text-[26px] text-black font-normal">65</div>
-</div>
+</div> */}
               </div>
               
               {/* Mobile conversion rate */}
-              <div className="conv-rate xl:hidden text-right mt-4">
+              {/* <div className="conv-rate xl:hidden text-right mt-4">
                 <div className="text-[13px] text-[#C8C8C8]">Conversion Rate</div>
                 <div className="text-[26px] text-black font-normal">65</div>
-              </div>
+              </div> */}
             </div>
           </div>
         </main>
