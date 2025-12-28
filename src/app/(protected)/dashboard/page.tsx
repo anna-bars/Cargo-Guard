@@ -197,14 +197,14 @@ export default function DashboardPage() {
         </div>
 
         {/* Main Content Grid - Exact same as CSS */}
-        <main className="grid grid-cols-1 xl:grid-cols-[75%_25%] gap-4 items-stretch main-content">
+        <main className="grid grid-cols-1 xl:grid-cols-[75%_24%] gap-4 items-stretch main-content">
           {/* Left Column - 75% */}
-          <div className="flex flex-col gap-4">
+          <div className="max-h-[86%] flex flex-col gap-4">
             {/* Performance Overview */}
-            <section className="bg-[#fafcff]/80 rounded-2xl p-4 h-auto performance-section">
-              <div className="flex justify-between items-start mb-7 section-header">
+            <section className="block-1 bg-[#fafcff]/80 rounded-2xl p-4 h-auto performance-section">
+              <div className="flex justify-between items-start mb-2 section-header">
                 <div>
-                  <h2 className="font-montserrat text-[20px] font-medium text-black section-title">
+                  <h2 className="font-montserrat text-[16px] font-medium text-black section-title">
                     Performance Overview
                   </h2>
                 </div>
@@ -326,9 +326,10 @@ export default function DashboardPage() {
             </div>
 
             {/* Recent Activity Table */}
-            <section className="activity-section bg-[#fafcff]/80 rounded-2xl p-4 xl:p-4">
+            <section className="block-2 flex flex-col max-h-[88%] activity-section bg-[#fafcff]/80 rounded-2xl p-4 xl:p-4">
               {/* Desktop Filters */}
-              <div className="hidden xl:flex justify-between items-center mb-6 activity-header activity-filters">
+              <div className='block-1 '>
+                <div className="hidden xl:flex justify-between items-center mb-6 activity-header activity-filters">
                 <div className="flex items-center gap-1.5">
                   <img 
                     src="https://c.animaapp.com/mjiggi0jSqvoj5/img/filter-1.png" 
@@ -386,9 +387,10 @@ export default function DashboardPage() {
                   </div>
                 ))}
               </div>
+              </div>
 
               {/* Table Rows */}
-              <div className="space-y-2 activity-table">
+              <div className="block-2 space-y-2 activity-table  overflow-y-scroll">
                 {[
                   {
                     type: 'Quote',
@@ -459,7 +461,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Right Column - 25% with exact 400px on desktop */}
-          <div className="flex flex-col gap-4 right">
+          <div className="flex max-h-[86%] flex-col gap-4 right">
             {/* Welcome Widget */}
             <div className="relative h-[380px] rounded-2xl overflow-hidden w-full welcome-widget hover:shadow-lg transition-shadow duration-300">
               <img 
@@ -779,6 +781,10 @@ export default function DashboardPage() {
         }
 
         @media screen and (max-width: 1336px) {
+        .block-2 {
+    overflow: scroll !important;
+}
+
             .activity-header {
                 display: block;
             }
@@ -788,7 +794,6 @@ export default function DashboardPage() {
             }
             
             .action-content {
-                display: block;
                 height: 100%;
             }
             
@@ -860,7 +865,7 @@ export default function DashboardPage() {
             }
 
             .quote-conversion.performance-section {
-                width: 36%;
+                width: 49%;
                 position: relative;
                 justify-content: space-between;
                 display: flex;
@@ -882,7 +887,7 @@ export default function DashboardPage() {
             
             .welcome-widget {
                 height: 260px;
-                width: 36%;
+                width: 49%;
             }
             
             .showin-result-ittle-info {
@@ -1062,6 +1067,10 @@ export default function DashboardPage() {
             .btn-primary {
     width: 100%;
 }
+
+
+
+
       `}</style>
     </div>
           {/* ... rest of your dashboard content ... */}
