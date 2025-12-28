@@ -5,8 +5,6 @@ import DashboardLayout from '../DashboardLayout'
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
 import { redirect } from 'next/navigation'
-import LogoutButton from './LogoutButton'
-import Notifications from './Notifications' 
 import { usePathname } from 'next/navigation'
 
 interface User {
