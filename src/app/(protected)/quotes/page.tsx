@@ -198,7 +198,8 @@ export default function QuotesPage() {
                 <section className="block-2 flex flex-col max-h-[88%] activity-section bg-[#fafcff]/80 rounded-2xl p-4 xl:p-4">
                   {/* Desktop Filters */}
                   <div className='block-1'>
-                    <div className="hidden xl:flex justify-between items-center mb-6 activity-header activity-filters">
+                    <h2 className="text-[20px] mb-4">All Insurance Quotes</h2>
+                    <div className="hidden xl:flex justify-between items-center mb-4 activity-header activity-filters">
                       <div className="flex items-center gap-1.5">
                         <img 
                           src="https://c.animaapp.com/mjiggi0jSqvoj5/img/filter-1.png" 
@@ -235,8 +236,8 @@ export default function QuotesPage() {
                           </div>
                         ))}
                         
-                        <button className="bg-[#2563eb] text-white px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#1d4ed8] transition-colors duration-300">
-                          Get New Quote
+                        <button className="bg-[#F9FBFD] border border-[#C8C8C8]  text-white p-2 rounded-[50%] font-poppins text-sm font-normal hover:bg-[#F1F6FA] transition-colors duration-300">
+                          <img src="/quotes/refresh.svg" className="w-[16px] h-[16px]" alt="" />
                         </button>
                       </div>
                     </div>
