@@ -220,6 +220,16 @@ export default function QuotesPage() {
             <main className="grid grid-cols-1 xl:grid-cols-[75%_24%] gap-4 items-stretch main-content">
               {/* Left Column - 75% */}
               <div className="max-h-[87.5%] flex flex-col gap-4">
+                <div className="flex items-center gap-3">
+                  <img
+                    src="/quotes/header-ic.svg"
+                    alt=""
+                    className="w-6 h-6"
+                  />
+                  <h2 className="text-[26px]">Quotes</h2>
+                </div>
+
+                
                 {/* Mobile Activity Header */}
                 <div className="xl:hidden flex items-center justify-between activity-mobile-header activity-section-mob-hd">
                   <h3 className="text-lg font-normal">All Insurance Quotes</h3>
