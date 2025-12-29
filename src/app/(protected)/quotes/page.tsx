@@ -58,6 +58,14 @@ export default function QuotesPage() {
   
   const [unreadCount, setUnreadCount] = useState(0)
 
+  // Mobile filter states
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedActivity, setSelectedActivity] = useState('All Activity')
+  const [selectedTimeframe, setSelectedTimeframe] = useState('Last 30 days')
+  const [selectedSort, setSelectedSort] = useState('Sort by')
+  const [selectedStatus, setSelectedStatus] = useState('Status')
+
   useEffect(() => {
     const count = notifications.filter(n => !n.read).length
     setUnreadCount(count)
@@ -105,6 +113,34 @@ export default function QuotesPage() {
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false)
     document.body.classList.remove('overflow-hidden')
+  }
+
+  // Mobile filter functions
+  const toggleMobileFilter = () => {
+    setIsMobileFilterOpen(!isMobileFilterOpen)
+  }
+
+  const closeMobileFilter = () => {
+    setIsMobileFilterOpen(false)
+  }
+
+  const applyFilters = () => {
+    console.log('Applying filters:', {
+      searchTerm,
+      selectedActivity,
+      selectedTimeframe,
+      selectedSort,
+      selectedStatus
+    })
+    closeMobileFilter()
+  }
+
+  const resetFilters = () => {
+    setSearchTerm('')
+    setSelectedActivity('All Activity')
+    setSelectedTimeframe('Last 30 days')
+    setSelectedSort('Sort by')
+    setSelectedStatus('Status')
   }
 
   const handleProfileSetting = () => {
@@ -200,7 +236,10 @@ export default function QuotesPage() {
                       <img src="/dashboard/btn/03.svg" alt="" className="w-4 h-4" />
                     </button>
 
-                    <button className="p-[10px] bg-[#FBFBFC] border border-[#FBFBFC] rounded-[6px]">
+                    <button 
+                      onClick={toggleMobileFilter}
+                      className="p-[10px] bg-[#FBFBFC] border border-[#FBFBFC] rounded-[6px]"
+                    >
                       <img src="/dashboard/btn/04.svg" alt="" className="w-4 h-4" />
                     </button>
                   </div>
@@ -477,7 +516,143 @@ export default function QuotesPage() {
             </main>
           </div>
 
-          {/* CSS Styles remain exactly the same */}
+          {/* Mobile Filter Overlay */}
+          {isMobileFilterOpen && (
+            <div className="mobile-filter-overlay active">
+              <div className="mobile-filter-container">
+                <div className="mobile-filter-header">
+                  <h3 className="mobile-filter-title">Filters</h3>
+                  <button onClick={closeMobileFilter} className="mobile-close-filter-btn">
+                    <img src="/dashboard/close.svg" alt="Close" className="w-5 h-5" />
+                  </button>
+                </div>
+                
+                <div className="mobile-filter-content">
+                  {/* Search Input */}
+                  <div className="mobile-filter-group">
+                    <label className="mobile-filter-label">Search by...</label>
+                    <div className="mobile-search-input">
+                      <input
+                        type="text"
+                        placeholder="Type to search..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="mobile-search-field"
+                      />
+                      <img 
+                        src="https://c.animaapp.com/mjiggi0jSqvoj5/img/search--1--2.png" 
+                        alt="Search" 
+                        className="mobile-search-icon"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* All Activity Dropdown */}
+                  <div className="mobile-filter-group">
+                    <label className="mobile-filter-label">All Activity</label>
+                    <div className="mobile-dropdown">
+                      <select 
+                        value={selectedActivity}
+                        onChange={(e) => setSelectedActivity(e.target.value)}
+                        className="mobile-dropdown-select"
+                      >
+                        <option value="All Activity">All Activity</option>
+                        <option value="Quotes Only">Quotes Only</option>
+                        <option value="Shipments Only">Shipments Only</option>
+                        <option value="Documents Only">Documents Only</option>
+                      </select>
+                      <img 
+                        src="https://c.animaapp.com/mjiggi0jSqvoj5/img/arrow-3-1.svg" 
+                        alt="Dropdown"
+                        className="mobile-dropdown-arrow"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Last 30 days Dropdown */}
+                  <div className="mobile-filter-group">
+                    <label className="mobile-filter-label">Timeframe</label>
+                    <div className="mobile-dropdown">
+                      <select 
+                        value={selectedTimeframe}
+                        onChange={(e) => setSelectedTimeframe(e.target.value)}
+                        className="mobile-dropdown-select"
+                      >
+                        <option value="Last 30 days">Last 30 days</option>
+                        <option value="Last 7 days">Last 7 days</option>
+                        <option value="Last 24 hours">Last 24 hours</option>
+                        <option value="Last 3 months">Last 3 months</option>
+                        <option value="All time">All time</option>
+                      </select>
+                      <img 
+                        src="https://c.animaapp.com/mjiggi0jSqvoj5/img/arrow-3-1.svg" 
+                        alt="Dropdown"
+                        className="mobile-dropdown-arrow"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Sort by Dropdown */}
+                  <div className="mobile-filter-group">
+                    <label className="mobile-filter-label">Sort by</label>
+                    <div className="mobile-dropdown">
+                      <select 
+                        value={selectedSort}
+                        onChange={(e) => setSelectedSort(e.target.value)}
+                        className="mobile-dropdown-select"
+                      >
+                        <option value="Sort by">Sort by</option>
+                        <option value="Newest first">Newest first</option>
+                        <option value="Oldest first">Oldest first</option>
+                        <option value="Status">Status</option>
+                        <option value="Value">Value</option>
+                      </select>
+                      <img 
+                        src="https://c.animaapp.com/mjiggi0jSqvoj5/img/arrow-3-1.svg" 
+                        alt="Dropdown"
+                        className="mobile-dropdown-arrow"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Status Dropdown */}
+                  <div className="mobile-filter-group">
+                    <label className="mobile-filter-label">Status</label>
+                    <div className="mobile-dropdown">
+                      <select 
+                        value={selectedStatus}
+                        onChange={(e) => setSelectedStatus(e.target.value)}
+                        className="mobile-dropdown-select"
+                      >
+                        <option value="Status">Status</option>
+                        <option value="All Status">All Status</option>
+                        <option value="Pending Approval">Pending Approval</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Declined">Declined</option>
+                        <option value="Expired">Expired</option>
+                      </select>
+                      <img 
+                        src="https://c.animaapp.com/mjiggi0jSqvoj5/img/arrow-3-1.svg" 
+                        alt="Dropdown"
+                        className="mobile-dropdown-arrow"
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mobile-filter-actions">
+                  <button onClick={resetFilters} className="mobile-filter-reset">
+                    Reset Filters
+                  </button>
+                  <button onClick={applyFilters} className="mobile-filter-apply">
+                    Apply Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* CSS Styles */}
           <style jsx>{`
             /* Hamburger Menu Styles */
             .hamburger-menu {
@@ -572,6 +747,206 @@ export default function QuotesPage() {
                 cursor: pointer;
                 font-size: 24px;
                 color: #000000;
+            }
+
+            /* Mobile Filter Overlay - Updated as requested */
+            .mobile-filter-overlay {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 70007;
+                display: none;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                top: 0;
+            }
+
+            .mobile-filter-overlay.active {
+                display: block;
+                opacity: 1;
+            }
+
+            .mobile-filter-container {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 75vh;
+                background-color: #ffffff;
+                border-top-left-radius: 20px;
+                border-top-right-radius: 20px;
+                padding: 24px;
+                transform: translateY(100%);
+                transition: transform 0.3s ease;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .mobile-filter-overlay.active .mobile-filter-container {
+                transform: translateY(0);
+            }
+
+            .mobile-filter-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 24px;
+                padding-bottom: 16px;
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            .mobile-filter-title {
+                font-family: 'Montserrat', sans-serif;
+                font-size: 20px;
+                font-weight: 600;
+                color: #000000;
+            }
+
+            .mobile-close-filter-btn {
+                width: 40px;
+                height: 40px;
+                background-color: #f7f7f7;
+                border-radius: 8px;
+                border: 1px solid rgba(255, 255, 255, 0.22);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+            }
+
+            .mobile-filter-content {
+                flex: 1;
+                overflow-y: auto;
+                padding-right: 8px;
+            }
+
+            .mobile-filter-group {
+                margin-bottom: 20px;
+            }
+
+            .mobile-filter-label {
+                display: block;
+                font-family: 'Montserrat', sans-serif;
+                font-size: 14px;
+                font-weight: 500;
+                color: #606068;
+                margin-bottom: 8px;
+            }
+
+            .mobile-search-input {
+                position: relative;
+                width: 100%;
+            }
+
+            .mobile-search-field {
+                width: 100%;
+                height: 48px;
+                padding: 0 16px 0 40px;
+                border: 1px solid #e3e6ea;
+                border-radius: 8px;
+                font-family: 'Montserrat', sans-serif;
+                font-size: 14px;
+                color: #7b7b7b;
+                background-color: #ffffff;
+                outline: none;
+                transition: border-color 0.3s;
+            }
+
+            .mobile-search-field:focus {
+                border-color: #2563eb;
+            }
+
+            .mobile-search-icon {
+                position: absolute;
+                left: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 16px;
+                height: 16px;
+                opacity: 0.5;
+            }
+
+            .mobile-dropdown {
+                position: relative;
+                width: 100%;
+            }
+
+            .mobile-dropdown-select {
+                width: 100%;
+                height: 48px;
+                padding: 0 16px;
+                border: 1px solid #e3e6ea;
+                border-radius: 8px;
+                font-family: 'Montserrat', sans-serif;
+                font-size: 14px;
+                color: #7b7b7b;
+                background-color: #ffffff;
+                outline: none;
+                appearance: none;
+                cursor: pointer;
+                transition: border-color 0.3s;
+            }
+
+            .mobile-dropdown-select:focus {
+                border-color: #2563eb;
+            }
+
+            .mobile-dropdown-arrow {
+                position: absolute;
+                right: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 12px;
+                height: 8px;
+                pointer-events: none;
+            }
+
+            .mobile-filter-actions {
+                display: flex;
+                gap: 12px;
+                margin-top: 20px;
+                padding-top: 16px;
+                border-top: 1px solid #f0f0f0;
+            }
+
+            .mobile-filter-reset {
+                flex: 1;
+                height: 48px;
+                border: 1px solid #e3e6ea;
+                border-radius: 8px;
+                background-color: transparent;
+                font-family: 'Montserrat', sans-serif;
+                font-size: 14px;
+                font-weight: 500;
+                color: #374151;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+
+            .mobile-filter-reset:hover {
+                background-color: #f3f4f6;
+                border-color: #d1d5db;
+            }
+
+            .mobile-filter-apply {
+                flex: 1;
+                height: 48px;
+                border: none;
+                border-radius: 8px;
+                background-color: #2563eb;
+                font-family: 'Montserrat', sans-serif;
+                font-size: 14px;
+                font-weight: 500;
+                color: #ffffff;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+
+            .mobile-filter-apply:hover {
+                background-color: #1d4ed8;
             }
 
             .mobile-nav-search {
