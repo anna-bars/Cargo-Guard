@@ -390,73 +390,117 @@ export default function DashboardPage() {
               </div>
 
               {/* Table Rows */}
-              <div className="block-2 space-y-2 activity-table  overflow-y-scroll">
-                {[
-                  {
-                    type: 'Quote',
-                    id: 'Q-005',
-                    cargo: 'Jewelry / 15,400.00',
-                    status: { text: 'Pending Approval', color: 'bg-[#cbd03c]/10', dot: 'bg-[#cbd03c]', textColor: 'text-[#cbd03c]' },
-                    date: 'Oct 25, 9:10PM',
-                    button: { text: 'Approve Quote', variant: 'primary' }
-                  },
-                  {
-                    type: 'Policy',
-                    id: 'P-021',
-                    cargo: 'Textiles / 3,700.00',
-                    status: { text: 'Document Missing', color: 'bg-[#f97316]/10', dot: 'bg-[#f97316]', textColor: 'text-[#f97316]' },
-                    date: 'Oct 20, 6:30PM',
-                    button: { text: 'Upload Docs', variant: 'secondary' }
-                  },
-                  {
-                    type: 'Policy',
-                    id: 'P-020',
-                    cargo: 'Heavy Machinery / 48,400.00',
-                    status: { text: 'Expires 15 Nov 2025', color: 'bg-[#eab308]/10', dot: 'bg-[#eab308]', textColor: 'text-[#eab308]' },
-                    date: 'Oct 15, 4:20AM',
-                    button: { text: 'Renew Policy', variant: 'secondary' }
-                  },
-                  {
-                    type: 'Policy',
-                    id: 'P-019',
-                    cargo: 'Electronics / 8,000.00',
-                    status: { text: 'Active', color: 'bg-[#16a34a]/10', dot: 'bg-[#16a34a]', textColor: 'text-[#16a34a]' },
-                    date: 'Oct 21, 2:30PM',
-                    button: { text: 'Download Cert', variant: 'secondary' }
-                  },
-                  {
-                    type: 'Quote',
-                    id: 'Q-007',
-                    cargo: 'Food Products / 1,100.00',
-                    status: { text: 'Declined', color: 'bg-[#8ea0b0]/10', dot: 'bg-[#8ea0b0]', textColor: 'text-[#8ea0b0]' },
-                    date: 'Sept 28, 9:30PM',
-                    button: { text: 'View Details', variant: 'secondary' }
-                  }
-                ].map((row, idx) => (
-                  <div key={idx} className="xl:grid xl:grid-cols-[120px_120px_1fr_200px_150px_140px] gap-2 p-3 xl:p-3 bg-[#f8fafd] xl:bg-[#f8fafd] rounded-lg xl:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
-                    {/* Mobile/Desktop Layout */}
-                    <div className="w-[45%] xl:w-auto font-poppins text-sm text-black truncate row-cell">{row.type}</div>
-                    <div className="w-[45%] xl:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">{row.id}</div>
-                    <div className="w-[45%] xl:w-auto font-poppins text-sm text-black truncate mt-2 xl:mt-0 row-cell">{row.cargo}</div>
-                    <div className="w-[45%] xl:w-auto mt-2 xl:mt-0 row-cell">
-                      <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${row.status.dot}`}></span>
-                        {row.status.text}
-                      </span>
-                    </div>
-                    <div className="w-[45%] xl:w-auto font-poppins text-sm text-black truncate mt-2 xl:mt-0 row-cell">{row.date}</div>
-                    <div className="w-full xl:w-auto mt-2 xl:mt-0 row-cell">
-                      <button className={`h-9 px-4 rounded-lg font-poppins text-sm font-normal transition-colors duration-300 w-full xl:w-[140px] ${
-                        row.button.variant === 'primary' 
-                          ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]' 
-                          : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f3f4f6] hover:border-[#d1d5db]'
-                      }`}>
-                        {row.button.text}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              {/* Table Rows */}
+{/* Table Rows */}
+<div className="block-2 space-y-2 activity-table  overflow-y-scroll">
+  {[
+    {
+      type: 'Quote',
+      id: 'Q-005',
+      cargo: 'Jewelry',
+      value: '15,400.00',
+      status: { text: 'Pending Approval', color: 'bg-[#cbd03c]/10', dot: 'bg-[#cbd03c]', textColor: 'text-[#cbd03c]' },
+      date: 'Oct 25, 9:10PM',
+      button: { text: 'Approve Quote', variant: 'primary' }
+    },
+    {
+      type: 'Policy',
+      id: 'P-021',
+      cargo: 'Textiles',
+      value: '3,700.00',
+      status: { text: 'Document Missing', color: 'bg-[#f97316]/10', dot: 'bg-[#f97316]', textColor: 'text-[#f97316]' },
+      date: 'Oct 20, 6:30PM',
+      button: { text: 'Upload Docs', variant: 'secondary' }
+    },
+    {
+      type: 'Policy',
+      id: 'P-020',
+      cargo: 'Heavy Machinery',
+      value: '48,400.00',
+      status: { text: 'Expires 15 Nov 2025', color: 'bg-[#eab308]/10', dot: 'bg-[#eab308]', textColor: 'text-[#eab308]' },
+      date: 'Oct 15, 4:20AM',
+      button: { text: 'Renew Policy', variant: 'secondary' }
+    },
+    {
+      type: 'Policy',
+      id: 'P-019',
+      cargo: 'Electronics',
+      value: '8,000.00',
+      status: { text: 'Active', color: 'bg-[#16a34a]/10', dot: 'bg-[#16a34a]', textColor: 'text-[#16a34a]' },
+      date: 'Oct 21, 2:30PM',
+      button: { text: 'Download Cert', variant: 'secondary' }
+    },
+    {
+      type: 'Quote',
+      id: 'Q-007',
+      cargo: 'Food Products',
+      value: '1,100.00',
+      status: { text: 'Declined', color: 'bg-[#8ea0b0]/10', dot: 'bg-[#8ea0b0]', textColor: 'text-[#8ea0b0]' },
+      date: 'Sept 28, 9:30PM',
+      button: { text: 'View Details', variant: 'secondary' }
+    }
+  ].map((row, idx) => (
+    <div key={idx} className="xl:grid xl:grid-cols-[120px_120px_1fr_200px_150px_140px] gap-2 p-3 xl:p-3 bg-[#f8fafd] xl:bg-[#f8fafd] rounded-lg xl:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
+      {/* Desktop Layout - unchanged */}
+      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">{row.type}</div>
+      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">{row.id}</div>
+      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">{row.cargo} / {row.value}</div>
+      <div className="hidden xl:block xl:w-auto row-cell">
+        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor}`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${row.status.dot}`}></span>
+          {row.status.text}
+        </span>
+      </div>
+      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">{row.date}</div>
+      
+      {/* Mobile Layout - NEW structure */}
+      <div className="xl:hidden w-full">
+        {/* Top row: Type/ID on left, Status on right */}
+        <div className="flex justify-between items-start mb-3">
+          <div className="flex items-center gap-2">
+            <span className="font-poppins text-sm font-medium text-black">{row.type}</span>
+            <span className="font-poppins text-sm text-[#2563eb] underline">{row.id}</span>
+          </div>
+          <div className="row-cell flex-shrink-0">
+            <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor} mobile-status-badge`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${row.status.dot}`}></span>
+              {row.status.text}
+            </span>
+          </div>
+        </div>
+        
+        {/* Middle row: Cargo on left, Value on right */}
+        <div className="flex justify-between items-center mb-3">
+          <div className="font-poppins text-sm text-gray-700">{row.cargo}</div>
+          <div className="font-poppins text-sm font-medium text-black">{row.value}</div>
+        </div>
+        
+        {/* Bottom row: Date on left, full-width button */}
+        <div className="flex flex-col gap-3">
+          <div className="font-poppins text-sm text-gray-600">{row.date}</div>
+          <button className={`h-10 px-4 rounded-lg font-poppins text-sm font-normal transition-colors duration-300 w-full mobile-action-btn ${
+            row.button.variant === 'primary' 
+              ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]' 
+              : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f3f4f6] hover:border-[#d1d5db]'
+          }`}>
+            {row.button.text}
+          </button>
+        </div>
+      </div>
+      
+      {/* Desktop button */}
+      <div className="hidden xl:block xl:w-auto row-cell">
+        <button className={`h-9 px-4 rounded-lg font-poppins text-sm font-normal transition-colors duration-300 w-full xl:w-[140px] ${
+          row.button.variant === 'primary' 
+            ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]' 
+            : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f3f4f6] hover:border-[#d1d5db]'
+        }`}>
+          {row.button.text}
+        </button>
+      </div>
+    </div>
+  ))}
+</div>
             </section>
           </div>
 
@@ -1068,7 +1112,49 @@ export default function DashboardPage() {
     width: 100%;
 }
 
+/* Add these styles to your existing <style jsx> block */
+.mobile-status-badge {
+  width: fit-content !important;
+  min-width: fit-content !important;
+  white-space: nowrap !important;
+}
 
+@media screen and (max-width: 1024px) {
+  .row-cell {
+    /* Update the existing .row-cell rule for mobile */
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #000000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: auto !important; /* Changed from 45% to auto */
+    min-width: fit-content !important;
+  }
+  
+  /* Specific style for status badge in mobile */
+  .mobile-status-badge {
+    width: fit-content !important;
+    max-width: none !important;
+    flex-shrink: 0 !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+  
+  /* Ensure the status container doesn't take 45% */
+  .table-row > .row-cell:nth-child(4) {
+    width: fit-content !important;
+    min-width: fit-content !important;
+  }
+}
+
+/* For mobile status badge specifically */
+@media screen and (max-width: 768px) {
+  .mobile-status-badge {
+    font-size: 11px !important;
+    padding: 6px 8px !important;
+  }
+}
 
 
       `}</style>
