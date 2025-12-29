@@ -226,7 +226,7 @@ export default function DashboardPage() {
                 <section className="block-1 bg-[#fafcff]/80 rounded-2xl p-4 h-auto performance-section">
                   <div className="flex justify-between items-start mb-2 section-header">
                     <div>
-                      <h2 className="font-montserrat text-[16px] font-medium text-black section-title">
+                      <h2 className="font-montserrat text-[16px] font-normal text-black section-title">
                         Performance Overview
                       </h2>
                     </div>
@@ -253,7 +253,7 @@ export default function DashboardPage() {
                           <span className="absolute -left-5 top-3 text-[12px]">$</span>
                         </div>
                       </div>
-                      <p className="font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
+                      <p className="sub-header-metric font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
                         Total Insured Amount
                       </p>
                     </div>
@@ -270,7 +270,7 @@ export default function DashboardPage() {
                         </span>
                         </div>
                       </div>
-                      <p className="font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
+                      <p className="sub-header-metric font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
                         Active Policies
                       </p>
                     </div>
@@ -290,7 +290,7 @@ export default function DashboardPage() {
                           <img src="/dashboard/top-arrow.svg" alt="" />
                         </span>
                       </div>
-                      <p className="font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
+                      <p className="sub-header-metric font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
                         Quotes Awaiting Approval
                       </p>
                     </div>
@@ -310,7 +310,7 @@ export default function DashboardPage() {
                           <img src="/dashboard/top-arrow.svg" alt="" />
                         </span>
                       </div>
-                      <p className="font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
+                      <p className="sub-header-metric font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
                         Contracts Due to Expire
                       </p>
                     </div>
@@ -330,7 +330,7 @@ export default function DashboardPage() {
                           <img src="/dashboard/top-arrow.svg" alt="" />
                         </span>
                       </div>
-                      <p className="font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
+                      <p className="sub-header-metric font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
                         Required Document Uploads
                       </p>
                     </div>
@@ -493,7 +493,7 @@ export default function DashboardPage() {
                           {/* Top row: Type/ID on left, Status on right */}
                           <div className="flex justify-between items-start mb-4">
                             <div className="flex items-center gap-2">
-                              <span className="font-poppins text-sm font-medium text-black">{row.type}</span>
+                              <span className="font-poppins text-sm font-normal text-black">{row.type}</span>
                               <span className="font-poppins text-sm text-[#2563eb] underline">{row.id}</span>
                             </div>
                             <div className="row-cell flex-shrink-0">
@@ -507,7 +507,7 @@ export default function DashboardPage() {
                           {/* Middle row: Cargo on left, Value on right */}
                           <div className="flex justify-between items-center mb-4">
                             <div className="font-poppins text-sm text-gray-700">{row.cargo}</div>
-                            <div className="font-poppins text-sm font-medium text-black">{row.value}</div>
+                            <div className="font-poppins text-sm font-normal text-black">{row.value}</div>
                           </div>
                           
                           {/* Bottom row: Date on left, full-width button */}
@@ -557,7 +557,7 @@ export default function DashboardPage() {
                     </p>
                     
                     <div className="flex items-end justify-between gap-[82px] action-buttons">
-                      <h3 className="font-montserrat text-[32px] font-medium text-white leading-[38px] tracking-[0.64px] max-w-[224px] cta-title">
+                      <h3 className="font-montserrat text-[32px] font-normal text-white leading-[38px] tracking-[0.64px] max-w-[224px] cta-title">
                         Get Your New Quote Instantly
                       </h3>
                       <img 
@@ -570,9 +570,9 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Quote Conversion Rate */}
-                <div className="bg-[#fafcff]/80 rounded-2xl p-4 h-auto min-h-[203px] w-full quote-conversion performance-section hover:shadow-sm transition-shadow duration-300">
+                <div className="flex flex-col justify-between bg-[#fafcff]/80 rounded-2xl p-4 h-auto min-h-[203px] w-full quote-conversion performance-section hover:shadow-sm transition-shadow duration-300">
                   <div className="mb-[24px]">
-                    <h3 className="font-montserrat text-[18px] font-medium text-black action-title">
+                    <h3 className="font-montserrat text-[18px] font-normal text-black action-title">
                       Quote Conversion Rate
                     </h3>
                     <p className="font-montserrat text-[12px] font-normal text-[#c7c7c7]">
@@ -582,7 +582,7 @@ export default function DashboardPage() {
                   
                   <div className="block justify-between items-end">
                     <div className="w-full">
-                      <div className="flex justify-between mb-1.5">
+                      <div className="flex w-[96%] justify-between mb-1.5">
                         <div>
                           <div className="text-[13px] text-[#C8C8C8]">Approved</div>
                           <div className="text-[15px] mt-0.5">17</div>
@@ -604,6 +604,15 @@ export default function DashboardPage() {
                             <div 
                               key={`top-${i}`} 
                               className={`w-[3px] bg-[#bed5f8] ${i === 0 || i === 21 ? 'h-8' : 'h-5'}`}
+                            />
+                          ))}
+                        </div>
+
+                        <div className="flex gap-1 items-baseline">
+                          {Array.from({ length: 7 }).map((_, i) => (
+                            <div 
+                              key={`top-${i}`} 
+                              className={`w-[3px] bg-[#FCC573] ${i === 0 || i === 6 ? 'h-8' : 'h-5'}`}
                             />
                           ))}
                         </div>
@@ -1395,12 +1404,13 @@ export default function DashboardPage() {
 
             @media screen and (max-width: 768px) {
                 .metric-value, .metric-value2 {
-                    font-size: 32px;
-                    font-weight: 200;
+                    font-size: 38px;
+                    font-weight: 300 !important;
                 }
 
                 .metrics-grid {
-                    gap: 22px;
+                            gap: 16px 32px;
+        justify-content: flex-start;
                 }
                 
                 .performance-section {
@@ -1534,6 +1544,11 @@ export default function DashboardPage() {
 }
 
 @media screen and (max-width: 768px) {
+.sub-header-metric {
+    margin-top: -8px !important;
+    font-size: 10px !important;
+    width: 74% !important;
+}
   .mobile-action-btn {
     height: 44px;
     font-size: 14px;

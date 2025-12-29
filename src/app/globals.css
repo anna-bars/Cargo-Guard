@@ -167,3 +167,6 @@ body {
 *::-webkit-scrollbar-corner {
   display: none;
 }
+* {
+  font-weight: normal !important;
+}
