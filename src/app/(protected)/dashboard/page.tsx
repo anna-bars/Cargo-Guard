@@ -392,13 +392,14 @@ export default function DashboardPage() {
               {/* Table Rows */}
               {/* Table Rows */}
 {/* Table Rows */}
-<div className="block-2 space-y-2 activity-table  overflow-y-scroll">
+{/* Table Rows */}
+<div className="block-2 space-y-2 activity-table overflow-y-scroll">
   {[
     {
       type: 'Quote',
       id: 'Q-005',
       cargo: 'Jewelry',
-      value: '15,400.00',
+      value: '$15,400.00',
       status: { text: 'Pending Approval', color: 'bg-[#cbd03c]/10', dot: 'bg-[#cbd03c]', textColor: 'text-[#cbd03c]' },
       date: 'Oct 25, 9:10PM',
       button: { text: 'Approve Quote', variant: 'primary' }
@@ -407,7 +408,7 @@ export default function DashboardPage() {
       type: 'Policy',
       id: 'P-021',
       cargo: 'Textiles',
-      value: '3,700.00',
+      value: '$3,700.00',
       status: { text: 'Document Missing', color: 'bg-[#f97316]/10', dot: 'bg-[#f97316]', textColor: 'text-[#f97316]' },
       date: 'Oct 20, 6:30PM',
       button: { text: 'Upload Docs', variant: 'secondary' }
@@ -416,7 +417,7 @@ export default function DashboardPage() {
       type: 'Policy',
       id: 'P-020',
       cargo: 'Heavy Machinery',
-      value: '48,400.00',
+      value: '$48,400.00',
       status: { text: 'Expires 15 Nov 2025', color: 'bg-[#eab308]/10', dot: 'bg-[#eab308]', textColor: 'text-[#eab308]' },
       date: 'Oct 15, 4:20AM',
       button: { text: 'Renew Policy', variant: 'secondary' }
@@ -425,7 +426,7 @@ export default function DashboardPage() {
       type: 'Policy',
       id: 'P-019',
       cargo: 'Electronics',
-      value: '8,000.00',
+      value: '$8,000.00',
       status: { text: 'Active', color: 'bg-[#16a34a]/10', dot: 'bg-[#16a34a]', textColor: 'text-[#16a34a]' },
       date: 'Oct 21, 2:30PM',
       button: { text: 'Download Cert', variant: 'secondary' }
@@ -434,7 +435,7 @@ export default function DashboardPage() {
       type: 'Quote',
       id: 'Q-007',
       cargo: 'Food Products',
-      value: '1,100.00',
+      value: '$1,100.00',
       status: { text: 'Declined', color: 'bg-[#8ea0b0]/10', dot: 'bg-[#8ea0b0]', textColor: 'text-[#8ea0b0]' },
       date: 'Sept 28, 9:30PM',
       button: { text: 'View Details', variant: 'secondary' }
@@ -453,35 +454,35 @@ export default function DashboardPage() {
       </div>
       <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">{row.date}</div>
       
-      {/* Mobile Layout - NEW structure */}
+      {/* Mobile Layout */}
       <div className="xl:hidden w-full">
         {/* Top row: Type/ID on left, Status on right */}
-        <div className="flex justify-between items-start mb-3">
+        <div className="flex justify-between items-start mb-4">
           <div className="flex items-center gap-2">
             <span className="font-poppins text-sm font-medium text-black">{row.type}</span>
             <span className="font-poppins text-sm text-[#2563eb] underline">{row.id}</span>
           </div>
           <div className="row-cell flex-shrink-0">
-            <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor} mobile-status-badge`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${row.status.dot}`}></span>
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor} mobile-status-badge`}>
+              <span className={`w-2 h-2 rounded-full ${row.status.dot}`}></span>
               {row.status.text}
             </span>
           </div>
         </div>
         
         {/* Middle row: Cargo on left, Value on right */}
-        <div className="flex justify-between items-center mb-3">
+        <div className="flex justify-between items-center mb-4">
           <div className="font-poppins text-sm text-gray-700">{row.cargo}</div>
           <div className="font-poppins text-sm font-medium text-black">{row.value}</div>
         </div>
         
         {/* Bottom row: Date on left, full-width button */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4">
           <div className="font-poppins text-sm text-gray-600">{row.date}</div>
-          <button className={`h-10 px-4 rounded-lg font-poppins text-sm font-normal transition-colors duration-300 w-full mobile-action-btn ${
+          <button className={`mobile-action-btn ${
             row.button.variant === 'primary' 
-              ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]' 
-              : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f3f4f6] hover:border-[#d1d5db]'
+              ? 'primary-btn' 
+              : 'secondary-btn'
           }`}>
             {row.button.text}
           </button>
@@ -1156,7 +1157,122 @@ export default function DashboardPage() {
   }
 }
 
+/* Mobile action button styles */
+.mobile-action-btn {
+  color: #ffffff;
+  cursor: pointer;
+  background-color: #2563EB;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  transition: background-color 0.3s;
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  width: 100%;
+  height: 44px;
+  border: 1px solid rgba(0, 0, 255, 0.169);
+}
 
+.mobile-action-btn.primary-btn {
+  background-color: #2563EB;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.mobile-action-btn.secondary-btn {
+  background-color: transparent;
+  color: #374151;
+  border: 1px solid #e3e6ea;
+}
+
+.mobile-action-btn:hover {
+  background-color: #1d4ed8;
+}
+
+.mobile-action-btn.secondary-btn:hover {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+/* Mobile status badge - fit content */
+.mobile-status-badge {
+  width: fit-content !important;
+  min-width: fit-content !important;
+  white-space: nowrap !important;
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+  height: 26px;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+/* Mobile specific styles */
+@media screen and (max-width: 1024px) {
+  .table-row {
+    min-width: 100%;
+    display: flex;
+    background-color: rgba(250, 252, 255, 0.8);
+    border-radius: 16px;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: space-between;
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+  
+  .row-cell {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #000000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: auto !important;
+    min-width: fit-content !important;
+  }
+  
+  /* Status badge in mobile */
+  .table-row .mobile-status-badge {
+    font-size: 11px !important;
+    padding: 6px 10px !important;
+    height: 24px;
+  }
+  
+  /* Mobile layout spacing */
+  .table-row > .xl\\:hidden {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .table-row .xl\\:hidden > div {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .mobile-action-btn {
+    height: 44px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  
+  .mobile-status-badge {
+    font-size: 10px !important;
+    padding: 5px 8px !important;
+    height: 22px;
+  }
+  
+  .table-row {
+    padding: 16px;
+    gap: 12px;
+  }
+}
       `}</style>
     </div>
           {/* ... rest of your dashboard content ... */}
