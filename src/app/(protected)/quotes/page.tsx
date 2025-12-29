@@ -186,11 +186,23 @@ export default function QuotesPage() {
               <div className="max-h-[87.5%] flex flex-col gap-4">
                 {/* Mobile Activity Header */}
                 <div className="xl:hidden flex items-center justify-between activity-mobile-header activity-section-mob-hd">
-                  <h3 className="text-lg font-normal">Recent Activity</h3>
-                  <div className="flex">
-                    {[1, 2, 3, 4].map((num) => (
-                      <img key={num} src={`dashboard/btn/0${num}.svg`} alt="" className="w-[44px] h-[44px] p-0 border-none" />
-                    ))}
+                  <h3 className="text-lg font-normal">All Insurance Quotes</h3>
+                  <div className="flex gap-1">
+                    <button className="p-[10px] bg-[#FBFBFC] border border-[#FBFBFC] rounded-[6px]">
+                      <img src="/dashboard/btn/01.svg" alt="" className="w-4 h-4" />
+                    </button>
+
+                    <button className="p-[10px] bg-[#FBFBFC] border border-[#FBFBFC] rounded-[6px]">
+                      <img src="/dashboard/btn/02.svg" alt="" className="w-4 h-4" />
+                    </button>
+
+                    <button className="p-[10px] bg-[#FBFBFC] border border-[#FBFBFC] rounded-[6px]">
+                      <img src="/dashboard/btn/03.svg" alt="" className="w-4 h-4" />
+                    </button>
+
+                    <button className="p-[10px] bg-[#FBFBFC] border border-[#FBFBFC] rounded-[6px]">
+                      <img src="/dashboard/btn/04.svg" alt="" className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
 
