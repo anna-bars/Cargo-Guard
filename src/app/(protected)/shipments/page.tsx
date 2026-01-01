@@ -207,7 +207,7 @@ export default function QuotesPage() {
     <DashboardLayout>
       <div className='insult'>
         <div className='infarkt'>
-          <div className="max-w-[88%] min-w-full sm:max-w-[96%] mx-auto">
+          <div className="max-w-[96%] min-w-full sm:max-w-[96%] mx-auto">
             {/* Header */}
             
             {/* Mobile Header for Activity Section */}
@@ -620,118 +620,78 @@ export default function QuotesPage() {
                 </div>
                 {/* Stats Cards Section */}
 <div className="flex flex-col gap-4">
-  {/* Improve Your Quote Rate Card */}
+  {/* Reduce Policy Risk Card */}
   <div className="stats-card bg-[#fafcff]/80 rounded-2xl p-4">
-    <h3 className="font-montserrat text-lg font-medium text-black mb-6">Improve Your Quote Rate</h3>
+    <h3 className="font-montserrat text-lg font-medium text-black mb-6">Reduce Policy Risk</h3>
     <div className="stats-content mb-6">
-      <div className="rate-section relative w-[145px] h-[39px]">
-        <div className="rate-label absolute top-6 left-24 font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px]">Quotes</div>
-        <div className="rate-value absolute top-0 left-0 w-20 h-[37px] flex gap-1 items-baseline">
-          <span className="percentage font-montserrat text-[56px] text-black font-normal tracking-[1.12px] leading-9 w-16">72</span>
-          <span className="percent-symbol font-montserrat text-xs text-black font-normal tracking-[0.20px] w-2">%</span>
+      <div className="risk-score relative">
+        <div className="score-display flex items-start gap-1">
+          <span className="percentage-symbol font-montserrat text-xs font-normal text-black">%</span>
+          <span className="score-number font-montserrat text-[56px] font-normal text-black tracking-[1.12px] leading-9">88</span>
         </div>
+        <span className="score-label font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px]">Policy Risk Score</span>
       </div>
-      <p className="stats-description font-montserrat text-xs font-normal text-[#afaeae] tracking-[0.24px] max-w-[268px]">
-        Your Quotes are often Declined due to 
-        <strong className="font-medium tracking-[0.03px]"> Inaccurate Cargo Value</strong>
+      <p className="risk-description font-montserrat text-xs font-normal text-[#c7c7c7] tracking-[0.24px]">
+        <span className="highlight font-medium text-[#afaeae]">7</span> of your active policies are at risk due to <span className="highlight font-medium text-[#afaeae]">Missing Documents</span>
       </p>
     </div>
     <div className="stats-footer flex items-end justify-between w-full">
       <span className="font-montserrat text-base font-normal text-[#3c3c3c] tracking-[0.32px] max-w-[206px]">
-        View Full Cargo Type Rules Before Proceeding
+        View<br />Required Documents
       </span>
-      <img 
-        src="https://c.animaapp.com/mjous28hLTkY2o/img/group-84-1.png" 
-        alt="Arrow"
-        className="w-10 h-10"
-      />
+      <button className="action-button bg-transparent border-none p-0 cursor-pointer">
+        <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="21" cy="21" r="21" fill="#000"/>
+          <path d="M21 15L27 21L21 27M27 21H15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
     </div>
   </div>
 
-  {/* Quotes Expiration Card */}
+  {/* Policy Expiration Timeline Card */}
   <div className="stats-card bg-[#fafcff]/80 rounded-2xl p-4">
     <div className="card-header mb-6">
-      <h3 className="font-montserrat text-lg font-medium text-black mb-0">Quotes Expiration</h3>
-      <div className="time-tabs flex gap-6">
-        <span className="active font-montserrat text-xs font-medium text-[#6f6f6f] tracking-[0.24px] underline cursor-pointer whitespace-nowrap">This Week</span>
-        <span className="font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px] cursor-pointer whitespace-nowrap">Next Week</span>
-        <span className="font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px] cursor-pointer whitespace-nowrap">In 2–4 Weeks</span>
-        <span className="font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px] cursor-pointer whitespace-nowrap">Next Month</span>
+      <h3 className="font-montserrat text-lg font-medium text-black mb-0">Policy Expiration Timeline</h3>
+    </div>
+    
+    <div className="expiration-stats relative mb-6">
+      <div className="expiration-score">
+        <div className="score-display flex items-center gap-1">
+          <span className="percentage-symbol font-montserrat text-xs font-normal text-black">%</span>
+          <span className="score-number font-montserrat text-[56px] font-normal text-black tracking-[1.12px] leading-10">71</span>
+          <svg width="6" height="8" viewBox="0 0 6 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 0L6 8H0L3 0Z" fill="#000"/>
+          </svg>
+        </div>
+        <span className="score-label font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px]">Policies</span>
       </div>
     </div>
     
-    <div className="expiration-stats relative w-[149px] h-[73.5px] mb-6">
-      <div className="expiration-left absolute top-0 left-0.5 w-[143px] h-11 flex gap-6">
-        <div className="expiration-rate w-20 h-10 flex gap-1 items-baseline">
-          <span className="rate-number font-montserrat text-[56px] text-black font-normal tracking-[1.12px] leading-10 w-16">32</span>
-          <span className="rate-symbol font-montserrat text-xs text-black font-normal tracking-[0.20px] w-2">%</span>
+    <p className="expiration-info font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px] mb-4">
+      Total expiring policies: 7
+    </p>
+    
+    <div className="chart-container mb-4">
+      <div className="chart-labels flex justify-between items-center mb-2">
+        <span className="chart-label font-montserrat text-base font-normal text-[#c7c7c7] tracking-[0.32px]">0%</span>
+        <span className="chart-label-center font-montserrat text-base font-normal text-black tracking-[0.32px]">50%</span>
+        <span className="chart-label font-montserrat text-base font-normal text-[#c7c7c7] tracking-[0.32px]">100%</span>
+      </div>
+      <div className="progress-wrapper relative">
+        <div className="progress-track absolute top-1/2 left-0 w-full h-1 bg-[#FCDCA2]/50 rounded-full transform -translate-y-1/2"></div>
+        {/* <div className="progress-fill absolute top-1/2 left-0 h-1 bg-[#FCDCA2] rounded-full transform -translate-y-1/2" style={{ width: '71%' }}></div> */}
+        <div className="progress-fill absolute top-0 left-0 w-full">
+          <img src="/shipments/bar.svg" alt="Gradient bar" className="w-full h-4" />
+        </div>
+        <div className="triangle-pointer absolute top-0 left-[calc(71%-13.5px)] w-6 h-6">
+          <img src="/shipments/bar0.svg" alt="Triangle pointer" className="w-full h-full" />
         </div>
       </div>
-      <div className="expiration-right absolute top-14 left-0">
-        <span className="expiration-total font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px] whitespace-nowrap">
-          Total expiring quotes: 7
-        </span>
-      </div>
     </div>
     
-   <div className="chaart">
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            
-                        </div>
-    
-    <div className="expiration-chart flex flex-col gap-6">
-      <span className="chart-label font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px]">
-        Total quotes: 22
-      </span>
-    </div>
+    <p className="total-policies font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px]">
+      Total policies: 22
+    </p>
   </div>
 </div>
               </div>
@@ -1748,17 +1708,44 @@ export default function QuotesPage() {
     margin-bottom: 24px;
 }
 
-.rate-section {
-    position: relative;
-    width: 145px;
-    height: 39px;
+.risk-score {
+    flex-direction: row;
+    gap: 16px;
+    display: flex;
+    align-items: end;
 }
 
-.rate-label {
-    position: absolute;
-    top: 24px;
-    left: 97px;
-    font-family: "Montserrat", Helvetica;
+.score-display {
+    display: flex;
+    align-items: flex-start;
+    gap: 3px;
+}
+
+.percentage-symbol {
+    font-size: 10px;
+    font-weight: 400;
+    color: #000000;
+    letter-spacing: 0.20px;
+    line-height: 12px;
+}
+
+.score-number {
+    font-size: 56px;
+    font-weight: 400;
+    color: #000000;
+    letter-spacing: 1.12px;
+    line-height: 36px;
+}
+
+.expiration-score .score-display {
+    align-items: center;
+}
+
+.expiration-score .score-display svg {
+    margin-top: 3px;
+}
+
+.score-label {
     font-size: 12px;
     font-weight: 500;
     color: #c7c7c7;
@@ -1766,197 +1753,139 @@ export default function QuotesPage() {
     line-height: normal;
 }
 
-.rate-value {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 82px;
-    height: 37px;
-    display: flex;
-    gap: 3px;
-    align-items: baseline;
-}
-
-.percentage {
-    font-family: "Montserrat", Helvetica;
-    font-size: 56px;
-    color: #000000;
-    font-weight: 400;
-    letter-spacing: 1.12px;
-    line-height: 36px;
-    margin-top: 1px;
-    width: 66px;
-}
-
-.percent-symbol {
-    font-family: "Montserrat", Helvetica;
-    font-size: 10px;
-    color: #000000;
-    font-weight: 400;
-    letter-spacing: 0.20px;
-    line-height: normal;
-    width: 9px;
-}
-
-.stats-description {
-    font-family: "Montserrat", Helvetica;
+.risk-description {
     font-size: 12px;
     font-weight: 400;
-    color: #afaeae;
+    color: #c7c7c7;
     letter-spacing: 0.24px;
     line-height: normal;
-    width: 268px;
-    margin: 0;
 }
 
-.stats-description strong {
+.risk-description .highlight {
     font-weight: 500;
-    letter-spacing: 0.03px;
+    color: #afaeae;
 }
 
-.stats-footer {
+.action-button {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: space-between;
-    width: 100%;
+    width: fit-content;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-top: auto;
 }
 
-.stats-footer span {
-    font-family: "Montserrat", Helvetica;
+.action-button span {
     font-size: 16px;
     font-weight: 400;
     color: #3c3c3c;
     letter-spacing: 0.32px;
     line-height: normal;
-    width: 206px;
+    text-align: left;
 }
 
-.stats-footer img {
-    width: 42px;
-    height: 42px;
+.action-button:hover {
+    opacity: 0.8;
 }
 
-/* Quotes Expiration Card */
-.card-header {
+.action-button:focus {
+    outline: 2px solid #4a90e2;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+.expiration-info,
+.total-policies {
+    font-size: 12px;
+    font-weight: 500;
+    color: #c7c7c7;
+    letter-spacing: 0.24px;
+    line-height: normal;
+}
+
+.chart-container {
     display: flex;
     flex-direction: column;
-    width: 331px;
-    gap: 16px;
-    margin-bottom: 24px;
+    gap: 8px;
 }
 
-.time-tabs {
+.chart-labels {
     display: flex;
-    gap: 12px;
-}
-
-.time-tabs span {
-    font-family: "Montserrat", Helvetica;
-    font-size: 12px;
-    font-weight: 500;
-    color: #c7c7c7;
-    letter-spacing: 0.24px;
-    line-height: normal;
-    cursor: pointer;
-    white-space: nowrap;
-}
-
-.time-tabs span.active {
-    color: #6f6f6f;
-    text-decoration: underline;
-}
-
-.expiration-stats {
-    position: relative;
-    width: 149px;
-    height: 73.5px;
-    margin-bottom: 24px;
-}
-
-.expiration-left {
-    position: absolute;
-    top: 0;
-    left: 2px;
-    width: 143px;
-    height: 45px;
-    display: flex;
-    gap: 14px;
-}
-
-.expiration-rate {
-    width: 81px;
-    height: 42px;
-    display: flex;
-    gap: 3px;
-    align-items: baseline;
-}
-
-.rate-number {
-    font-family: "Montserrat", Helvetica;
-    font-size: 56px;
-    color: #000000;
-    font-weight: 400;
-    letter-spacing: 1.12px;
-    line-height: 41px;
-    margin-top: 1px;
-    width: 65px;
-}
-
-.rate-symbol {
-    font-family: "Montserrat", Helvetica;
-    font-size: 10px;
-    color: #000000;
-    font-weight: 400;
-    letter-spacing: 0.20px;
-    line-height: normal;
-    width: 9px;
-}
-
-.expiration-left .rate-label {
-    margin-top: 30.2px;
-    width: 46px;
-    height: 15px;
-    font-weight: 500;
-    color: #c7c7c7;
-    font-size: 12px;
-    letter-spacing: 0.24px;
-    line-height: normal;
-}
-
-.expiration-right {
-    position: absolute;
-    top: 58px;
-    left: 0;
-}
-
-.expiration-total {
-    font-family: "Montserrat", Helvetica;
-    font-size: 12px;
-    font-weight: 500;
-    color: #c7c7c7;
-    letter-spacing: 0.24px;
-    line-height: normal;
-    white-space: nowrap;
-}
-
-.expiration-chart {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.expiration-chart img {
-    width: 100%;
-    height: 24px;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .chart-label {
-    font-family: "Montserrat", Helvetica;
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 16px;
+    font-weight: 400;
     color: #c7c7c7;
-    letter-spacing: 0.24px;
-    line-height: normal;
+    letter-spacing: 0.32px;
+}
+
+.chart-label-center {
+    font-size: 16px;
+    font-weight: 400;
+    color: #000000;
+    letter-spacing: 0.32px;
+}
+
+.progress-wrapper {
+    position: relative;
+    width: 100%;
+    height: 28px;
+}
+
+.progress-track {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background-color: rgba(252, 220, 162, 0.5);
+    border-radius: 58px;
+}
+
+.progress-fill {
+    background-color: #fca2a200;
+    border-radius: 58px;
+    height: 100%;
+    transition: width .3s;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 78%;
+}
+
+.gradient-bar {
+    position: absolute;
+    top: 4px;
+    left: 0;
+    width: 100%;
+    height: 16px;
+}
+
+.gradient-bar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.triangle-pointer {
+    position: absolute;
+    top: -1px;
+    width: 27px;
+    height: 25px;
+    pointer-events: none;
+    transition: left 0.3s ease;
+}
+
+.triangle-pointer img {
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
 /* Chart styles */
