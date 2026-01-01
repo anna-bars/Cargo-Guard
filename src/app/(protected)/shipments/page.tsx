@@ -220,7 +220,7 @@ export default function QuotesPage() {
             <main className="grid grid-cols-1 xl:grid-cols-[75%_24%] gap-4 items-stretch main-content">
               {/* Left Column - 75% */}
               <div className="max-h-[99.5%] flex flex-col gap-4">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-6">
                   <img
                     src="/quotes/header-ic.svg"
                     alt=""
@@ -287,7 +287,7 @@ export default function QuotesPage() {
                         </div>
                         
                         {['All Activity', 'Last 30 days', 'Sort by', 'Status'].map((text, idx) => (
-                          <div key={idx} className="h-[38px] flex items-center gap-3 px-3 py-2 rounded-lg border border-[#c7c7c7]/51 font-montserrat text-xs text-[#7b7b7b] hover:border-[#a0a0a0]/51 transition-colors duration-300">
+                          <div key={idx} className="h-[38px] flex items-center gap-6 px-3 py-2 rounded-lg border border-[#c7c7c7]/51 font-montserrat text-xs text-[#7b7b7b] hover:border-[#a0a0a0]/51 transition-colors duration-300">
                             <span>{text}</span>
                             <img 
                               src="https://c.animaapp.com/mjiggi0jSqvoj5/img/arrow-3-1.svg" 
@@ -303,9 +303,9 @@ export default function QuotesPage() {
                       </div>
                     </div>
                     
-                    {/* Desktop Table Header - Updated */}
-                    <div className="hidden xl:grid grid-cols-[100px_120px_120px_140px_150px_150px_140px] gap-4 pb-2 border-b border-gray-200 mb-2 table-header">
-                      {['Quote ID', 'Cargo', 'Shipment Value', 'Premium Amount', 'Expiration Date', 'Status', 'Action'].map((header, idx) => (
+                    {/* Desktop Table Header - Optimized for no overflow */}
+                    <div className="hidden xl:grid grid-cols-[6.8%_10.8%_9.8%_7.8%_17.7%_24.8%_13.2%] gap-6 pb-2 border-b border-gray-200 mb-2 table-header">
+                      {['Policy ID', 'Cargo', 'Value', 'Premium', 'Coverage Period', 'Status', 'Action'].map((header, idx) => (
                         <div key={idx} className="flex items-center gap-2 font-poppins text-sm font-normal text-[#606068]">
                           <span>{header}</span>
                           {header !== 'Action' && (
@@ -320,123 +320,281 @@ export default function QuotesPage() {
                     </div>
                   </div>
 
-                  {/* Table Rows - Updated with new data */}
-                  {/* Table Rows - Updated with mobile layout */}
-<div className="block-2 space-y-2 activity-table overflow-y-scroll">
-  {[
-    {
-      id: 'Q-005',
-      cargo: 'Electronics',
-      value: '$15,400.00',
-      premium: '$450.00',
-      expiration: 'Oct 25 – Nov 5',
-      status: { text: 'Pending Approval', color: 'bg-[#cbd03c]/10', dot: 'bg-[#cbd03c]', textColor: 'text-[#cbd03c]' },
-      button: { text: 'Approve Quote', variant: 'primary' }
-    },
-    {
-      id: 'Q-021',
-      cargo: 'Furniture',
-      value: '$20,000.00',
-      premium: '$255.00',
-      expiration: 'Oct 20 – Nov 1',
-      status: { text: 'Approved', color: 'bg-[#16a34a]/10', dot: 'bg-[#16a34a]', textColor: 'text-[#16a34a]' },
-      button: { text: 'Approve Quote', variant: 'primary' }
-    },
-    {
-      id: 'Q-054',
-      cargo: 'Clothing',
-      value: '$5,500.00',
-      premium: '$600.00',
-      expiration: 'Oct 22 – Nov 3',
-      status: { text: 'Declined', color: 'bg-[#8ea0b0]/10', dot: 'bg-[#8ea0b0]', textColor: 'text-[#8ea0b0]' },
-      button: { text: 'View Reason', variant: 'secondary' }
-    },
-    {
-      id: 'Q-005',
-      cargo: 'Machinery',
-      value: '$8,500.00',
-      premium: '$165.00',
-      expiration: 'Oct 24 – Nov 4',
-      status: { text: 'Pending Approval', color: 'bg-[#cbd03c]/10', dot: 'bg-[#cbd03c]', textColor: 'text-[#cbd03c]' },
-      button: { text: 'Approve Quote', variant: 'primary' }
-    },
-    {
-      id: 'Q-014',
-      cargo: 'Chemicals',
-      value: '$12,800.00',
-      premium: '$360.00',
-      expiration: 'Oct 21 – Nov 2',
-      status: { text: 'Approved', color: 'bg-[#16a34a]/10', dot: 'bg-[#16a34a]', textColor: 'text-[#16a34a]' },
-      button: { text: 'Approve Quote', variant: 'primary' }
-    }
-  ].map((row, idx) => (
-    <div key={idx} className="xl:grid xl:grid-cols-[100px_120px_120px_140px_150px_150px_140px] gap-4 p-3 xl:p-3 bg-[#f8fafd] xl:bg-[#f8fafd] rounded-lg xl:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
-      {/* Desktop Layout */}
-      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">{row.id}</div>
-      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">{row.cargo}</div>
-      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">{row.value}</div>
-      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">{row.premium}</div>
-      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">{row.expiration}</div>
-      <div className="hidden xl:block xl:w-auto row-cell">
-        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor}`}>
-          <span className={`w-1.5 h-1.5 rounded-full ${row.status.dot}`}></span>
-          {row.status.text}
-        </span>
-      </div>
-      
-      {/* Mobile Layout */}
-      <div className="xl:hidden w-full">
-        {/* Top row: ID on left, Status on right */}
-        <div className="flex justify-between items-start mb-4">
-          <div className="flex items-center gap-2">
-            <span className="font-poppins text-sm font-medium text-[#2563eb] underline">{row.id}</span>
-          </div>
-          <div className="row-cell flex-shrink-0">
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor} mobile-status-badge`}>
-              <span className={`w-2 h-2 rounded-full ${row.status.dot}`}></span>
-              {row.status.text}
-            </span>
-          </div>
-        </div>
-        
-        {/* Middle row: Cargo and Value */}
-        <div className="flex justify-between items-center mb-2">
-          <div className="font-poppins text-sm text-gray-700">{row.cargo}</div>
-          <div className="font-poppins text-sm font-medium text-black">{row.value}</div>
-        </div>
-        
-        {/* Middle row: Premium and Expiration */}
-        <div className="flex justify-between items-center mb-4">
-          <div className="font-poppins text-sm text-gray-700">Premium: {row.premium}</div>
-          <div className="font-poppins text-sm text-gray-600">{row.expiration}</div>
-        </div>
-        
-        {/* Full-width button */}
-        <div className="flex flex-col gap-4">
-          <button className={`mobile-action-btn ${
-            row.button.variant === 'primary' 
-              ? 'primary-btn' 
-              : 'secondary-btn'
-          }`}>
-            {row.button.text}
-          </button>
-        </div>
-      </div>
-      
-      {/* Desktop button */}
-      <div className="hidden xl:block xl:w-auto row-cell">
-        <button className={`h-9 px-4 rounded-lg font-poppins text-sm font-normal transition-colors duration-300 w-full xl:w-[140px] ${
-          row.button.variant === 'primary' 
-            ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]' 
-            : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f3f4f6] hover:border-[#d1d5db]'
-        }`}>
-          {row.button.text}
-        </button>
-      </div>
-    </div>
-  ))}
-</div>
+                  {/* Table Rows - Optimized with stacked status */}
+                  <div className="block-2 space-y-2 activity-table overflow-y-auto overflow-x-hidden">
+                    {/* Row 1 */}
+                    <div className="xl:grid xl:grid-cols-[6.8%_10.8%_9.8%_7.8%_17.7%_24.8%_13.2%] gap-5 p-3 xl:p-3 bg-[#f8fafd] xl:bg-[#f8fafd] rounded-lg xl:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
+                      {/* Desktop Layout */}
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">P-3401</div>
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">Electronics</div>
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">12,500.00</div>
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">170.00</div>
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">Dec 1, '25 - Dec 1, '26</div>
+                      <div className="hidden xl:block xl:w-auto row-cell">
+                        <div className="flex flex-row gap-1">
+                          <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
+                            Active
+                          </span>
+                          <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
+                            All Uploaded
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {/* Mobile Layout */}
+                      <div className="xl:hidden w-full">
+                        <div className="flex justify-between items-start mb-4">
+                          <span className="font-poppins text-sm font-medium text-[#2563eb] underline">P-3401</span>
+                          <div className="flex flex-row items-end gap-1">
+                            <span className="w-fit inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a] mobile-status-badge">
+                              <span className="w-2 h-2 rounded-full bg-[#16a34a]"></span>
+                              Active
+                            </span>
+                            <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
+                            All Uploaded
+                          </span>
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center mb-2">
+                          <div className="font-poppins text-sm text-gray-700">Electronics</div>
+                          <div className="font-poppins text-sm font-medium text-black">12,500.00</div>
+                        </div>
+                        <div className="flex justify-between items-center mb-4">
+                          <div className="font-poppins text-sm text-gray-700">Premium: 170.00</div>
+                          <div className="font-poppins text-sm text-gray-600">Dec 1, '25 - Dec 1, '26</div>
+                        </div>
+                        <button className="mobile-action-btn primary-btn">
+                          Download Cert
+                        </button>
+                      </div>
+                      
+                      {/* Desktop button */}
+                      <div className="hidden xl:block xl:w-auto row-cell">
+                        <button className="h-9 px-4 rounded-lg font-poppins text-sm font-normal bg-[#2563eb] text-white hover:bg-[#1d4ed8] transition-colors duration-300 w-full xl:w-[100px]">
+                          Download
+                        </button>
+                      </div>
+                    </div>
 
+                    {/* Row 2 */}
+                    <div className="xl:grid xl:grid-cols-[6.8%_10.8%_9.8%_7.8%_17.7%_24.8%_13.2%] gap-5 p-3 xl:p-3 bg-[#f8fafd] xl:bg-[#f8fafd] rounded-lg xl:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">P-2015</div>
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">Textiles</div>
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">25,800.00</div>
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">285.00</div>
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">Oct 15, '25 - Dec 15, '25</div>
+                      <div className="hidden xl:block xl:w-auto row-cell">
+                        <div className="flex flex-row gap-1">
+                          <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#f97316]/10 text-[#f97316]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#f97316]"></span>
+                            Expiring Soon
+                          </span>
+                          <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
+                            All Uploaded
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="xl:hidden w-full">
+                        <div className="flex justify-between items-start mb-4">
+                          <span className="font-poppins text-sm font-medium text-[#2563eb] underline">P-2015</span>
+                          <div className="flex flex-row  items-end gap-1">
+                            <span className="w-fit inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs bg-[#f97316]/10 text-[#f97316] mobile-status-badge">
+                              <span className="w-2 h-2 rounded-full bg-[#f97316]"></span>
+                              Expiring Soon
+                            </span>
+                            <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
+                            All Uploaded
+                          </span>
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center mb-2">
+                          <div className="font-poppins text-sm text-gray-700">Textiles</div>
+                          <div className="font-poppins text-sm font-medium text-black">25,800.00</div>
+                        </div>
+                        <div className="flex justify-between items-center mb-4">
+                          <div className="font-poppins text-sm text-gray-700">Premium: 285.00</div>
+                          <div className="font-poppins text-sm text-gray-600">Oct 15, '25 - Dec 15, '25</div>
+                        </div>
+                        <button className="mobile-action-btn primary-btn">
+                          Renew Policy
+                        </button>
+                      </div>
+                      
+                      <div className="hidden xl:block xl:w-auto row-cell">
+                        <button className="h-9 px-4 rounded-lg font-poppins text-sm font-normal bg-[#2563eb] text-white hover:bg-[#1d4ed8] transition-colors duration-300 w-full xl:w-[100px]">
+                          Renew
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Row 3 */}
+                    <div className="xl:grid xl:grid-cols-[6.8%_10.8%_9.8%_7.8%_17.7%_24.8%_13.2%] gap-5 p-3 xl:p-3 bg-[#f8fafd] xl:bg-[#f8fafd] rounded-lg xl:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">P-4809</div>
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">Machinery</div>
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">45,000.00</div>
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">490.00</div>
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">Nov 5, '25 - Nov 5, '26</div>
+                      <div className="hidden xl:block xl:w-auto row-cell">
+                        <div className="flex flex-row gap-1">
+                          <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
+                            Active
+                          </span>
+                          <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
+                            Missing BOL
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="xl:hidden w-full">
+                        <div className="flex justify-between items-start mb-4">
+                          <span className="font-poppins text-sm font-medium text-[#2563eb] underline">P-4809</span>
+                          <div className="flex flex-row  items-end gap-1">
+                            <span className="w-fit inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a] mobile-status-badge">
+                              <span className="w-2 h-2 rounded-full bg-[#16a34a]"></span>
+                              Active
+                            </span>
+                            <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
+                            All Uploaded
+                          </span>
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center mb-2">
+                          <div className="font-poppins text-sm text-gray-700">Machinery</div>
+                          <div className="font-poppins text-sm font-medium text-black">45,000.00</div>
+                        </div>
+                        <div className="flex justify-between items-center mb-4">
+                          <div className="font-poppins text-sm text-gray-700">Premium: 490.00</div>
+                          <div className="font-poppins text-sm text-gray-600">Nov 5, '25 - Nov 5, '26</div>
+                        </div>
+                        <button className="mobile-action-btn primary-btn">
+                          Upload Docs
+                        </button>
+                      </div>
+                      
+                      <div className="hidden xl:block xl:w-auto row-cell">
+                        <button className="h-9 px-4 rounded-lg font-poppins text-sm font-normal bg-[#2563eb] text-white hover:bg-[#1d4ed8] transition-colors duration-300 w-full xl:w-[100px]">
+                          Upload
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Row 4 */}
+                    <div className="xl:grid xl:grid-cols-[6.8%_10.8%_9.8%_7.8%_17.7%_24.8%_13.2%] gap-5 p-3 xl:p-3 bg-[#f8fafd] xl:bg-[#f8fafd] rounded-lg xl:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">P-1244</div>
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">Perishables</div>
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">5,200.00</div>
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">85.00</div>
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">Jan 10, '25 - Jan 10, '26</div>
+                      <div className="hidden xl:block xl:w-auto row-cell">
+                        <div className="flex flex-row gap-1">
+                          <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#8b5cf6]/10 text-[#8b5cf6]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#8b5cf6]"></span>
+                            Claim Filed
+                          </span>
+                          <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
+                            All Uploaded
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="xl:hidden w-full">
+                        <div className="flex justify-between items-start mb-4">
+                          <span className="font-poppins text-sm font-medium text-[#2563eb] underline">P-1244</span>
+                          <div className="flex flex-row  items-end gap-1">
+                            <span className="w-fit inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs bg-[#8b5cf6]/10 text-[#8b5cf6] mobile-status-badge">
+                              <span className="w-2 h-2 rounded-full bg-[#8b5cf6]"></span>
+                              Claim Filed
+                            </span>
+                            <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
+                            All Uploaded
+                          </span>
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center mb-2">
+                          <div className="font-poppins text-sm text-gray-700">Perishables</div>
+                          <div className="font-poppins text-sm font-medium text-black">5,200.00</div>
+                        </div>
+                        <div className="flex justify-between items-center mb-4">
+                          <div className="font-poppins text-sm text-gray-700">Premium: 85.00</div>
+                          <div className="font-poppins text-sm text-gray-600">Jan 10, '25 - Jan 10, '26</div>
+                        </div>
+                        <button className="mobile-action-btn primary-btn">
+                          Claim Status
+                        </button>
+                      </div>
+                      
+                      <div className="hidden xl:block xl:w-auto row-cell">
+                        <button className="h-9 px-4 rounded-lg font-poppins text-sm font-normal bg-[#2563eb] text-white hover:bg-[#1d4ed8] transition-colors duration-300 w-full xl:w-[100px]">
+                          Claim
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Row 5 */}
+                    <div className="xl:grid xl:grid-cols-[6.8%_10.8%_9.8%_7.8%_17.7%_24.8%_13.2%] gap-5 p-3 xl:p-3 bg-[#f8fafd] xl:bg-[#f8fafd] rounded-lg xl:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">P-0890</div>
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">Auto Parts</div>
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">33,100.00</div>
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">370.00</div>
+                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">Aug 1, '24 - Aug 1, '25</div>
+                      <div className="hidden xl:block xl:w-auto row-cell">
+                        <div className="flex flex-row gap-1">
+                          <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#8ea0b0]/10 text-[#8ea0b0]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#8ea0b0]"></span>
+                            Expired
+                          </span>
+                          <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
+                            All Uploaded
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="xl:hidden w-full">
+                        <div className="flex justify-between items-start mb-4">
+                          <span className="font-poppins text-sm font-medium text-[#2563eb] underline">P-0890</span>
+                          <div className="flex flex-row  items-end gap-1">
+                            <span className="w-fit inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs bg-[#8ea0b0]/10 text-[#8ea0b0] mobile-status-badge">
+                              <span className="w-2 h-2 rounded-full bg-[#8ea0b0]"></span>
+                              Expired
+                            </span>
+                            <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
+                            All Uploaded
+                          </span>
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center mb-2">
+                          <div className="font-poppins text-sm text-gray-700">Auto Parts</div>
+                          <div className="font-poppins text-sm font-medium text-black">33,100.00</div>
+                        </div>
+                        <div className="flex justify-between items-center mb-4">
+                          <div className="font-poppins text-sm text-gray-700">Premium: 370.00</div>
+                          <div className="font-poppins text-sm text-gray-600">Aug 1, '24 - Aug 1, '25</div>
+                        </div>
+                        <button className="mobile-action-btn primary-btn">
+                          Download Cert
+                        </button>
+                      </div>
+                      
+                      <div className="hidden xl:block xl:w-auto row-cell">
+                        <button className="h-9 px-4 rounded-lg font-poppins text-sm font-normal bg-[#2563eb] text-white hover:bg-[#1d4ed8] transition-colors duration-300 w-full xl:w-[100px]">
+                          Download
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </section>
               </div>
 
@@ -460,7 +618,6 @@ export default function QuotesPage() {
                     File a Claim
                   </button>
                 </div>
-                {/* Welcome Widget */}
                 {/* Stats Cards Section */}
 <div className="flex flex-col gap-4">
   {/* Improve Your Quote Rate Card */}
@@ -495,7 +652,7 @@ export default function QuotesPage() {
   <div className="stats-card bg-[#fafcff]/80 rounded-2xl p-4">
     <div className="card-header mb-6">
       <h3 className="font-montserrat text-lg font-medium text-black mb-0">Quotes Expiration</h3>
-      <div className="time-tabs flex gap-3">
+      <div className="time-tabs flex gap-6">
         <span className="active font-montserrat text-xs font-medium text-[#6f6f6f] tracking-[0.24px] underline cursor-pointer whitespace-nowrap">This Week</span>
         <span className="font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px] cursor-pointer whitespace-nowrap">Next Week</span>
         <span className="font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px] cursor-pointer whitespace-nowrap">In 2–4 Weeks</span>
@@ -504,7 +661,7 @@ export default function QuotesPage() {
     </div>
     
     <div className="expiration-stats relative w-[149px] h-[73.5px] mb-6">
-      <div className="expiration-left absolute top-0 left-0.5 w-[143px] h-11 flex gap-3">
+      <div className="expiration-left absolute top-0 left-0.5 w-[143px] h-11 flex gap-6">
         <div className="expiration-rate w-20 h-10 flex gap-1 items-baseline">
           <span className="rate-number font-montserrat text-[56px] text-black font-normal tracking-[1.12px] leading-10 w-16">32</span>
           <span className="rate-symbol font-montserrat text-xs text-black font-normal tracking-[0.20px] w-2">%</span>
@@ -570,7 +727,7 @@ export default function QuotesPage() {
                             
                         </div>
     
-    <div className="expiration-chart flex flex-col gap-3">
+    <div className="expiration-chart flex flex-col gap-6">
       <span className="chart-label font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px]">
         Total quotes: 22
       </span>
