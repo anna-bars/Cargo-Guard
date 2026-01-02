@@ -217,9 +217,9 @@ export default function DashboardPage() {
             </div>
 
             {/* Main Content Grid */}
-            <main className="grid grid-cols-1 xl:grid-cols-[75%_24%] gap-4 items-stretch main-content">
+            <main className="grid grid-cols-1 xl:grid-cols-[76.5%_23%] gap-2 items-stretch main-content">
               {/* Left Column - 75% */}
-              <div className="max-h-[87.5%] flex flex-col gap-4">
+              <div className="max-h-[90%] flex flex-col gap-2">
                 {/* Performance Overview */}
                 <section className="block-1 bg-[#fafcff]/80 rounded-2xl p-4 h-auto performance-section">
                   <div className="flex justify-between items-start mb-2 section-header">
@@ -376,7 +376,7 @@ export default function DashboardPage() {
                         </span>
                       </div>
                       
-                      <div className="flex items-center gap-4 showin-result-ittle-info">
+                      <div className="flex items-center gap-2 showin-result-ittle-info">
                         <div className="w-36 h-[38px] border-b border-[#c7c7c7]/51 flex items-center justify-between px-3 py-2 hover:border-[#a0a0a0]/51 transition-colors duration-300">
                           <input 
                             type="text" 
@@ -509,7 +509,7 @@ export default function DashboardPage() {
                           </div>
                           
                           {/* Bottom row: Date on left, full-width button */}
-                          <div className="flex flex-col gap-4">
+                          <div className="flex flex-col gap-2">
                             <div className="font-poppins text-sm text-gray-600">{row.date}</div>
                             <button className={`mobile-action-btn ${
                               row.button.variant === 'primary' 
@@ -538,7 +538,7 @@ export default function DashboardPage() {
               </div>
 
               {/* Right Column - 25% */}
-              <div className="flex max-h-[87.5%] flex-col gap-4 right">
+              <div className="flex max-h-[90%] flex-col gap-2 right">
                 {/* Welcome Widget */}
                 <div className="relative h-[380px] rounded-2xl overflow-hidden w-full welcome-widget hover:shadow-lg transition-shadow duration-300">
                   <img 

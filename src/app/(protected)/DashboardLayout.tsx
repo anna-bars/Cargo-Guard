@@ -31,7 +31,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f3f3f6] flex items-center justify-center">
+      <div className="min-h-screen bg-[#eaeaef] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0a3d62]"></div>
       </div>
     )
@@ -39,7 +39,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <div className='h-[100vh] max-h-[100vh] overflow-hidden'>
-        <div className="h-[102vh] min-h-[102vh] bg-[#f3f3f6] font-montserrat flex flex-col">
+        <div className="h-[102vh] min-h-[102vh] bg-[#eaeaef] font-montserrat flex flex-col">
       <div className='block-1'><DashboardHeader userEmail={user?.email} /></div>
       
       <main className="block-2 !min-w-[96%] max-h-[86%] max-w-[88%] sm:max-w-[96%] scrollbar-thin mx-auto overflow-hidden">
