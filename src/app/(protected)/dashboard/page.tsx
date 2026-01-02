@@ -209,7 +209,7 @@ export default function DashboardPage() {
     <DashboardLayout>
       <div className='insult'>
         <div className='infarkt'>
-          <div className="max-w-[88%] min-w-full sm:max-w-[96%] mx-auto">
+          <div className="max-w-[88%] min-w-full sm:max-w-[97.5%] mx-auto">
             {/* Mobile Header for Activity Section */}
             <div className="flex gap-2 items-center mb-4 xl:hidden">
               <img src="/dashboard/hashtag.svg" alt="" className="w-5 h-5" />
@@ -219,9 +219,9 @@ export default function DashboardPage() {
             {/* Main Content Grid */}
             <main className="grid grid-cols-1 xl:grid-cols-[76.5%_23%] gap-2 items-stretch main-content">
               {/* Left Column - 75% */}
-              <div className="max-h-[90%] flex flex-col gap-2">
+              <div className="max-h-[91%] flex flex-col gap-2">
                 {/* Performance Overview */}
-                <section className="block-1 bg-[#fafcff]/80 rounded-2xl p-4 h-auto performance-section">
+                <section className="block-1 border border-[#d1d1d154] bg-[#fafaf7]/80 rounded-2xl p-4 h-auto performance-section">
                   <div className="flex justify-between items-start mb-2 section-header">
                     <div>
                       <h2 className="font-montserrat text-[16px] font-normal text-black section-title">
@@ -361,7 +361,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Recent Activity Table */}
-                <section className="block-2 flex flex-col max-h-[88%] activity-section bg-[#fafcff]/80 rounded-2xl p-4 xl:p-4">
+                <section className="block-2 flex flex-col max-h-[88%] border border-[#d1d1d154] activity-section bg-[#fafaf7]/80 rounded-2xl p-4 xl:p-4">
                   {/* Desktop Filters */}
                   <div className='block-1'>
                     <div className="hidden xl:flex justify-between items-center mb-6 activity-header activity-filters">
@@ -538,7 +538,7 @@ export default function DashboardPage() {
               </div>
 
               {/* Right Column - 25% */}
-              <div className="flex max-h-[90%] flex-col gap-2 right">
+              <div className="flex max-h-[91%] flex-col gap-2 right">
                 {/* Welcome Widget */}
                 <div className="relative h-[380px] rounded-2xl overflow-hidden w-full welcome-widget hover:shadow-lg transition-shadow duration-300">
                   <img 
@@ -568,7 +568,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Quote Conversion Rate */}
-                <div className="flex flex-col justify-between bg-[#fafcff]/80 rounded-2xl p-4 h-auto min-h-[203px] w-full quote-conversion performance-section hover:shadow-sm transition-shadow duration-300">
+                <div className="flex flex-col justify-between border border-[#d1d1d154] bg-[#fafaf7]/80 rounded-2xl p-4 h-auto min-h-[203px] w-full quote-conversion performance-section hover:shadow-sm transition-shadow duration-300">
                   <div className="mb-[24px]">
                     <h3 className="font-montserrat text-[18px] font-normal text-black action-title">
                       Quote Conversion Rate
