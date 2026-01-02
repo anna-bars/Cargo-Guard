@@ -610,37 +610,60 @@ export default function DashboardPage() {
                           <div className="text-[15px] mt-0.5">0</div>
                         </div>
                       </div>
-                      
-<div className="flex items-end overflow-hidden">
-  {/* Top bars */}
-  <div className="flex items-baseline">
-    {Array.from({ length: 22 }).map((_, i) => (
-      <div 
-        key={`top-${i}`} 
-        className={`w-[2px] bg-[#bed5f8] ${i === 0 || i === 21 ? 'h-8' : 'h-5'} ${i !== 21 ? 'mr-[3px]' : ''}`}
-      />
-    ))}
-  </div>
+                         <div className="chaart">
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
 
-  <div className="flex items-baseline ml-[3px]">
-    {Array.from({ length: 7 }).map((_, i) => (
-      <div 
-        key={`top-${i}`} 
-        className={`w-[2px] bg-[#FCC573] ${i === 0 || i === 6 ? 'h-8' : 'h-5'} ${i !== 6 ? 'mr-[3px]' : ''}`}
-      />
-    ))}
-  </div>
-  
-  {/* Bottom bars */}
-  <div className="flex items-baseline ml-[3px]">
-    {Array.from({ length: 44 }).map((_, i) => (
-      <div 
-        key={`bottom-${i}`} 
-        className="w-[2px] h-1 bg-[#f3f3f6] mr-[3px] last:mr-0"
-      />
-    ))}
-  </div>
-</div> 
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            
+                        </div>
+                        
+                       
 
                     </div>
                   </div>
@@ -1419,7 +1442,14 @@ export default function DashboardPage() {
                     height: 6px;
                 }
             }
-
+.chaart {
+    display: flex;
+    gap: 4px;
+    justify-content: start;
+    align-items: center;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
             @media screen and (max-width: 768px) {
                 .metric-value, .metric-value2 {
                     font-size: 38px;
@@ -1591,6 +1621,31 @@ export default function DashboardPage() {
     padding: 16px;
     gap: 12px;
   }
+}
+
+
+/* Chart styles */
+.chart-div-item {
+    height: 24px;
+    background-color: #E2E3E4;
+}
+.chart-div-active-item {
+    height: 20px;
+    background-color: #EE9F66;
+}
+.chaart {
+    display: flex;
+    gap: 4px;
+    justify-content: start;
+    align-items: end;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+.chart-div-item,
+.chart-div-active-item {
+    width: 1px;
+    transform: scaleX(2);
+    transform-origin: left;
 }
           `}</style>
         </div>
