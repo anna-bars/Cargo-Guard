@@ -611,6 +611,7 @@ export default function DashboardPage() {
                         </div>
                       </div>
                          <div className="chaart">
+                            <div className="chart-div-active-item heg"></div>
                             <div className="chart-div-active-item"></div>
                             <div className="chart-div-active-item"></div>
                             <div className="chart-div-active-item"></div>
@@ -627,9 +628,9 @@ export default function DashboardPage() {
                             <div className="chart-div-active-item"></div>
                             <div className="chart-div-active-item"></div>
                             <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item heg"></div>
 
+                            <div className="chart-div-item heg"></div>
                             <div className="chart-div-item"></div>
                             <div className="chart-div-item"></div>
                             <div className="chart-div-item"></div>
@@ -658,8 +659,7 @@ export default function DashboardPage() {
                             <div className="chart-div-item"></div>
                             <div className="chart-div-item"></div>
                             <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item heg"></div>
                             
                         </div>
                         
@@ -1635,7 +1635,7 @@ export default function DashboardPage() {
 }
 .chaart {
     display: flex;
-    gap: 4px;
+    gap: 4.5px;
     justify-content: start;
     align-items: end;
     overflow: hidden;
@@ -1644,9 +1644,12 @@ export default function DashboardPage() {
 .chart-div-item,
 .chart-div-active-item {
     width: 1px;
-    transform: scaleX(2);
+    transform: scaleX(2.7);
     transform-origin: left;
 }
+.heg {
+            height: 32px !important;
+}    
           `}</style>
         </div>
       </div>
