@@ -1442,14 +1442,7 @@ export default function DashboardPage() {
                     height: 6px;
                 }
             }
-.chaart {
-    display: flex;
-    gap: 4px;
-    justify-content: start;
-    align-items: center;
-    overflow: hidden;
-    margin-bottom: 12px;
-}
+
             @media screen and (max-width: 768px) {
                 .metric-value, .metric-value2 {
                     font-size: 38px;
@@ -1626,7 +1619,7 @@ export default function DashboardPage() {
 
 /* Chart styles */
 .chart-div-item {
-    height: 24px;
+    height: 20px;
     background-color: #E2E3E4;
 }
 .chart-div-active-item {
