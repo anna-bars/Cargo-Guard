@@ -130,7 +130,7 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
       {/* Fixed width container */}
       <div className="max-w-[88%] sm:max-w-[96%] mx-auto pt-3">
         {/* Header */}
-        <header className="flex justify-between items-center h-[68px] mb-2">
+        <header className="flex justify-between items-center h-[68px] mb-3">
           <div className="flex items-center gap-3">
             <img 
               src="https://c.animaapp.com/mjiggi0jSqvoj5/img/layer-1-1.png" 

@@ -219,7 +219,7 @@ export default function DashboardPage() {
             {/* Main Content Grid */}
             <main className="grid grid-cols-1 xl:grid-cols-[76.5%_23%] gap-2 items-stretch main-content">
               {/* Left Column - 75% */}
-              <div className="max-h-[91%] flex flex-col gap-2">
+              <div className="max-h-[93%] flex flex-col gap-2">
                 {/* Performance Overview */}
                 <section className="block-1 border border-[#d1d1d154] bg-[#fafaf7]/80 rounded-2xl p-4 h-auto performance-section">
                   <div className="flex justify-between items-start mb-2 section-header">
@@ -424,7 +424,7 @@ export default function DashboardPage() {
                     </div>
                     
                     {/* Desktop Table Header */}
-                    <div className="px-4 xl:px-4 py-2 hidden xl:grid grid-cols-[120px_120px_1fr_200px_150px_140px] gap-2 pb-2 border-b border-gray-200 mb-2 table-header">
+                    <div className="px-4 xl:px-4 py-2 hidden xl:grid grid-cols-[120px_120px_1fr_200px_150px_140px] gap-2 pb-2 mb-0 table-header w-[97%] bg-[#ededed7a] mx-auto my-4 rounded-[4px]">
                       {['Type', 'ID', 'Cargo / Value', 'Status / Due Date', 'Last Update', 'Action'].map((header, idx) => (
                         <div key={idx} className="flex items-center gap-2 font-poppins text-sm font-normal text-[#606068]">
                           <span>{header}</span>
@@ -489,13 +489,13 @@ export default function DashboardPage() {
                         button: { text: 'View Details', variant: 'secondary' }
                       }
                     ].map((row, idx) => (
-                      <div key={idx} className="xl:grid xl:grid-cols-[120px_120px_1fr_200px_150px_140px] gap-2 p-3 xl:p-3 bg-[#f8fafd] xl:bg-[#f8fafd] rounded-lg xl:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
+                      <div key={idx} className="tab-item xl:grid xl:grid-cols-[120px_120px_1fr_200px_150px_140px] gap-2 p-4 xl:p-3 bg-[#f9f9f6] xl:bg-[#f9f9f6] rounded-lg xl:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
                         {/* Desktop Layout */}
                         <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">{row.type}</div>
                         <div className="hidden xl:block xl:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">{row.id}</div>
                         <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">{row.cargo} / {row.value}</div>
                         <div className="hidden xl:block xl:w-auto row-cell">
-                          <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor}`}>
+                          <span className={`!font-medium inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor}`}>
                             <span className={`w-1.5 h-1.5 rounded-full ${row.status.dot}`}></span>
                             {row.status.text}
                           </span>
@@ -554,7 +554,7 @@ export default function DashboardPage() {
               </div>
 
               {/* Right Column - 25% */}
-              <div className="flex max-h-[91%] flex-col gap-2 right">
+              <div className="flex max-h-[93%] flex-col gap-2 right">
                 {/* Welcome Widget */}
                 <div className="relative h-[380px] rounded-2xl overflow-hidden w-full welcome-widget hover:shadow-lg transition-shadow duration-300">
                   <img 
@@ -1556,7 +1556,12 @@ export default function DashboardPage() {
     width: 100%;
   }
 }
-
+.tab-item {
+            margin: 0;
+    background-color: #f9f9f6;
+    border: none;
+    border-bottom: 1px solid #d1d1d140;
+}
 @media screen and (max-width: 768px) {
 .sub-header-metric {
     margin-top: -8px !important;
