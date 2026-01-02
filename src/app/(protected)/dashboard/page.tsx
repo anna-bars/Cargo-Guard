@@ -361,10 +361,10 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Recent Activity Table */}
-                <section className="block-2 flex flex-col max-h-[88%] border border-[#d1d1d154] activity-section bg-[#fafaf7]/80 rounded-2xl p-4 xl:p-4">
+                <section className="block-2 flex flex-col max-h-[88%] border border-[#d1d1d154] activity-section bg-[#fafaf7]/80 rounded-2xl py-4 xl:py-4">
                   {/* Desktop Filters */}
-                  <div className='block-1'>
-                    <div className="hidden xl:flex justify-between items-center mb-6 activity-header activity-filters">
+                  <div className='block-1 '>
+                    {/* <div className="hidden xl:flex justify-between items-center mb-6 activity-header activity-filters">
                       <div className="flex items-center gap-1.5">
                         <img 
                           src="https://c.animaapp.com/mjiggi0jSqvoj5/img/filter-1.png" 
@@ -405,10 +405,26 @@ export default function DashboardPage() {
                           Get New Quote
                         </button>
                       </div>
+                    </div> */}
+                    <div className='px-4 xl:px-4 flex justify-between items-center border-b border-b-[#d1d1d154] pb-3'>
+                      <h2>Recent Insurance Activity</h2>
+                      <div className='flex justify-betwwen gap-2'>
+                        <button className="flex text-[#6e6d6d] items-center gap-2 w-[180px] bg-[#f9f9f6] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300">
+                          <img src="dashboard/icons/search-01-stroke-rounded.svg" alt="" className="w-[16px] h-[16px]" />
+                          Search
+                        </button>
+                        <button className="flex items-center gap-1 bg-[#F5F4F7] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300">
+                          <img src="dashboard/icons/filter-stroke-rounded.svg" alt="" className="w-[16px] h-[16px]" />
+                          Filter
+                        </button>
+                        <button className="bg-[#eb8d25] text-white px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#ff8c0c] transition-colors duration-300">
+                          Get New Quote
+                        </button>
+                      </div>
                     </div>
                     
                     {/* Desktop Table Header */}
-                    <div className="hidden xl:grid grid-cols-[120px_120px_1fr_200px_150px_140px] gap-2 pb-2 border-b border-gray-200 mb-2 table-header">
+                    <div className="px-4 xl:px-4 py-2 hidden xl:grid grid-cols-[120px_120px_1fr_200px_150px_140px] gap-2 pb-2 border-b border-gray-200 mb-2 table-header">
                       {['Type', 'ID', 'Cargo / Value', 'Status / Due Date', 'Last Update', 'Action'].map((header, idx) => (
                         <div key={idx} className="flex items-center gap-2 font-poppins text-sm font-normal text-[#606068]">
                           <span>{header}</span>
@@ -425,7 +441,7 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Table Rows */}
-                  <div className="block-2 space-y-2 activity-table overflow-y-scroll">
+                  <div className="px-4 xl:px-4 block-2 space-y-2 activity-table overflow-y-scroll">
                     {[
                       {
                         type: 'Quote',
