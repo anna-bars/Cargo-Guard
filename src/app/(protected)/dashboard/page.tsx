@@ -424,7 +424,7 @@ export default function DashboardPage() {
                     </div>
                     
                     {/* Desktop Table Header */}
-                    <div className="px-4 xl:px-4 py-2 mb-0.5 hidden xl:grid grid-cols-[120px_120px_1fr_200px_150px_140px] gap-2 pb-2 mb-0 table-header w-[97%] bg-[#ededed7a] mx-auto my-4 rounded-[4px]">
+                    <div className="px-4 xl:px-4 py-2 mb-0.5 hidden xl:grid grid-cols-[120px_120px_1fr_200px_150px_140px] gap-2 pb-2 mb-0 table-header w-[97%] bg-[#ededed7a] mx-auto my-3.5 rounded-[4px]">
                       {['Type', 'ID', 'Cargo / Value', 'Status / Due Date', 'Last Update', 'Action'].map((header, idx) => (
                         <div key={idx} className="flex items-center gap-2 font-poppins text-sm font-normal text-[#606068]">
                           <span>{header}</span>
