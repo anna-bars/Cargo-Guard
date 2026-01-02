@@ -611,39 +611,43 @@ export default function DashboardPage() {
                         </div>
                       </div>
                       
-                      <div className="flex items-end gap-1 overflow-hidden">
-                        {/* Top bars */}
-                        <div className="flex gap-1 items-baseline">
-                          {Array.from({ length: 22 }).map((_, i) => (
-                            <div 
-                              key={`top-${i}`} 
-                              className={`w-[3px] bg-[#bed5f8] ${i === 0 || i === 21 ? 'h-8' : 'h-5'}`}
-                            />
-                          ))}
-                        </div>
+<div className="flex items-end overflow-hidden">
+  {/* Top bars */}
+  <div className="flex items-baseline">
+    {Array.from({ length: 22 }).map((_, i) => (
+      <div 
+        key={`top-${i}`} 
+        className={`w-[2px] bg-[#bed5f8] ${i === 0 || i === 21 ? 'h-8' : 'h-5'} ${i !== 21 ? 'mr-[3px]' : ''}`}
+      />
+    ))}
+  </div>
 
-                        <div className="flex gap-1 items-baseline">
-                          {Array.from({ length: 7 }).map((_, i) => (
-                            <div 
-                              key={`top-${i}`} 
-                              className={`w-[3px] bg-[#FCC573] ${i === 0 || i === 6 ? 'h-8' : 'h-5'}`}
-                            />
-                          ))}
-                        </div>
-                        
-                        {/* Bottom bars */}
-                        <div className="flex gap-1 items-baseline">
-                          {Array.from({ length: 44 }).map((_, i) => (
-                            <div 
-                              key={`bottom-${i}`} 
-                              className="w-[3px] h-1 bg-[#f3f3f6]"
-                            />
-                          ))}
-                        </div>
-                      </div>
+  <div className="flex items-baseline ml-[3px]">
+    {Array.from({ length: 7 }).map((_, i) => (
+      <div 
+        key={`top-${i}`} 
+        className={`w-[2px] bg-[#FCC573] ${i === 0 || i === 6 ? 'h-8' : 'h-5'} ${i !== 6 ? 'mr-[3px]' : ''}`}
+      />
+    ))}
+  </div>
+  
+  {/* Bottom bars */}
+  <div className="flex items-baseline ml-[3px]">
+    {Array.from({ length: 44 }).map((_, i) => (
+      <div 
+        key={`bottom-${i}`} 
+        className="w-[2px] h-1 bg-[#f3f3f6] mr-[3px] last:mr-0"
+      />
+    ))}
+  </div>
+</div> 
+
                     </div>
                   </div>
                 </div>
+
+
+                
               </div>
             </main>
           </div>
