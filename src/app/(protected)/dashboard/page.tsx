@@ -483,7 +483,7 @@ export default function DashboardPage() {
               
                 .welcome-widget {
                     height: 260px;
-                    width: 100%;
+                    width: 80%;
                 }
                 
                 .showin-result-ittle-info {
@@ -506,16 +506,16 @@ export default function DashboardPage() {
                 flex-direction: column-reverse;
             }
                     .right.jsx-d116e6d599512e01 {
-        gap: 16px;
+        gap: 8px;
         display: flex;
         flex-direction: row;
     }
         .welcome-widget, .quote-conversion.performance-section.jsx-be524dc674521ed {
-                    height: 200px;  
+                            max-height: 100% !important
           width: 49%;
         }
                 .right {
-        gap: 16px;
+        gap: 8px;
         display: flex;
         flex-direction: row;
     }

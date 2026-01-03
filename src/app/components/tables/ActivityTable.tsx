@@ -53,10 +53,10 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
       <section className="block-2 flex flex-col max-h-[88%] border border-[#d1d1d154] activity-section bg-[#fafaf7]/80 rounded-2xl py-4 xl:py-4">
         {/* Desktop Filters - ՓՈՓՈԽԵԼ ԵՆՔ SM->MD */}
         <div className='block-1'>
-          <div className='hidden md:flex px-4 xl:px-4 justify-between items-center border-b border-b-[#d1d1d154] pb-3'>
-            <h2 className="hidden md:block">{title}</h2>
-            <div className='hidden md:flex justify-between gap-2'>
-              <button className="flex text-[#6e6d6d] items-center gap-2 w-[180px] bg-[#f9f9f6] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300">
+          <div className='hidden sm:flex px-4 xl:px-4 justify-between items-center border-b border-b-[#d1d1d154] pb-3'>
+            <h2 className="hidden sm:block">{title}</h2>
+            <div className='hidden sm:flex justify-between gap-2'>
+              <button className="hidden md:flex text-[#6e6d6d] items-center gap-2 w-[180px] bg-[#f9f9f6] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300">
                 <img src="dashboard/icons/search-01-stroke-rounded.svg" alt="" className="w-[16px] h-[16px]" />
                 Search
               </button>
@@ -94,21 +94,21 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
         {/* Table Rows */}
         <div className="table-rows-cont px-4 xl:px-4 block-2 space-y-2 activity-table overflow-y-scroll">
           {rows.map((row, idx) => (
-            <div key={idx} className="tab-item md:grid md:grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 p-4 md:p-3 bg-[#f9f9f6] md:bg-[#f9f9f6] rounded-lg md:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
+            <div key={idx} className="tab-item sm:grid sm:grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 p-4 md:p-3 bg-[#f9f9f6] md:bg-[#f9f9f6] rounded-lg md:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
               {/* Desktop Layout */}
-              <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.type}</div>
-              <div className="hidden md:block md:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">{row.id}</div>
-              <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.cargo} / {row.value}</div>
-              <div className="hidden md:block md:w-auto row-cell flex justify-end">
+              <div className="hidden sm:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.type}</div>
+              <div className="hidden sm:block md:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">{row.id}</div>
+              <div className="hidden sm:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.cargo} / {row.value}</div>
+              <div className="hidden sm:block md:w-auto row-cell flex justify-end">
                 <span className={`!font-medium inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor}`}>
                   <span className={`w-1.5 h-1.5 rounded-full ${row.status.dot}`}></span>
                   {row.status.text}
                 </span>
               </div>
-              <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.date}</div>
+              <div className="hidden sm:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.date}</div>
               
               {/* Mobile Layout - FIXED ALIGNMENT */}
-              <div className="md:hidden w-full">
+              <div className="sm:hidden w-full">
                 {/* Top row: Type/ID on left, Status on right - FIXED ALIGNMENT */}
                 <div className="flex justify-between items-center mb-4">
                   {/* Left side: Type + ID */}
@@ -185,13 +185,6 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
         }
 
         @media screen and (max-width: 1024px) {
-          .activity-section {
-            border: none !important;
-            background: transparent !important;
-            padding: 0 !important;
-            border-radius: 0 !important;
-          }
-          
           .block-2 {
             max-height: none !important;
           }
@@ -206,18 +199,6 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             margin-top: 0px;
           }
           
-          .table-row {
-            min-width: 100%;
-            display: flex;
-            background-color: rgba(250, 252, 255, 0.8) !important;
-            border-radius: 16px !important;
-            flex-wrap: wrap;
-            gap: 16px;
-            justify-content: space-between;
-            padding: 20px !important;
-            margin-bottom: 12px !important;
-            border-bottom: 1px solid #d1d1d140 !important;
-          }
           
           .table-row:hover {
             background-color: #f6f6ecff !important;
@@ -231,22 +212,25 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             color: #2563eb !important;
           }
           
-          .row-cell {
-            font-family: 'Poppins', sans-serif;
-            font-size: 14px;
-            color: #000000;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            width: 45.5%;
-            gap: 8px;
-          }
+          
         }
 
         @media screen and (max-width: 768px) {
           .recent-activity button {
             padding: 6px 12px !important;
             font-size: 12px !important;
+          }
+          .table-row {
+            min-width: 100%;
+            display: flex;
+            background-color: rgba(250, 252, 255, 0.8) !important;
+            border-radius: 16px !important;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: space-between;
+            padding: 20px !important;
+            margin-bottom: 12px !important;
+            border-bottom: 1px solid #d1d1d140 !important;
           }
           
           .recent-activity h3 {
