@@ -1,0 +1,445 @@
+import React, { useState } from 'react';
+
+interface ActivityRow {
+  type: 'Quote' | 'Policy';
+  id: string;
+  cargo: string;
+  value: string;
+  status: {
+    text: string;
+    color: string;
+    dot: string;
+    textColor: string;
+  };
+  date: string;
+  button: {
+    text: string;
+    variant: 'primary' | 'secondary';
+  };
+}
+
+interface RecentActivityTableProps {
+  title?: string;
+  showMobileHeader?: boolean;
+  rows?: ActivityRow[];
+}
+
+export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
+  title = 'Recent Insurance Activity',
+  showMobileHeader = true,
+  rows = DEFAULT_ROWS
+}) => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  return (
+    <>
+      {/* Mobile Activity Header - ԲՆՈՐԻՆԱԼ ՏԵՍՔԸ */}
+      {showMobileHeader && (
+        <div className="recent-activity md:hidden flex items-center justify-between activity-mobile-header activity-section-mob-hd mb-4">
+          <h3 className="text-lg font-normal">Recent Activity</h3>
+          <div className='flex justify-betwwen gap-2'>
+            <button className="flex items-center gap-1 bg-[#F5F4F7] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300">
+              <img src="dashboard/icons/filter-stroke-rounded.svg" alt="" className="w-[16px] h-[16px]" />
+              Filter
+            </button>
+            <button className="bg-[#eb8d25] text-white px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#ff8c0c] transition-colors duration-300">
+              Get New Quote
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Recent Activity Table - ԲՆՈՐԻՆԱԼ ԿԱՌՈՒՑՎԱԾՔԸ */}
+      <section className="block-2 flex flex-col max-h-[88%] border border-[#d1d1d154] activity-section bg-[#fafaf7]/80 rounded-2xl py-4 xl:py-4">
+        {/* Desktop Filters */}
+        <div className='block-1'>
+          <div className='hidden sm:flex px-4 xl:px-4 flex justify-between items-center border-b border-b-[#d1d1d154] pb-3'>
+            <h2 className="hidden md:block">{title}</h2>
+            <div className='hidden md:flex justify-between gap-2'>
+              <button className="flex text-[#6e6d6d] items-center gap-2 w-[180px] bg-[#f9f9f6] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300">
+                <img src="dashboard/icons/search-01-stroke-rounded.svg" alt="" className="w-[16px] h-[16px]" />
+                Search
+              </button>
+              <button className="flex items-center gap-1 bg-[#F5F4F7] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300">
+                <img src="dashboard/icons/filter-stroke-rounded.svg" alt="" className="w-[16px] h-[16px]" />
+                Filter
+              </button>
+              <button className="bg-[#eb8d25] text-white px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#ff8c0c] transition-colors duration-300">
+                Get New Quote
+              </button>
+            </div>
+          </div>
+          
+          {/* Desktop Table Header */}
+          <div className="px-4 sm:px-4 py-2 mb-0.5 hidden md:grid grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 pb-2 mb-0 table-header w-[97%] bg-[#ededed7a] mx-auto my-3.5 rounded-[4px]">
+            {['Type', 'ID', 'Cargo / Value', 'Status / Due Date', 'Last Update', 'Action'].map((header, idx) => (
+              <div
+                key={idx}
+                className={`flex items-center gap-2 font-poppins text-sm font-normal text-[#606068]
+                  ${header === 'Action' ? 'justify-end' : ''}`}
+              >
+                <span>{header}</span>
+                {header !== 'Action' && (
+                  <img
+                    src="https://c.animaapp.com/mjiggi0jSqvoj5/img/filter--1--7.png"
+                    alt="Sort"
+                    className="w-3 h-3"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Table Rows - ԲՆՈՐԻՆԱԼ HTML ԿԱՌՈՒՑՎԱԾՔԸ */}
+        <div className="table-rows-cont px-4 xl:px-4 block-2 space-y-2 activity-table overflow-y-scroll">
+          {rows.map((row, idx) => (
+            <div key={idx} className="tab-item md:grid md:grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 p-4 md:p-3 bg-[#f9f9f6] md:bg-[#f9f9f6] rounded-lg md:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
+              {/* Desktop Layout */}
+              <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.type}</div>
+              <div className="hidden md:block md:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">{row.id}</div>
+              <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.cargo} / {row.value}</div>
+              <div className="hidden md:block md:w-auto row-cell flex justify-end">
+                <span className={`!font-medium inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor}`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${row.status.dot}`}></span>
+                  {row.status.text}
+                </span>
+              </div>
+              <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.date}</div>
+              
+              {/* Mobile Layout - ԲՆՈՐԻՆԱԼ ԿԱՌՈՒՑՎԱԾՔԸ */}
+              <div className="md:hidden w-full">
+                {/* Top row: Type/ID on left, Status on right */}
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center gap-2">
+                    <span className="font-poppins text-sm font-normal text-black">{row.type}</span>
+                    <span className="font-poppins text-sm text-[#2563eb] underline">{row.id}</span>
+                  </div>
+                  <div className="row-cell flex-shrink-0">
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor} mobile-status-badge`}>
+                      <span className={`w-2 h-2 rounded-full ${row.status.dot}`}></span>
+                      {row.status.text}
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Middle row: Cargo on left, Value on right */}
+                <div className="flex justify-between items-center mb-4">
+                  <div className="font-poppins text-sm text-gray-700">{row.cargo}</div>
+                  <div className="font-poppins text-sm font-normal text-black">{row.value}</div>
+                </div>
+                
+                {/* Bottom row: Date on left, full-width button */}
+                <div className="flex flex-col gap-2">
+                  <div className="font-poppins text-sm text-gray-600">{row.date}</div>
+                  <button className={`mobile-action-btn ${
+                    row.button.variant === 'primary' 
+                      ? 'primary-btn' 
+                      : 'secondary-btn'
+                  }`}>
+                    {row.button.text}
+                  </button>
+                </div>
+              </div>
+              
+              {/* Desktop button */}
+              <div className="flex justify-end hidden md:flex md:w-auto row-cell">
+                <button className={`h-9 px-4 rounded-lg font-poppins text-sm font-normal transition-colors duration-300 w-full xl:w-[140px] ${
+                  row.button.variant === 'primary' 
+                    ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]' 
+                    : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f3f4f6] hover:border-[#d1d5db]'
+                }`}>
+                  {row.button.text}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ՄՈԲԱՅԼ ԱԴԱՊՏԻՎ CSS - ԲՆՈՐԻՆԱԼԸ */}
+      <style jsx>{`
+        /* Activity table responsive styles */
+        @media screen and (max-width: 1336px) {
+          .block-2 {
+            overflow: scroll !important;
+          }
+          
+          .activity-header {
+            display: block;
+          }
+          
+          .activity-filters {
+            justify-content: flex-end;
+          }
+        }
+
+        @media screen and (max-width: 1280px) {
+          .table-row {
+            min-width: 100%;
+          }
+          
+          .activity-section {
+            padding: 16px;
+          }
+        }
+
+        @media screen and (max-width: 1024px) {
+          .activity-section {
+            border: none !important;
+            background: transparent !important;
+            padding: 0 !important;
+            border-radius: 0 !important;
+          }
+          
+          .block-2 {
+            max-height: none !important;
+          }
+          
+          .table-rows-cont {
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100% !important;
+          }
+          
+          .activity-table {
+            margin-top: 0px;
+          }
+          
+          .table-row {
+            min-width: 100%;
+            display: flex;
+            background-color: rgba(250, 252, 255, 0.8) !important;
+            border-radius: 16px !important;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: space-between;
+            padding: 20px !important;
+            margin-bottom: 12px !important;
+            border-bottom: 1px solid #d1d1d140 !important;
+          }
+          
+          .table-row:hover {
+            background-color: #f6f6ecff !important;
+          }
+          
+          .table-row button {
+            width: 100% !important;
+          }
+          
+          .id-link {
+            color: #2563eb !important;
+          }
+          
+          .row-cell {
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            color: #000000;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 45.5%;
+            gap: 8px;
+          }
+          
+          /* Activity header adjustments */
+          .activity-header {
+            display: none;
+          }
+        }
+
+        @media screen and (max-width: 768px) {
+          .recent-activity button {
+            padding: 6px 12px !important;
+            font-size: 12px !important;
+          }
+          
+          .recent-activity h3 {
+            font-size: 16px !important;
+          }
+          
+          .table-rows-cont {
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 101% !important;
+          }
+          
+          .activity-section {
+            border: none !important;
+            background: transparent !important;
+            padding: 0 !important;
+          }
+          
+          .table-row {
+            padding: 16px !important;
+            gap: 12px !important;
+            margin-bottom: 12px !important;
+          }
+          
+          .tab-item {
+            margin: 0;
+            background-color: #f9f9f6 !important;
+            border: none !important;
+            border-bottom: 1px solid #d1d1d140 !important;
+          }
+          
+          .tab-item:hover {
+            background-color: #f6f6ecff !important;
+          }
+        }
+
+        /* Mobile action button styles */
+        .mobile-action-btn {
+          color: #ffffff;
+          cursor: pointer;
+          background-color: #2563EB;
+          border: 1px solid rgba(255, 255, 255, 0.22);
+          border-radius: 8px;
+          align-items: center;
+          gap: 8px;
+          padding: 12px 16px;
+          font-family: 'Inter', sans-serif;
+          font-size: 14px;
+          transition: background-color 0.3s;
+          display: flex;
+          text-align: center;
+          justify-content: center;
+          width: 100%;
+          height: 44px;
+          border: 1px solid rgba(0, 0, 255, 0.169);
+        }
+
+        .mobile-action-btn.primary-btn {
+          background-color: #2563EB;
+          color: #ffffff;
+          border: 1px solid rgba(255, 255, 255, 0.22);
+        }
+
+        .mobile-action-btn.secondary-btn {
+          background-color: transparent;
+          color: #374151;
+          border: 1px solid #e3e6ea;
+        }
+
+        .mobile-action-btn:hover {
+          background-color: #1d4ed8;
+        }
+
+        .mobile-action-btn.secondary-btn:hover {
+          background-color: #f3f4f6;
+          border-color: #d1d5db;
+        }
+
+        /* Mobile status badge - fit content */
+        .mobile-status-badge {
+          width: fit-content !important;
+          min-width: fit-content !important;
+          white-space: nowrap !important;
+          padding-left: 12px !important;
+          padding-right: 12px !important;
+          height: 26px;
+          display: inline-flex !important;
+          align-items: center !important;
+        }
+
+        @media screen and (max-width: 1024px) {
+          .table-row .mobile-status-badge {
+            font-size: 11px !important;
+            padding: 6px 10px !important;
+            height: 24px;
+          }
+        }
+
+        @media screen and (max-width: 768px) {
+          .mobile-action-btn {
+            height: 44px;
+            font-size: 14px;
+            font-weight: 500;
+          }
+          
+          .mobile-status-badge {
+            font-size: 10px !important;
+            padding: 5px 8px !important;
+            height: 22px;
+          }
+        }
+      `}</style>
+    </>
+  );
+};
+
+// Default data
+const DEFAULT_ROWS = [
+  {
+    type: 'Quote',
+    id: 'Q-005',
+    cargo: 'Jewelry',
+    value: '$15,400.00',
+    status: { 
+      text: 'Pending Approval', 
+      color: 'bg-[#cbd03c]/10', 
+      dot: 'bg-[#cbd03c]', 
+      textColor: 'text-[#cbd03c]' 
+    },
+    date: 'Oct 25, 9:10PM',
+    button: { text: 'Approve Quote', variant: 'primary' }
+  },
+  {
+    type: 'Policy',
+    id: 'P-021',
+    cargo: 'Textiles',
+    value: '$3,700.00',
+    status: { 
+      text: 'Document Missing', 
+      color: 'bg-[#f97316]/10', 
+      dot: 'bg-[#f97316]', 
+      textColor: 'text-[#f97316]' 
+    },
+    date: 'Oct 20, 6:30PM',
+    button: { text: 'Upload Docs', variant: 'secondary' }
+  },
+  {
+    type: 'Policy',
+    id: 'P-020',
+    cargo: 'Heavy Machinery',
+    value: '$48,400.00',
+    status: { 
+      text: 'Expires 15 Nov 2025', 
+      color: 'bg-[#eab308]/10', 
+      dot: 'bg-[#eab308]', 
+      textColor: 'text-[#eab308]' 
+    },
+    date: 'Oct 15, 4:20AM',
+    button: { text: 'Renew Policy', variant: 'secondary' }
+  },
+  {
+    type: 'Policy',
+    id: 'P-019',
+    cargo: 'Electronics',
+    value: '$8,000.00',
+    status: { 
+      text: 'Active', 
+      color: 'bg-[#16a34a]/10', 
+      dot: 'bg-[#16a34a]', 
+      textColor: 'text-[#16a34a]' 
+    },
+    date: 'Oct 21, 2:30PM',
+    button: { text: 'Download Cert', variant: 'secondary' }
+  },
+  {
+    type: 'Quote',
+    id: 'Q-007',
+    cargo: 'Food Products',
+    value: '$1,100.00',
+    status: { 
+      text: 'Declined', 
+      color: 'bg-[#8ea0b0]/10', 
+      dot: 'bg-[#8ea0b0]', 
+      textColor: 'text-[#8ea0b0]' 
+    },
+    date: 'Sept 28, 9:30PM',
+    button: { text: 'View Details', variant: 'secondary' }
+  }
+];
+
+export default RecentActivityTable;
