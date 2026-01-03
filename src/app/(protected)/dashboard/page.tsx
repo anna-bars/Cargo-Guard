@@ -219,7 +219,7 @@ export default function DashboardPage() {
             {/* Main Content Grid */}
             <main className="grid grid-cols-1 xl:grid-cols-[76.5%_23%] gap-2 items-stretch main-content">
               {/* Left Column - 75% */}
-              <div className="max-h-[100%] flex flex-col gap-2">
+              <div className="max-h-[93%] flex flex-col gap-2">
                 {/* Performance Overview */}
                 <section className="block-1 border border-[#d1d1d154] bg-[#fafaf7]/80 rounded-2xl p-4 h-auto performance-section">
                   <div className="flex justify-between items-start mb-2 section-header">
@@ -509,9 +509,9 @@ export default function DashboardPage() {
               </div>
 
               {/* Right Column - 25% */}
-              <div className="flex max-h-[100%] flex-col gap-2 right">
+              <div className="flex max-h-[93%] flex-col gap-2 right">
                 {/* Welcome Widget */}
-                <div className="relative h-[60%] rounded-2xl overflow-hidden w-full welcome-widget hover:shadow-lg transition-shadow duration-300">
+                <div className="relative h-[380px] rounded-2xl overflow-hidden w-full welcome-widget hover:shadow-lg transition-shadow duration-300">
                   <img 
                     src="https://c.animaapp.com/mjiggi0jSqvoj5/img/frame-76.png" 
                     alt="Background" 
@@ -539,7 +539,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Quote Conversion Rate */}
-                <div className="h-[60%]  flex flex-col justify-between border border-[#d1d1d154] bg-[#fafaf7]/80 rounded-2xl p-4 h-auto min-h-[203px] w-full quote-conversion performance-section hover:shadow-sm transition-shadow duration-300">
+                <div className="flex flex-col justify-between border border-[#d1d1d154] bg-[#fafaf7]/80 rounded-2xl p-4 h-auto min-h-[203px] w-full quote-conversion performance-section hover:shadow-sm transition-shadow duration-300">
                   <div className="mb-[24px]">
                     <h3 className="font-montserrat text-[18px] font-normal text-black action-title">
                       Quote Conversion Rate
@@ -552,7 +552,7 @@ export default function DashboardPage() {
                   <div className="block justify-between items-end">
                     <div className="w-full">
                    
-                   <div className="flex w-[96%] justify-between mb-7">
+                   <div className="flex w-[96%] justify-between mb-3.5">
   <div>
     <div className="text-[13px] text-[#C8C8C8]">Approved</div>
     <div className="flex items-center gap-1.5 mt-0.5">
