@@ -338,81 +338,7 @@ export default function DashboardPage() {
                 {/* Mobile Activity Header */}
                 <div className="xl:hidden flex items-center justify-between activity-mobile-header activity-section-mob-hd">
                   <h3 className="text-lg font-normal">Recent Activity</h3>
-                  <div className="flex gap-1">
-                    <button className="p-[10px] bg-[#FBFBFC] border border-[#FBFBFC] rounded-[6px]">
-                      <img src="/dashboard/btn/01.svg" alt="" className="w-4 h-4" />
-                    </button>
-
-                    <button className="p-[10px] bg-[#FBFBFC] border border-[#FBFBFC] rounded-[6px]">
-                      <img src="/dashboard/btn/02.svg" alt="" className="w-4 h-4" />
-                    </button>
-
-                    <button className="p-[10px] bg-[#FBFBFC] border border-[#FBFBFC] rounded-[6px]">
-                      <img src="/dashboard/btn/03.svg" alt="" className="w-4 h-4" />
-                    </button>
-
-                    <button 
-                      onClick={toggleMobileFilter}
-                      className="p-[10px] bg-[#FBFBFC] border border-[#FBFBFC] rounded-[6px]"
-                    >
-                      <img src="/dashboard/btn/04.svg" alt="" className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Recent Activity Table */}
-                <section className="block-2 flex flex-col max-h-[88%] border border-[#d1d1d154] activity-section bg-[#fafaf7]/80 rounded-2xl py-4 xl:py-4">
-                  {/* Desktop Filters */}
-                  <div className='block-1 '>
-                    {/* <div className="hidden xl:flex justify-between items-center mb-6 activity-header activity-filters">
-                      <div className="flex items-center gap-1.5">
-                        <img 
-                          src="https://c.animaapp.com/mjiggi0jSqvoj5/img/filter-1.png" 
-                          alt="Filter" 
-                          className="w-3 h-3"
-                        />
-                        <span className="font-montserrat text-base font-normal text-[#818181]">
-                          Search Filter
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2 showin-result-ittle-info">
-                        <div className="w-36 h-[38px] border-b border-[#c7c7c7]/51 flex items-center justify-between px-3 py-2 hover:border-[#a0a0a0]/51 transition-colors duration-300">
-                          <input 
-                            type="text" 
-                            placeholder="Search by..."
-                            className="w-full border-none bg-transparent font-montserrat text-xs text-[#7b7b7b] outline-none"
-                          />
-                          <img 
-                            src="https://c.animaapp.com/mjiggi0jSqvoj5/img/search--1--2.png" 
-                            alt="Search" 
-                            className="w-3 h-3"
-                          />
-                        </div>
-                        
-                        {['All Activity', 'Last 30 days', 'Sort by', 'Status'].map((text, idx) => (
-                          <div key={idx} className="h-[38px] flex items-center gap-3 px-3 py-2 rounded-lg border border-[#c7c7c7]/51 font-montserrat text-xs text-[#7b7b7b] hover:border-[#a0a0a0]/51 transition-colors duration-300">
-                            <span>{text}</span>
-                            <img 
-                              src="https://c.animaapp.com/mjiggi0jSqvoj5/img/arrow-3-1.svg" 
-                              alt="Dropdown"
-                              className="w-2 h-1"
-                            />
-                          </div>
-                        ))}
-                        
-                        <button className="bg-[#2563eb] text-white px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#1d4ed8] transition-colors duration-300">
-                          Get New Quote
-                        </button>
-                      </div>
-                    </div> */}
-                    <div className='px-4 xl:px-4 flex justify-between items-center border-b border-b-[#d1d1d154] pb-3'>
-                      <h2>Recent Insurance Activity</h2>
-                      <div className='flex justify-betwwen gap-2'>
-                        <button className="flex text-[#6e6d6d] items-center gap-2 w-[180px] bg-[#f9f9f6] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300">
-                          <img src="dashboard/icons/search-01-stroke-rounded.svg" alt="" className="w-[16px] h-[16px]" />
-                          Search
-                        </button>
+                  <div className='flex justify-betwwen gap-2'>
                         <button className="flex items-center gap-1 bg-[#F5F4F7] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300">
                           <img src="dashboard/icons/filter-stroke-rounded.svg" alt="" className="w-[16px] h-[16px]" />
                           Filter
@@ -421,7 +347,29 @@ export default function DashboardPage() {
                           Get New Quote
                         </button>
                       </div>
+                </div>
+
+                {/* Recent Activity Table */}
+                <section className="block-2 flex flex-col max-h-[88%] border border-[#d1d1d154] activity-section bg-[#fafaf7]/80 rounded-2xl py-4 xl:py-4">
+                  {/* Desktop Filters */}
+                  <div className='block-1 '>
+                   
+                  <div className='hidden md:flex px-4 xl:px-4 flex justify-between items-center border-b border-b-[#d1d1d154] pb-3'>
+                    <h2 className="hidden md:block">Recent Insurance Activity</h2>
+                    <div className='hidden md:flex justify-between gap-2'>
+                      <button className="flex text-[#6e6d6d] items-center gap-2 w-[180px] bg-[#f9f9f6] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300">
+                        <img src="dashboard/icons/search-01-stroke-rounded.svg" alt="" className="w-[16px] h-[16px]" />
+                        Search
+                      </button>
+                      <button className="flex items-center gap-1 bg-[#F5F4F7] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300">
+                        <img src="dashboard/icons/filter-stroke-rounded.svg" alt="" className="w-[16px] h-[16px]" />
+                        Filter
+                      </button>
+                      <button className="bg-[#eb8d25] text-white px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#ff8c0c] transition-colors duration-300">
+                        Get New Quote
+                      </button>
                     </div>
+                  </div>
                     
                     {/* Desktop Table Header */}
                     <div className="px-4 xl:px-4 py-2 mb-0.5 hidden xl:grid grid-cols-[120px_120px_1fr_200px_150px_140px] gap-2 pb-2 mb-0 table-header w-[97%] bg-[#ededed7a] mx-auto my-3.5 rounded-[4px]">
@@ -441,7 +389,7 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Table Rows */}
-                  <div className="px-4 xl:px-4 block-2 space-y-2 activity-table overflow-y-scroll">
+                  <div className="table-rows-cont px-4 xl:px-4 block-2 space-y-2 activity-table overflow-y-scroll">
                     {[
                       {
                         type: 'Quote',
@@ -1523,6 +1471,14 @@ export default function DashboardPage() {
             }
 
             @media screen and (max-width: 768px) {
+                .table-rows-cont {
+                  padding: 0 !important;
+                  margin: 0 !important;
+                  width: 101%;
+                }
+                .activity-section {
+                   border: none !important;
+                }
                 .metric-value, .metric-value2 {
                     font-size: 38px;
                     font-weight: 300 !important;
@@ -1692,6 +1648,7 @@ export default function DashboardPage() {
   .table-row {
     padding: 16px;
     gap: 12px;
+    margin-bottom: 12px;
   }
 }
 

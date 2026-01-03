@@ -180,3 +180,9 @@ body {
   --expired-start: #BEF8BE;
   --expired-end: #66EE88;
 }
+/* Լրացուցիչ CSS ֆայլում */
+@media screen and (max-width: 768px) {
+  .omblock {
+    min-width: 90.5% !important;
+  }
+}
