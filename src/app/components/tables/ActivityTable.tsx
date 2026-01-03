@@ -33,11 +33,11 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
 
   return (
     <>
-      {/* Mobile Activity Header - ԲՆՈՐԻՆԱԼ ՏԵՍՔԸ */}
+      {/* Mobile Activity Header */}
       {showMobileHeader && (
         <div className="recent-activity md:hidden flex items-center justify-between activity-mobile-header activity-section-mob-hd mb-4">
           <h3 className="text-lg font-normal">Recent Activity</h3>
-          <div className='flex justify-betwwen gap-2'>
+          <div className='flex gap-2'>
             <button className="flex items-center gap-1 bg-[#F5F4F7] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300">
               <img src="dashboard/icons/filter-stroke-rounded.svg" alt="" className="w-[16px] h-[16px]" />
               Filter
@@ -49,11 +49,11 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
         </div>
       )}
 
-      {/* Recent Activity Table - ԲՆՈՐԻՆԱԼ ԿԱՌՈՒՑՎԱԾՔԸ */}
+      {/* Recent Activity Table */}
       <section className="block-2 flex flex-col max-h-[88%] border border-[#d1d1d154] activity-section bg-[#fafaf7]/80 rounded-2xl py-4 xl:py-4">
-        {/* Desktop Filters */}
+        {/* Desktop Filters - ՓՈՓՈԽԵԼ ԵՆՔ SM->MD */}
         <div className='block-1'>
-          <div className='hidden sm:flex px-4 xl:px-4 flex justify-between items-center border-b border-b-[#d1d1d154] pb-3'>
+          <div className='hidden md:flex px-4 xl:px-4 justify-between items-center border-b border-b-[#d1d1d154] pb-3'>
             <h2 className="hidden md:block">{title}</h2>
             <div className='hidden md:flex justify-between gap-2'>
               <button className="flex text-[#6e6d6d] items-center gap-2 w-[180px] bg-[#f9f9f6] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300">
@@ -91,7 +91,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           </div>
         </div>
 
-        {/* Table Rows - ԲՆՈՐԻՆԱԼ HTML ԿԱՌՈՒՑՎԱԾՔԸ */}
+        {/* Table Rows */}
         <div className="table-rows-cont px-4 xl:px-4 block-2 space-y-2 activity-table overflow-y-scroll">
           {rows.map((row, idx) => (
             <div key={idx} className="tab-item md:grid md:grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 p-4 md:p-3 bg-[#f9f9f6] md:bg-[#f9f9f6] rounded-lg md:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
@@ -107,14 +107,17 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
               </div>
               <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.date}</div>
               
-              {/* Mobile Layout - ԲՆՈՐԻՆԱԼ ԿԱՌՈՒՑՎԱԾՔԸ */}
+              {/* Mobile Layout - FIXED ALIGNMENT */}
               <div className="md:hidden w-full">
-                {/* Top row: Type/ID on left, Status on right */}
-                <div className="flex justify-between items-start mb-4">
+                {/* Top row: Type/ID on left, Status on right - FIXED ALIGNMENT */}
+                <div className="flex justify-between items-center mb-4">
+                  {/* Left side: Type + ID */}
                   <div className="flex items-center gap-2">
                     <span className="font-poppins text-sm font-normal text-black">{row.type}</span>
                     <span className="font-poppins text-sm text-[#2563eb] underline">{row.id}</span>
                   </div>
+                  
+                  {/* Right side: Status badge - NOW RIGHT ALIGNED */}
                   <div className="row-cell flex-shrink-0">
                     <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor} mobile-status-badge`}>
                       <span className={`w-2 h-2 rounded-full ${row.status.dot}`}></span>
@@ -157,30 +160,27 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
         </div>
       </section>
 
-      {/* ՄՈԲԱՅԼ ԱԴԱՊՏԻՎ CSS - ԲՆՈՐԻՆԱԼԸ */}
+      {/* ՄՈԲԱՅԼ ԱԴԱՊՏԻՎ CSS - UPDATED */}
       <style jsx>{`
         /* Activity table responsive styles */
         @media screen and (max-width: 1336px) {
           .block-2 {
             overflow: scroll !important;
           }
-          
-          .activity-header {
-            display: block;
-          }
-          
-          .activity-filters {
-            justify-content: flex-end;
-          }
         }
 
-        @media screen and (max-width: 1280px) {
-          .table-row {
-            min-width: 100%;
+        /* 768px - Desktop filters appear */
+        @media screen and (min-width: 768px) {
+          .activity-section {
+            border: 1px solid #d1d1d154 !important;
+            background: #fafaf7/80 !important;
+            border-radius: 16px !important;
+            padding-top: 16px !important;
+            padding-bottom: 16px !important;
           }
           
-          .activity-section {
-            padding: 16px;
+          .table-rows-cont {
+            padding: 0 16px !important;
           }
         }
 
@@ -241,11 +241,6 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             width: 45.5%;
             gap: 8px;
           }
-          
-          /* Activity header adjustments */
-          .activity-header {
-            display: none;
-          }
         }
 
         @media screen and (max-width: 768px) {
@@ -285,6 +280,12 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           
           .tab-item:hover {
             background-color: #f6f6ecff !important;
+          }
+          
+          /* Fix mobile status badge alignment */
+          .mobile-status-badge {
+            margin-left: auto !important;
+            margin-right: 0 !important;
           }
         }
 
@@ -330,7 +331,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           border-color: #d1d5db;
         }
 
-        /* Mobile status badge - fit content */
+        /* Mobile status badge */
         .mobile-status-badge {
           width: fit-content !important;
           min-width: fit-content !important;
@@ -361,6 +362,15 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             font-size: 10px !important;
             padding: 5px 8px !important;
             height: 22px;
+          }
+          
+          /* Ensure status badge stays on right in mobile */
+          .md\\:hidden .flex.justify-between {
+            align-items: center !important;
+          }
+          
+          .md\\:hidden .row-cell {
+            margin-left: auto !important;
           }
         }
       `}</style>
