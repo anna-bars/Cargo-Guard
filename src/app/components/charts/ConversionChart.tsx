@@ -4,9 +4,9 @@ export const ConversionChart = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   
   const DATA = [
-    { type: 'approved', count: 17 },
-    { type: 'declined', count: 9 },
-    { type: 'expired', count: 0 }
+    { type: 'approved', count: 17, color: '#669CEE', hegHeight: 26, normalHeight: 20 },
+    { type: 'declined', count: 9, color: '#EEAF66', hegHeight: 24, normalHeight: 16 },
+    { type: 'expired', count: 18, color: '#66EE88', hegHeight: 18, normalHeight: 14 }
   ];
 
   const calculateBarsCount = useCallback((width: number) => {
@@ -51,8 +51,8 @@ export const ConversionChart = () => {
             width: '1px',
             transform: 'scaleX(2.7)',
             transformOrigin: 'left',
-            height: isFirst || isLast ? '26px' : '20px',
-            backgroundColor: '#669CEE'
+            height: isFirst || isLast ? `${DATA[0].hegHeight}px` : `${DATA[0].normalHeight}px`,
+            backgroundColor: DATA[0].color
           }}
         />
       );
@@ -72,15 +72,36 @@ export const ConversionChart = () => {
             width: '1px',
             transform: 'scaleX(2.7)',
             transformOrigin: 'left',
-            height: isFirst || isLast ? '24px' : '16px',
-            backgroundColor: '#EEAF66'
+            height: isFirst || isLast ? `${DATA[1].hegHeight}px` : `${DATA[1].normalHeight}px`,
+            backgroundColor: DATA[1].color
+          }}
+        />
+      );
+    }
+    
+    // Expired գծիկներ (ԱՎԵԼԱՑՆՈՒՄ ԵՆՔ ՍԱ)
+    const expiredBars = Math.max(1, Math.round((DATA[2].count / total) * barsCount));
+    for (let i = 0; i < expiredBars; i++) {
+      const isFirst = i === 0;
+      const isLast = i === expiredBars - 1;
+      
+      bars.push(
+        <div 
+          key={`expired-${i}`}
+          className={`expired-chart-bar ${isFirst || isLast ? 'heg' : ''}`}
+          style={{
+            width: '1px',
+            transform: 'scaleX(2.7)',
+            transformOrigin: 'left',
+            height: isFirst || isLast ? `${DATA[2].hegHeight}px` : `${DATA[2].normalHeight}px`,
+            backgroundColor: DATA[2].color
           }}
         />
       );
     }
     
     // Մնացած դատարկ գծիկներ
-    const remainingBars = barsCount - (approvedBars + declinedBars);
+    const remainingBars = barsCount - (approvedBars + declinedBars + expiredBars);
     for (let i = 0; i < remainingBars; i++) {
       bars.push(
         <div 
@@ -132,7 +153,8 @@ export const ConversionChart = () => {
               <div className="text-[13px] text-[#C8C8C8]">Expired</div>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#66EE88]"></div>
-                <div className="text-[15px]">0</div>
+                {/* ՓՈԽԵՄ ՆՈՐ ԱՐՏԱԴՐՈՒԹՅԱՆ ՀԱՄԱՐ */}
+                <div className="text-[15px]">18</div>
               </div>
             </div>
           </div>
@@ -185,7 +207,6 @@ export const ConversionChart = () => {
         </div>
       </div>
 
-      {/* Պահպանում եմ ձեր սկզբնական CSS-ը գրադիենտների համար */}
       <style jsx global>{`
         .approved-chart-bar {
           background-color: #669CEE !important;
@@ -195,17 +216,24 @@ export const ConversionChart = () => {
           background-color: #EEAF66 !important;
         }
         
+        .expired-chart-bar {
+          background-color: #66EE88 !important;
+        }
+        
         .empty-chart-bar {
           background: linear-gradient(180deg, #E2E3E4, transparent) !important;
         }
         
-        /* Ձեր սկզբնական գրադիենտների համար (optional) */
         .approved-chart-bar.heg {
           height: 26px !important;
         }
         
         .declined-chart-bar.heg {
           height: 24px !important;
+        }
+        
+        .expired-chart-bar.heg {
+          height: 18px !important;
         }
         
         .chart-cont {
