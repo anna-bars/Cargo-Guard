@@ -578,7 +578,7 @@ export default function DashboardPage() {
 
 
                          <div className='chart-cont'>
-                              <div className="chaart">
+                            <div className="chaart">
                                 <div className="approved chart-div-active-item heg"></div>
                                 <div className="approved chart-div-active-item"></div>
                                 <div className="approved chart-div-active-item"></div>
@@ -696,6 +696,10 @@ export default function DashboardPage() {
                                 <div className=" chart-div-active-item"></div>
                                 <div className=" chart-div-active-item"></div>
                                 <div className=" chart-div-active-item"></div>
+                            </div>
+                            <div className='flex justify-between '>
+                              <p className='text-xs text-[#C8C8C8]'>0</p>
+                              <p className='text-xs text-[#C8C8C8]'>100</p>
                             </div>
                          </div>
                         
@@ -1192,7 +1196,7 @@ export default function DashboardPage() {
     background: linear-gradient(180deg, #E2E3E4, transparent);
 }
 .chaart2, .chaart {
-            display: -webkit-box;
+            display: inline-flex;
 }
             .chart-cont {
               gap: 0px;
