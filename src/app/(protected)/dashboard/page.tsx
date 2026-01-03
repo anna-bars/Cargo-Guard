@@ -596,20 +596,32 @@ export default function DashboardPage() {
                   
                   <div className="block justify-between items-end">
                     <div className="w-full">
-                      <div className="flex w-[96%] justify-between mb-1.5">
-                        <div>
-                          <div className="text-[13px] text-[#C8C8C8]">Approved</div>
-                          <div className="text-[15px] mt-0.5">17</div>
-                        </div>
-                        <div>
-                          <div className="text-[13px] text-[#C8C8C8]">Declined</div>
-                          <div className="text-[15px] mt-0.5">9</div>
-                        </div>
-                        <div>
-                          <div className="text-[13px] text-[#C8C8C8]">Expired</div>
-                          <div className="text-[15px] mt-0.5">0</div>
-                        </div>
-                      </div>
+                   
+                   <div className="flex w-[96%] justify-between mb-3.5">
+  <div>
+    <div className="text-[13px] text-[#C8C8C8]">Approved</div>
+    <div className="flex items-center gap-1.5 mt-0.5">
+      <div className="w-1.5 h-1.5 rounded-full bg-[#669CEE]"></div>
+      <div className="text-[15px]">17</div>
+    </div>
+  </div>
+  <div>
+    <div className="text-[13px] text-[#C8C8C8]">Declined</div>
+    <div className="flex items-center gap-1.5 mt-0.5">
+      <div className="w-1.5 h-1.5 rounded-full bg-[#EEAF66]"></div>
+      <div className="text-[15px]">9</div>
+    </div>
+  </div>
+  <div>
+    <div className="text-[13px] text-[#C8C8C8]">Expired</div>
+    <div className="flex items-center gap-1.5 mt-0.5">
+      <div className="w-1.5 h-1.5 rounded-full bg-[#66EE88]"></div>
+      <div className="text-[15px]">0</div>
+    </div>
+  </div>
+</div>
+
+
                          <div className="chaart">
                             <div className="approved chart-div-active-item heg"></div>
                             <div className="approved chart-div-active-item"></div>
