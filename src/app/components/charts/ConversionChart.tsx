@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState, useCallback, JSX } from 'react';
 
 export const ConversionChart = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [hoveredType, setHoveredType] = useState<string | null>(null);
   
   const DATA = [
     { type: 'approved', count: 17, color: '#669CEE', hegHeight: 26, normalHeight: 20 },
@@ -37,88 +38,111 @@ export const ConversionChart = () => {
     const total = DATA.reduce((sum, item) => sum + item.count, 0);
     const bars: JSX.Element[] = [];
     
-    // Approved գծիկներ
-    const approvedBars = Math.max(1, Math.round((DATA[0].count / total) * barsCount));
-    for (let i = 0; i < approvedBars; i++) {
-      const isFirst = i === 0;
-      const isLast = i === approvedBars - 1;
-      
-      bars.push(
-        <div 
-          key={`approved-${i}`}
-          className={`approved-chart-bar ${isFirst || isLast ? 'heg' : ''}`}
-          style={{
-            width: '1px',
-            transform: 'scaleX(2.7)',
-            transformOrigin: 'left',
-            height: isFirst || isLast ? `${DATA[0].hegHeight}px` : `${DATA[0].normalHeight}px`,
-            backgroundColor: DATA[0].color
-          }}
-        />
-      );
-    }
+    let barIndex = 0;
     
-    // Declined գծիկներ
-    const declinedBars = Math.max(1, Math.round((DATA[1].count / total) * barsCount));
-    for (let i = 0; i < declinedBars; i++) {
-      const isFirst = i === 0;
-      const isLast = i === declinedBars - 1;
+    // Յուրաքանչյուր տեսակի գծիկների համար
+    DATA.forEach((item, dataIndex) => {
+      const itemBars = Math.max(1, Math.round((item.count / total) * barsCount));
       
-      bars.push(
-        <div 
-          key={`declined-${i}`}
-          className={`declined-chart-bar ${isFirst || isLast ? 'heg' : ''}`}
-          style={{
-            width: '1px',
-            transform: 'scaleX(2.7)',
-            transformOrigin: 'left',
-            height: isFirst || isLast ? `${DATA[1].hegHeight}px` : `${DATA[1].normalHeight}px`,
-            backgroundColor: DATA[1].color
-          }}
-        />
-      );
-    }
-    
-    // Expired գծիկներ (ԱՎԵԼԱՑՆՈՒՄ ԵՆՔ ՍԱ)
-    const expiredBars = Math.max(1, Math.round((DATA[2].count / total) * barsCount));
-    for (let i = 0; i < expiredBars; i++) {
-      const isFirst = i === 0;
-      const isLast = i === expiredBars - 1;
-      
-      bars.push(
-        <div 
-          key={`expired-${i}`}
-          className={`expired-chart-bar ${isFirst || isLast ? 'heg' : ''}`}
-          style={{
-            width: '1px',
-            transform: 'scaleX(2.7)',
-            transformOrigin: 'left',
-            height: isFirst || isLast ? `${DATA[2].hegHeight}px` : `${DATA[2].normalHeight}px`,
-            backgroundColor: DATA[2].color
-          }}
-        />
-      );
-    }
+      for (let i = 0; i < itemBars; i++) {
+        const isFirst = i === 0;
+        const isLast = i === itemBars - 1;
+        
+        // Հաշվել բարձրությունը՝ հաշվի առնելով hover էֆֆեկտը
+        let height = item.normalHeight;
+        
+        if (isFirst || isLast) {
+          height = item.hegHeight;
+        } else if (hoveredType === item.type) {
+          // Եթե hover է՝ ամեն գծիկ դառնում է hegHeight-ի չափ
+          height = item.hegHeight;
+        }
+        
+        // Հաշվել գույնի պայծառությունը hover-ի ժամանակ
+        let backgroundColor = item.color;
+        let opacity = 1;
+        
+        if (hoveredType && hoveredType !== item.type) {
+          // Եթե hover է մեկ այլ տեսակի վրա՝ այս տեսակի գծիկները դառնում են թափանցիկ
+          opacity = 0.4;
+        } else if (hoveredType === item.type) {
+          // Եթե hover է այս տեսակի վրա՝ գույնը պայծառանում է
+          backgroundColor = adjustColorBrightness(item.color, 20);
+        }
+        
+        bars.push(
+          <div 
+            key={`${item.type}-${i}-${barIndex}`}
+            className={`${item.type}-chart-bar ${isFirst || isLast ? 'heg' : ''}`}
+            style={{
+              width: '1px',
+              transform: 'scaleX(2.7)',
+              transformOrigin: 'left',
+              height: `${height}px`,
+              backgroundColor: backgroundColor,
+              opacity: opacity,
+              transition: 'all 0.3s ease',
+              cursor: 'pointer',
+              borderRadius: '1px'
+            }}
+            onMouseEnter={() => setHoveredType(item.type)}
+            onMouseLeave={() => setHoveredType(null)}
+            title={`${item.type}: ${item.count}`}
+          />
+        );
+        barIndex++;
+      }
+    });
     
     // Մնացած դատարկ գծիկներ
-    const remainingBars = barsCount - (approvedBars + declinedBars + expiredBars);
+    const totalDataBars = DATA.reduce((sum, item) => 
+      sum + Math.max(1, Math.round((item.count / total) * barsCount)), 0);
+    const remainingBars = barsCount - totalDataBars;
+    
     for (let i = 0; i < remainingBars; i++) {
+      let opacity = 1;
+      if (hoveredType) {
+        opacity = 0.2; // Hover-ի ժամանակ դատարկ գծիկները նույնպես թափանցիկ
+      }
+      
       bars.push(
         <div 
-          key={`empty-${i}`}
+          key={`empty-${i}-${barIndex}`}
           className="empty-chart-bar"
           style={{
             width: '1px',
             transform: 'scaleX(2.7)',
             transformOrigin: 'left',
             height: '10px',
-            background: 'linear-gradient(180deg, #E2E3E4, transparent)'
+            background: 'linear-gradient(180deg, #E2E3E4, transparent)',
+            opacity: opacity,
+            transition: 'all 0.3s ease',
+            borderRadius: '1px'
           }}
         />
       );
+      barIndex++;
     }
     
     return bars;
+  };
+
+  // Օգնական ֆունկցիա գույնի պայծառությունը փոխելու համար
+  const adjustColorBrightness = (color: string, percent: number): string => {
+    // Պարզեցված տարբերակ - ավելացնում է պայծառությունը
+    if (color.startsWith('#')) {
+      // Hex գույնի համար
+      let r = parseInt(color.slice(1, 3), 16);
+      let g = parseInt(color.slice(3, 5), 16);
+      let b = parseInt(color.slice(5, 7), 16);
+      
+      r = Math.min(255, r + (255 - r) * percent / 100);
+      g = Math.min(255, g + (255 - g) * percent / 100);
+      b = Math.min(255, b + (255 - b) * percent / 100);
+      
+      return `#${Math.round(r).toString(16).padStart(2, '0')}${Math.round(g).toString(16).padStart(2, '0')}${Math.round(b).toString(16).padStart(2, '0')}`;
+    }
+    return color;
   };
 
   return (
@@ -135,28 +159,33 @@ export const ConversionChart = () => {
       <div className="block justify-between items-end">
         <div className="w-full">
           <div className="flex w-[96%] justify-between mb-3.5">
-            <div>
-              <div className="text-[13px] text-[#C8C8C8]">Approved</div>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#669CEE]"></div>
-                <div className="text-[15px]">17</div>
+            {DATA.map((item) => (
+              <div 
+                key={item.type}
+                className={`transition-all duration-300 ${hoveredType === item.type ? 'scale-105' : ''}`}
+                onMouseEnter={() => setHoveredType(item.type)}
+                onMouseLeave={() => setHoveredType(null)}
+                style={{ cursor: 'pointer' }}
+              >
+                <div className="text-[13px] text-[#C8C8C8] capitalize">
+                  {item.type}
+                </div>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <div 
+                    className="w-1.5 h-1.5 rounded-full transition-all duration-300"
+                    style={{ 
+                      backgroundColor: item.color,
+                      transform: hoveredType === item.type ? 'scale(1.2)' : 'scale(1)',
+                      boxShadow: hoveredType === item.type ? `0 0 8px ${item.color}80` : 'none'
+                    }}
+                  ></div>
+                  <div className="text-[15px] font-medium transition-all duration-300"
+                       style={{ color: hoveredType === item.type ? '#000' : 'inherit' }}>
+                    {item.count}
+                  </div>
+                </div>
               </div>
-            </div>
-            <div>
-              <div className="text-[13px] text-[#C8C8C8]">Declined</div>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#EEAF66]"></div>
-                <div className="text-[15px]">9</div>
-              </div>
-            </div>
-            <div>
-              <div className="text-[13px] text-[#C8C8C8]">Expired</div>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#66EE88]"></div>
-                {/* ՓՈԽԵՄ ՆՈՐ ԱՐՏԱԴՐՈՒԹՅԱՆ ՀԱՄԱՐ */}
-                <div className="text-[15px]">18</div>
-              </div>
-            </div>
+            ))}
           </div>
 
           <div className='chart-cont' ref={containerRef}>
@@ -168,7 +197,8 @@ export const ConversionChart = () => {
                 justifyContent: 'start',
                 alignItems: 'end',
                 overflow: 'hidden',
-                marginBottom: '4px'
+                marginBottom: '4px',
+                minHeight: '26px' // Ամենաբարձր գծիկի համար
               }}
             >
               {renderBars()}
@@ -193,13 +223,14 @@ export const ConversionChart = () => {
                     height: '10px',
                     transform: 'scaleX(2.7)',
                     transformOrigin: 'left',
-                    background: 'linear-gradient(180deg, #E2E3E4, transparent)'
+                    background: 'linear-gradient(180deg, #E2E3E4, transparent)',
+                    borderRadius: '1px'
                   }}
                 />
               ))}
             </div>
             
-            <div className='flex justify-between '>
+            <div className='flex justify-between mt-1'>
               <p className='text-xs text-[#C8C8C8]'>0</p>
               <p className='text-xs text-[#C8C8C8]'>100</p>
             </div>
@@ -239,6 +270,14 @@ export const ConversionChart = () => {
         .chart-cont {
           gap: 0px;
           display: grid;
+        }
+        
+        /* Smooth transitions for all chart bars */
+        .approved-chart-bar,
+        .declined-chart-bar,
+        .expired-chart-bar,
+        .empty-chart-bar {
+          transition: all 0.3s ease !important;
         }
       `}</style>
     </div>
