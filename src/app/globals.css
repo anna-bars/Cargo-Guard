@@ -170,3 +170,13 @@ body {
 * {
   font-weight: normal !important;
 }
+:root {
+  --approved-start: #BED5F8;
+  --approved-end: #669CEE;
+  
+  --declined-start: #F8BEBE;
+  --declined-end: #EEAF66;
+  
+  --expired-start: #BEF8BE;
+  --expired-end: #66EE88;
+}
