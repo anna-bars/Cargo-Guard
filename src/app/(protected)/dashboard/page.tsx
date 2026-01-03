@@ -611,55 +611,57 @@ export default function DashboardPage() {
                         </div>
                       </div>
                          <div className="chaart">
-                            <div className="chart-div-active-item heg"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item heg"></div>
+                            <div className="approved chart-div-active-item heg"></div>
+                            <div className="approved chart-div-active-item"></div>
+                            <div className="approved chart-div-active-item"></div>
+                            <div className="approved chart-div-active-item"></div>
+                            <div className="approved chart-div-active-item"></div>
+                            <div className="approved chart-div-active-item"></div>
+                            <div className="approved chart-div-active-item"></div>
+                            <div className="approved chart-div-active-item"></div>
+                            <div className="approved chart-div-active-item"></div>
+                            <div className="approved chart-div-active-item"></div>
+                            <div className="approved chart-div-active-item"></div>
+                            <div className="approved chart-div-active-item"></div>
+                            <div className="approved chart-div-active-item"></div>
+                            <div className="approved chart-div-active-item"></div>
+                            <div className="approved chart-div-active-item"></div>
+                            <div className="approved chart-div-active-item"></div>
+                            <div className="approved chart-div-active-item"></div>
+                            <div className="approved chart-div-active-item heg"></div>
 
-                            <div className="chart-div-item heg"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item heg"></div>
+                            <div className="declined chart-div-item heg"></div>
+                            <div className="declined chart-div-item"></div>
+                            <div className="declined chart-div-item"></div>
+                            <div className="declined chart-div-item"></div>
+                            <div className="declined chart-div-item"></div>
+                            <div className="declined chart-div-item"></div>
+                            <div className="declined chart-div-item"></div>
+                            <div className="declined chart-div-item"></div>
+                            <div className="declined chart-div-item"></div>
+                            <div className="declined chart-div-item"></div>
+                            <div className="declined chart-div-item"></div>
+                            <div className="declined chart-div-item"></div>
+                            <div className="declined chart-div-item"></div>
+                            <div className="declined chart-div-item"></div>
+                            <div className="declined chart-div-item"></div>
+                            <div className="declined chart-div-item"></div>
+                            <div className="declined chart-div-item"></div>
+                            <div className="declined chart-div-item"></div>
+                            <div className="declined chart-div-item heg"></div>
+
+
+                            <div className="expired chart-div-item heg"></div>
+                            <div className="expired chart-div-item"></div>
+                            <div className="expired chart-div-item"></div>
+                            <div className="expired chart-div-item"></div>
+                            <div className="expired chart-div-item"></div>
+                            <div className="expired chart-div-item"></div>
+                            <div className="expired chart-div-item"></div>
+                            <div className="expired chart-div-item"></div>
+                            <div className="expired chart-div-item"></div>
+                            <div className="expired chart-div-item"></div>
+                            <div className="expired chart-div-item heg"></div>
                             
                         </div>
                         
@@ -1643,6 +1645,7 @@ export default function DashboardPage() {
 .heg {
             height: 32px !important;
 }    
+            
           `}</style>
         </div>
       </div>
