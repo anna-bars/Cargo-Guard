@@ -1711,13 +1711,25 @@ export default function DashboardPage() {
 }
 
 .heg {
-    height: 32px !important;
+    height: 26px !important;
 }
 .chaart2 .chart-div-active-item {
     height: 10px;
     background: linear-gradient(180deg, #E2E3E4, transparent);
 }
 
+.declined.chart-div-item.heg {
+    height: 24px !important;
+}
+.declined.chart-div-item {
+    height: 16px;
+}
+    .expired.chart-div-item.heg {
+    height: 18px !important;
+}
+.expired.chart-div-item {
+    height: 14px;
+}
 /* Approved items gradient */
 .approved.chart-div-active-item:nth-child(1) {
     background-color: var(--approved-start);
