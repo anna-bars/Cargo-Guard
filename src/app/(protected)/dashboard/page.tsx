@@ -213,7 +213,7 @@ export default function DashboardPage() {
             {/* Mobile Header for Activity Section */}
             <div className="flex gap-2 items-center mb-4 xl:hidden">
               <img src="/dashboard/hashtag.svg" alt="" className="w-5 h-5" />
-              <h4 className="font-normal text-base">Dashboard</h4>
+              <h2 className="font-normal text-lg">Dashboard</h2>
             </div>
 
             {/* Main Content Grid */}
@@ -241,7 +241,7 @@ export default function DashboardPage() {
                   </div>
                   
                   {/* Metrics Grid */}
-                  <div className="flex justify-around flex-wrap xl:flex-nowrap gap-8 xl:gap-2 metrics-grid">
+                  <div className="flex justify-around xl:flex-nowrap gap-8 xl:gap-2 metrics-grid">
                     {/* Total Insured Amount */}
                     <div className="w-[43%] xl:w-[12%] metric-card-item">
                       <div className="relative">
@@ -336,7 +336,7 @@ export default function DashboardPage() {
                 </section>
 
                 {/* Mobile Activity Header */}
-                <div className="xl:hidden flex items-center justify-between activity-mobile-header activity-section-mob-hd">
+                <div className="recent-activity md:hidden flex items-center justify-between activity-mobile-header activity-section-mob-hd">
                   <h3 className="text-lg font-normal">Recent Activity</h3>
                   <div className='flex justify-betwwen gap-2'>
                         <button className="flex items-center gap-1 bg-[#F5F4F7] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300">
@@ -354,7 +354,7 @@ export default function DashboardPage() {
                   {/* Desktop Filters */}
                   <div className='block-1 '>
                    
-                  <div className='hidden md:flex px-4 xl:px-4 flex justify-between items-center border-b border-b-[#d1d1d154] pb-3'>
+                  <div className='hidden sm:flex px-4 xl:px-4 flex justify-between items-center border-b border-b-[#d1d1d154] pb-3'>
                     <h2 className="hidden md:block">Recent Insurance Activity</h2>
                     <div className='hidden md:flex justify-between gap-2'>
                       <button className="flex text-[#6e6d6d] items-center gap-2 w-[180px] bg-[#f9f9f6] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300">
@@ -372,20 +372,27 @@ export default function DashboardPage() {
                   </div>
                     
                     {/* Desktop Table Header */}
-                    <div className="px-4 xl:px-4 py-2 mb-0.5 hidden xl:grid grid-cols-[120px_120px_1fr_200px_150px_140px] gap-2 pb-2 mb-0 table-header w-[97%] bg-[#ededed7a] mx-auto my-3.5 rounded-[4px]">
+                    {/* Desktop Table Header */}
+                    <div className="px-4 sm:px-4 py-2 mb-0.5 hidden md:grid grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 pb-2 mb-0 table-header w-[97%] bg-[#ededed7a] mx-auto my-3.5 rounded-[4px]">
                       {['Type', 'ID', 'Cargo / Value', 'Status / Due Date', 'Last Update', 'Action'].map((header, idx) => (
-                        <div key={idx} className="flex items-center gap-2 font-poppins text-sm font-normal text-[#606068]">
+                        <div
+                          key={idx}
+                          className={`flex items-center gap-2 font-poppins text-sm font-normal text-[#606068]
+                            ${header === 'Action' ? 'justify-end' : ''}`}
+                        >
                           <span>{header}</span>
+
                           {header !== 'Action' && (
-                            <img 
-                              src="https://c.animaapp.com/mjiggi0jSqvoj5/img/filter--1--7.png" 
-                              alt="Sort" 
+                            <img
+                              src="https://c.animaapp.com/mjiggi0jSqvoj5/img/filter--1--7.png"
+                              alt="Sort"
                               className="w-3 h-3"
                             />
                           )}
                         </div>
                       ))}
                     </div>
+
                   </div>
 
                   {/* Table Rows */}
@@ -437,21 +444,21 @@ export default function DashboardPage() {
                         button: { text: 'View Details', variant: 'secondary' }
                       }
                     ].map((row, idx) => (
-                      <div key={idx} className="tab-item xl:grid xl:grid-cols-[120px_120px_1fr_200px_150px_140px] gap-2 p-4 xl:p-3 bg-[#f9f9f6] xl:bg-[#f9f9f6] rounded-lg xl:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
+                      <div key={idx} className="tab-item md:grid md:grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 p-4 md:p-3 bg-[#f9f9f6] md:bg-[#f9f9f6] rounded-lg md:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
                         {/* Desktop Layout */}
-                        <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">{row.type}</div>
-                        <div className="hidden xl:block xl:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">{row.id}</div>
-                        <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">{row.cargo} / {row.value}</div>
-                        <div className="hidden xl:block xl:w-auto row-cell">
+                        <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.type}</div>
+                        <div className="hidden md:block md:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">{row.id}</div>
+                        <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.cargo} / {row.value}</div>
+                        <div className="hidden md:block md:w-auto row-cell flex justify-end">
                           <span className={`!font-medium inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor}`}>
                             <span className={`w-1.5 h-1.5 rounded-full ${row.status.dot}`}></span>
                             {row.status.text}
                           </span>
                         </div>
-                        <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">{row.date}</div>
+                        <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.date}</div>
                         
                         {/* Mobile Layout */}
-                        <div className="xl:hidden w-full">
+                        <div className="md:hidden w-full">
                           {/* Top row: Type/ID on left, Status on right */}
                           <div className="flex justify-between items-start mb-4">
                             <div className="flex items-center gap-2">
@@ -486,7 +493,7 @@ export default function DashboardPage() {
                         </div>
                         
                         {/* Desktop button */}
-                        <div className="hidden xl:block xl:w-auto row-cell">
+                        <div className="flex justify-end hidden md:flex md:w-auto row-cell">
                           <button className={`h-9 px-4 rounded-lg font-poppins text-sm font-normal transition-colors duration-300 w-full xl:w-[140px] ${
                             row.button.variant === 'primary' 
                               ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]' 
@@ -570,125 +577,127 @@ export default function DashboardPage() {
 </div>
 
 
-                         <div className="chaart">
-                            <div className="approved chart-div-active-item heg"></div>
-                            <div className="approved chart-div-active-item"></div>
-                            <div className="approved chart-div-active-item"></div>
-                            <div className="approved chart-div-active-item"></div>
-                            <div className="approved chart-div-active-item"></div>
-                            <div className="approved chart-div-active-item"></div>
-                            <div className="approved chart-div-active-item"></div>
-                            <div className="approved chart-div-active-item"></div>
-                            <div className="approved chart-div-active-item"></div>
-                            <div className="approved chart-div-active-item"></div>
-                            <div className="approved chart-div-active-item"></div>
-                            <div className="approved chart-div-active-item"></div>
-                            <div className="approved chart-div-active-item"></div>
-                            <div className="approved chart-div-active-item"></div>
-                            <div className="approved chart-div-active-item"></div>
-                            <div className="approved chart-div-active-item"></div>
-                            <div className="approved chart-div-active-item"></div>
-                            <div className="approved chart-div-active-item heg"></div>
+                         <div className='chart-cont'>
+                              <div className="chaart">
+                                <div className="approved chart-div-active-item heg"></div>
+                                <div className="approved chart-div-active-item"></div>
+                                <div className="approved chart-div-active-item"></div>
+                                <div className="approved chart-div-active-item"></div>
+                                <div className="approved chart-div-active-item"></div>
+                                <div className="approved chart-div-active-item"></div>
+                                <div className="approved chart-div-active-item"></div>
+                                <div className="approved chart-div-active-item"></div>
+                                <div className="approved chart-div-active-item"></div>
+                                <div className="approved chart-div-active-item"></div>
+                                <div className="approved chart-div-active-item"></div>
+                                <div className="approved chart-div-active-item"></div>
+                                <div className="approved chart-div-active-item"></div>
+                                <div className="approved chart-div-active-item"></div>
+                                <div className="approved chart-div-active-item"></div>
+                                <div className="approved chart-div-active-item"></div>
+                                <div className="approved chart-div-active-item"></div>
+                                <div className="approved chart-div-active-item heg"></div>
 
-                            <div className="declined chart-div-item heg"></div>
-                            <div className="declined chart-div-item"></div>
-                            <div className="declined chart-div-item"></div>
-                            <div className="declined chart-div-item"></div>
-                            <div className="declined chart-div-item"></div>
-                            <div className="declined chart-div-item"></div>
-                            <div className="declined chart-div-item"></div>
-                            <div className="declined chart-div-item"></div>
-                            <div className="declined chart-div-item"></div>
-                            <div className="declined chart-div-item"></div>
-                            <div className="declined chart-div-item"></div>
-                            <div className="declined chart-div-item"></div>
-                            <div className="declined chart-div-item"></div>
-                            <div className="declined chart-div-item"></div>
-                            <div className="declined chart-div-item"></div>
-                            <div className="declined chart-div-item"></div>
-                            <div className="declined chart-div-item"></div>
-                            <div className="declined chart-div-item"></div>
-                            <div className="declined chart-div-item heg"></div>
+                                <div className="declined chart-div-item heg"></div>
+                                <div className="declined chart-div-item"></div>
+                                <div className="declined chart-div-item"></div>
+                                <div className="declined chart-div-item"></div>
+                                <div className="declined chart-div-item"></div>
+                                <div className="declined chart-div-item"></div>
+                                <div className="declined chart-div-item"></div>
+                                <div className="declined chart-div-item"></div>
+                                <div className="declined chart-div-item"></div>
+                                <div className="declined chart-div-item"></div>
+                                <div className="declined chart-div-item"></div>
+                                <div className="declined chart-div-item"></div>
+                                <div className="declined chart-div-item"></div>
+                                <div className="declined chart-div-item"></div>
+                                <div className="declined chart-div-item"></div>
+                                <div className="declined chart-div-item"></div>
+                                <div className="declined chart-div-item"></div>
+                                <div className="declined chart-div-item"></div>
+                                <div className="declined chart-div-item heg"></div>
 
 
-                            <div className="expired chart-div-item heg"></div>
-                            <div className="expired chart-div-item"></div>
-                            <div className="expired chart-div-item"></div>
-                            <div className="expired chart-div-item"></div>
-                            <div className="expired chart-div-item"></div>
-                            <div className="expired chart-div-item"></div>
-                            <div className="expired chart-div-item"></div>
-                            <div className="expired chart-div-item"></div>
-                            <div className="expired chart-div-item"></div>
-                            <div className="expired chart-div-item"></div>
-                            <div className="expired chart-div-item heg"></div>
-                            
-                        </div>
-                        <div className='chaart chaart2'>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                            <div className=" chart-div-active-item"></div>
-                        </div>
+                                <div className="expired chart-div-item heg"></div>
+                                <div className="expired chart-div-item"></div>
+                                <div className="expired chart-div-item"></div>
+                                <div className="expired chart-div-item"></div>
+                                <div className="expired chart-div-item"></div>
+                                <div className="expired chart-div-item"></div>
+                                <div className="expired chart-div-item"></div>
+                                <div className="expired chart-div-item"></div>
+                                <div className="expired chart-div-item"></div>
+                                <div className="expired chart-div-item"></div>
+                                <div className="expired chart-div-item heg"></div>
+                                
+                            </div>
+                            <div className='chaart chaart2'>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                                <div className=" chart-div-active-item"></div>
+                            </div>
+                         </div>
                         
                        
 
@@ -1274,14 +1283,11 @@ export default function DashboardPage() {
 
             @media screen and (max-width: 1280px) {
                 .main-content {
-                    display: flex;
-                    flex-direction: column-reverse;
+                        grid-template-columns: 76.5% 23%;
                 }
                 
                 .right {
                     display: flex;
-                    flex-direction: row;
-                    width: 100%;
                     gap: 16px;
                 }
                 
@@ -1311,7 +1317,7 @@ export default function DashboardPage() {
                 }
 
                 .quote-conversion.performance-section {
-                    width: 49%;
+                    width: 100%;
                     position: relative;
                     justify-content: space-between;
                     display: flex;
@@ -1322,26 +1328,16 @@ export default function DashboardPage() {
                     display: none;
                 }
                 
-                .activity-mobile-header {
-                    display: flex;
-                    margin-bottom: 16px;
-                }
+               
                 
-                .activity-section-mob-hd {
-                    display: flex;
-                }
-                
+              
                 .welcome-widget {
                     height: 260px;
-                    width: 49%;
+                    width: 100%;
                 }
                 
                 .showin-result-ittle-info {
                     display: none;
-                }
-                
-                .activity-table {
-                    margin-top: -12px;
                 }
                 
                 .hamburger-menu {
@@ -1355,16 +1351,38 @@ export default function DashboardPage() {
             }
 
             @media screen and (max-width: 1024px) {
-                .welcome-widget, .action-center, .conv-rate {
+            .main-content {
+                display: flex;
+                flex-direction: column-reverse;
+            }
+                    .right.jsx-d116e6d599512e01 {
+        gap: 16px;
+        display: flex;
+        flex-direction: row;
+    }
+        .welcome-widget, .quote-conversion.performance-section.jsx-be524dc674521ed {
+                    height: 200px;  
+          width: 49%;
+        }
+                .right {
+        gap: 16px;
+        display: flex;
+        flex-direction: row;
+    }
+                 .action-center, .conv-rate {
                     display: none;
                 }
                 .rate-mob-hid {
                   display: none !important;
                 }
                 .quote-conversion.performance-section {
-                    width: 100%;
+                    width: 62%;
                     min-height: 170px;
                 }
+
+                    .action-content {
+                        justify-content: space-between;
+                    }
                 
                 .action-title, .section-title {
                     font-size: 16px;
@@ -1376,7 +1394,6 @@ export default function DashboardPage() {
                 
                 .metrics-grid {
                     display: flex;
-                    flex-wrap: wrap;
                     gap: 35px;
                     padding-left: 20px;
                 }
@@ -1393,9 +1410,6 @@ export default function DashboardPage() {
                     display: none;
                 }
                 
-                .table-header {
-                    display: none;
-                }
                 
                 .activity-table {
                     margin-top: 0px;
@@ -1420,12 +1434,6 @@ export default function DashboardPage() {
                 
                 .id-link {
                     color: #2563eb !important;
-                }
-                
-                .activity-section {
-                    padding: 0;
-                    background-color: transparent;
-                    margin-top: -12px;
                 }
                 
                 .row-cell {
@@ -1471,13 +1479,31 @@ export default function DashboardPage() {
             }
 
             @media screen and (max-width: 768px) {
+                .recent-activity button {
+                    padding: 6px 12px;
+                    font-size: 12px;
+                }
+                    .recent-activity h3 {
+                        font-size: 16px;
+                    }
                 .table-rows-cont {
                   padding: 0 !important;
                   margin: 0 !important;
                   width: 101%;
                 }
+                  .welcome-widget {
+                   display: none;
+                  }
+                   .quote-conversion.performance-section {
+        width: 100%;
+          }
+            .metrics-grid {
+        flex-wrap: wrap;
+    }
                 .activity-section {
                    border: none !important;
+                           background: transparent;
+        padding: 0;
                 }
                 .metric-value, .metric-value2 {
                     font-size: 38px;
@@ -1664,7 +1690,7 @@ export default function DashboardPage() {
 }
 
 .chaart {
-    display: flex;
+    display: inline-flex;
     gap: 4.5px;
     justify-content: start;
     align-items: end;
@@ -1686,7 +1712,13 @@ export default function DashboardPage() {
     height: 10px;
     background: linear-gradient(180deg, #E2E3E4, transparent);
 }
-
+.chaart2, .chaart {
+            display: -webkit-box;
+}
+            .chart-cont {
+              gap: 0px;
+              display: grid;
+            }
 .declined.chart-div-item.heg {
     height: 24px !important;
 }
