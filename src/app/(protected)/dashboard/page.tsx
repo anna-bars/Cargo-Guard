@@ -511,7 +511,7 @@ export default function DashboardPage() {
               {/* Right Column - 25% */}
               <div className="flex max-h-[100%] flex-col gap-2 right">
                 {/* Welcome Widget */}
-                <div className="relative h-[380px] rounded-2xl overflow-hidden w-full welcome-widget hover:shadow-lg transition-shadow duration-300">
+                <div className="relative h-[60%] rounded-2xl overflow-hidden w-full welcome-widget hover:shadow-lg transition-shadow duration-300">
                   <img 
                     src="https://c.animaapp.com/mjiggi0jSqvoj5/img/frame-76.png" 
                     alt="Background" 
@@ -539,7 +539,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Quote Conversion Rate */}
-                <div className="flex flex-col justify-between border border-[#d1d1d154] bg-[#fafaf7]/80 rounded-2xl p-4 h-auto min-h-[203px] w-full quote-conversion performance-section hover:shadow-sm transition-shadow duration-300">
+                <div className="h-[60%]  flex flex-col justify-between border border-[#d1d1d154] bg-[#fafaf7]/80 rounded-2xl p-4 h-auto min-h-[203px] w-full quote-conversion performance-section hover:shadow-sm transition-shadow duration-300">
                   <div className="mb-[24px]">
                     <h3 className="font-montserrat text-[18px] font-normal text-black action-title">
                       Quote Conversion Rate
@@ -552,7 +552,7 @@ export default function DashboardPage() {
                   <div className="block justify-between items-end">
                     <div className="w-full">
                    
-                   <div className="flex w-[96%] justify-between mb-3.5">
+                   <div className="flex w-[96%] justify-between mb-7">
   <div>
     <div className="text-[13px] text-[#C8C8C8]">Approved</div>
     <div className="flex items-center gap-1.5 mt-0.5">
