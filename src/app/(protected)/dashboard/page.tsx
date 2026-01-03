@@ -664,6 +664,71 @@ export default function DashboardPage() {
                             <div className="expired chart-div-item heg"></div>
                             
                         </div>
+                        <div className='chaart chaart2'>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                            <div className=" chart-div-active-item"></div>
+                        </div>
                         
                        
 
@@ -1617,6 +1682,8 @@ export default function DashboardPage() {
     gap: 12px;
   }
 }
+
+// 🍭🍭🍭🍭🍭
 .chart-div-item {
     height: 20px;
     background-color: #E2E3E4;
@@ -1633,7 +1700,7 @@ export default function DashboardPage() {
     justify-content: start;
     align-items: end;
     overflow: hidden;
-    margin-bottom: 12px;
+    margin-bottom: 4px;
 }
 
 .chart-div-item,
@@ -1645,6 +1712,10 @@ export default function DashboardPage() {
 
 .heg {
     height: 32px !important;
+}
+.chaart2 .chart-div-active-item {
+    height: 10px;
+    background: linear-gradient(180deg, #E2E3E4, transparent);
 }
 
 /* Approved items gradient */
