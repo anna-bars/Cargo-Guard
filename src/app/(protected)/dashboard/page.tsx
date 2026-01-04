@@ -338,7 +338,7 @@ export default function DashboardPage() {
                 </section>
 
                 <RecentActivityTable 
-        title="My Recent Activity"
+        title="Recent Activity"
         showMobileHeader={false}
       />
               </div>
