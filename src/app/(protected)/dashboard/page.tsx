@@ -516,7 +516,7 @@ export default function DashboardPage() {
               
                 .welcome-widget {
                     height: 260px;
-                    width: 80%;
+                    width: 100%;
                 }
                 
                 .showin-result-ittle-info {
