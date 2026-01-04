@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 
 interface ActivityRow {
   type: 'Quote' | 'Policy';
@@ -80,7 +80,24 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
     return filtered;
   };
 
-  const filteredRows = getFilteredRows();
+  // Search functionality
+  const filteredRows = useMemo(() => {
+    const filtered = getFilteredRows();
+    
+    if (!searchQuery.trim()) {
+      return filtered;
+    }
+    
+    const query = searchQuery.toLowerCase().trim();
+    return filtered.filter(row => 
+      row.type.toLowerCase().includes(query) ||
+      row.id.toLowerCase().includes(query) ||
+      row.cargo.toLowerCase().includes(query) ||
+      row.value.toLowerCase().includes(query) ||
+      row.status.text.toLowerCase().includes(query) ||
+      row.date.toLowerCase().includes(query)
+    );
+  }, [searchQuery, selectedFilter, selectedTimeframe, selectedSort, rows]);
 
   return (
     <>
@@ -110,10 +127,28 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           <div className='flex px-0 md:px-4 justify-between items-center border-b border-b-[#d1d1d154] pb-3 relative'>
             <h2 className="block">{title}</h2>
             <div className='header-btn flex justify-between gap-2'>
-              <button className="hidden md:flex text-[#6e6d6d] items-center gap-2 w-[180px] bg-[#f9f9f6] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300">
-                <img src="dashboard/icons/search-01-stroke-rounded.svg" alt="" className="w-[16px] h-[16px]" />
-                Search
-              </button>
+              {/* Search Input - Replaced button with input */}
+              <div className="hidden md:flex items-center gap-2 w-[180px] bg-[#f9f9f6] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm relative">
+                <img src="dashboard/icons/search-01-stroke-rounded.svg" alt="Search" className="w-[16px] h-[16px]" />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-transparent outline-none border-none text-[#6e6d6d] placeholder:text-[#6e6d6d] font-poppins text-sm font-normal"
+                />
+                {/* Clear search button */}
+                {searchQuery && (
+                  <button 
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
               <button 
                 className="flex items-center gap-1 bg-[#F5F4F7] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300 relative"
                 onClick={() => setShowFilter(!showFilter)}
@@ -252,8 +287,19 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
         </div>
 
         {/* Active filters display - MINIMALIST STYLE */}
-        {(selectedFilter !== 'All Activity' || selectedTimeframe !== 'Last 30 days' || selectedSort !== 'Status') && (
+        {(selectedFilter !== 'All Activity' || selectedTimeframe !== 'Last 30 days' || selectedSort !== 'Status' || searchQuery) && (
           <div className="px-4 mb-0.5 mt-1 flex flex-wrap gap-2 filter-tags mobile-filter-tags">
+            {searchQuery && (
+              <span className="inline-flex items-center gap-1 bg-[#fdfeff] border border-[#00000026] text-[#7f7f7f] px-3 py-1.5 rounded-[6px] text-xs font-poppins font-medium mobile-filter-tag">
+                Search: "{searchQuery}"
+                <button 
+                  onClick={() => setSearchQuery('')} 
+                  className="ml-1 text-[#7f7f7f] hover:text-black text-sm font-normal transition-colors"
+                >
+                  ×
+                </button>
+              </span>
+            )}
             {selectedFilter !== 'All Activity' && (
               <span className="inline-flex items-center gap-1 bg-[#fdfeff] border border-[#00000026] text-[#7f7f7f] px-3 py-1.5 rounded-[6px] text-xs font-poppins font-medium mobile-filter-tag">
                 Activity: {selectedFilter}
@@ -292,101 +338,127 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
 
         {/* Table Rows */}
         <div className="table-rows-cont px-4 xl:px-4 block-2 space-y-2 activity-table overflow-y-scroll">
-          {filteredRows.map((row, idx) => (
-            <div key={idx} className="tab-item md:grid sm:grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 p-4 md:p-3 bg-[#f9f9f6] md:bg-[#f9f9f6] rounded-lg md:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
-              {/* Desktop Layout */}
-              <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.type}</div>
-              <div className="hidden md:block md:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">{row.id}</div>
-              <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.cargo} / {row.value}</div>
-              <div className="hidden md:block md:w-auto row-cell flex justify-end">
-                <span className={`!font-medium inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor}`}>
-                  <span className={`w-1.5 h-1.5 rounded-full ${row.status.dot}`}></span>
-                  {row.status.text}
-                </span>
-              </div>
-              <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.date}</div>
-              
-              {/* Mobile Layout - UPDATED WITH ICONS */}
-              <div className="md:hidden w-full">
-                {/* Top row: Type/ID on left, Status on right */}
-                <div className="flex justify-between items-center mb-4">
-                  <div className="flex items-center gap-2">
-                    {/* Type icon */}
-                    <img 
-                      src={row.type === 'Policy' 
-                        ? "/table/document-attachment-stroke-rounded.svg" 
-                        : "/table/document-text-stroke-rounded.svg"
-                      } 
-                      alt={row.type} 
-                      className="w-4 h-4"
-                    />
-                    <span className="font-poppins text-sm font-normal text-black">{row.type}</span>
-                    <span className="font-poppins text-sm text-[#2563eb] underline">{row.id}</span>
+          {filteredRows.length > 0 ? (
+            filteredRows.map((row, idx) => (
+              <div key={idx} className="tab-item md:grid sm:grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 p-4 md:p-3 bg-[#f9f9f6] md:bg-[#f9f9f6] rounded-lg md:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
+                {/* Desktop Layout */}
+                <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.type}</div>
+                <div className="hidden md:block md:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">{row.id}</div>
+                <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.cargo} / {row.value}</div>
+                <div className="hidden md:block md:w-auto row-cell flex justify-end">
+                  <span className={`!font-medium inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${row.status.dot}`}></span>
+                    {row.status.text}
+                  </span>
+                </div>
+                <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.date}</div>
+                
+                {/* Mobile Layout - UPDATED WITH ICONS */}
+                <div className="md:hidden w-full">
+                  {/* Top row: Type/ID on left, Status on right */}
+                  <div className="flex justify-between items-center mb-4">
+                    <div className="flex items-center gap-2">
+                      {/* Type icon */}
+                      <img 
+                        src={row.type === 'Policy' 
+                          ? "/table/document-attachment-stroke-rounded.svg" 
+                          : "/table/document-text-stroke-rounded.svg"
+                        } 
+                        alt={row.type} 
+                        className="w-4 h-4"
+                      />
+                      <span className="font-poppins text-sm font-normal text-black">{row.type}</span>
+                      <span className="font-poppins text-sm text-[#2563eb] underline">{row.id}</span>
+                    </div>
+                    
+                    {/* Right side: Status badge */}
+                    <div className="row-cell flex-shrink-0">
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor} mobile-status-badge`}>
+                        <span className={`w-2 h-2 rounded-full ${row.status.dot}`}></span>
+                        {row.status.text}
+                      </span>
+                    </div>
                   </div>
                   
-                  {/* Right side: Status badge */}
-                  <div className="row-cell flex-shrink-0">
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor} mobile-status-badge`}>
-                      <span className={`w-2 h-2 rounded-full ${row.status.dot}`}></span>
-                      {row.status.text}
-                    </span>
-                  </div>
-                </div>
-                
-                {/* Middle row: Cargo on left, Value on right */}
-                <div className="flex justify-between items-center mb-4">
-                  <div className="flex items-center gap-2">
-                    {/* Cargo icon */}
-                    <img 
-                      src="/table/package-stroke-rounded.svg" 
-                      alt="Cargo" 
-                      className="w-4 h-4"
-                    />
-                    <span className="font-poppins text-sm text-gray-700">{row.cargo}</span>
-                  </div>
-                  <div className="font-poppins text-sm font-normal text-black">{row.value}</div>
-                </div>
-                
-                {/* NEW: Divider line */}
-                <div className="border-t border-[#f2f2ed] my-3"></div>
-                
-                {/* Bottom row: Date and Button in 50/50 split */}
-                <div className="flex items-center justify-between mobile-bottom-row">
-                  {/* Date with clock icon - 50% width */}
-                  <div className="flex items-center gap-2 w-1/2 mobile-date-container">
-                    <img 
-                      src="/table/clock.svg" 
-                      alt="Time" 
-                      className="w-4 h-4"
-                    />
-                    <div className="font-poppins text-sm text-gray-600">{row.date}</div>
+                  {/* Middle row: Cargo on left, Value on right */}
+                  <div className="flex justify-between items-center mb-4">
+                    <div className="flex items-center gap-2">
+                      {/* Cargo icon */}
+                      <img 
+                        src="/table/package-stroke-rounded.svg" 
+                        alt="Cargo" 
+                        className="w-4 h-4"
+                      />
+                      <span className="font-poppins text-sm text-gray-700">{row.cargo}</span>
+                    </div>
+                    <div className="font-poppins text-sm font-normal text-black">{row.value}</div>
                   </div>
                   
-                  {/* Button - 50% width */}
-                  <div className="w-1/2 mobile-button-container">
-                    <button className={`mobile-action-btn ${
-                      row.button.variant === 'primary' 
-                        ? 'primary-btn' 
-                        : 'secondary-btn'
-                    }`}>
-                      {row.button.text}
-                    </button>
+                  {/* NEW: Divider line */}
+                  <div className="border-t border-[#f2f2ed] my-3"></div>
+                  
+                  {/* Bottom row: Date and Button in 50/50 split */}
+                  <div className="flex items-center justify-between mobile-bottom-row">
+                    {/* Date with clock icon - 50% width */}
+                    <div className="flex items-center gap-2 w-1/2 mobile-date-container">
+                      <img 
+                        src="/table/clock.svg" 
+                        alt="Time" 
+                        className="w-4 h-4"
+                      />
+                      <div className="font-poppins text-sm text-gray-600">{row.date}</div>
+                    </div>
+                    
+                    {/* Button - 50% width */}
+                    <div className="w-1/2 mobile-button-container">
+                      <button className={`mobile-action-btn ${
+                        row.button.variant === 'primary' 
+                          ? 'primary-btn' 
+                          : 'secondary-btn'
+                      }`}>
+                        {row.button.text}
+                      </button>
+                    </div>
                   </div>
                 </div>
+                
+                {/* Desktop button */}
+                <div className="flex justify-end hidden md:flex md:w-auto row-cell">
+                  <button className={`h-9 px-4 rounded-lg font-poppins text-sm font-normal transition-colors duration-300 w-full xl:w-[140px] ${
+                    row.button.variant === 'primary' 
+                      ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]' 
+                      : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f3f4f6] hover:border-[#d1d5db]'
+                  }`}>
+                    {row.button.text}
+                  </button>
+                </div>
               </div>
-              
-              {/* Desktop button */}
-              <div className="flex justify-end hidden md:flex md:w-auto row-cell">
-                <button className={`h-9 px-4 rounded-lg font-poppins text-sm font-normal transition-colors duration-300 w-full xl:w-[140px] ${
-                  row.button.variant === 'primary' 
-                    ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]' 
-                    : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f3f4f6] hover:border-[#d1d5db]'
-                }`}>
-                  {row.button.text}
-                </button>
+            ))
+          ) : (
+            // No results message
+            <div className="flex flex-col items-center justify-center py-12 px-4">
+              <div className="text-gray-400 mb-4">
+                <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
               </div>
+              <h3 className="font-poppins font-medium text-lg text-gray-700 mb-2">No results found</h3>
+              <p className="font-poppins text-sm text-gray-500 text-center max-w-md">
+                No activities match your search "{searchQuery}". Try adjusting your filters or search terms.
+              </p>
+              <button 
+                className="mt-6 px-6 py-2.5 bg-[#2563eb] text-white rounded-lg font-poppins text-sm font-normal hover:bg-[#1d4ed8] transition-colors duration-300"
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedFilter('All Activity');
+                  setSelectedTimeframe('Last 30 days');
+                  setSelectedSort('Status');
+                }}
+              >
+                Clear all filters
+              </button>
             </div>
-          ))}
+          )}
         </div>
       </section>
 
@@ -714,7 +786,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             background: #f9f9f6 !important;
             margin: 0 !important;
             padding: 12px 16px !important;
-            display: none !important;
+            display: flex !important;
             width: 100% !important;
           }
           
