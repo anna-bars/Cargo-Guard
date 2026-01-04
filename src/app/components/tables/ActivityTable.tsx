@@ -131,104 +131,104 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             </div>
             
             {/* Filter Dropdown */}
-            {showFilter && (
-              <div className="absolute right-0 top-14 z-50 w-72 bg-white border border-[#e5e7eb] rounded-xl shadow-lg p-5 filter-dropdown">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-poppins font-medium text-base text-gray-900">Filters</h3>
-                  <button 
-                    className="text-gray-400 hover:text-gray-600 transition-colors"
-                    onClick={() => setShowFilter(false)}
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-                
-                {/* Filter sections */}
-                <div className="space-y-2">
-                  {/* Activity Type */}
-                  <div>
-                    <h4 className="font-poppins font-medium text-sm text-gray-700 mb-3">Activity</h4>
-                    <div className="grid grid-cols-3 gap-2">
-                      {['All Activity', 'Pending', 'Active', 'Expiring', 'Missing', 'Declined'].map((filter) => (
-                        <button
-                          key={filter}
-                          className={`px-3 py-2 rounded-lg font-poppins text-sm transition-all duration-200 ${
-                            selectedFilter === filter
-                              ? 'bg-[#2563eb] text-white'
-                              : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                          }`}
-                          onClick={() => setSelectedFilter(filter)}
-                        >
-                          {filter}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* Timeframe */}
-                  <div>
-                    <h4 className="font-poppins font-medium text-sm text-gray-700 mb-3">Timeframe</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {['Last 7 days', 'Last 30 days', 'Last 3 months', 'All time'].map((timeframe) => (
-                        <button
-                          key={timeframe}
-                          className={`px-3 py-2 rounded-lg font-poppins text-sm transition-all duration-200 ${
-                            selectedTimeframe === timeframe
-                              ? 'bg-[#2563eb] text-white'
-                              : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                          }`}
-                          onClick={() => setSelectedTimeframe(timeframe)}
-                        >
-                          {timeframe}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* Sort By */}
-                  <div>
-                    <h4 className="font-poppins font-medium text-sm text-gray-700 mb-3">Sort by</h4>
-                    <div className="grid grid-cols-3 gap-2">
-                      {['Status', 'Date', 'Value', 'Type'].map((sort) => (
-                        <button
-                          key={sort}
-                          className={`px-3 py-2 rounded-lg font-poppins text-sm transition-all duration-200 ${
-                            selectedSort === sort
-                              ? 'bg-[#2563eb] text-white'
-                              : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                          }`}
-                          onClick={() => setSelectedSort(sort)}
-                        >
-                          {sort}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Action buttons */}
-                <div className="flex gap-2 pt-4 mt-4 border-t border-gray-100">
-                  <button 
-                    className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-poppins text-sm font-medium hover:bg-gray-200 transition-colors"
-                    onClick={() => {
-                      setSelectedFilter('All Activity');
-                      setSelectedTimeframe('Last 30 days');
-                      setSelectedSort('Status');
-                    }}
-                  >
-                    Reset
-                  </button>
-                  <button 
-                    className="flex-1 py-2.5 bg-[#2563eb] text-white rounded-lg font-poppins text-sm font-medium hover:bg-[#1d4ed8] transition-colors"
-                    onClick={() => setShowFilter(false)}
-                  >
-                    Apply Filters
-                  </button>
-                </div>
-              </div>
-            )}
+            {/* Filter Dropdown */}
+{showFilter && (
+  <div className="absolute right-0 top-14 z-50 w-72 bg-white border border-[#e5e7eb] rounded-xl shadow-lg p-4 filter-dropdown">
+    <div className="flex justify-between items-center mb-0">
+      <button 
+        className="absolute right-2 top-2 text-gray-400 hover:text-gray-600 transition-colors p-1"
+        onClick={() => setShowFilter(false)}
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    
+    {/* Filter sections */}
+    <div className="space-y-3">
+      {/* Activity Type */}
+      <div>
+        <h4 className="font-poppins font-medium text-xs text-gray-700 mb-2">Activity</h4>
+        <div className="grid grid-cols-3 gap-1.5">
+          {['All Activity', 'Pending', 'Active', 'Expiring', 'Missing', 'Declined'].map((filter) => (
+            <button
+              key={filter}
+              className={`px-2 py-1.5 rounded-md font-poppins text-xs transition-all duration-200 ${
+                selectedFilter === filter
+                  ? 'bg-[#2563eb] text-white'
+                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+              }`}
+              onClick={() => setSelectedFilter(filter)}
+            >
+              {filter}
+            </button>
+          ))}
+        </div>
+      </div>
+      
+      {/* Timeframe */}
+      <div>
+        <h4 className="font-poppins font-medium text-xs text-gray-700 mb-2">Timeframe</h4>
+        <div className="flex flex-wrap gap-1.5">
+          {['Last 7 days', 'Last 30 days', 'Last 3 months', 'All time'].map((timeframe) => (
+            <button
+              key={timeframe}
+              className={`px-2 py-1.5 rounded-md font-poppins text-xs transition-all duration-200 ${
+                selectedTimeframe === timeframe
+                  ? 'bg-[#2563eb] text-white'
+                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+              }`}
+              onClick={() => setSelectedTimeframe(timeframe)}
+            >
+              {timeframe}
+            </button>
+          ))}
+        </div>
+      </div>
+      
+      {/* Sort By */}
+      <div>
+        <h4 className="font-poppins font-medium text-xs text-gray-700 mb-2">Sort by</h4>
+        <div className="grid grid-cols-3 gap-1.5">
+          {['Status', 'Date', 'Value', 'Type'].map((sort) => (
+            <button
+              key={sort}
+              className={`px-2 py-1.5 rounded-md font-poppins text-xs transition-all duration-200 ${
+                selectedSort === sort
+                  ? 'bg-[#2563eb] text-white'
+                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+              }`}
+              onClick={() => setSelectedSort(sort)}
+            >
+              {sort}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+    
+    {/* Action buttons */}
+    <div className="flex gap-2 pt-1.5 mt-1.5 border-t border-gray-100">
+      <button 
+        className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg font-poppins text-xs font-medium hover:bg-gray-200 transition-colors"
+        onClick={() => {
+          setSelectedFilter('All Activity');
+          setSelectedTimeframe('Last 30 days');
+          setSelectedSort('Status');
+        }}
+      >
+        Reset
+      </button>
+      <button 
+        className="flex-1 py-2 bg-[#2563eb] text-white rounded-lg font-poppins text-xs font-medium hover:bg-[#1d4ed8] transition-colors"
+        onClick={() => setShowFilter(false)}
+      >
+        Apply Filters
+      </button>
+    </div>
+  </div>
+)}
           </div>
           
           {/* Desktop Table Header */}
@@ -413,6 +413,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
             animation: slideDown 0.2s ease-out;
             width: 42%;
+            background: #edf1e9;
           }
         }
 
@@ -752,6 +753,122 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             margin-bottom: 4px;
           }
         }
+
+        .filter-dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: slideDown 0.2s ease-out;
+  width: 34% !important; /* Fixed compact width */
+  max-width: 90vw;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .filter-dropdown {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 90% !important;
+    max-width: 400px !important;
+    max-height: 80vh !important;
+    overflow-y: auto !important;
+    z-index: 1000 !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2) !important;
+    animation: modalFadeIn 0.3s ease-out !important;
+    margin-top: 0 !important;
+  }
+  
+  /* Add overlay for mobile */
+  .activity-section::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    display: ${showFilter ? 'block' : 'none'};
+  }
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .filter-dropdown {
+    width: 95% !important;
+    max-width: 350px !important;
+    padding: 16px !important;
+  }
+  
+  .filter-dropdown h3 {
+    font-size: 15px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  .filter-dropdown h4 {
+    font-size: 12px !important;
+  }
+  
+  .filter-dropdown button {
+    font-size: 12px !important;
+    padding: 6px 10px !important;
+  }
+  
+  .filter-dropdown .grid.grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  
+  .filter-dropdown .flex.gap-2 {
+    gap: 8px !important;
+  }
+  
+  .filter-dropdown .flex-1 {
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+  }
+}
+
+@media screen and (max-width: 425px) {
+  .filter-dropdown {
+    max-width: 320px !important;
+    padding: 14px !important;
+  }
+  
+  .filter-dropdown button {
+    font-size: 11px !important;
+    padding: 5px 8px !important;
+  }
+  
+  .filter-dropdown h3 {
+    font-size: 14px !important;
+  }
+}
       `}</style>
     </>
   );
