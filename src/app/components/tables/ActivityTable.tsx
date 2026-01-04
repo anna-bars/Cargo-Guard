@@ -251,29 +251,38 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           </div>
         </div>
 
-        {/* Active filters display */}
+        {/* Active filters display - MINIMALIST STYLE */}
         {(selectedFilter !== 'All Activity' || selectedTimeframe !== 'Last 30 days' || selectedSort !== 'Status') && (
-          <div className="px-4 mb-3 flex flex-wrap gap-2">
+          <div className="px-4 mb-0.5 mt-1 flex flex-wrap gap-2 filter-tags">
             {selectedFilter !== 'All Activity' && (
-              <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full text-sm">
+              <span className="inline-flex items-center gap-1 bg-[#fdfeff] border border-[#00000026] text-[#7f7f7f] px-3 py-1.5 rounded-[6px] text-xs font-poppins font-medium">
                 Activity: {selectedFilter}
-                <button onClick={() => setSelectedFilter('All Activity')} className="text-blue-500 hover:text-blue-700">
+                <button 
+                  onClick={() => setSelectedFilter('All Activity')} 
+                  className="ml-1 text-[#7f7f7f] hover:text-black text-sm font-normal transition-colors"
+                >
                   ×
                 </button>
               </span>
             )}
             {selectedTimeframe !== 'Last 30 days' && (
-              <span className="inline-flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1.5 rounded-full text-sm">
+              <span className="inline-flex items-center gap-1 bg-[#fdfeff] border border-[#00000026] text-[#7f7f7f] px-3 py-1.5 rounded-[6px] text-xs font-poppins font-medium">
                 Time: {selectedTimeframe}
-                <button onClick={() => setSelectedTimeframe('Last 30 days')} className="text-green-500 hover:text-green-700">
+                <button 
+                  onClick={() => setSelectedTimeframe('Last 30 days')} 
+                  className="ml-1 text-[#7f7f7f] hover:text-black text-sm font-normal transition-colors"
+                >
                   ×
                 </button>
               </span>
             )}
             {selectedSort !== 'Status' && (
-              <span className="inline-flex items-center gap-1 bg-purple-50 text-purple-700 px-3 py-1.5 rounded-full text-sm">
+              <span className="inline-flex items-center gap-1 bg-[#fdfeff] border border-[#00000026] text-[#7f7f7f] px-3 py-1.5 rounded-[6px] text-xs font-poppins font-medium">
                 Sort: {selectedSort}
-                <button onClick={() => setSelectedSort('Status')} className="text-purple-500 hover:text-purple-700">
+                <button 
+                  onClick={() => setSelectedSort('Status')} 
+                  className="ml-1 text-[#7f7f7f] hover:text-black text-sm font-normal transition-colors"
+                >
                   ×
                 </button>
               </span>
@@ -526,7 +535,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
             animation: slideDown 0.2s ease-out;
             width: 42%;
-            background: #edf1e9;
+            background: #e2e5efff;
           }
         }
 
@@ -553,6 +562,46 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
 
         .animate-slide-up {
           animation: slide-up 0.3s ease-out;
+        }
+
+        /* Active filter tags styling - MINIMALIST DESIGN */
+        .filter-tags {
+          position: relative;
+          z-index: 10;
+        }
+        
+        .filter-tags span {
+          background-color: #fdfeff !important;
+          border: 1px solid #00000026 !important;
+          border-radius: 6px !important;
+          box-shadow: none !important;
+          color: #7f7f7f !important;
+          font-family: 'Poppins', sans-serif;
+          font-size: 11px !important;
+          font-weight: 400;
+          padding: 4px 10px !important;
+          line-height: 1.4;
+          transition: all 0.2s ease;
+        }
+        
+        .filter-tags span:hover {
+          background-color: #f8f9fa !important;
+          border-color: #00000040 !important;
+        }
+        
+        .filter-tags button {
+          font-size: 14px !important;
+          font-weight: 400;
+          padding: 0 4px !important;
+          margin-left: 4px !important;
+          opacity: 0.7;
+          transition: all 0.2s ease;
+          line-height: 1;
+        }
+        
+        .filter-tags button:hover {
+          opacity: 1;
+          color: #333333 !important;
         }
 
         @media screen and (max-width: 1024px) {
@@ -660,9 +709,24 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             margin-right: 0 !important;
           }
           
-          /* Active filters styling */
-          .activity-section > div.flex.flex-wrap {
-            padding: 0 16px !important;
+          /* Active filters styling for mobile */
+          .activity-section .filter-tags {
+            padding: 12px 16px !important;
+            background: #f9f9f6 !important;
+            margin-top: -8px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #d1d1d140 !important;
+          }
+          
+          .activity-section .filter-tags span {
+            font-size: 10px !important;
+            padding: 3px 8px !important;
+            background-color: #ffffff !important;
+          }
+          
+          .activity-section .filter-tags button {
+            font-size: 12px !important;
+            margin-left: 2px !important;
           }
         }
 
@@ -819,6 +883,16 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             font-size: 14px !important;
             padding: 12px !important;
           }
+          
+          /* Active filters on small screens */
+          .activity-section .filter-tags {
+            padding: 10px 12px !important;
+          }
+          
+          .activity-section .filter-tags span {
+            font-size: 9px !important;
+            padding: 2px 6px !important;
+          }
         }
 
         /* Specific adjustments for iPhone SE and similar small devices */
@@ -850,6 +924,25 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             font-size: 13px !important;
             padding: 10px !important;
           }
+          
+          /* Active filters on very small screens */
+          .activity-section .filter-tags {
+            flex-wrap: nowrap !important;
+            overflow-x: auto;
+            padding: 8px 10px !important;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+          }
+          
+          .activity-section .filter-tags span {
+            flex-shrink: 0;
+            font-size: 8px !important;
+            padding: 2px 5px !important;
+          }
+          
+          .activity-section .filter-tags button {
+            font-size: 10px !important;
+          }
         }
 
         /* Desktop filter dropdown */
@@ -864,6 +957,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           max-width: 90vw;
           border: 1px solid #e5e7eb !important;
           border-radius: 12px !important;
+          background: #f8f9fa !important;
         }
 
         /* Mobile filter modal specific styles */
