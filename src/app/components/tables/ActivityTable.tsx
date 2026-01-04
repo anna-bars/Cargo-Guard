@@ -51,10 +51,10 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
 
       {/* Recent Activity Table */}
       <section className="block-2 flex flex-col max-h-[88%] border border-[#d1d1d154] activity-section bg-[#fafaf7]/80 rounded-2xl py-4 xl:py-4">
-        {/* Desktop Filters - ՓՈՓՈԽԵԼ ԵՆՔ SM->MD */}
+        {/* Desktop Filters */}
         <div className='block-1'>
           <div className='flex px-0 md:px-4 justify-between items-center border-b border-b-[#d1d1d154] pb-3'>
-            <h2 className=" block">{title}</h2>
+            <h2 className="block">{title}</h2>
             <div className='header-btn flex justify-between gap-2'>
               <button className="hidden md:flex text-[#6e6d6d] items-center gap-2 w-[180px] bg-[#f9f9f6] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300">
                 <img src="dashboard/icons/search-01-stroke-rounded.svg" alt="" className="w-[16px] h-[16px]" />
@@ -107,17 +107,16 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
               </div>
               <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.date}</div>
               
-              {/* Mobile Layout - FIXED ALIGNMENT */}
+              {/* Mobile Layout - UPDATED FOR 50/50 SPLIT */}
               <div className="md:hidden w-full">
-                {/* Top row: Type/ID on left, Status on right - FIXED ALIGNMENT */}
+                {/* Top row: Type/ID on left, Status on right */}
                 <div className="flex justify-between items-center mb-4">
-                  {/* Left side: Type + ID */}
                   <div className="flex items-center gap-2">
                     <span className="font-poppins text-sm font-normal text-black">{row.type}</span>
                     <span className="font-poppins text-sm text-[#2563eb] underline">{row.id}</span>
                   </div>
                   
-                  {/* Right side: Status badge - NOW RIGHT ALIGNED */}
+                  {/* Right side: Status badge */}
                   <div className="row-cell flex-shrink-0">
                     <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor} mobile-status-badge`}>
                       <span className={`w-2 h-2 rounded-full ${row.status.dot}`}></span>
@@ -132,16 +131,31 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
                   <div className="font-poppins text-sm font-normal text-black">{row.value}</div>
                 </div>
                 
-                {/* Bottom row: Date on left, full-width button */}
-                <div className="flex flex-col gap-2">
-                  <div className="font-poppins text-sm text-gray-600">{row.date}</div>
-                  <button className={`mobile-action-btn ${
-                    row.button.variant === 'primary' 
-                      ? 'primary-btn' 
-                      : 'secondary-btn'
-                  }`}>
-                    {row.button.text}
-                  </button>
+                {/* NEW: Divider line */}
+                <div className="border-t border-[#f2f2ed] my-3"></div>
+                
+                {/* Bottom row: Date and Button in 50/50 split */}
+                <div className="flex items-center justify-between mobile-bottom-row">
+                  {/* Date with clock icon - 50% width */}
+                  <div className="flex items-center gap-2 w-1/2 mobile-date-container">
+                    <img 
+                      src="/table/clock.svg" 
+                      alt="Time" 
+                      className="w-4 h-4"
+                    />
+                    <div className="font-poppins text-sm text-gray-600">{row.date}</div>
+                  </div>
+                  
+                  {/* Button - 50% width */}
+                  <div className="w-1/2 mobile-button-container">
+                    <button className={`mobile-action-btn ${
+                      row.button.variant === 'primary' 
+                        ? 'primary-btn' 
+                        : 'secondary-btn'
+                    }`}>
+                      {row.button.text}
+                    </button>
+                  </div>
                 </div>
               </div>
               
@@ -160,7 +174,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
         </div>
       </section>
 
-      {/* ՄՈԲԱՅԼ ԱԴԱՊՏԻՎ CSS - UPDATED */}
+      {/* ՄՈԲԱՅԼ ԱԴԱՊՏԻՎ CSS - UPDATED FOR NEW LAYOUT */}
       <style jsx>{`
         /* Activity table responsive styles */
         @media screen and (max-width: 1336px) {
@@ -169,7 +183,6 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           }
         }
 
-        /* 768px - Desktop filters appear */
         @media screen and (min-width: 768px) {
           .activity-section {
             border: 1px solid #d1d1d154 !important;
@@ -199,20 +212,13 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             margin-top: 0px;
           }
           
-          
           .table-row:hover {
             background-color: #f6f6ecff !important;
-          }
-          
-          .table-row button {
-            width: 100% !important;
           }
           
           .id-link {
             color: #2563eb !important;
           }
-          
-          
         }
 
         @media screen and (max-width: 768px) {
@@ -220,6 +226,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             padding: 6px 12px !important;
             font-size: 12px !important;
           }
+          
           .table-row {
             min-width: 100%;
             display: flex;
@@ -249,12 +256,6 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             padding: 0 !important;
           }
           
-          .table-row {
-            padding: 16px !important;
-            gap: 12px !important;
-            margin-bottom: 12px !important;
-          }
-          
           .tab-item {
             margin: 0;
             background-color: #f9f9f6 !important;
@@ -266,6 +267,25 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             background-color: #f6f6ecff !important;
           }
           
+          /* New mobile bottom row layout */
+          .mobile-bottom-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+          }
+          
+          .mobile-date-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-right: 6px;
+          }
+          
+          .mobile-button-container {
+            padding-left: 6px;
+          }
+          
           /* Fix mobile status badge alignment */
           .mobile-status-badge {
             margin-left: auto !important;
@@ -273,7 +293,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           }
         }
 
-        /* Mobile action button styles */
+        /* Mobile action button styles - UPDATED FOR 50% WIDTH */
         .mobile-action-btn {
           color: #ffffff;
           cursor: pointer;
@@ -282,14 +302,14 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           border-radius: 8px;
           align-items: center;
           gap: 8px;
-          padding: 12px 16px;
+          padding: 12px 8px !important;
           font-family: 'Inter', sans-serif;
           font-size: 14px;
           transition: background-color 0.3s;
           display: flex;
           text-align: center;
           justify-content: center;
-          width: 100%;
+          width: 100% !important;
           height: 44px;
           border: 1px solid rgba(0, 0, 255, 0.169);
         }
@@ -340,6 +360,8 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             height: 44px;
             font-size: 14px;
             font-weight: 500;
+            width: 95% !important;
+            min-width: 0 !important;
           }
           
           .mobile-status-badge {
@@ -348,25 +370,71 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             height: 22px;
           }
           
-          /* Ensure status badge stays on right in mobile */
-          .md\\:hidden .flex.justify-between {
-            align-items: center !important;
+          /* Ensure 50/50 split works properly */
+          .mobile-date-container,
+          .mobile-button-container {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
           }
           
-          .md\\:hidden .row-cell {
-            margin-left: auto !important;
+          /* Adjust spacing for the divider */
+          .border-t {
+            margin-top: 12px !important;
+            margin-bottom: 12px !important;
           }
         }
 
         @media screen and (max-width: 425px) {
-            h2.block {
-    font-size: 16px;
-}
+          h2.block {
+            font-size: 16px;
+          }
+          
+          .header-btn button {
+            font-size: 14px;
+            padding: 6px 12px;
+          }
+          
+          /* Adjust for very small screens */
+          .mobile-date-container {
+            gap: 4px;
+          }
+          
+          .mobile-date-container img {
+            width: 14px !important;
+            height: 14px !important;
+          }
+          
+          .mobile-date-container .font-poppins {
+            font-size: 12px !important;
+          }
+          
+          .mobile-action-btn {
+            font-size: 13px !important;
+            padding: 6px 6px !important;
+            height: auto;
+            max-width: 95%;
+          }
+        }
 
-.header-btn button {
-    font-size: 14px;
-    padding: 6px 12px;
-}
+        /* Specific adjustments for iPhone SE and similar small devices */
+        @media screen and (max-width: 375px) {
+          .mobile-bottom-row {
+            flex-direction: column;
+            gap: 8px;
+          }
+          
+          .mobile-date-container,
+          .mobile-button-container {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            padding: 0 !important;
+          }
+          
+          .mobile-date-container {
+            justify-content: center;
+            margin-bottom: 4px;
+          }
         }
       `}</style>
     </>
