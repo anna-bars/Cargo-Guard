@@ -107,11 +107,20 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
               </div>
               <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.date}</div>
               
-              {/* Mobile Layout - UPDATED FOR 50/50 SPLIT */}
+              {/* Mobile Layout - UPDATED WITH ICONS */}
               <div className="md:hidden w-full">
                 {/* Top row: Type/ID on left, Status on right */}
                 <div className="flex justify-between items-center mb-4">
                   <div className="flex items-center gap-2">
+                    {/* Type icon */}
+                    <img 
+                      src={row.type === 'Policy' 
+                        ? "/table/document-attachment-stroke-rounded.svg" 
+                        : "/table/document-text-stroke-rounded.svg"
+                      } 
+                      alt={row.type} 
+                      className="w-4 h-4"
+                    />
                     <span className="font-poppins text-sm font-normal text-black">{row.type}</span>
                     <span className="font-poppins text-sm text-[#2563eb] underline">{row.id}</span>
                   </div>
@@ -127,7 +136,15 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
                 
                 {/* Middle row: Cargo on left, Value on right */}
                 <div className="flex justify-between items-center mb-4">
-                  <div className="font-poppins text-sm text-gray-700">{row.cargo}</div>
+                  <div className="flex items-center gap-2">
+                    {/* Cargo icon */}
+                    <img 
+                      src="/table/package-stroke-rounded.svg" 
+                      alt="Cargo" 
+                      className="w-4 h-4"
+                    />
+                    <span className="font-poppins text-sm text-gray-700">{row.cargo}</span>
+                  </div>
                   <div className="font-poppins text-sm font-normal text-black">{row.value}</div>
                 </div>
                 
@@ -174,7 +191,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
         </div>
       </section>
 
-      {/* ՄՈԲԱՅԼ ԱԴԱՊՏԻՎ CSS - UPDATED FOR NEW LAYOUT */}
+      {/* ՄՈԲԱՅԼ ԱԴԱՊՏԻՎ CSS - UPDATED FOR ICONS */}
       <style jsx>{`
         /* Activity table responsive styles */
         @media screen and (max-width: 1336px) {
@@ -267,6 +284,15 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             background-color: #f6f6ecff !important;
           }
           
+          /* Icon container styling */
+          .table-row .flex.items-center.gap-2 img {
+            opacity: 0.8;
+          }
+          
+          .table-row .flex.items-center.gap-2 img:hover {
+            opacity: 1;
+          }
+          
           /* New mobile bottom row layout */
           .mobile-bottom-row {
             display: flex;
@@ -293,7 +319,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           }
         }
 
-        /* Mobile action button styles - UPDATED FOR 50% WIDTH */
+        /* Mobile action button styles */
         .mobile-action-btn {
           color: #ffffff;
           cursor: pointer;
@@ -305,7 +331,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           padding: 12px 8px !important;
           font-family: 'Inter', sans-serif;
           font-size: 14px;
-          transition: background-color 0.3s;
+          transition: all 0.3s ease;
           display: flex;
           text-align: center;
           justify-content: center;
@@ -345,6 +371,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           height: 26px;
           display: inline-flex !important;
           align-items: center !important;
+          transition: all 0.3s ease;
         }
 
         @media screen and (max-width: 1024px) {
@@ -382,6 +409,17 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             margin-top: 12px !important;
             margin-bottom: 12px !important;
           }
+          
+          /* Icon sizes */
+          .table-row .flex.items-center.gap-2 img {
+            width: 16px !important;
+            height: 16px !important;
+          }
+          
+          .mobile-date-container img {
+            width: 16px !important;
+            height: 16px !important;
+          }
         }
 
         @media screen and (max-width: 425px) {
@@ -410,9 +448,15 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           
           .mobile-action-btn {
             font-size: 13px !important;
-            padding: 6px 6px !important;
-            height: auto;
+            padding: 10px 6px !important;
+            height: 40px;
             max-width: 95%;
+          }
+          
+          /* Smaller icons on very small screens */
+          .table-row .flex.items-center.gap-2 img {
+            width: 14px !important;
+            height: 14px !important;
           }
         }
 
