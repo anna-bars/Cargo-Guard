@@ -601,8 +601,8 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           /* Filter dropdown positioning for desktop */
           .filter-dropdown {
             position: absolute;
-            right: 0;
-            top: 100%;
+            right: 16px !important;
+            top: 72% !important;
             margin-top: 8px;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
             animation: slideDown 0.2s ease-out;
