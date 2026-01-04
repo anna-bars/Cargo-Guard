@@ -597,6 +597,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           .desktop-filter-cont select {
             transition: all 0.2s ease;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+                    background-color: #f5f6f3 !important;
           }
           
           .desktop-filter-cont select:hover {
