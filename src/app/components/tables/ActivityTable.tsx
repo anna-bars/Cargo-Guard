@@ -127,7 +127,67 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           <div className='flex px-0 md:px-4 justify-between items-center border-b border-b-[#d1d1d154] pb-3 relative'>
             <h2 className="block">{title}</h2>
             <div className='header-btn flex justify-between gap-2'>
-              {/* Search Input - Replaced button with input */}
+              <div className='desktop-filter-cont hidden md:flex items-center gap-4 px-4 py-3 mb-3 bg-[#f9f9f6] rounded-lg border border-[#d1d1d154] mx-4'>
+            <div className="flex items-center gap-2">
+              
+              {/* Activity Filter */}
+              <div className="relative">
+                <select
+                  value={selectedFilter}
+                  onChange={(e) => setSelectedFilter(e.target.value)}
+                  className="appearance-none bg-white border border-[#d1d1d154] rounded-lg px-3 py-2 pl-4 pr-8 font-poppins text-sm text-gray-700 focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] cursor-pointer min-w-[140px]"
+                >
+                  <option value="All Activity">All Activity</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Active">Active</option>
+                  <option value="Expiring">Expiring</option>
+                  <option value="Missing">Missing</option>
+                  <option value="Declined">Declined</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Timeframe Filter */}
+              <div className="relative">
+                <select
+                  value={selectedTimeframe}
+                  onChange={(e) => setSelectedTimeframe(e.target.value)}
+                  className="appearance-none bg-white border border-[#d1d1d154] rounded-lg px-3 py-2 pl-4 pr-8 font-poppins text-sm text-gray-700 focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] cursor-pointer min-w-[140px]"
+                >
+                  <option value="Last 7 days">Last 7 days</option>
+                  <option value="Last 30 days">Last 30 days</option>
+                  <option value="Last 3 months">Last 3 months</option>
+                  <option value="All time">All time</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+              
+              {/* Sort By Filter */}
+              <div className="relative">
+                <select
+                  value={selectedSort}
+                  onChange={(e) => setSelectedSort(e.target.value)}
+                  className="appearance-none bg-white border border-[#d1d1d154] rounded-lg px-3 py-2 pl-4 pr-8 font-poppins text-sm text-gray-700 focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] cursor-pointer min-w-[120px]"
+                >
+                  <option value="Status">Status</option>
+                  <option value="Date">Date</option>
+                  <option value="Value">Value</option>
+                  <option value="Type">Type</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
               <div className="hidden md:flex items-center gap-2 w-[180px] bg-[#f9f9f6] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm relative">
                 <img src="dashboard/icons/search-01-stroke-rounded.svg" alt="Search" className="w-[16px] h-[16px]" />
                 <input
@@ -149,8 +209,27 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
                   </button>
                 )}
               </div>
+              {/* Reset Button */}
+              <button
+                onClick={() => {
+                  setSelectedFilter('All Activity');
+                  setSelectedTimeframe('Last 30 days');
+                  setSelectedSort('Status');
+                  setSearchQuery('');
+                }}
+                className="flex items-center gap-1 px-3 py-2 text-sm font-poppins text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Reset
+              </button>
+            </div>
+          </div>
+              {/* Search Input - Replaced button with input */}
+              
               <button 
-                className="flex items-center gap-1 bg-[#F5F4F7] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300 relative"
+                className="md:hidden flex items-center gap-1 bg-[#F5F4F7] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300 relative"
                 onClick={() => setShowFilter(!showFilter)}
               >
                 <img src="dashboard/icons/filter-stroke-rounded.svg" alt="" className="w-[16px] h-[16px]" />
@@ -164,107 +243,11 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
                 Get New Quote
               </button>
             </div>
-            
-            {/* Desktop Filter Dropdown */}
-            {showFilter && (
-              <div className="absolute right-0 top-14 z-50 w-72 bg-white border border-[#e5e7eb] rounded-xl shadow-lg p-4 filter-dropdown hidden md:block">
-                <div className="flex justify-between items-center mb-0">
-                  <button 
-                    className="absolute right-2 top-2 text-gray-400 hover:text-gray-600 transition-colors p-1"
-                    onClick={() => setShowFilter(false)}
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-                
-                {/* Filter sections */}
-                <div className="space-y-3">
-                  {/* Activity Type */}
-                  <div>
-                    <h4 className="font-poppins font-medium text-xs text-gray-700 mb-2">Activity</h4>
-                    <div className="grid grid-cols-3 gap-1.5">
-                      {['All Activity', 'Pending', 'Active', 'Expiring', 'Missing', 'Declined'].map((filter) => (
-                        <button
-                          key={filter}
-                          className={`px-2 py-1.5 rounded-md font-poppins text-xs transition-all duration-200 ${
-                            selectedFilter === filter
-                              ? 'bg-[#2563eb] text-white'
-                              : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                          }`}
-                          onClick={() => setSelectedFilter(filter)}
-                        >
-                          {filter}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* Timeframe */}
-                  <div>
-                    <h4 className="font-poppins font-medium text-xs text-gray-700 mb-2">Timeframe</h4>
-                    <div className="flex flex-wrap gap-1.5">
-                      {['Last 7 days', 'Last 30 days', 'Last 3 months', 'All time'].map((timeframe) => (
-                        <button
-                          key={timeframe}
-                          className={`px-2 py-1.5 rounded-md font-poppins text-xs transition-all duration-200 ${
-                            selectedTimeframe === timeframe
-                              ? 'bg-[#2563eb] text-white'
-                              : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                          }`}
-                          onClick={() => setSelectedTimeframe(timeframe)}
-                        >
-                          {timeframe}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* Sort By */}
-                  <div>
-                    <h4 className="font-poppins font-medium text-xs text-gray-700 mb-2">Sort by</h4>
-                    <div className="grid grid-cols-3 gap-1.5">
-                      {['Status', 'Date', 'Value', 'Type'].map((sort) => (
-                        <button
-                          key={sort}
-                          className={`px-2 py-1.5 rounded-md font-poppins text-xs transition-all duration-200 ${
-                            selectedSort === sort
-                              ? 'bg-[#2563eb] text-white'
-                              : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                          }`}
-                          onClick={() => setSelectedSort(sort)}
-                        >
-                          {sort}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Action buttons */}
-                <div className="flex gap-2 pt-1.5 mt-1.5 border-t border-gray-100">
-                  <button 
-                    className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg font-poppins text-xs font-medium hover:bg-gray-200 transition-colors"
-                    onClick={() => {
-                      setSelectedFilter('All Activity');
-                      setSelectedTimeframe('Last 30 days');
-                      setSelectedSort('Status');
-                    }}
-                  >
-                    Reset
-                  </button>
-                  <button 
-                    className="flex-1 py-2 bg-[#2563eb] text-white rounded-lg font-poppins text-xs font-medium hover:bg-[#1d4ed8] transition-colors"
-                    onClick={() => setShowFilter(false)}
-                  >
-                    Apply Filters
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
           
+          {/* Desktop Filter Container - ADDED NEW FILTER COMPONENTS */}
+          
+
           {/* Desktop Table Header */}
           <div className="px-4 sm:px-4 py-2 mb-0.5 hidden md:grid grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 pb-2 mb-0 table-header w-[97%] bg-[#ededed7a] mx-auto my-3.5 rounded-[4px]">
             {['Type', 'ID', 'Cargo / Value', 'Status / Due Date', 'Last Update', 'Action'].map((header, idx) => (
@@ -576,7 +559,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
         </div>
       )}
 
-      {/* ՄՈԲԱՅԼ ԱԴԱՊՏԻՎ CSS - INCLUDING FILTER DROPDOWN */}
+      {/* ՄՈԲԱՅԼ ԱԴԱՊՏԻՎ CSS */}
       <style jsx>{`
         /* Activity table responsive styles */
         @media screen and (max-width: 1336px) {
@@ -598,31 +581,38 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             padding: 0 16px !important;
           }
           
-          /* Filter dropdown positioning for desktop */
-          .filter-dropdown {
-            position: absolute;
-            right: 16px !important;
-            top: 72% !important;
-            margin-top: 8px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-            animation: slideDown 0.2s ease-out;
-            width: 42%;
-            background: #e2e5efff;
+          /* Desktop filter container styling */
+          .desktop-filter-cont {
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            height: auto !important;
+            margin: 0 !important;
+            border-radius: 12px !important;
+            background: #f9f9f6 !important;
+            padding: 0 !important;
+            border: none !important;
+          }
+          
+          .desktop-filter-cont select {
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+          }
+          
+          .desktop-filter-cont select:hover {
+            border-color: #a5b4fc !important;
+          }
+          
+          .desktop-filter-cont select:focus {
+            border-color: #2563eb !important;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+          }
+          
+          .desktop-filter-cont button:hover {
+            background-color: #f3f4f6 !important;
           }
         }
 
-        @keyframes slideDown {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        /* Mobile bottom slide-up animation */
         @keyframes slide-up {
           from {
             transform: translateY(100%);
@@ -636,7 +626,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           animation: slide-up 0.3s ease-out;
         }
 
-        /* Active filter tags styling - MINIMALIST DESIGN */
+        /* Active filter tags styling */
         .filter-tags {
           position: relative;
           z-index: 10;
@@ -1051,21 +1041,6 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           .mobile-filter-tags button {
             font-size: 10px !important;
           }
-        }
-
-        /* Desktop filter dropdown */
-        .filter-dropdown {
-          position: absolute;
-          right: 0;
-          top: 100%;
-          margin-top: 8px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-          animation: slideDown 0.2s ease-out;
-          width: 34% !important;
-          max-width: 90vw;
-          border: 1px solid #e5e7eb !important;
-          border-radius: 12px !important;
-          background: #f8f9fa !important;
         }
 
         /* Mobile filter modal specific styles */
