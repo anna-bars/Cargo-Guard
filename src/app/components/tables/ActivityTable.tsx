@@ -55,7 +55,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
         <div className='block-1'>
           <div className='flex px-0 md:px-4 justify-between items-center border-b border-b-[#d1d1d154] pb-3'>
             <h2 className=" block">{title}</h2>
-            <div className=' flex justify-between gap-2'>
+            <div className='header-btn flex justify-between gap-2'>
               <button className="hidden md:flex text-[#6e6d6d] items-center gap-2 w-[180px] bg-[#f9f9f6] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300">
                 <img src="dashboard/icons/search-01-stroke-rounded.svg" alt="" className="w-[16px] h-[16px]" />
                 Search
@@ -356,6 +356,17 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           .md\\:hidden .row-cell {
             margin-left: auto !important;
           }
+        }
+
+        @media screen and (max-width: 425px) {
+            h2.block {
+    font-size: 16px;
+}
+
+.header-btn button {
+    font-size: 14px;
+    padding: 6px 12px;
+}
         }
       `}</style>
     </>
