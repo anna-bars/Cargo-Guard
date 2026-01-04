@@ -133,7 +133,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             {/* Filter Dropdown */}
             {showFilter && (
               <div className="absolute right-0 top-14 z-50 w-72 bg-white border border-[#e5e7eb] rounded-xl shadow-lg p-5 filter-dropdown">
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex justify-between items-center mb-2">
                   <h3 className="font-poppins font-medium text-base text-gray-900">Filters</h3>
                   <button 
                     className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -146,11 +146,11 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
                 </div>
                 
                 {/* Filter sections */}
-                <div className="space-y-6">
+                <div className="space-y-2">
                   {/* Activity Type */}
                   <div>
                     <h4 className="font-poppins font-medium text-sm text-gray-700 mb-3">Activity</h4>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-3 gap-2">
                       {['All Activity', 'Pending', 'Active', 'Expiring', 'Missing', 'Declined'].map((filter) => (
                         <button
                           key={filter}
@@ -190,7 +190,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
                   {/* Sort By */}
                   <div>
                     <h4 className="font-poppins font-medium text-sm text-gray-700 mb-3">Sort by</h4>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-3 gap-2">
                       {['Status', 'Date', 'Value', 'Type'].map((sort) => (
                         <button
                           key={sort}
@@ -412,6 +412,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             margin-top: 8px;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
             animation: slideDown 0.2s ease-out;
+            width: 42%;
           }
         }
 
