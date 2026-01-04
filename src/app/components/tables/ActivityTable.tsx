@@ -104,7 +104,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
       )}
 
       {/* Recent Activity Table */}
-      <section className="block-2 flex flex-col max-h-[88%] border border-[#d1d1d154] activity-section bg-[#fafaf7]/80 rounded-2xl py-4 xl:py-4">
+      <section className="block-2 flex flex-col max-h-[88%] border border-[#d1d1d154] activity-section bg-[#fafaf7]/80 rounded-2xl py-4 xl:py-4 relative">
         {/* Desktop Filters */}
         <div className='block-1'>
           <div className='flex px-0 md:px-4 justify-between items-center border-b border-b-[#d1d1d154] pb-3 relative'>
@@ -130,105 +130,104 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
               </button>
             </div>
             
-            {/* Filter Dropdown */}
-            {/* Filter Dropdown */}
-{showFilter && (
-  <div className="absolute right-0 top-14 z-50 w-72 bg-white border border-[#e5e7eb] rounded-xl shadow-lg p-4 filter-dropdown">
-    <div className="flex justify-between items-center mb-0">
-      <button 
-        className="absolute right-2 top-2 text-gray-400 hover:text-gray-600 transition-colors p-1"
-        onClick={() => setShowFilter(false)}
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
-    
-    {/* Filter sections */}
-    <div className="space-y-3">
-      {/* Activity Type */}
-      <div>
-        <h4 className="font-poppins font-medium text-xs text-gray-700 mb-2">Activity</h4>
-        <div className="grid grid-cols-3 gap-1.5">
-          {['All Activity', 'Pending', 'Active', 'Expiring', 'Missing', 'Declined'].map((filter) => (
-            <button
-              key={filter}
-              className={`px-2 py-1.5 rounded-md font-poppins text-xs transition-all duration-200 ${
-                selectedFilter === filter
-                  ? 'bg-[#2563eb] text-white'
-                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-              }`}
-              onClick={() => setSelectedFilter(filter)}
-            >
-              {filter}
-            </button>
-          ))}
-        </div>
-      </div>
-      
-      {/* Timeframe */}
-      <div>
-        <h4 className="font-poppins font-medium text-xs text-gray-700 mb-2">Timeframe</h4>
-        <div className="flex flex-wrap gap-1.5">
-          {['Last 7 days', 'Last 30 days', 'Last 3 months', 'All time'].map((timeframe) => (
-            <button
-              key={timeframe}
-              className={`px-2 py-1.5 rounded-md font-poppins text-xs transition-all duration-200 ${
-                selectedTimeframe === timeframe
-                  ? 'bg-[#2563eb] text-white'
-                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-              }`}
-              onClick={() => setSelectedTimeframe(timeframe)}
-            >
-              {timeframe}
-            </button>
-          ))}
-        </div>
-      </div>
-      
-      {/* Sort By */}
-      <div>
-        <h4 className="font-poppins font-medium text-xs text-gray-700 mb-2">Sort by</h4>
-        <div className="grid grid-cols-3 gap-1.5">
-          {['Status', 'Date', 'Value', 'Type'].map((sort) => (
-            <button
-              key={sort}
-              className={`px-2 py-1.5 rounded-md font-poppins text-xs transition-all duration-200 ${
-                selectedSort === sort
-                  ? 'bg-[#2563eb] text-white'
-                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-              }`}
-              onClick={() => setSelectedSort(sort)}
-            >
-              {sort}
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-    
-    {/* Action buttons */}
-    <div className="flex gap-2 pt-1.5 mt-1.5 border-t border-gray-100">
-      <button 
-        className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg font-poppins text-xs font-medium hover:bg-gray-200 transition-colors"
-        onClick={() => {
-          setSelectedFilter('All Activity');
-          setSelectedTimeframe('Last 30 days');
-          setSelectedSort('Status');
-        }}
-      >
-        Reset
-      </button>
-      <button 
-        className="flex-1 py-2 bg-[#2563eb] text-white rounded-lg font-poppins text-xs font-medium hover:bg-[#1d4ed8] transition-colors"
-        onClick={() => setShowFilter(false)}
-      >
-        Apply Filters
-      </button>
-    </div>
-  </div>
-)}
+            {/* Desktop Filter Dropdown */}
+            {showFilter && (
+              <div className="absolute right-0 top-14 z-50 w-72 bg-white border border-[#e5e7eb] rounded-xl shadow-lg p-4 filter-dropdown hidden md:block">
+                <div className="flex justify-between items-center mb-0">
+                  <button 
+                    className="absolute right-2 top-2 text-gray-400 hover:text-gray-600 transition-colors p-1"
+                    onClick={() => setShowFilter(false)}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                
+                {/* Filter sections */}
+                <div className="space-y-3">
+                  {/* Activity Type */}
+                  <div>
+                    <h4 className="font-poppins font-medium text-xs text-gray-700 mb-2">Activity</h4>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {['All Activity', 'Pending', 'Active', 'Expiring', 'Missing', 'Declined'].map((filter) => (
+                        <button
+                          key={filter}
+                          className={`px-2 py-1.5 rounded-md font-poppins text-xs transition-all duration-200 ${
+                            selectedFilter === filter
+                              ? 'bg-[#2563eb] text-white'
+                              : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                          }`}
+                          onClick={() => setSelectedFilter(filter)}
+                        >
+                          {filter}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Timeframe */}
+                  <div>
+                    <h4 className="font-poppins font-medium text-xs text-gray-700 mb-2">Timeframe</h4>
+                    <div className="flex flex-wrap gap-1.5">
+                      {['Last 7 days', 'Last 30 days', 'Last 3 months', 'All time'].map((timeframe) => (
+                        <button
+                          key={timeframe}
+                          className={`px-2 py-1.5 rounded-md font-poppins text-xs transition-all duration-200 ${
+                            selectedTimeframe === timeframe
+                              ? 'bg-[#2563eb] text-white'
+                              : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                          }`}
+                          onClick={() => setSelectedTimeframe(timeframe)}
+                        >
+                          {timeframe}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Sort By */}
+                  <div>
+                    <h4 className="font-poppins font-medium text-xs text-gray-700 mb-2">Sort by</h4>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {['Status', 'Date', 'Value', 'Type'].map((sort) => (
+                        <button
+                          key={sort}
+                          className={`px-2 py-1.5 rounded-md font-poppins text-xs transition-all duration-200 ${
+                            selectedSort === sort
+                              ? 'bg-[#2563eb] text-white'
+                              : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                          }`}
+                          onClick={() => setSelectedSort(sort)}
+                        >
+                          {sort}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Action buttons */}
+                <div className="flex gap-2 pt-1.5 mt-1.5 border-t border-gray-100">
+                  <button 
+                    className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg font-poppins text-xs font-medium hover:bg-gray-200 transition-colors"
+                    onClick={() => {
+                      setSelectedFilter('All Activity');
+                      setSelectedTimeframe('Last 30 days');
+                      setSelectedSort('Status');
+                    }}
+                  >
+                    Reset
+                  </button>
+                  <button 
+                    className="flex-1 py-2 bg-[#2563eb] text-white rounded-lg font-poppins text-xs font-medium hover:bg-[#1d4ed8] transition-colors"
+                    onClick={() => setShowFilter(false)}
+                  >
+                    Apply Filters
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
           
           {/* Desktop Table Header */}
@@ -382,6 +381,120 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
         </div>
       </section>
 
+      {/* Mobile Filter Modal - Now appears from bottom */}
+      {showFilter && (
+        <div className="md:hidden fixed inset-0 z-50 flex items-end justify-center">
+          {/* Overlay */}
+          <div 
+            className="absolute inset-0 bg-black/40 transition-opacity"
+            onClick={() => setShowFilter(false)}
+          />
+          
+          {/* Filter Modal - Sliding from bottom */}
+          <div className="relative w-full bg-white rounded-t-2xl shadow-xl max-h-[85vh] overflow-y-auto animate-slide-up">
+            {/* Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 rounded-t-2xl">
+              <div className="flex items-center justify-between">
+                <h3 className="font-poppins font-semibold text-lg text-gray-900">Filters</h3>
+                <button 
+                  className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
+                  onClick={() => setShowFilter(false)}
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            {/* Filter Content */}
+            <div className="p-4 space-y-6">
+              {/* Activity Type */}
+              <div>
+                <h4 className="font-poppins font-medium text-sm text-gray-900 mb-3">Activity</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  {['All Activity', 'Pending', 'Active', 'Expiring', 'Missing', 'Declined'].map((filter) => (
+                    <button
+                      key={filter}
+                      className={`px-4 py-3 rounded-lg font-poppins text-sm transition-all duration-200 ${
+                        selectedFilter === filter
+                          ? 'bg-[#2563eb] text-white'
+                          : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                      }`}
+                      onClick={() => setSelectedFilter(filter)}
+                    >
+                      {filter}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Timeframe */}
+              <div>
+                <h4 className="font-poppins font-medium text-sm text-gray-900 mb-3">Timeframe</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  {['Last 7 days', 'Last 30 days', 'Last 3 months', 'All time'].map((timeframe) => (
+                    <button
+                      key={timeframe}
+                      className={`px-4 py-3 rounded-lg font-poppins text-sm transition-all duration-200 ${
+                        selectedTimeframe === timeframe
+                          ? 'bg-[#2563eb] text-white'
+                          : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                      }`}
+                      onClick={() => setSelectedTimeframe(timeframe)}
+                    >
+                      {timeframe}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Sort By */}
+              <div>
+                <h4 className="font-poppins font-medium text-sm text-gray-900 mb-3">Sort by</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  {['Status', 'Date', 'Value', 'Type'].map((sort) => (
+                    <button
+                      key={sort}
+                      className={`px-4 py-3 rounded-lg font-poppins text-sm transition-all duration-200 ${
+                        selectedSort === sort
+                          ? 'bg-[#2563eb] text-white'
+                          : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                      }`}
+                      onClick={() => setSelectedSort(sort)}
+                    >
+                      {sort}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4">
+              <div className="flex gap-3">
+                <button 
+                  className="flex-1 py-3.5 bg-gray-100 text-gray-700 rounded-xl font-poppins text-base font-medium hover:bg-gray-200 transition-colors"
+                  onClick={() => {
+                    setSelectedFilter('All Activity');
+                    setSelectedTimeframe('Last 30 days');
+                    setSelectedSort('Status');
+                  }}
+                >
+                  Reset
+                </button>
+                <button 
+                  className="flex-1 py-3.5 bg-[#2563eb] text-white rounded-xl font-poppins text-base font-medium hover:bg-[#1d4ed8] transition-colors"
+                  onClick={() => setShowFilter(false)}
+                >
+                  Apply Filters
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ՄՈԲԱՅԼ ԱԴԱՊՏԻՎ CSS - INCLUDING FILTER DROPDOWN */}
       <style jsx>{`
         /* Activity table responsive styles */
@@ -428,6 +541,20 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           }
         }
 
+        /* Mobile bottom slide-up animation */
+        @keyframes slide-up {
+          from {
+            transform: translateY(100%);
+          }
+          to {
+            transform: translateY(0);
+          }
+        }
+
+        .animate-slide-up {
+          animation: slide-up 0.3s ease-out;
+        }
+
         @media screen and (max-width: 1024px) {
           .block-2 {
             max-height: none !important;
@@ -449,45 +576,6 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           
           .id-link {
             color: #2563eb !important;
-          }
-          
-          /* Mobile filter dropdown */
-          .filter-dropdown {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90%;
-            max-width: 400px;
-            max-height: 80vh;
-            overflow-y: auto;
-            z-index: 100;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-            animation: modalFadeIn 0.3s ease-out;
-          }
-          
-          /* Overlay for mobile */
-          .activity-section::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 99;
-            display: ${showFilter ? 'block' : 'none'};
-          }
-        }
-
-        @keyframes modalFadeIn {
-          from {
-            opacity: 0;
-            transform: translate(-50%, -45%);
-          }
-          to {
-            opacity: 1;
-            transform: translate(-50%, -50%);
           }
         }
 
@@ -596,7 +684,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           justify-content: center;
           width: 100% !important;
           height: 44px;
-          border: 1px solid rgba(0, 0, 255, 0.169);
+          border: 1px solid rgba(0, 0, 0, 0.169);
         }
 
         .mobile-action-btn.primary-btn {
@@ -718,18 +806,18 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             height: 14px !important;
           }
           
-          /* Filter dropdown adjustments */
-          .filter-dropdown {
+          /* Mobile filter modal adjustments */
+          .fixed.inset-0 .relative {
+            max-height: 80vh !important;
+          }
+          
+          .fixed.inset-0 .p-4 {
             padding: 16px !important;
           }
           
-          .filter-dropdown h3 {
-            font-size: 15px !important;
-          }
-          
-          .filter-dropdown button {
-            font-size: 13px !important;
-            padding: 8px 12px !important;
+          .fixed.inset-0 button {
+            font-size: 14px !important;
+            padding: 12px !important;
           }
         }
 
@@ -752,123 +840,91 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             justify-content: center;
             margin-bottom: 4px;
           }
+          
+          /* Mobile filter modal adjustments */
+          .fixed.inset-0 .grid.grid-cols-2 {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+          
+          .fixed.inset-0 button {
+            font-size: 13px !important;
+            padding: 10px !important;
+          }
         }
 
+        /* Desktop filter dropdown */
         .filter-dropdown {
-  position: absolute;
-  right: 0;
-  top: 100%;
-  margin-top: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  animation: slideDown 0.2s ease-out;
-  width: 34% !important; /* Fixed compact width */
-  max-width: 90vw;
-  border: 1px solid #e5e7eb !important;
-  border-radius: 12px !important;
-}
+          position: absolute;
+          right: 0;
+          top: 100%;
+          margin-top: 8px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+          animation: slideDown 0.2s ease-out;
+          width: 34% !important;
+          max-width: 90vw;
+          border: 1px solid #e5e7eb !important;
+          border-radius: 12px !important;
+        }
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+        /* Mobile filter modal specific styles */
+        @media screen and (max-width: 768px) {
+          .fixed.inset-0 {
+            z-index: 9999;
+          }
+          
+          .fixed.inset-0 .relative {
+            width: 100% !important;
+            border-radius: 24px 24px 0 0 !important;
+            box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.1);
+          }
+          
+          .fixed.inset-0 h3 {
+            font-size: 18px !important;
+            font-weight: 600;
+          }
+          
+          .fixed.inset-0 h4 {
+            font-size: 15px !important;
+            font-weight: 500;
+          }
+          
+          .fixed.inset-0 .space-y-6 > div {
+            margin-bottom: 20px;
+          }
+          
+          .fixed.inset-0 .grid.grid-cols-2 button {
+            width: 100%;
+            text-align: center;
+            padding: 14px 12px;
+            border-radius: 12px;
+            font-weight: 500;
+          }
+          
+          .fixed.inset-0 .sticky.bottom-0 {
+            padding-top: 16px;
+            padding-bottom: calc(16px + env(safe-area-inset-bottom, 0));
+            background: linear-gradient(to top, white 85%, transparent);
+          }
+          
+          .fixed.inset-0 .sticky.bottom-0 button {
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 14px;
+          }
+        }
 
-@media screen and (max-width: 1024px) {
-  .filter-dropdown {
-    position: fixed !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    width: 90% !important;
-    max-width: 400px !important;
-    max-height: 80vh !important;
-    overflow-y: auto !important;
-    z-index: 1000 !important;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2) !important;
-    animation: modalFadeIn 0.3s ease-out !important;
-    margin-top: 0 !important;
-  }
-  
-  /* Add overlay for mobile */
-  .activity-section::after {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.3);
-    z-index: 999;
-    display: ${showFilter ? 'block' : 'none'};
-  }
-}
-
-@keyframes modalFadeIn {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -48%);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%);
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .filter-dropdown {
-    width: 95% !important;
-    max-width: 350px !important;
-    padding: 16px !important;
-  }
-  
-  .filter-dropdown h3 {
-    font-size: 15px !important;
-    margin-bottom: 12px !important;
-  }
-  
-  .filter-dropdown h4 {
-    font-size: 12px !important;
-  }
-  
-  .filter-dropdown button {
-    font-size: 12px !important;
-    padding: 6px 10px !important;
-  }
-  
-  .filter-dropdown .grid.grid-cols-3 {
-    grid-template-columns: repeat(3, 1fr) !important;
-  }
-  
-  .filter-dropdown .flex.gap-2 {
-    gap: 8px !important;
-  }
-  
-  .filter-dropdown .flex-1 {
-    padding-top: 8px !important;
-    padding-bottom: 8px !important;
-  }
-}
-
-@media screen and (max-width: 425px) {
-  .filter-dropdown {
-    max-width: 320px !important;
-    padding: 14px !important;
-  }
-  
-  .filter-dropdown button {
-    font-size: 11px !important;
-    padding: 5px 8px !important;
-  }
-  
-  .filter-dropdown h3 {
-    font-size: 14px !important;
-  }
-}
+        @media screen and (max-width: 425px) {
+          .fixed.inset-0 .grid.grid-cols-2 button {
+            padding: 12px 8px;
+            font-size: 14px;
+          }
+          
+          .fixed.inset-0 .sticky.bottom-0 button {
+            padding: 14px;
+            font-size: 15px;
+          }
+        }
       `}</style>
     </>
   );
