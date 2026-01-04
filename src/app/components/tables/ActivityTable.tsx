@@ -30,6 +30,57 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
   rows = DEFAULT_ROWS
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [showFilter, setShowFilter] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState('All Activity');
+  const [selectedTimeframe, setSelectedTimeframe] = useState('Last 30 days');
+  const [selectedSort, setSelectedSort] = useState('Status');
+  
+  // Ֆիլտրացված տվյալներ
+  const getFilteredRows = () => {
+    let filtered = [...rows];
+    
+    // Ժամանակային ֆիլտր
+    if (selectedTimeframe === 'Last 7 days') {
+      // Սիմուլյացիա
+      filtered = filtered.slice(0, 3);
+    } else if (selectedTimeframe === 'Last 3 months') {
+      // Բոլորը
+      filtered = filtered;
+    }
+    
+    // Status ֆիլտր
+    if (selectedFilter !== 'All Activity') {
+      const statusMap: Record<string, string> = {
+        'Pending': 'Pending Approval',
+        'Active': 'Active',
+        'Expiring': 'Expires',
+        'Missing': 'Document Missing',
+        'Declined': 'Declined'
+      };
+      
+      const targetStatus = statusMap[selectedFilter];
+      if (targetStatus) {
+        filtered = filtered.filter(row => 
+          row.status.text.includes(targetStatus)
+        );
+      }
+    }
+    
+    // Սորտավորում
+    if (selectedSort === 'Date') {
+      filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    } else if (selectedSort === 'Value') {
+      filtered.sort((a, b) => {
+        const aValue = parseFloat(a.value.replace(/[^\d.-]/g, ''));
+        const bValue = parseFloat(b.value.replace(/[^\d.-]/g, ''));
+        return bValue - aValue;
+      });
+    }
+    
+    return filtered;
+  };
+
+  const filteredRows = getFilteredRows();
 
   return (
     <>
@@ -38,7 +89,10 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
         <div className="recent-activity md:hidden flex items-center justify-between activity-mobile-header activity-section-mob-hd mb-4">
           <h3 className="text-lg font-normal">Recent Activity</h3>
           <div className='flex gap-2'>
-            <button className="flex items-center gap-1 bg-[#F5F4F7] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300">
+            <button 
+              className="flex items-center gap-1 bg-[#F5F4F7] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300"
+              onClick={() => setShowFilter(!showFilter)}
+            >
               <img src="dashboard/icons/filter-stroke-rounded.svg" alt="" className="w-[16px] h-[16px]" />
               Filter
             </button>
@@ -53,21 +107,128 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
       <section className="block-2 flex flex-col max-h-[88%] border border-[#d1d1d154] activity-section bg-[#fafaf7]/80 rounded-2xl py-4 xl:py-4">
         {/* Desktop Filters */}
         <div className='block-1'>
-          <div className='flex px-0 md:px-4 justify-between items-center border-b border-b-[#d1d1d154] pb-3'>
+          <div className='flex px-0 md:px-4 justify-between items-center border-b border-b-[#d1d1d154] pb-3 relative'>
             <h2 className="block">{title}</h2>
             <div className='header-btn flex justify-between gap-2'>
               <button className="hidden md:flex text-[#6e6d6d] items-center gap-2 w-[180px] bg-[#f9f9f6] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300">
                 <img src="dashboard/icons/search-01-stroke-rounded.svg" alt="" className="w-[16px] h-[16px]" />
                 Search
               </button>
-              <button className="flex items-center gap-1 bg-[#F5F4F7] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300">
+              <button 
+                className="flex items-center gap-1 bg-[#F5F4F7] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300 relative"
+                onClick={() => setShowFilter(!showFilter)}
+              >
                 <img src="dashboard/icons/filter-stroke-rounded.svg" alt="" className="w-[16px] h-[16px]" />
                 Filter
+                {/* Active filter indicator */}
+                {(selectedFilter !== 'All Activity' || selectedTimeframe !== 'Last 30 days' || selectedSort !== 'Status') && (
+                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#2563eb] rounded-full"></span>
+                )}
               </button>
               <button className="bg-[#eb8d25] text-white px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#ff8c0c] transition-colors duration-300">
                 Get New Quote
               </button>
             </div>
+            
+            {/* Filter Dropdown */}
+            {showFilter && (
+              <div className="absolute right-0 top-14 z-50 w-72 bg-white border border-[#e5e7eb] rounded-xl shadow-lg p-5 filter-dropdown">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-poppins font-medium text-base text-gray-900">Filters</h3>
+                  <button 
+                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                    onClick={() => setShowFilter(false)}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                
+                {/* Filter sections */}
+                <div className="space-y-6">
+                  {/* Activity Type */}
+                  <div>
+                    <h4 className="font-poppins font-medium text-sm text-gray-700 mb-3">Activity</h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {['All Activity', 'Pending', 'Active', 'Expiring', 'Missing', 'Declined'].map((filter) => (
+                        <button
+                          key={filter}
+                          className={`px-3 py-2 rounded-lg font-poppins text-sm transition-all duration-200 ${
+                            selectedFilter === filter
+                              ? 'bg-[#2563eb] text-white'
+                              : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                          }`}
+                          onClick={() => setSelectedFilter(filter)}
+                        >
+                          {filter}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Timeframe */}
+                  <div>
+                    <h4 className="font-poppins font-medium text-sm text-gray-700 mb-3">Timeframe</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {['Last 7 days', 'Last 30 days', 'Last 3 months', 'All time'].map((timeframe) => (
+                        <button
+                          key={timeframe}
+                          className={`px-3 py-2 rounded-lg font-poppins text-sm transition-all duration-200 ${
+                            selectedTimeframe === timeframe
+                              ? 'bg-[#2563eb] text-white'
+                              : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                          }`}
+                          onClick={() => setSelectedTimeframe(timeframe)}
+                        >
+                          {timeframe}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Sort By */}
+                  <div>
+                    <h4 className="font-poppins font-medium text-sm text-gray-700 mb-3">Sort by</h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {['Status', 'Date', 'Value', 'Type'].map((sort) => (
+                        <button
+                          key={sort}
+                          className={`px-3 py-2 rounded-lg font-poppins text-sm transition-all duration-200 ${
+                            selectedSort === sort
+                              ? 'bg-[#2563eb] text-white'
+                              : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                          }`}
+                          onClick={() => setSelectedSort(sort)}
+                        >
+                          {sort}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Action buttons */}
+                <div className="flex gap-2 pt-4 mt-4 border-t border-gray-100">
+                  <button 
+                    className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-poppins text-sm font-medium hover:bg-gray-200 transition-colors"
+                    onClick={() => {
+                      setSelectedFilter('All Activity');
+                      setSelectedTimeframe('Last 30 days');
+                      setSelectedSort('Status');
+                    }}
+                  >
+                    Reset
+                  </button>
+                  <button 
+                    className="flex-1 py-2.5 bg-[#2563eb] text-white rounded-lg font-poppins text-sm font-medium hover:bg-[#1d4ed8] transition-colors"
+                    onClick={() => setShowFilter(false)}
+                  >
+                    Apply Filters
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
           
           {/* Desktop Table Header */}
@@ -91,9 +252,39 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           </div>
         </div>
 
+        {/* Active filters display */}
+        {(selectedFilter !== 'All Activity' || selectedTimeframe !== 'Last 30 days' || selectedSort !== 'Status') && (
+          <div className="px-4 mb-3 flex flex-wrap gap-2">
+            {selectedFilter !== 'All Activity' && (
+              <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full text-sm">
+                Activity: {selectedFilter}
+                <button onClick={() => setSelectedFilter('All Activity')} className="text-blue-500 hover:text-blue-700">
+                  ×
+                </button>
+              </span>
+            )}
+            {selectedTimeframe !== 'Last 30 days' && (
+              <span className="inline-flex items-center gap-1 bg-green-50 text-green-700 px-3 py-1.5 rounded-full text-sm">
+                Time: {selectedTimeframe}
+                <button onClick={() => setSelectedTimeframe('Last 30 days')} className="text-green-500 hover:text-green-700">
+                  ×
+                </button>
+              </span>
+            )}
+            {selectedSort !== 'Status' && (
+              <span className="inline-flex items-center gap-1 bg-purple-50 text-purple-700 px-3 py-1.5 rounded-full text-sm">
+                Sort: {selectedSort}
+                <button onClick={() => setSelectedSort('Status')} className="text-purple-500 hover:text-purple-700">
+                  ×
+                </button>
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Table Rows */}
         <div className="table-rows-cont px-4 xl:px-4 block-2 space-y-2 activity-table overflow-y-scroll">
-          {rows.map((row, idx) => (
+          {filteredRows.map((row, idx) => (
             <div key={idx} className="tab-item md:grid sm:grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 p-4 md:p-3 bg-[#f9f9f6] md:bg-[#f9f9f6] rounded-lg md:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
               {/* Desktop Layout */}
               <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.type}</div>
@@ -191,7 +382,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
         </div>
       </section>
 
-      {/* ՄՈԲԱՅԼ ԱԴԱՊՏԻՎ CSS - UPDATED FOR ICONS */}
+      {/* ՄՈԲԱՅԼ ԱԴԱՊՏԻՎ CSS - INCLUDING FILTER DROPDOWN */}
       <style jsx>{`
         /* Activity table responsive styles */
         @media screen and (max-width: 1336px) {
@@ -211,6 +402,27 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           
           .table-rows-cont {
             padding: 0 16px !important;
+          }
+          
+          /* Filter dropdown positioning for desktop */
+          .filter-dropdown {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 8px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            animation: slideDown 0.2s ease-out;
+          }
+        }
+
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
           }
         }
 
@@ -235,6 +447,45 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           
           .id-link {
             color: #2563eb !important;
+          }
+          
+          /* Mobile filter dropdown */
+          .filter-dropdown {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            animation: modalFadeIn 0.3s ease-out;
+          }
+          
+          /* Overlay for mobile */
+          .activity-section::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+            display: ${showFilter ? 'block' : 'none'};
+          }
+        }
+
+        @keyframes modalFadeIn {
+          from {
+            opacity: 0;
+            transform: translate(-50%, -45%);
+          }
+          to {
+            opacity: 1;
+            transform: translate(-50%, -50%);
           }
         }
 
@@ -271,6 +522,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             border: none !important;
             background: transparent !important;
             padding: 0 !important;
+            position: relative;
           }
           
           .tab-item {
@@ -316,6 +568,11 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           .mobile-status-badge {
             margin-left: auto !important;
             margin-right: 0 !important;
+          }
+          
+          /* Active filters styling */
+          .activity-section > div.flex.flex-wrap {
+            padding: 0 16px !important;
           }
         }
 
@@ -457,6 +714,20 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           .table-row .flex.items-center.gap-2 img {
             width: 14px !important;
             height: 14px !important;
+          }
+          
+          /* Filter dropdown adjustments */
+          .filter-dropdown {
+            padding: 16px !important;
+          }
+          
+          .filter-dropdown h3 {
+            font-size: 15px !important;
+          }
+          
+          .filter-dropdown button {
+            font-size: 13px !important;
+            padding: 8px 12px !important;
           }
         }
 
