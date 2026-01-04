@@ -86,7 +86,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
     <>
       {/* Mobile Activity Header */}
       {showMobileHeader && (
-        <div className="recent-activity md:hidden flex items-center justify-between activity-mobile-header activity-section-mob-hd mb-4">
+        <div className="pt-2 recent-activity md:hidden flex items-center justify-between activity-mobile-header activity-section-mob-hd mb-4">
           <h3 className="text-lg font-normal">Recent Activity</h3>
           <div className='flex gap-2'>
             <button 
@@ -253,9 +253,9 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
 
         {/* Active filters display - MINIMALIST STYLE */}
         {(selectedFilter !== 'All Activity' || selectedTimeframe !== 'Last 30 days' || selectedSort !== 'Status') && (
-          <div className="px-4 mb-0.5 mt-1 flex flex-wrap gap-2 filter-tags">
+          <div className="px-4 mb-0.5 mt-1 flex flex-wrap gap-2 filter-tags mobile-filter-tags">
             {selectedFilter !== 'All Activity' && (
-              <span className="inline-flex items-center gap-1 bg-[#fdfeff] border border-[#00000026] text-[#7f7f7f] px-3 py-1.5 rounded-[6px] text-xs font-poppins font-medium">
+              <span className="inline-flex items-center gap-1 bg-[#fdfeff] border border-[#00000026] text-[#7f7f7f] px-3 py-1.5 rounded-[6px] text-xs font-poppins font-medium mobile-filter-tag">
                 Activity: {selectedFilter}
                 <button 
                   onClick={() => setSelectedFilter('All Activity')} 
@@ -266,7 +266,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
               </span>
             )}
             {selectedTimeframe !== 'Last 30 days' && (
-              <span className="inline-flex items-center gap-1 bg-[#fdfeff] border border-[#00000026] text-[#7f7f7f] px-3 py-1.5 rounded-[6px] text-xs font-poppins font-medium">
+              <span className="inline-flex items-center gap-1 bg-[#fdfeff] border border-[#00000026] text-[#7f7f7f] px-3 py-1.5 rounded-[6px] text-xs font-poppins font-medium mobile-filter-tag">
                 Time: {selectedTimeframe}
                 <button 
                   onClick={() => setSelectedTimeframe('Last 30 days')} 
@@ -277,7 +277,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
               </span>
             )}
             {selectedSort !== 'Status' && (
-              <span className="inline-flex items-center gap-1 bg-[#fdfeff] border border-[#00000026] text-[#7f7f7f] px-3 py-1.5 rounded-[6px] text-xs font-poppins font-medium">
+              <span className="inline-flex items-center gap-1 bg-[#fdfeff] border border-[#00000026] text-[#7f7f7f] px-3 py-1.5 rounded-[6px] text-xs font-poppins font-medium mobile-filter-tag">
                 Sort: {selectedSort}
                 <button 
                   onClick={() => setSelectedSort('Status')} 
@@ -568,6 +568,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
         .filter-tags {
           position: relative;
           z-index: 10;
+          display: flex !important;
         }
         
         .filter-tags span {
@@ -582,6 +583,8 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           padding: 4px 10px !important;
           line-height: 1.4;
           transition: all 0.2s ease;
+          display: inline-flex !important;
+          align-items: center !important;
         }
         
         .filter-tags span:hover {
@@ -597,11 +600,51 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           opacity: 0.7;
           transition: all 0.2s ease;
           line-height: 1;
+          cursor: pointer;
         }
         
         .filter-tags button:hover {
           opacity: 1;
           color: #333333 !important;
+        }
+
+        /* Mobile specific filter tags styling */
+        @media screen and (max-width: 768px) {
+          .mobile-filter-tags {
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            padding: 12px 16px !important;
+            background: #f9f9f6 !important;
+            margin-top: -8px;
+            margin-bottom: 8px !important;
+            border-bottom: 1px solid #d1d1d140 !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            position: relative !important;
+            z-index: 5 !important;
+          }
+          
+          .mobile-filter-tag {
+            background-color: #ffffff !important;
+            border: 1px solid #00000026 !important;
+            border-radius: 6px !important;
+            box-shadow: none !important;
+            color: #7f7f7f !important;
+            font-size: 10px !important;
+            padding: 3px 8px !important;
+            margin: 2px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+          }
+          
+          .mobile-filter-tags button {
+            font-size: 12px !important;
+            margin-left: 2px !important;
+            opacity: 0.7;
+          }
         }
 
         @media screen and (max-width: 1024px) {
@@ -657,11 +700,22 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             width: 101% !important;
           }
           
+          /* FIX: Keep activity-section styling but ensure filter tags are visible */
           .activity-section {
             border: none !important;
             background: transparent !important;
             padding: 0 !important;
             position: relative;
+            border-radius: 0 !important;
+          }
+          
+          /* Ensure filter tags container is visible in mobile */
+          .activity-section > .filter-tags.mobile-filter-tags {
+            background: #f9f9f6 !important;
+            margin: 0 !important;
+            padding: 12px 16px !important;
+            display: none !important;
+            width: 100% !important;
           }
           
           .tab-item {
@@ -707,26 +761,6 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           .mobile-status-badge {
             margin-left: auto !important;
             margin-right: 0 !important;
-          }
-          
-          /* Active filters styling for mobile */
-          .activity-section .filter-tags {
-            padding: 12px 16px !important;
-            background: #f9f9f6 !important;
-            margin-top: -8px;
-            margin-bottom: 8px;
-            border-bottom: 1px solid #d1d1d140 !important;
-          }
-          
-          .activity-section .filter-tags span {
-            font-size: 10px !important;
-            padding: 3px 8px !important;
-            background-color: #ffffff !important;
-          }
-          
-          .activity-section .filter-tags button {
-            font-size: 12px !important;
-            margin-left: 2px !important;
           }
         }
 
@@ -885,11 +919,11 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           }
           
           /* Active filters on small screens */
-          .activity-section .filter-tags {
+          .mobile-filter-tags {
             padding: 10px 12px !important;
           }
           
-          .activity-section .filter-tags span {
+          .mobile-filter-tag {
             font-size: 9px !important;
             padding: 2px 6px !important;
           }
@@ -926,21 +960,23 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           }
           
           /* Active filters on very small screens */
-          .activity-section .filter-tags {
+          .mobile-filter-tags {
             flex-wrap: nowrap !important;
             overflow-x: auto;
             padding: 8px 10px !important;
             white-space: nowrap;
             -webkit-overflow-scrolling: touch;
+            margin-bottom: 6px !important;
           }
           
-          .activity-section .filter-tags span {
+          .mobile-filter-tag {
             flex-shrink: 0;
             font-size: 8px !important;
             padding: 2px 5px !important;
+            margin: 2px 3px !important;
           }
           
-          .activity-section .filter-tags button {
+          .mobile-filter-tags button {
             font-size: 10px !important;
           }
         }
