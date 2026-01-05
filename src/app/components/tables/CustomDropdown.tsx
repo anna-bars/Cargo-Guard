@@ -35,7 +35,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
     <div ref={dropdownRef} className={`relative ${className}`}>
       <button
         type="button"
-        className="w-full appearance-none bg-[#f3f2ee] border border-[#d1d1d154] rounded-lg px-3 py-2 pl-4 pr-8 font-poppins text-sm text-gray-700 focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] cursor-pointer min-w-[140px] text-left flex items-center justify-between"
+        className="w-full appearance-none bg-[#f3f2ee] border border-[#d1d1d154] rounded-lg px-3 py-2 pl-4  font-poppins text-sm text-gray-700 focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] cursor-pointer min-w-[40px] text-left flex items-center justify-between"
         onClick={() => setIsOpen(!isOpen)}
       >
         <span className="truncate">{selectedOption}</span>
