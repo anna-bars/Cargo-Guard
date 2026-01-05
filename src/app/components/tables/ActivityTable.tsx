@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { ActivityTableFilter } from './ActivityTableFilter';
+import { CustomDropdown } from './CustomDropdown';
 
 interface ActivityRow {
   type: 'Quote' | 'Policy';
@@ -35,20 +36,15 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
   const [selectedTimeframe, setSelectedTimeframe] = useState('Last 30 days');
   const [selectedSort, setSelectedSort] = useState('Status');
 
-  // Ֆիլտրացված տվյալներ
   const getFilteredRows = () => {
     let filtered = [...rows];
     
-    // Ժամանակային ֆիլտր
     if (selectedTimeframe === 'Last 7 days') {
-      // Սիմուլյացիա
       filtered = filtered.slice(0, 3);
     } else if (selectedTimeframe === 'Last 3 months') {
-      // Բոլորը
       filtered = filtered;
     }
     
-    // Status ֆիլտր
     if (selectedFilter !== 'All Activity') {
       const statusMap: Record<string, string> = {
         'Pending': 'Pending Approval',
@@ -66,7 +62,6 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
       }
     }
     
-    // Սորտավորում
     if (selectedSort === 'Date') {
       filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     } else if (selectedSort === 'Value') {
@@ -80,7 +75,6 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
     return filtered;
   };
 
-  // Search functionality
   const filteredRows = useMemo(() => {
     const filtered = getFilteredRows();
     
@@ -199,9 +193,9 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
                     <div className="w-1/2 mobile-button-container">
                       <button className={`mobile-action-btn ${
                         row.button.variant === 'primary' 
-                          ? 'primary-btn' 
-                          : 'secondary-btn'
-                      }`}>
+                          ? 'primary-btn bg-[#2563EB] text-white border border-[rgba(255,255,255,0.22)]' 
+                          : 'secondary-btn bg-transparent text-[#374151] border border-[#e3e6ea]'
+                      } h-[44px] w-full rounded-lg font-inter text-sm justify-center items-center gap-2 hover:bg-[#1d4ed8] hover:text-white transition-colors duration-300 hover:border-[#d1d5db]`}>
                         {row.button.text}
                       </button>
                     </div>
@@ -247,519 +241,475 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           )}
         </div>
       </section>
-
-      {/* ՄՈԲԱՅԼ ԱԴԱՊՏԻՎ CSS */}
       <style jsx>{`
         /* Activity table responsive styles */
-        @media screen and (max-width: 1336px) {
-          .block-2 {
-            overflow: scroll !important;
-          }
-        }
+@media screen and (max-width: 1336px) {
+  .block-2 {
+    overflow: scroll !important;
+  }
+}
 
-        @media screen and (min-width: 768px) {
-          .activity-section {
-            border: 1px solid #d1d1d154 !important;
-            background: #fafaf7/80 !important;
-            border-radius: 16px !important;
-            padding-top: 16px !important;
-            padding-bottom: 16px !important;
-          }
-          
-          .table-rows-cont {
-            padding: 0 16px !important;
-          }
-        }
+@media screen and (min-width: 768px) {
+  .activity-section {
+    border: 1px solid #d1d1d154 !important;
+    background: #fafaf7/80 !important;
+    border-radius: 16px !important;
+    padding-top: 16px !important;
+    padding-bottom: 16px !important;
+  }
+  
+  .table-rows-cont {
+    padding: 0 16px !important;
+  }
+}
 
-        @keyframes slide-up {
-          from {
-            transform: translateY(100%);
-          }
-          to {
-            transform: translateY(0);
-          }
-        }
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
 
-        .animate-slide-up {
-          animation: slide-up 0.3s ease-out;
-        }
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
 
-        /* Active filter tags styling */
-        .filter-tags {
-          position: relative;
-          z-index: 10;
-          display: flex !important;
-        }
-        
-        .filter-tags span {
-          background-color: #fdfeff !important;
-          border: 1px solid #00000026 !important;
-          border-radius: 6px !important;
-          box-shadow: none !important;
-          color: #7f7f7f !important;
-          font-family: 'Poppins', sans-serif;
-          font-size: 11px !important;
-          font-weight: 400;
-          padding: 4px 10px !important;
-          line-height: 1.4;
-          transition: all 0.2s ease;
-          display: inline-flex !important;
-          align-items: center !important;
-        }
-        
-        .filter-tags span:hover {
-          background-color: #f8f9fa !important;
-          border-color: #00000040 !important;
-        }
-        
-        .filter-tags button {
-          font-size: 14px !important;
-          font-weight: 400;
-          padding: 0 4px !important;
-          margin-left: 4px !important;
-          opacity: 0.7;
-          transition: all 0.2s ease;
-          line-height: 1;
-          cursor: pointer;
-        }
-        
-        .filter-tags button:hover {
-          opacity: 1;
-          color: #333333 !important;
-        }
+/* Active filter tags styling */
+.filter-tags {
+  position: relative;
+  z-index: 10;
+  display: flex !important;
+}
 
-        /* Mobile specific filter tags styling */
-        @media screen and (max-width: 768px) {
-          .mobile-filter-tags {
-            display: flex !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            padding: 12px 16px !important;
-            background: #f9f9f6 !important;
-            margin-top: -8px;
-            margin-bottom: 8px !important;
-            border-bottom: 1px solid #d1d1d140 !important;
-            width: 100% !important;
-            box-sizing: border-box !important;
-            position: relative !important;
-            z-index: 5 !important;
-          }
-          
-          .mobile-filter-tag {
-            background-color: #ffffff !important;
-            border: 1px solid #00000026 !important;
-            border-radius: 6px !important;
-            box-shadow: none !important;
-            color: #7f7f7f !important;
-            font-size: 10px !important;
-            padding: 3px 8px !important;
-            margin: 2px !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-          }
-          
-          .mobile-filter-tags button {
-            font-size: 12px !important;
-            margin-left: 2px !important;
-            opacity: 0.7;
-          }
-        }
+.filter-tags span {
+  background-color: #fdfeff !important;
+  border: 1px solid #00000026 !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+  color: #7f7f7f !important;
+  font-family: 'Poppins', sans-serif;
+  font-size: 11px !important;
+  font-weight: 400;
+  padding: 4px 10px !important;
+  line-height: 1.4;
+  transition: all 0.2s ease;
+  display: inline-flex !important;
+  align-items: center !important;
+}
 
-        @media screen and (max-width: 1024px) {
-          .block-2 {
-            max-height: none !important;
-          }
-          
-          .table-rows-cont {
-            padding: 0 !important;
-            margin: 0 !important;
-            width: 100% !important;
-          }
-          
-          .activity-table {
-            margin-top: 0px;
-          }
-          
-          .table-row:hover {
-            background-color: #f6f6ecff !important;
-          }
-          
-          .id-link {
-            color: #2563eb !important;
-          }
-        }
+.filter-tags span:hover {
+  background-color: #f8f9fa !important;
+  border-color: #00000040 !important;
+}
 
-        @media screen and (max-width: 768px) {
-          .recent-activity button {
-            padding: 6px 12px !important;
-            font-size: 12px !important;
-          }
-          
-          .table-row {
-            min-width: 100%;
-            display: flex;
-            background-color: rgba(250, 252, 255, 0.8) !important;
-            border-radius: 16px !important;
-            flex-wrap: wrap;
-            gap: 16px;
-            justify-content: space-between;
-            padding: 20px !important;
-            margin-bottom: 12px !important;
-            border-bottom: 1px solid #d1d1d140 !important;
-          }
-          
-          .recent-activity h3 {
-            font-size: 16px !important;
-          }
-          
-          .table-rows-cont {
-            padding: 0 !important;
-            margin: 0 !important;
-            width: 101% !important;
-          }
-          
-          /* FIX: Keep activity-section styling but ensure filter tags are visible */
-          .activity-section {
-            border: none !important;
-            background: transparent !important;
-            padding: 0 !important;
-            position: relative;
-            border-radius: 0 !important;
-          }
-          
-          /* Ensure filter tags container is visible in mobile */
-          .activity-section > .filter-tags.mobile-filter-tags {
-            background: #f9f9f6 !important;
-            margin: 0 !important;
-            padding: 12px 16px !important;
-            display: flex !important;
-            width: 100% !important;
-          }
-          
-          .tab-item {
-            margin: 0;
-            background-color: #f9f9f6 !important;
-            border: none !important;
-            border-bottom: 1px solid #d1d1d140 !important;
-          }
-          
-          .tab-item:hover {
-            background-color: #f6f6ecff !important;
-          }
-          
-          /* Icon container styling */
-          .table-row .flex.items-center.gap-2 img {
-            opacity: 0.8;
-          }
-          
-          .table-row .flex.items-center.gap-2 img:hover {
-            opacity: 1;
-          }
-          
-          /* New mobile bottom row layout */
-          .mobile-bottom-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            width: 100%;
-          }
-          
-          .mobile-date-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding-right: 6px;
-          }
-          
-          .mobile-button-container {
-            padding-left: 6px;
-          }
-          
-          /* Fix mobile status badge alignment */
-          .mobile-status-badge {
-            margin-left: auto !important;
-            margin-right: 0 !important;
-          }
-        }
+.filter-tags button {
+  font-size: 14px !important;
+  font-weight: 400;
+  padding: 0 4px !important;
+  margin-left: 4px !important;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+  line-height: 1;
+  cursor: pointer;
+}
 
-        /* Mobile action button styles */
-        .mobile-action-btn {
-          color: #ffffff;
-          cursor: pointer;
-          background-color: #2563EB;
-          border: 1px solid rgba(255, 255, 255, 0.22);
-          border-radius: 8px;
-          align-items: center;
-          gap: 8px;
-          padding: 12px 8px !important;
-          font-family: 'Inter', sans-serif;
-          font-size: 14px;
-          transition: all 0.3s ease;
-          display: flex;
-          text-align: center;
-          justify-content: center;
-          width: 100% !important;
-          height: 44px;
-          border: 1px solid rgba(0, 0, 0, 0.169);
-        }
+.filter-tags button:hover {
+  opacity: 1;
+  color: #333333 !important;
+}
 
-        .mobile-action-btn.primary-btn {
-          background-color: #2563EB;
-          color: #ffffff;
-          border: 1px solid rgba(255, 255, 255, 0.22);
-        }
+/* Mobile specific filter tags styling */
+@media screen and (max-width: 768px) {
+  .mobile-filter-tags {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    padding: 12px 16px !important;
+    background: #f9f9f6 !important;
+    margin-top: -8px;
+    margin-bottom: 8px !important;
+    border-bottom: 1px solid #d1d1d140 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    z-index: 5 !important;
+  }
+  
+  .mobile-filter-tag {
+    background-color: #ffffff !important;
+    border: 1px solid #00000026 !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+    color: #7f7f7f !important;
+    font-size: 10px !important;
+    padding: 3px 8px !important;
+    margin: 2px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  .mobile-filter-tags button {
+    font-size: 12px !important;
+    margin-left: 2px !important;
+    opacity: 0.7;
+  }
+}
 
-        .mobile-action-btn.secondary-btn {
-          background-color: transparent;
-          color: #374151;
-          border: 1px solid #e3e6ea;
-        }
+@media screen and (max-width: 1024px) {
+  .block-2 {
+    max-height: none !important;
+  }
+  
+  .table-rows-cont {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+  
+  .activity-table {
+    margin-top: 0px;
+  }
+  
+  .table-row:hover {
+    background-color: #f6f6ecff !important;
+  }
+  
+  .id-link {
+    color: #2563eb !important;
+  }
+}
 
-        .mobile-action-btn:hover {
-          background-color: #1d4ed8;
-        }
+@media screen and (max-width: 768px) {
+  .recent-activity button {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+  }
+  
+  .table-row {
+    min-width: 100%;
+    display: flex;
+    background-color: rgba(250, 252, 255, 0.8) !important;
+    border-radius: 16px !important;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: space-between;
+    padding: 20px !important;
+    margin-bottom: 12px !important;
+    border-bottom: 1px solid #d1d1d140 !important;
+  }
+  
+  .recent-activity h3 {
+    font-size: 16px !important;
+  }
+  
+  .table-rows-cont {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 101% !important;
+  }
+  
+  /* FIX: Keep activity-section styling but ensure filter tags are visible */
+  .activity-section {
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    position: relative;
+    border-radius: 0 !important;
+  }
+  
+  /* Ensure filter tags container is visible in mobile */
+  .activity-section > .filter-tags.mobile-filter-tags {
+    background: #f9f9f6 !important;
+    margin: 0 !important;
+    padding: 12px 16px !important;
+    display: flex !important;
+    width: 100% !important;
+  }
+  
+  .tab-item {
+    margin: 0;
+    background-color: #f9f9f6 !important;
+    border: none !important;
+    border-bottom: 1px solid #d1d1d140 !important;
+  }
+  
+  .tab-item:hover {
+    background-color: #f6f6ecff !important;
+  }
+  
+  /* Icon container styling */
+  .table-row .flex.items-center.gap-2 img {
+    opacity: 0.8;
+  }
+  
+  .table-row .flex.items-center.gap-2 img:hover {
+    opacity: 1;
+  }
+  
+  /* New mobile bottom row layout */
+  .mobile-bottom-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+  
+  .mobile-date-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-right: 6px;
+  }
+  
+  .mobile-button-container {
+    padding-left: 6px;
+  }
+  
+  /* Fix mobile status badge alignment */
+  .mobile-status-badge {
+    margin-left: auto !important;
+    margin-right: 0 !important;
+  }
+}
 
-        .mobile-action-btn.secondary-btn:hover {
-          background-color: #f3f4f6;
-          border-color: #d1d5db;
-        }
+/* Mobile status badge */
+.mobile-status-badge {
+  width: fit-content !important;
+  min-width: fit-content !important;
+  white-space: nowrap !important;
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+  height: 26px;
+  display: inline-flex !important;
+  align-items: center !important;
+  transition: all 0.3s ease;
+}
 
-        /* Mobile status badge */
-        .mobile-status-badge {
-          width: fit-content !important;
-          min-width: fit-content !important;
-          white-space: nowrap !important;
-          padding-left: 12px !important;
-          padding-right: 12px !important;
-          height: 26px;
-          display: inline-flex !important;
-          align-items: center !important;
-          transition: all 0.3s ease;
-        }
+@media screen and (max-width: 1024px) {
+  .table-row .mobile-status-badge {
+    font-size: 11px !important;
+    padding: 6px 10px !important;
+    height: 24px;
+  }
+}
 
-        @media screen and (max-width: 1024px) {
-          .table-row .mobile-status-badge {
-            font-size: 11px !important;
-            padding: 6px 10px !important;
-            height: 24px;
-          }
-        }
+@media screen and (max-width: 768px) {
+  .mobile-action-btn {
+    height: 44px;
+    font-size: 14px;
+    font-weight: 500;
+    width: 95% !important;
+    min-width: 0 !important;
+  }
+  
+  .mobile-status-badge {
+    font-size: 10px !important;
+    padding: 5px 8px !important;
+    height: 22px;
+  }
+  
+  /* Ensure 50/50 split works properly */
+  .mobile-date-container,
+  .mobile-button-container {
+    flex: 0 0 50% !important;
+    max-width: 50% !important;
+  }
+  
+  /* Adjust spacing for the divider */
+  .border-t {
+    margin-top: 12px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  /* Icon sizes */
+  .table-row .flex.items-center.gap-2 img {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  
+  .mobile-date-container img {
+    width: 16px !important;
+    height: 16px !important;
+  }
+}
 
-        @media screen and (max-width: 768px) {
-          .mobile-action-btn {
-            height: 44px;
-            font-size: 14px;
-            font-weight: 500;
-            width: 95% !important;
-            min-width: 0 !important;
-          }
-          
-          .mobile-status-badge {
-            font-size: 10px !important;
-            padding: 5px 8px !important;
-            height: 22px;
-          }
-          
-          /* Ensure 50/50 split works properly */
-          .mobile-date-container,
-          .mobile-button-container {
-            flex: 0 0 50% !important;
-            max-width: 50% !important;
-          }
-          
-          /* Adjust spacing for the divider */
-          .border-t {
-            margin-top: 12px !important;
-            margin-bottom: 12px !important;
-          }
-          
-          /* Icon sizes */
-          .table-row .flex.items-center.gap-2 img {
-            width: 16px !important;
-            height: 16px !important;
-          }
-          
-          .mobile-date-container img {
-            width: 16px !important;
-            height: 16px !important;
-          }
-        }
+@media screen and (max-width: 425px) {
+  h2.block {
+    font-size: 16px;
+  }
+  
+  .header-btn button {
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+  
+  /* Adjust for very small screens */
+  .mobile-date-container {
+    gap: 4px;
+  }
+  
+  .mobile-date-container img {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  
+  .mobile-date-container .font-poppins {
+    font-size: 12px !important;
+  }
+  
+  .mobile-action-btn {
+    font-size: 13px !important;
+    padding: 10px 6px !important;
+    height: 40px;
+    max-width: 95%;
+  }
+  
+  /* Smaller icons on very small screens */
+  .table-row .flex.items-center.gap-2 img {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  
+  /* Mobile filter modal adjustments */
+  .fixed.inset-0 .relative {
+    max-height: 80vh !important;
+  }
+  
+  .fixed.inset-0 .p-4 {
+    padding: 16px !important;
+  }
+  
+  .fixed.inset-0 button {
+    font-size: 14px !important;
+    padding: 12px !important;
+  }
+  
+  /* Active filters on small screens */
+  .mobile-filter-tags {
+    padding: 10px 12px !important;
+  }
+  
+  .mobile-filter-tag {
+    font-size: 9px !important;
+    padding: 2px 6px !important;
+  }
+}
 
-        @media screen and (max-width: 425px) {
-          h2.block {
-            font-size: 16px;
-          }
-          
-          .header-btn button {
-            font-size: 14px;
-            padding: 6px 12px;
-          }
-          
-          /* Adjust for very small screens */
-          .mobile-date-container {
-            gap: 4px;
-          }
-          
-          .mobile-date-container img {
-            width: 14px !important;
-            height: 14px !important;
-          }
-          
-          .mobile-date-container .font-poppins {
-            font-size: 12px !important;
-          }
-          
-          .mobile-action-btn {
-            font-size: 13px !important;
-            padding: 10px 6px !important;
-            height: 40px;
-            max-width: 95%;
-          }
-          
-          /* Smaller icons on very small screens */
-          .table-row .flex.items-center.gap-2 img {
-            width: 14px !important;
-            height: 14px !important;
-          }
-          
-          /* Mobile filter modal adjustments */
-          .fixed.inset-0 .relative {
-            max-height: 80vh !important;
-          }
-          
-          .fixed.inset-0 .p-4 {
-            padding: 16px !important;
-          }
-          
-          .fixed.inset-0 button {
-            font-size: 14px !important;
-            padding: 12px !important;
-          }
-          
-          /* Active filters on small screens */
-          .mobile-filter-tags {
-            padding: 10px 12px !important;
-          }
-          
-          .mobile-filter-tag {
-            font-size: 9px !important;
-            padding: 2px 6px !important;
-          }
-        }
+/* Specific adjustments for iPhone SE and similar small devices */
+@media screen and (max-width: 375px) {
+  .mobile-bottom-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .mobile-date-container,
+  .mobile-button-container {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+  }
+  
+  .mobile-date-container {
+    justify-content: center;
+    margin-bottom: 4px;
+  }
+  
+  /* Mobile filter modal adjustments */
+  .fixed.inset-0 .grid.grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .fixed.inset-0 button {
+    font-size: 13px !important;
+    padding: 10px !important;
+  }
+  
+  /* Active filters on very small screens */
+  .mobile-filter-tags {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    padding: 8px 10px !important;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 6px !important;
+  }
+  
+  .mobile-filter-tag {
+    flex-shrink: 0;
+    font-size: 8px !important;
+    padding: 2px 5px !important;
+    margin: 2px 3px !important;
+  }
+  
+  .mobile-filter-tags button {
+    font-size: 10px !important;
+  }
+}
 
-        /* Specific adjustments for iPhone SE and similar small devices */
-        @media screen and (max-width: 375px) {
-          .mobile-bottom-row {
-            flex-direction: column;
-            gap: 8px;
-          }
-          
-          .mobile-date-container,
-          .mobile-button-container {
-            flex: 0 0 100% !important;
-            max-width: 100% !important;
-            width: 100% !important;
-            padding: 0 !important;
-          }
-          
-          .mobile-date-container {
-            justify-content: center;
-            margin-bottom: 4px;
-          }
-          
-          /* Mobile filter modal adjustments */
-          .fixed.inset-0 .grid.grid-cols-2 {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-          
-          .fixed.inset-0 button {
-            font-size: 13px !important;
-            padding: 10px !important;
-          }
-          
-          /* Active filters on very small screens */
-          .mobile-filter-tags {
-            flex-wrap: nowrap !important;
-            overflow-x: auto;
-            padding: 8px 10px !important;
-            white-space: nowrap;
-            -webkit-overflow-scrolling: touch;
-            margin-bottom: 6px !important;
-          }
-          
-          .mobile-filter-tag {
-            flex-shrink: 0;
-            font-size: 8px !important;
-            padding: 2px 5px !important;
-            margin: 2px 3px !important;
-          }
-          
-          .mobile-filter-tags button {
-            font-size: 10px !important;
-          }
-        }
+/* Mobile filter modal specific styles */
+@media screen and (max-width: 768px) {
+  .fixed.inset-0 {
+    z-index: 9999;
+  }
+  
+  .fixed.inset-0 .relative {
+    width: 100% !important;
+    border-radius: 24px 24px 0 0 !important;
+    box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.1);
+  }
+  
+  .fixed.inset-0 h3 {
+    font-size: 18px !important;
+    font-weight: 600;
+  }
+  
+  .fixed.inset-0 h4 {
+    font-size: 15px !important;
+    font-weight: 500;
+  }
+  
+  .fixed.inset-0 .space-y-6 > div {
+    margin-bottom: 20px;
+  }
+  
+  .fixed.inset-0 .grid.grid-cols-2 button {
+    width: 100%;
+    text-align: center;
+    padding: 14px 12px;
+    border-radius: 12px;
+    font-weight: 500;
+  }
+  
+  .fixed.inset-0 .sticky.bottom-0 {
+    padding-top: 16px;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0));
+    background: linear-gradient(to top, white 85%, transparent);
+  }
+  
+  .fixed.inset-0 .sticky.bottom-0 button {
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 14px;
+  }
+}
 
-        /* Mobile filter modal specific styles */
-        @media screen and (max-width: 768px) {
-          .fixed.inset-0 {
-            z-index: 9999;
-          }
-          
-          .fixed.inset-0 .relative {
-            width: 100% !important;
-            border-radius: 24px 24px 0 0 !important;
-            box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.1);
-          }
-          
-          .fixed.inset-0 h3 {
-            font-size: 18px !important;
-            font-weight: 600;
-          }
-          
-          .fixed.inset-0 h4 {
-            font-size: 15px !important;
-            font-weight: 500;
-          }
-          
-          .fixed.inset-0 .space-y-6 > div {
-            margin-bottom: 20px;
-          }
-          
-          .fixed.inset-0 .grid.grid-cols-2 button {
-            width: 100%;
-            text-align: center;
-            padding: 14px 12px;
-            border-radius: 12px;
-            font-weight: 500;
-          }
-          
-          .fixed.inset-0 .sticky.bottom-0 {
-            padding-top: 16px;
-            padding-bottom: calc(16px + env(safe-area-inset-bottom, 0));
-            background: linear-gradient(to top, white 85%, transparent);
-          }
-          
-          .fixed.inset-0 .sticky.bottom-0 button {
-            padding: 16px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 14px;
-          }
-        }
-
-        @media screen and (max-width: 425px) {
-          .fixed.inset-0 .grid.grid-cols-2 button {
-            padding: 12px 8px;
-            font-size: 14px;
-          }
-          
-          .fixed.inset-0 .sticky.bottom-0 button {
-            padding: 14px;
-            font-size: 15px;
-          }
-        }
+@media screen and (max-width: 425px) {
+  .fixed.inset-0 .grid.grid-cols-2 button {
+    padding: 12px 8px;
+    font-size: 14px;
+  }
+  
+  .fixed.inset-0 .sticky.bottom-0 button {
+    padding: 14px;
+    font-size: 15px;
+  }
+}
       `}</style>
     </>
   );

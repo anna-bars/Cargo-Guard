@@ -356,7 +356,6 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
         </div>
       )}
 
-      {/* Add CSS animations to your global CSS file */}
       <style jsx global>{`
         @keyframes fade-in {
           from { opacity: 0; }
