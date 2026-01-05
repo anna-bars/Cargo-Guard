@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CustomDropdown } from './CustomDropdown'; // Կամ ճիշտ path-ը
 
 interface ActivityTableFilterProps {
   searchQuery: string;
@@ -37,6 +38,10 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
     if (onReset) onReset();
   };
 
+  const activityOptions = ['All Activity', 'Pending', 'Active', 'Expiring', 'Missing', 'Declined'];
+  const timeframeOptions = ['Last 7 days', 'Last 30 days', 'Last 3 months', 'All time'];
+  const sortOptions = ['Status', 'Date', 'Value', 'Type'];
+
   return (
     <>
       {/* Mobile Activity Header */}
@@ -64,64 +69,30 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
           <div className='header-btn flex justify-between gap-2'>
             <div className='desktop-filter-cont hidden md:flex items-center gap-4 bg-[#f9f9f6] rounded-lg mx-4'>
               <div className="flex items-center gap-2">
-                {/* Activity Filter */}
-                <div className="relative">
-                  <select
-                    value={selectedFilter}
-                    onChange={(e) => setSelectedFilter(e.target.value)}
-                    className="appearance-none bg-[#f3f2ee] border border-[#d1d1d154] rounded-lg px-3 py-2 pl-4 pr-8 font-poppins text-sm text-gray-700 focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] cursor-pointer min-w-[140px]"
-                  >
-                    <option value="All Activity">All Activity</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Active">Active</option>
-                    <option value="Expiring">Expiring</option>
-                    <option value="Missing">Missing</option>
-                    <option value="Declined">Declined</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </div>
+                {/* Activity Filter - Custom Dropdown */}
+                <CustomDropdown
+                  options={activityOptions}
+                  value={selectedFilter}
+                  onChange={setSelectedFilter}
+                  className="min-w-[140px]"
+                />
                 
-                {/* Timeframe Filter */}
-                <div className="relative">
-                  <select
-                    value={selectedTimeframe}
-                    onChange={(e) => setSelectedTimeframe(e.target.value)}
-                    className="appearance-none bg-[#f3f2ee] border border-[#d1d1d154] rounded-lg px-3 py-2 pl-4 pr-8 font-poppins text-sm text-gray-700 focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] cursor-pointer min-w-[140px]"
-                  >
-                    <option value="Last 7 days">Last 7 days</option>
-                    <option value="Last 30 days">Last 30 days</option>
-                    <option value="Last 3 months">Last 3 months</option>
-                    <option value="All time">All time</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </div>
+                {/* Timeframe Filter - Custom Dropdown */}
+                <CustomDropdown
+                  options={timeframeOptions}
+                  value={selectedTimeframe}
+                  onChange={setSelectedTimeframe}
+                  className="min-w-[140px]"
+                />
                 
-                {/* Sort By Filter */}
-                <div className="relative">
-                  <select
-                    value={selectedSort}
-                    onChange={(e) => setSelectedSort(e.target.value)}
-                    className="appearance-none bg-[#f3f2ee] border border-[#d1d1d154] rounded-lg px-3 py-2 pl-4 pr-8 font-poppins text-sm text-gray-700 focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] cursor-pointer min-w-[120px]"
-                  >
-                    <option value="Status">Status</option>
-                    <option value="Date">Date</option>
-                    <option value="Value">Value</option>
-                    <option value="Type">Type</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </div>
+                {/* Sort By Filter - Custom Dropdown */}
+                <CustomDropdown
+                  options={sortOptions}
+                  value={selectedSort}
+                  onChange={setSelectedSort}
+                  className="min-w-[120px]"
+                />
+                
                 <div className="hidden md:flex items-center gap-2 w-[180px] bg-[#f9f9f6] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm relative">
                   <img src="dashboard/icons/search-01-stroke-rounded.svg" alt="Search" className="w-[16px] h-[16px]" />
                   <input
@@ -131,7 +102,6 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full bg-transparent outline-none border-none text-[#6e6d6d] placeholder:text-[#6e6d6d] font-poppins text-sm font-normal"
                   />
-                  {/* Clear search button */}
                   {searchQuery && (
                     <button 
                       onClick={() => setSearchQuery('')}
@@ -143,6 +113,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
                     </button>
                   )}
                 </div>
+                
                 {/* Reset Button */}
                 <button
                   onClick={handleReset}
@@ -162,7 +133,6 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
             >
               <img src="dashboard/icons/filter-stroke-rounded.svg" alt="" className="w-[16px] h-[16px]" />
               Filter
-              {/* Active filter indicator */}
               {(selectedFilter !== 'All Activity' || selectedTimeframe !== 'Last 30 days' || selectedSort !== 'Status') && (
                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#2563eb] rounded-full"></span>
               )}
@@ -194,7 +164,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
         </div>
       </div>
 
-      {/* Active filters display - MINIMALIST STYLE */}
+      {/* Active filters display */}
       {(selectedFilter !== 'All Activity' || selectedTimeframe !== 'Last 30 days' || selectedSort !== 'Status' || searchQuery) && (
         <div className="px-4 mb-0.5 mt-1 flex flex-wrap gap-2 filter-tags mobile-filter-tags">
           {searchQuery && (
@@ -244,21 +214,28 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
         </div>
       )}
 
-      {/* Mobile Filter Modal */}
+      {/* Mobile Filter Modal - IMPROVED */}
       {showFilter && (
         <div className="md:hidden fixed inset-0 z-50 flex items-end justify-center">
-          {/* Overlay */}
+          {/* Overlay with animation */}
           <div 
-            className="absolute inset-0 bg-black/40 transition-opacity"
+            className="absolute inset-0 bg-black/40 transition-opacity duration-300 animate-fade-in"
             onClick={() => setShowFilter(false)}
           />
           
-          {/* Filter Modal - Sliding from bottom */}
+          {/* Filter Modal - Improved */}
           <div className="relative w-full bg-white rounded-t-2xl shadow-xl max-h-[85vh] overflow-y-auto animate-slide-up">
             {/* Header */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 rounded-t-2xl">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-5 py-4 rounded-t-2xl z-10">
               <div className="flex items-center justify-between">
-                <h3 className="font-poppins font-semibold text-lg text-gray-900">Filters</h3>
+                <div>
+                  <h3 className="font-poppins font-semibold text-lg text-gray-900">Filters</h3>
+                  <p className="font-poppins text-xs text-gray-500 mt-1">
+                    {selectedFilter !== 'All Activity' || selectedTimeframe !== 'Last 30 days' || selectedSort !== 'Status' 
+                      ? 'Active filters applied' 
+                      : 'Select your preferences'}
+                  </p>
+                </div>
                 <button 
                   className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
                   onClick={() => setShowFilter(false)}
@@ -270,19 +247,44 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
               </div>
             </div>
             
-            {/* Filter Content */}
-            <div className="p-4 space-y-6">
-              {/* Activity Type */}
+            {/* Filter Content - Improved */}
+            <div className="p-5 space-y-6">
+              {/* Search Input for Mobile */}
               <div>
-                <h4 className="font-poppins font-medium text-sm text-gray-900 mb-3">Activity</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  {['All Activity', 'Pending', 'Active', 'Expiring', 'Missing', 'Declined'].map((filter) => (
+                <h4 className="font-poppins font-medium text-sm text-gray-900 mb-3">Search</h4>
+                <div className="flex items-center gap-2 w-full bg-[#f9f9f6] border border-[#d1d1d154] px-4 py-3 rounded-lg font-poppins text-sm relative">
+                  <img src="dashboard/icons/search-01-stroke-rounded.svg" alt="Search" className="w-[16px] h-[16px]" />
+                  <input
+                    type="text"
+                    placeholder="Search activities..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-transparent outline-none border-none text-[#6e6d6d] placeholder:text-[#6e6d6d] font-poppins text-sm font-normal"
+                  />
+                  {searchQuery && (
+                    <button 
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-3 text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Activity Type - Improved */}
+              <div>
+                <h4 className="font-poppins font-medium text-sm text-gray-900 mb-3">Activity Type</h4>
+                <div className="grid grid-cols-2 gap-2.5">
+                  {activityOptions.map((filter) => (
                     <button
                       key={filter}
-                      className={`px-4 py-3 rounded-lg font-poppins text-sm transition-all duration-200 ${
+                      className={`px-3 py-2.5 rounded-lg font-poppins text-sm transition-all duration-200 ${
                         selectedFilter === filter
-                          ? 'bg-[#2563eb] text-white'
-                          : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                          ? 'bg-[#2563eb] text-white shadow-sm'
+                          : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-100'
                       }`}
                       onClick={() => setSelectedFilter(filter)}
                     >
@@ -292,17 +294,17 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
                 </div>
               </div>
               
-              {/* Timeframe */}
+              {/* Timeframe - Improved */}
               <div>
                 <h4 className="font-poppins font-medium text-sm text-gray-900 mb-3">Timeframe</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  {['Last 7 days', 'Last 30 days', 'Last 3 months', 'All time'].map((timeframe) => (
+                <div className="grid grid-cols-2 gap-2.5">
+                  {timeframeOptions.map((timeframe) => (
                     <button
                       key={timeframe}
-                      className={`px-4 py-3 rounded-lg font-poppins text-sm transition-all duration-200 ${
+                      className={`px-3 py-2.5 rounded-lg font-poppins text-sm transition-all duration-200 ${
                         selectedTimeframe === timeframe
-                          ? 'bg-[#2563eb] text-white'
-                          : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                          ? 'bg-[#2563eb] text-white shadow-sm'
+                          : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-100'
                       }`}
                       onClick={() => setSelectedTimeframe(timeframe)}
                     >
@@ -312,17 +314,17 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
                 </div>
               </div>
               
-              {/* Sort By */}
+              {/* Sort By - Improved */}
               <div>
                 <h4 className="font-poppins font-medium text-sm text-gray-900 mb-3">Sort by</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  {['Status', 'Date', 'Value', 'Type'].map((sort) => (
+                <div className="grid grid-cols-2 gap-2.5">
+                  {sortOptions.map((sort) => (
                     <button
                       key={sort}
-                      className={`px-4 py-3 rounded-lg font-poppins text-sm transition-all duration-200 ${
+                      className={`px-3 py-2.5 rounded-lg font-poppins text-sm transition-all duration-200 ${
                         selectedSort === sort
-                          ? 'bg-[#2563eb] text-white'
-                          : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                          ? 'bg-[#2563eb] text-white shadow-sm'
+                          : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-100'
                       }`}
                       onClick={() => setSelectedSort(sort)}
                     >
@@ -333,17 +335,17 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
               </div>
             </div>
             
-            {/* Action Buttons */}
-            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4">
+            {/* Action Buttons - Improved */}
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-5 pt-4">
               <div className="flex gap-3">
                 <button 
-                  className="flex-1 py-3.5 bg-gray-100 text-gray-700 rounded-xl font-poppins text-base font-medium hover:bg-gray-200 transition-colors"
+                  className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-poppins text-sm font-medium hover:bg-gray-200 transition-colors active:scale-[0.98]"
                   onClick={handleReset}
                 >
-                  Reset
+                  Reset All
                 </button>
                 <button 
-                  className="flex-1 py-3.5 bg-[#2563eb] text-white rounded-xl font-poppins text-base font-medium hover:bg-[#1d4ed8] transition-colors"
+                  className="flex-1 py-3 bg-[#2563eb] text-white rounded-xl font-poppins text-sm font-medium hover:bg-[#1d4ed8] transition-colors active:scale-[0.98]"
                   onClick={() => setShowFilter(false)}
                 >
                   Apply Filters
@@ -353,6 +355,27 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
           </div>
         </div>
       )}
+
+      {/* Add CSS animations to your global CSS file */}
+      <style jsx global>{`
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        @keyframes slide-up {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+          animation: fade-in 0.3s ease-out;
+        }
+        
+        .animate-slide-up {
+          animation: slide-up 0.3s ease-out;
+        }
+      `}</style>
     </>
   );
 };
