@@ -62,14 +62,14 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
         <div className='flex px-0 md:px-4 justify-between items-center border-b border-b-[#d1d1d154] pb-3 relative'>
           <h2 className="block">{title}</h2>
           <div className='header-btn flex justify-between gap-2'>
-            <div className='desktop-filter-cont hidden md:flex items-center gap-4 px-4 py-3 mb-3 bg-[#f9f9f6] rounded-lg border border-[#d1d1d154] mx-4'>
+            <div className='desktop-filter-cont hidden md:flex items-center gap-4 bg-[#f9f9f6] rounded-lg mx-4'>
               <div className="flex items-center gap-2">
                 {/* Activity Filter */}
                 <div className="relative">
                   <select
                     value={selectedFilter}
                     onChange={(e) => setSelectedFilter(e.target.value)}
-                    className="appearance-none bg-white border border-[#d1d1d154] rounded-lg px-3 py-2 pl-4 pr-8 font-poppins text-sm text-gray-700 focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] cursor-pointer min-w-[140px]"
+                    className="appearance-none bg-[#f3f2ee] border border-[#d1d1d154] rounded-lg px-3 py-2 pl-4 pr-8 font-poppins text-sm text-gray-700 focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] cursor-pointer min-w-[140px]"
                   >
                     <option value="All Activity">All Activity</option>
                     <option value="Pending">Pending</option>
@@ -90,7 +90,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
                   <select
                     value={selectedTimeframe}
                     onChange={(e) => setSelectedTimeframe(e.target.value)}
-                    className="appearance-none bg-white border border-[#d1d1d154] rounded-lg px-3 py-2 pl-4 pr-8 font-poppins text-sm text-gray-700 focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] cursor-pointer min-w-[140px]"
+                    className="appearance-none bg-[#f3f2ee] border border-[#d1d1d154] rounded-lg px-3 py-2 pl-4 pr-8 font-poppins text-sm text-gray-700 focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] cursor-pointer min-w-[140px]"
                   >
                     <option value="Last 7 days">Last 7 days</option>
                     <option value="Last 30 days">Last 30 days</option>
@@ -109,7 +109,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
                   <select
                     value={selectedSort}
                     onChange={(e) => setSelectedSort(e.target.value)}
-                    className="appearance-none bg-white border border-[#d1d1d154] rounded-lg px-3 py-2 pl-4 pr-8 font-poppins text-sm text-gray-700 focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] cursor-pointer min-w-[120px]"
+                    className="appearance-none bg-[#f3f2ee] border border-[#d1d1d154] rounded-lg px-3 py-2 pl-4 pr-8 font-poppins text-sm text-gray-700 focus:outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb] cursor-pointer min-w-[120px]"
                   >
                     <option value="Status">Status</option>
                     <option value="Date">Date</option>
