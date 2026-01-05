@@ -522,7 +522,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
   /* Adjust spacing for the divider */
   .border-t {
     margin-top: 12px !important;
-    margin-bottom: 12px !important;
+    margin-bottom: 0 !important;
   }
   
   /* Icon sizes */
@@ -659,8 +659,6 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
   
   .fixed.inset-0 .relative {
     width: 100% !important;
-    border-radius: 24px 24px 0 0 !important;
-    box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.1);
   }
   
   .fixed.inset-0 h3 {
@@ -674,13 +672,13 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
   }
   
   .fixed.inset-0 .space-y-6 > div {
-    margin-bottom: 20px;
+    margin-bottom: 0px;
   }
   
   .fixed.inset-0 .grid.grid-cols-2 button {
     width: 100%;
     text-align: center;
-    padding: 14px 12px;
+    padding: 8px 12px;
     border-radius: 12px;
     font-weight: 500;
   }
@@ -692,7 +690,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
   }
   
   .fixed.inset-0 .sticky.bottom-0 button {
-    padding: 16px;
+    padding: 10px;
     font-size: 16px;
     font-weight: 600;
     border-radius: 14px;
