@@ -215,7 +215,7 @@ export default function DashboardPage() {
         {/* Main Content Grid */}
         <main className="
           grid grid-cols-1 xl:grid-cols-[76.5%_23%] gap-2 
-          h-[calc(100vh-140px)] xl:min-h-[85vh] xl:max-h-[89vh]
+          h-[calc(100vh-140px)] xl:min-h-[100vh] xl:max-h-[100vh]
           max-[1336px]:grid-cols-[76.5%_23%]
           max-[1280px]:h-auto max-[1280px]:min-h-auto max-[1280px]:max-h-none
           max-[1280px]:grid-cols-1 max-[1280px]:grid-rows-[auto_auto]
@@ -223,7 +223,7 @@ export default function DashboardPage() {
         ">
           {/* Left Column - 75% */}
           <div className="
-            max-h-[89%] min-h-[88%] flex flex-col gap-2 xl:min-h-[85vh] xl:max-h-[89vh]
+            max-h-[89%] min-h-[88%] flex flex-col gap-2 xl:min-h-[100vh] xl:max-h-[89vh]
             max-[1280px]:min-h-auto max-[1280px]:max-h-none max-[1280px]:row-start-2
             max-[1024px]:min-h-auto max-[1024px]:max-h-none
           ">
@@ -441,7 +441,7 @@ export default function DashboardPage() {
 
           {/* Right Column - 25% */}
           <div className="
-            max-h-[89%] min-h-[88%] flex flex-col gap-2 xl:min-h-[85vh] xl:max-h-[89vh]
+            max-h-[89%] min-h-[88%] flex flex-col gap-2 xl:min-h-[100vh] xl:max-h-[89vh]
             max-[1336px]:flex max-[1336px]:flex-col max-[1336px]:gap-2
             max-[1280px]:min-h-auto max-[1280px]:max-h-none max-[1280px]:row-start-1
             max-[1280px]:flex max-[1280px]:flex-col max-[1280px]:gap-2 max-[1280px]:mb-2
@@ -515,6 +515,19 @@ export default function DashboardPage() {
               </div>
             </div>
 
+            {/* Quote Conversion Rate */}
+            <div className="
+              flex-grow min-h-[calc(30%-4px)] xl:flex-[0_0_30%] xl:min-h-auto xl:h-auto
+              max-[1336px]:flex-grow max-[1336px]:min-h-auto max-[1336px]:h-auto
+              max-[1280px]:flex-grow max-[1280px]:min-h-auto max-[1280px]:h-auto max-[1280px]:block
+              max-[1024px]:w-full max-[1024px]:min-h-[180px] max-[1024px]:max-h-[200px]
+              max-[1024px]:block
+              max-[768px]:flex-shrink-0 max-[768px]:w-[85%] max-[768px]:min-h-[250px] 
+              max-[768px]:max-h-[280px]
+            ">
+              <ConversionChart />
+            </div>
+
             {/* Middle Widget */}
             <div className="
               relative w-full font-montserrat flex-grow min-h-[calc(29%-4px)] 
@@ -580,18 +593,6 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Quote Conversion Rate */}
-            <div className="
-              flex-grow min-h-[calc(30%-4px)] xl:flex-[0_0_30%] xl:min-h-auto xl:h-auto
-              max-[1336px]:flex-grow max-[1336px]:min-h-auto max-[1336px]:h-auto
-              max-[1280px]:flex-grow max-[1280px]:min-h-auto max-[1280px]:h-auto max-[1280px]:block
-              max-[1024px]:w-full max-[1024px]:min-h-[180px] max-[1024px]:max-h-[200px]
-              max-[1024px]:block
-              max-[768px]:flex-shrink-0 max-[768px]:w-[85%] max-[768px]:min-h-[250px] 
-              max-[768px]:max-h-[280px]
-            ">
-              <ConversionChart />
-            </div>
           </div>
         </main>
       </div>
