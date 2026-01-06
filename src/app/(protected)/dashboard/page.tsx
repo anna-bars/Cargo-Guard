@@ -435,7 +435,7 @@ export default function DashboardPage() {
     </div>
     </div>
   </div>
-</div>
+              </div>
 
                 {/* Quote Conversion Rate */}
                 <ConversionChart />
