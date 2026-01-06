@@ -146,8 +146,8 @@ export const ConversionChart = () => {
   };
 
   return (
-    <div className="flex flex-col justify-between border border-[#d1d1d154] bg-[#fafaf7]/80 rounded-2xl p-4 h-auto min-h-[203px] w-full quote-conversion performance-section hover:shadow-sm transition-shadow duration-300">
-      <div className="mb-[24px]">
+    <div className="flex flex-col justify-between border border-[#d1d1d154] bg-[#fafaf7]/80 rounded-2xl p-4 h-auto min-h-[184px] w-full quote-conversion performance-section hover:shadow-sm transition-shadow duration-300">
+      <div className="mb-[4px]">
         <h3 className="font-montserrat text-[18px] font-normal text-black action-title">
           Quote Conversion Rate
         </h3>
@@ -211,8 +211,7 @@ export const ConversionChart = () => {
                 gap: '4.5px',
                 justifyContent: 'start',
                 alignItems: 'end',
-                overflow: 'hidden',
-                marginBottom: '4px'
+                overflow: 'hidden'
               }}
             >
               {Array.from({ length: 60 }).map((_, i) => (
@@ -230,10 +229,10 @@ export const ConversionChart = () => {
               ))}
             </div>
             
-            <div className='flex justify-between mt-1'>
+            {/* <div className='flex justify-between mt-1'>
               <p className='text-xs text-[#C8C8C8]'>0</p>
               <p className='text-xs text-[#C8C8C8]'>100</p>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
