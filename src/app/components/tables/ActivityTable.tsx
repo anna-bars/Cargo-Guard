@@ -345,6 +345,76 @@ const DEFAULT_ROWS = [
     },
     date: 'Sept 28, 9:30PM',
     button: { text: 'View Details', variant: 'secondary' }
+  },
+  {
+    type: 'Quote',
+    id: 'Q-007',
+    cargo: 'Food Products',
+    value: '$1,100.00',
+    status: { 
+      text: 'Declined', 
+      color: 'bg-[#8ea0b0]/10', 
+      dot: 'bg-[#8ea0b0]', 
+      textColor: 'text-[#8ea0b0]' 
+    },
+    date: 'Sept 28, 9:30PM',
+    button: { text: 'View Details', variant: 'secondary' }
+  },
+  {
+    type: 'Quote',
+    id: 'Q-007',
+    cargo: 'Food Products',
+    value: '$1,100.00',
+    status: { 
+      text: 'Declined', 
+      color: 'bg-[#8ea0b0]/10', 
+      dot: 'bg-[#8ea0b0]', 
+      textColor: 'text-[#8ea0b0]' 
+    },
+    date: 'Sept 28, 9:30PM',
+    button: { text: 'View Details', variant: 'secondary' }
+  },
+  {
+    type: 'Quote',
+    id: 'Q-007',
+    cargo: 'Food Products',
+    value: '$1,100.00',
+    status: { 
+      text: 'Declined', 
+      color: 'bg-[#8ea0b0]/10', 
+      dot: 'bg-[#8ea0b0]', 
+      textColor: 'text-[#8ea0b0]' 
+    },
+    date: 'Sept 28, 9:30PM',
+    button: { text: 'View Details', variant: 'secondary' }
+  },
+  {
+    type: 'Quote',
+    id: 'Q-007',
+    cargo: 'Food Products',
+    value: '$1,100.00',
+    status: { 
+      text: 'Declined', 
+      color: 'bg-[#8ea0b0]/10', 
+      dot: 'bg-[#8ea0b0]', 
+      textColor: 'text-[#8ea0b0]' 
+    },
+    date: 'Sept 28, 9:30PM',
+    button: { text: 'View Details', variant: 'secondary' }
+  },
+  {
+    type: 'Quote',
+    id: 'Q-007',
+    cargo: 'Food Products',
+    value: '$1,100.00',
+    status: { 
+      text: 'Declined', 
+      color: 'bg-[#8ea0b0]/10', 
+      dot: 'bg-[#8ea0b0]', 
+      textColor: 'text-[#8ea0b0]' 
+    },
+    date: 'Sept 28, 9:30PM',
+    button: { text: 'View Details', variant: 'secondary' }
   }
 ];
 

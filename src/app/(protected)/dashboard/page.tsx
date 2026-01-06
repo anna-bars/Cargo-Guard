@@ -453,7 +453,7 @@ export default function DashboardPage() {
             {/* Welcome Widget */}
             <div className="
               relative rounded-2xl overflow-hidden w-full transition-shadow duration-300 
-              flex-grow min-h-[calc(41%-4px)] xl:flex-[0_0_38%] xl:min-h-auto xl:h-auto
+              flex-grow min-h-[calc(41%-4px)] xl:flex-[0_0_38.5%] xl:min-h-auto xl:h-auto
               max-[1336px]:h-[352px] max-[1336px]:w-full
               max-[1280px]:h-auto max-[1280px]:min-h-[260px] max-[1280px]:w-full max-[1280px]:flex-grow
               max-[1024px]:w-[49%] max-[1024px]:min-h-[180px] max-[1024px]:max-h-[200px] max-[1024px]:flex-shrink
@@ -517,7 +517,7 @@ export default function DashboardPage() {
 
             {/* Quote Conversion Rate */}
             <div className="
-              flex-grow min-h-[calc(30%-4px)] xl:flex-[0_0_30%] xl:min-h-auto xl:h-auto
+              flex-grow min-h-[calc(31%-4px)] xl:flex-[0_0_31%] xl:min-h-auto xl:h-auto
               max-[1336px]:flex-grow max-[1336px]:min-h-auto max-[1336px]:h-auto
               max-[1280px]:flex-grow max-[1280px]:min-h-auto max-[1280px]:h-auto max-[1280px]:block
               max-[1024px]:w-full max-[1024px]:min-h-[180px] max-[1024px]:max-h-[200px]
@@ -531,7 +531,7 @@ export default function DashboardPage() {
             {/* Middle Widget */}
             <div className="
               relative w-full font-montserrat flex-grow min-h-[calc(29%-4px)] 
-              xl:flex-[0_0_27%] xl:min-h-auto xl:h-auto
+              xl:flex-[0_0_28%] xl:min-h-auto xl:h-auto
               max-[1336px]:flex-grow max-[1336px]:min-h-auto max-[1336px]:h-auto
               max-[1280px]:flex-grow max-[1280px]:min-h-auto max-[1280px]:h-auto max-[1280px]:block
               max-[1024px]:w-[49%] max-[1024px]:min-h-[180px] max-[1024px]:max-h-[200px]
