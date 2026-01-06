@@ -146,7 +146,7 @@ export const ConversionChart = () => {
   };
 
   return (
-    <div className="flex flex-col justify-between border border-[#d1d1d154] bg-[#fafaf7]/80 rounded-2xl p-4 h-auto min-h-[184px] w-full quote-conversion performance-section hover:shadow-sm transition-shadow duration-300">
+    <div className="flex flex-col justify-between border border-[#d1d1d154] bg-[#fafaf7]/80 rounded-2xl p-4 h-full w-full quote-conversion performance-section hover:shadow-sm transition-shadow duration-300">
       <div className="mb-[4px]">
         <h3 className="font-montserrat text-[18px] font-normal text-black action-title">
           Quote Conversion Rate
@@ -278,6 +278,39 @@ export const ConversionChart = () => {
         .empty-chart-bar {
           transition: all 0.3s ease !important;
         }
+          .quote-conversion.performance-section {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .quote-conversion .chart-cont {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  
+  @media screen and (max-width: 1024px) {
+    .quote-conversion.performance-section {
+      min-height: 180px;
+    }
+    
+    .chaart, .chaart2 {
+      min-height: 20px;
+    }
+  }
+  
+  @media screen and (max-width: 768px) {
+    .quote-conversion.performance-section {
+      min-height: 240px;
+    }
+    
+    .chaart, .chaart2 {
+      min-height: 24px;
+    }
+  }
       `}</style>
     </div>
   );

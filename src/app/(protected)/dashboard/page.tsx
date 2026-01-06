@@ -343,103 +343,101 @@ export default function DashboardPage() {
                 />
               </div>
 
-              {/* Right Column - 25% */}
-              <div className="max-h-[89%] min-h-[88%] flex flex-col gap-2 right right-column">
-                {/* Welcome Widget */}
-                <div className="relative h-[230px] rounded-2xl overflow-hidden w-full welcome-widget transition-shadow duration-300">
-                  <img 
-                    src="https://c.animaapp.com/mjiggi0jSqvoj5/img/frame-76.png" 
-                    alt="Background" 
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                  <div className="relative z-10 p-4 h-full flex flex-col action-content">
-                    <h2 className="font-montserrat text-[20px] font-normal text-white mb-0 welcome-title">
-                      Welcome back, Lucas!
-                    </h2>
-                    <p className="font-montserrat text-[14px] font-normal text-[#ffffffd9] mb-auto max-w-[224px] welcome-subtitle action-subtitle">
-                      Everything's under control — let's make this day productive.
-                    </p>
-                    
-                    <div className="flex items-end justify-between gap-[40px] action-buttons">
-                      <h3 className="font-montserrat text-[24px] !font-medium text-white leading-[27px] tracking-[0.64px] max-w-[224px] cta-title">
-                        Get Your New Quote Instantly
-                      </h3>
-
-                      <img 
-                        src="https://c.animaapp.com/mjiggi0jSqvoj5/img/group-84.png" 
-                        alt="Arrow" 
-                        className="outline-[4px] outline-[#f4f4f1] rounded-full w-[42px] h-[42px] hover:scale-102 transition-transform duration-300"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* {Middle Widget} */}
-              <div className="relative w-full max-w-[100%] h-[170px] font-['Montserrat']">
-  {/* Background */}
-  <div className="absolute top-0 left-0 w-full h-full bg-[#fafcffcc] rounded-xl"></div>
-  
-  {/* Content */}
-  <div className="relative z-10 p-4 flex flex-col h-full justify-between">
-    {/* Header */}
-    <div className="flex justify-between items-start mb-2">
-      <h3 className="text-[#3c3c3c] text-[16px] font-normal tracking-[0.24px] w-[60%] leading-tight">
-        High-value cargo insured this month
-      </h3>
-
+             {/* Right Column - 25% */}
+<div className="max-h-[89%] min-h-[88%] flex flex-col gap-2 right right-column">
+  {/* Welcome Widget */}
+  <div className="relative rounded-2xl overflow-hidden w-full welcome-widget transition-shadow duration-300 flex-grow"
+       style={{ minHeight: 'calc(41% - 4px)' }}>
+    <img 
+      src="https://c.animaapp.com/mjiggi0jSqvoj5/img/frame-76.png" 
+      alt="Background" 
+      className="absolute inset-0 w-full h-full object-cover"
+    />
+    <div className="relative z-10 p-4 h-full flex flex-col action-content">
+      <h2 className="font-montserrat text-[20px] font-normal text-white mb-0 welcome-title">
+        Welcome back, Lucas!
+      </h2>
+      <p className="font-montserrat text-[14px] font-normal text-[#ffffffd9] mb-auto max-w-[224px] welcome-subtitle action-subtitle">
+        Everything's under control — let's make this day productive.
+      </p>
       
-      <div className="relative">
-        <span className="absolute -left-1 top-0 text-[#ffffffd6] text-[4px] tracking-[0.08px]">$</span>
-        <div className="bg-[#71a3ef] rounded-[20px] px-2 py-0.5 flex items-center justify-center">
-          <span className="text-white text-xs tracking-[0.24px]">
-            <span className="tracking-[0.04px]">MTD · 62,</span>
-            <span className="text-white/80 tracking-[0.04px]">3k</span>
-          </span>
+      <div className="flex items-end justify-between gap-[40px] action-buttons">
+        <h3 className="font-montserrat text-[24px] !font-medium text-white leading-[27px] tracking-[0.64px] max-w-[224px] cta-title">
+          Get Your New Quote Instantly
+        </h3>
+
+        <img 
+          src="https://c.animaapp.com/mjiggi0jSqvoj5/img/group-84.png" 
+          alt="Arrow" 
+          className="outline-[4px] outline-[#f4f4f1] rounded-full w-[42px] h-[42px] hover:scale-102 transition-transform duration-300"
+        />
+      </div>
+    </div>
+  </div>
+
+  {/* Middle Widget */}
+  <div className="relative w-full font-['Montserrat'] flex-grow"
+       style={{ minHeight: 'calc(29% - 4px)' }}>
+    {/* Background */}
+    <div className="absolute top-0 left-0 w-full h-full bg-[#fafcffcc] rounded-xl"></div>
+    
+    {/* Content */}
+    <div className="relative z-10 p-4 flex flex-col h-full justify-between">
+      {/* Header */}
+      <div className="flex justify-between items-start mb-2">
+        <h3 className="text-[#3c3c3c] text-[16px] font-normal tracking-[0.24px] w-[60%] leading-tight">
+          High-value cargo insured this month
+        </h3>
+
+        <div className="relative">
+          <span className="absolute -left-1 top-0 text-[#ffffffd6] text-[4px] tracking-[0.08px]">$</span>
+          <div className="bg-[#71a3ef] rounded-[20px] px-2 py-0.5 flex items-center justify-center">
+            <span className="text-white text-xs tracking-[0.24px]">
+              <span className="tracking-[0.04px]">MTD · 62,</span>
+              <span className="text-white/80 tracking-[0.04px]">3k</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        {/* Percentage Section */}
+        <div className="flex mb-3 items-end justify-start">
+          <div className="flex items-start gap-0.5 mb-0.5">
+            <span className="text-black text-[42px] tracking-[0.84px] leading-none">
+              <span className="tracking-[0.54px]">75.</span>
+              <span className="text-[#c7c7c7] tracking-[0.54px]">55</span>
+            </span>
+            <span className="text-black text-[7px] tracking-[0.14px] mt-[9px]">%</span>
+          </div>
+          
+          <p className="text-[#c7c7c7] text-xs tracking-[0.24px] text-right leading-tight w-[50%] text-left mb-1">
+            of total insured value this month
+          </p>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="space-y-1">
+          <div className="relative h-5">
+            <div className="absolute top-1 left-0 w-[75%] h-3 bg-gradient-to-r from-[#bfd5f8] to-[#669cee] rounded-l-[40px] rounded-r-none"></div>
+            <div className="absolute top-1 left-[75%] w-[25%] h-3 bg-gradient-to-r from-[#6da1ef4f] to-[#f6f8fa40] rounded-r-[40px] rounded-l-none"></div>
+            <img 
+              className="absolute top-[-0.5px] left-[72%] w-[20px] h-[20px]" 
+              src="https://c.animaapp.com/mk1qdxa5LsxC7P/img/polygon-1.svg" 
+              alt="Progress marker"
+            />
+          </div>
         </div>
       </div>
     </div>
-
-    <div>
-      {/* Percentage Section */}
-    <div className="flex mb-3 items-end justify-start">
-      <div className="flex items-start gap-0.5 mb-0.5">
-        <span className="text-black text-[42px] tracking-[0.84px] leading-none">
-          <span className="tracking-[0.54px]">75.</span>
-          <span className="text-[#c7c7c7] tracking-[0.54px]">55</span>
-        </span>
-        <span className="text-black text-[7px] tracking-[0.14px] mt-[9px]">%</span>
-      </div>
-      
-      <p className="text-[#c7c7c7] text-xs tracking-[0.24px] text-right leading-tight w-[50%] text-left mb-1">
-        of total insured value this month
-      </p>
-    </div>
-
-    {/* Progress Bar */}
-    <div className="space-y-1">
-      <div className="relative h-5">
-        <div className="absolute top-1 left-0 w-[75%] h-3 bg-gradient-to-r from-[#bfd5f8] to-[#669cee] rounded-l-[40px] rounded-r-none"></div>
-        <div className="absolute top-1 left-[75%] w-[25%] h-3 bg-gradient-to-r from-[#6da1ef4f] to-[#f6f8fa40] rounded-r-[40px] rounded-l-none"></div>
-        <img 
-          className="absolute top-[-0.5px] left-[72%] w-[20px] h-[20px]" 
-          src="https://c.animaapp.com/mk1qdxa5LsxC7P/img/polygon-1.svg" 
-          alt="Progress marker"
-        />
-      </div>
-      
-      {/* <div className="flex justify-between items-center px-1">
-        <span className="text-[#c7c7c7] text-xs tracking-[0.24px]">0%</span>
-        <span className="text-black text-xs tracking-[0.24px]">50%</span>
-        <span className="text-[#c7c7c7] text-xs tracking-[0.24px]">100%</span>
-      </div> */}
-    </div>
-    </div>
   </div>
-              </div>
 
-                {/* Quote Conversion Rate */}
-                <ConversionChart />
-              </div>
+  {/* Quote Conversion Rate */}
+  <div className="flex-grow"
+       style={{ minHeight: 'calc(30% - 4px)' }}>
+    <ConversionChart />
+  </div>
+</div>
             </main>
           </div>
 
@@ -479,7 +477,7 @@ export default function DashboardPage() {
             }
             
             .right-column > *:last-child {
-              flex: 1;
+              // flex: 1;
               min-height: 0;
             }
            
@@ -755,9 +753,6 @@ export default function DashboardPage() {
                 width: 101%;
               }
               
-              .welcome-widget {
-                display: none;
-              }
               
               .quote-conversion.performance-section {
                 width: 100%;
@@ -954,6 +949,152 @@ export default function DashboardPage() {
                 margin-bottom: 12px;
               }
             }
+
+
+            .right-column {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .right-column > * {
+    flex-shrink: 0;
+  }
+
+  /* Desktop: հստակ բաժանում 41% 27% 30% */
+  @media screen and (min-width: 1025px) {
+    .welcome-widget {
+      flex: 0 0 38%;
+      min-height: auto !important;
+      height: auto;
+    }
+
+    .right-column > .relative.w-full.font-\\[\\'Montserrat\\'\\] {
+      flex: 0 0 27%;
+      min-height: auto !important;
+      height: auto;
+    }
+
+    .right-column > .flex-grow:last-child {
+      flex: 0 0 30%;
+      min-height: auto !important;
+      height: auto;
+    }
+
+    .right-column > * {
+      max-height: none !important;
+    }
+  }
+
+  /* Laptop (1024px և ցածր) - 100% բարձրություն */
+  @media screen and (max-width: 1024px) and (min-width: 769px) {
+    .right-column {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .right-column > * {
+      flex: 1 0 calc(50% - 4px);
+      min-height: 180px !important;
+      max-height: 200px !important;
+    }
+
+    .right-column > *:last-child {
+      flex: 1 0 100%;
+      min-height: 180px !important;
+    }
+  }
+
+  /* Tablet (768px և ցածր) - հորիզոնական սքրոլ */
+  @media screen and (max-width: 768px) {
+    .right-column {
+      flex-direction: row;
+      overflow-x: auto;
+      overflow-y: hidden;
+      gap: 12px;
+      padding-bottom: 8px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .right-column > * {
+      flex: 0 0 85%;
+      min-height: 250px !important;
+      max-height: 280px !important;
+      scroll-snap-align: start;
+      min-width: 0;
+    }
+
+    /* Սքրոլի բարի ոճավորում */
+    .right-column::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .right-column::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+
+    .right-column::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 3px;
+    }
+
+    .right-column::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+  }
+
+  /* ConversionChart-ի հարմարվողականություն */
+  @media screen and (max-width: 1024px) {
+    .quote-conversion.performance-section {
+      height: 100%;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chart-cont {
+      flex: 1;
+      min-height: 0;
+    }
+
+    .chaart, .chaart2 {
+      min-height: 26px;
+    }
+  }
+
+  /* Mobile օպտիմիզացիա */
+  @media screen and (max-width: 480px) {
+    .right-column > * {
+      flex: 0 0 92%;
+      min-height: 220px !important;
+    }
+
+    .welcome-title {
+      font-size: 18px !important;
+    }
+
+    .cta-title {
+      font-size: 20px !important;
+      line-height: 24px !important;
+    }
+  }
+
+  /* Ապահովում, որ բոլոր վիջեթները լրացնում են իրենց կոնտեյները */
+  .welcome-widget .action-content,
+  .right-column > .relative.w-full.font-\\[\\'Montserrat\\'\\] > .relative,
+  .quote-conversion.performance-section {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Դինամիկ բարձրությունների համար */
+  .right-column > * {
+    transition: all 0.3s ease;
+  }
           `}</style>
         </div>
       </div>
