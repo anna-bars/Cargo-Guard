@@ -1,7 +1,6 @@
 'use client'
 
 import DashboardLayout from '../DashboardLayout'
-
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
 import { redirect } from 'next/navigation'
@@ -23,7 +22,6 @@ export default function DashboardPage() {
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false)
   const pathname = usePathname()
   
-  // Ավելացրեք notifications state-երը
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
   const [notifications, setNotifications] = useState([
     {
@@ -62,7 +60,6 @@ export default function DashboardPage() {
   
   const [unreadCount, setUnreadCount] = useState(0)
 
-  // Mobile filter states for Dashboard
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedActivity, setSelectedActivity] = useState('All Activity')
@@ -130,7 +127,6 @@ export default function DashboardPage() {
     setIsUserDropdownOpen(false)
   }
 
-  // Mobile filter functions for Dashboard
   const toggleMobileFilter = () => {
     setIsMobileFilterOpen(!isMobileFilterOpen)
   }
@@ -207,960 +203,397 @@ export default function DashboardPage() {
     )
   }
   
-
   return (
     <DashboardLayout>
-      <div className='insult'>
-        <div className='infarkt'>
-          <div className="max-w-[88%] min-w-full sm:max-w-[97.5%] mx-auto">
-            {/* Mobile Header for Activity Section */}
-            <div className="flex gap-2 items-center mb-4 xl:hidden">
-              <img src="/dashboard/hashtag.svg" alt="" className="w-5 h-5" />
-              <h2 className="font-normal text-lg">Dashboard</h2>
+      <div className="w-full max-w-[99%] sm:max-w-[97.5%] mx-auto">
+        {/* Mobile Header for Activity Section */}
+        <div className="flex gap-2 items-center mb-4 xl:hidden">
+          <img src="/dashboard/hashtag.svg" alt="" className="w-5 h-5" />
+          <h2 className="font-normal text-lg">Dashboard</h2>
+        </div>
+
+        {/* Main Content Grid */}
+        <main className="
+          grid grid-cols-1 xl:grid-cols-[76.5%_23%] gap-2 
+          h-[calc(100vh-140px)] xl:min-h-[85vh] xl:max-h-[89vh]
+          max-[1336px]:grid-cols-[76.5%_23%]
+          max-[1280px]:h-auto max-[1280px]:min-h-auto max-[1280px]:max-h-none
+          max-[1280px]:grid-cols-1 max-[1280px]:grid-rows-[auto_auto]
+          max-[1024px]:flex max-[1024px]:flex-col-reverse
+        ">
+          {/* Left Column - 75% */}
+          <div className="
+            max-h-[89%] min-h-[88%] flex flex-col gap-2 xl:min-h-[85vh] xl:max-h-[89vh]
+            max-[1280px]:min-h-auto max-[1280px]:max-h-none max-[1280px]:row-start-2
+            max-[1024px]:min-h-auto max-[1024px]:max-h-none
+          ">
+            {/* Performance Overview */}
+            <section className="
+              border border-[#d1d1d1]/33 bg-[#fafaf7]/80 rounded-2xl p-4 h-auto
+              max-[768px]:p-4
+            ">
+              <div className="flex justify-between items-start mb-2 
+                max-[1336px]:items-center
+                max-[1280px]:items-center
+                max-[1024px]:items-center
+              ">
+                <div>
+                  <h2 className="
+                    font-montserrat text-[16px] font-normal text-black
+                    max-[1336px]:text-[16px]
+                    max-[1280px]:text-[16px]
+                    max-[1024px]:text-[14px]
+                  ">
+                    Performance Overview
+                  </h2>
+                </div>
+                <div className="
+                  flex items-center gap-3 px-3 py-2 rounded-lg border border-[#c7c7c7]/51 
+                  hover:border-[#a0a0a0]/51 transition-colors duration-300
+                ">
+                  <span className="font-montserrat text-[12px] font-normal text-[#7b7b7b]">
+                    This Month
+                  </span>
+                  <img 
+                    src="https://c.animaapp.com/mjiggi0jSqvoj5/img/arrow-3-1.svg" 
+                    alt="Dropdown" 
+                    className="w-2 h-1"
+                  />
+                </div>
+              </div>
+              
+              {/* Metrics Grid */}
+              <div className="
+                flex justify-around xl:flex-nowrap gap-8 xl:gap-2 
+                max-[1336px]:justify-around max-[1336px]:gap-2
+                max-[1280px]:justify-around max-[1280px]:gap-2
+                max-[1024px]:flex max-[1024px]:gap-8 max-[1024px]:px-5
+                max-[768px]:flex-wrap max-[768px]:gap-4 max-[768px]:gap-y-8 max-[768px]:justify-start
+              ">
+                {/* Total Insured Amount */}
+                <div className="
+                  w-[43%] xl:w-[12%]
+                  max-[1336px]:w-[12%]
+                  max-[1280px]:w-[12%]
+                  max-[1024px]:w-[43%]
+                ">
+                  <div className="relative">
+                    <div className="
+                      font-montserrat text-[46px] xl:text-[46px] font-normal text-black 
+                      flex items-baseline relative
+                      max-[1336px]:text-[46px]
+                      max-[1280px]:text-[46px]
+                      max-[768px]:text-[38px] max-[768px]:font-light
+                    ">
+                      <span className="text-black tracking-[1.28px]">84.</span>
+                      <span className="text-[#c7c7c7] tracking-[1.28px]">5k</span>
+                      <span className="absolute -left-5 top-3 text-[12px]">$</span>
+                    </div>
+                  </div>
+                  <p className="
+                    font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1
+                    max-[768px]:mt-[-8px] max-[768px]:text-[10px] max-[768px]:w-[74%]
+                  ">
+                    Total Insured Amount
+                  </p>
+                </div>
+                
+                {/* Active Policies */}
+                <div className="
+                  w-[43%] xl:w-[12%]
+                  max-[1336px]:w-[12%]
+                  max-[1280px]:w-[12%]
+                  max-[1024px]:w-[43%]
+                ">
+                  <div className="relative">
+                    <div className="
+                      font-montserrat relative w-fit text-[46px] xl:text-[46px] font-normal text-black 
+                      flex items-baseline relative
+                      max-[1336px]:text-[46px]
+                      max-[1280px]:text-[46px]
+                      max-[768px]:text-[38px] max-[768px]:font-light
+                    ">
+                      <span className="text-black tracking-[1.28px]">8.</span>
+                      <span className="text-[#c7c7c7] tracking-[1.28px]">47</span>
+                      <span className="absolute -left-5 top-3 text-[12px]">%</span>
+                      <span className="absolute -right-5 top-3 text-[12px]">
+                        <img src="/dashboard/top-arrow.svg" alt="" />
+                      </span>
+                    </div>
+                  </div>
+                  <p className="
+                    font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1
+                    max-[768px]:mt-[-8px] max-[768px]:text-[10px] max-[768px]:w-[74%]
+                  ">
+                    Active Policies
+                  </p>
+                </div>
+                
+                {/* Quotes Awaiting Approval */}
+                <div className="
+                  w-[43%] xl:w-[12%]
+                  max-[1336px]:w-[12%]
+                  max-[1280px]:w-[12%]
+                  max-[1024px]:w-[43%]
+                ">
+                  <div className="
+                    font-montserrat relative w-fit text-[46px] xl:text-[46px] font-normal text-black 
+                    flex items-baseline
+                    max-[1336px]:text-[46px]
+                    max-[1280px]:text-[46px]
+                    max-[768px]:text-[38px] max-[768px]:font-light
+                  ">
+                    <span className="text-black tracking-[1.28px]">3.</span>
+                    <img 
+                      className="w-7 ml-1.5" 
+                      src="/dashboard/arrow.svg" 
+                      alt="Arrow" 
+                      style={{ width: '28px', marginLeft: '6px' }}
+                    />
+                    <span className="absolute -left-5 top-3 text-[12px]">%</span>
+                    <span className="absolute -right-5 top-3 text-[12px]">
+                      <img src="/dashboard/top-arrow.svg" alt="" />
+                    </span>
+                  </div>
+                  <p className="
+                    font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1
+                    max-[768px]:mt-[-8px] max-[768px]:text-[10px] max-[768px]:w-[74%]
+                  ">
+                    Quotes Awaiting Approval
+                  </p>
+                </div>
+                
+                {/* Contracts Due to Expire */}
+                <div className="
+                  w-[43%] xl:w-[12%]
+                  max-[1336px]:w-[12%]
+                  max-[1280px]:w-[12%]
+                  max-[1024px]:w-[43%]
+                ">
+                  <div className="
+                    font-montserrat relative w-fit text-[46px] xl:text-[46px] font-normal text-black 
+                    flex items-baseline
+                    max-[1336px]:text-[46px]
+                    max-[1280px]:text-[46px]
+                    max-[768px]:text-[38px] max-[768px]:font-light
+                  ">
+                    <span className="text-black tracking-[1.28px]">2.</span>
+                    <img 
+                      className="w-7 ml-1.5" 
+                      src="/dashboard/arrow.svg" 
+                      alt="Arrow"
+                      style={{ width: '28px', marginLeft: '6px' }}
+                    />
+                    <span className="absolute -left-5 top-3 text-[12px]">%</span>
+                    <span className="absolute -right-5 top-3 text-[12px]">
+                      <img src="/dashboard/top-arrow.svg" alt="" />
+                    </span>
+                  </div>
+                  <p className="
+                    font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1
+                    max-[768px]:mt-[-8px] max-[768px]:text-[10px] max-[768px]:w-[74%]
+                  ">
+                    Contracts Due to Expire
+                  </p>
+                </div>
+                
+                {/* Required Document Uploads */}
+                <div className="
+                  w-[43%] xl:w-[12%]
+                  max-[1336px]:w-[12%]
+                  max-[1280px]:w-[12%]
+                  max-[1024px]:w-[43%]
+                ">
+                  <div className="
+                    font-montserrat relative w-fit text-[46px] xl:text-[46px] font-normal text-black 
+                    flex items-baseline
+                    max-[1336px]:text-[46px]
+                    max-[1280px]:text-[46px]
+                    max-[768px]:text-[38px] max-[768px]:font-light
+                  ">
+                    <span className="text-black tracking-[1.28px]">1.</span>
+                    <img 
+                      className="w-7 ml-1.5" 
+                      src="/dashboard/arrow.svg" 
+                      alt="Arrow"
+                      style={{ width: '28px', marginLeft: '6px' }}
+                    />
+                    <span className="absolute -left-5 top-3 text-[12px]">%</span>
+                    <span className="absolute -right-5 top-3 text-[12px]">
+                      <img src="/dashboard/top-arrow.svg" alt="" />
+                    </span>
+                  </div>
+                  <p className="
+                    font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1
+                    max-[768px]:mt-[-8px] max-[768px]:text-[10px] max-[768px]:w-[74%]
+                  ">
+                    Required Document Uploads
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <RecentActivityTable 
+              title="Recent Activity"
+              showMobileHeader={false}
+            />
+          </div>
+
+          {/* Right Column - 25% */}
+          <div className="
+            max-h-[89%] min-h-[88%] flex flex-col gap-2 xl:min-h-[85vh] xl:max-h-[89vh]
+            max-[1336px]:flex max-[1336px]:flex-col max-[1336px]:gap-2
+            max-[1280px]:min-h-auto max-[1280px]:max-h-none max-[1280px]:row-start-1
+            max-[1280px]:flex max-[1280px]:flex-col max-[1280px]:gap-2 max-[1280px]:mb-2
+            max-[1024px]:min-h-auto max-[1024px]:max-h-none
+            max-[1024px]:flex-row max-[1024px]:gap-2
+            max-[768px]:flex-row max-[768px]:overflow-x-auto max-[768px]:overflow-y-hidden
+            max-[768px]:pb-4 max-[768px]:gap-3
+          ">
+            {/* Welcome Widget */}
+            <div className="
+              relative rounded-2xl overflow-hidden w-full transition-shadow duration-300 
+              flex-grow min-h-[calc(41%-4px)] xl:flex-[0_0_38%] xl:min-h-auto xl:h-auto
+              max-[1336px]:h-[352px] max-[1336px]:w-full
+              max-[1280px]:h-auto max-[1280px]:min-h-[260px] max-[1280px]:w-full max-[1280px]:flex-grow
+              max-[1024px]:w-[49%] max-[1024px]:min-h-[180px] max-[1024px]:max-h-[200px] max-[1024px]:flex-shrink
+              max-[768px]:flex-shrink-0 max-[768px]:w-[85%] max-[768px]:min-h-[250px] 
+              max-[768px]:max-h-[280px]
+            ">
+              <img 
+                src="https://c.animaapp.com/mjiggi0jSqvoj5/img/frame-76.png" 
+                alt="Background" 
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="relative z-10 p-4 h-full flex flex-col 
+                max-[1336px]:h-full
+                max-[1280px]:h-full
+                max-[1024px]:justify-between
+              ">
+                <h2 className="
+                  font-montserrat text-[20px] font-normal text-white mb-0
+                  max-[1336px]:text-[20px] max-[1336px]:mb-1.5
+                  max-[1280px]:text-[18px] max-[1280px]:mb-1.5
+                  max-[480px]:text-[18px]
+                ">
+                  Welcome back, Lucas!
+                </h2>
+                <p className="
+                  font-montserrat text-[14px] font-normal text-white/85 mb-auto max-w-[224px]
+                  max-[1336px]:mb-auto max-[1336px]:max-w-full
+                  max-[1280px]:mb-auto max-[1280px]:max-w-full max-[1280px]:text-[12px]
+                  max-[1024px]:mb-0 max-[1024px]:max-w-none max-[1024px]:text-[12px]
+                ">
+                  Everything's under control — let's make this day productive.
+                </p>
+                
+                <div className="flex items-end justify-between gap-[40px] 
+                  max-[1336px]:max-w-full max-[1336px]:gap-[40px]
+                  max-[1280px]:max-w-full
+                  max-[1024px]:max-w-full
+                ">
+                  <h3 className="
+                    font-montserrat text-[24px] font-medium text-white leading-[27px] 
+                    tracking-[0.64px] max-w-[224px]
+                    max-[1336px]:text-[26px] max-[1336px]:font-medium max-[1336px]:leading-[33px] 
+                    max-[1336px]:tracking-[0.64px] max-[1336px]:max-w-[224px]
+                    max-[1280px]:text-[22px] max-[1280px]:leading-[28px] max-[1280px]:max-w-[224px]
+                    max-[480px]:text-[20px] max-[480px]:leading-[24px]
+                  ">
+                    Get Your New Quote Instantly
+                  </h3>
+
+                  <img 
+                    src="https://c.animaapp.com/mjiggi0jSqvoj5/img/group-84.png" 
+                    alt="Arrow" 
+                    className="
+                      outline-[4px] outline-[#f4f4f1] rounded-full w-[42px] h-[42px] 
+                      hover:scale-102 transition-transform duration-300
+                    "
+                  />
+                </div>
+              </div>
             </div>
 
-            {/* Main Content Grid */}
-            <main className="grid grid-cols-1 xl:grid-cols-[76.5%_23%] gap-2 items-stretch main-content dashboard-main-content">
-              {/* Left Column - 75% */}
-              <div className="max-h-[89%] min-h-[88%] flex flex-col gap-2 left-column">
-                {/* Performance Overview */}
-                <section className="block-1 border border-[#d1d1d154] bg-[#fafaf7]/80 rounded-2xl p-4 h-auto performance-section">
-                  <div className="flex justify-between items-start mb-2 section-header">
-                    <div>
-                      <h2 className="font-montserrat text-[16px] font-normal text-black section-title">
-                        Performance Overview
-                      </h2>
-                    </div>
-                    <div className="flex items-center gap-3 px-3 py-2 rounded-lg border border-[#c7c7c7]/51 hover:border-[#a0a0a0]/51 transition-colors duration-300">
-                      <span className="font-montserrat text-[12px] font-normal text-[#7b7b7b]">
-                        This Month
+            {/* Middle Widget */}
+            <div className="
+              relative w-full font-montserrat flex-grow min-h-[calc(29%-4px)] 
+              xl:flex-[0_0_27%] xl:min-h-auto xl:h-auto
+              max-[1336px]:flex-grow max-[1336px]:min-h-auto max-[1336px]:h-auto
+              max-[1280px]:flex-grow max-[1280px]:min-h-auto max-[1280px]:h-auto max-[1280px]:block
+              max-[1024px]:w-[49%] max-[1024px]:min-h-[180px] max-[1024px]:max-h-[200px]
+              max-[1024px]:block
+              max-[768px]:flex-shrink-0 max-[768px]:w-[85%] max-[768px]:min-h-[250px] 
+              max-[768px]:max-h-[280px]
+            ">
+              {/* Background */}
+              <div className="absolute top-0 left-0 w-full h-full bg-[#fafcffcc] rounded-xl"></div>
+              
+              {/* Content */}
+              <div className="relative z-10 p-4 flex flex-col h-full justify-between">
+                {/* Header */}
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="text-[#3c3c3c] text-[16px] font-normal tracking-[0.24px] w-[60%] leading-tight">
+                    High-value cargo insured this month
+                  </h3>
+
+                  <div className="relative">
+                    <span className="absolute -left-1 top-0 text-white/84 text-[4px] tracking-[0.08px]">$</span>
+                    <div className="bg-[#71a3ef] rounded-[20px] px-2 py-0.5 flex items-center justify-center">
+                      <span className="text-white text-xs tracking-[0.24px]">
+                        <span className="tracking-[0.04px]">MTD · 62,</span>
+                        <span className="text-white/80 tracking-[0.04px]">3k</span>
                       </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  {/* Percentage Section */}
+                  <div className="flex mb-3 items-end justify-start">
+                    <div className="flex items-start gap-0.5 mb-0.5">
+                      <span className="text-black text-[42px] tracking-[0.84px] leading-none">
+                        <span className="tracking-[0.54px]">75.</span>
+                        <span className="text-[#c7c7c7] tracking-[0.54px]">55</span>
+                      </span>
+                      <span className="text-black text-[7px] tracking-[0.14px] mt-[9px]">%</span>
+                    </div>
+                    
+                    <p className="text-[#c7c7c7] text-xs tracking-[0.24px] text-right leading-tight w-[50%] text-left mb-1">
+                      of total insured value this month
+                    </p>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="space-y-1">
+                    <div className="relative h-5">
+                      <div className="absolute top-1 left-0 w-[75%] h-3 bg-gradient-to-r from-[#bfd5f8] to-[#669cee] rounded-l-[40px] rounded-r-none"></div>
+                      <div className="absolute top-1 left-[75%] w-[25%] h-3 bg-gradient-to-r from-[#6da1ef4f] to-[#f6f8fa40] rounded-r-[40px] rounded-l-none"></div>
                       <img 
-                        src="https://c.animaapp.com/mjiggi0jSqvoj5/img/arrow-3-1.svg" 
-                        alt="Dropdown" 
-                        className="w-2 h-1"
+                        className="absolute top-[-0.5px] left-[72%] w-[20px] h-[20px]" 
+                        src="https://c.animaapp.com/mk1qdxa5LsxC7P/img/polygon-1.svg" 
+                        alt="Progress marker"
                       />
                     </div>
                   </div>
-                  
-                  {/* Metrics Grid */}
-                  <div className="flex justify-around xl:flex-nowrap gap-8 xl:gap-2 metrics-grid">
-                    {/* Total Insured Amount */}
-                    <div className="w-[43%] xl:w-[12%] metric-card-item">
-                      <div className="relative">
-                        <div className="font-montserrat text-[46px] xl:text-[46px] font-normal text-black flex items-baseline relative metric-value">
-                          <span className="text-black tracking-[1.28px]">84.</span>
-                          <span className="text-[#c7c7c7] tracking-[1.28px]">5k</span>
-                          <span className="absolute -left-5 top-3 text-[12px]">$</span>
-                        </div>
-                      </div>
-                      <p className="sub-header-metric font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
-                        Total Insured Amount
-                      </p>
-                    </div>
-                    
-                    {/* Active Policies */}
-                    <div className="w-[43%] xl:w-[12%] metric-card-item">
-                      <div className="relative">
-                        <div className="font-montserrat relative w-fit text-[46px] xl:text-[46px] font-normal text-black flex items-baseline relative metric-value2">
-                          <span className="text-black tracking-[1.28px]">8.</span>
-                          <span className="text-[#c7c7c7] tracking-[1.28px]">47</span>
-                          <span className="absolute -left-5 top-3 text-[12px]">%</span>
-                          <span className="absolute -right-5 top-3 text-[12px]">
-                          <img src="/dashboard/top-arrow.svg" alt="" />
-                        </span>
-                        </div>
-                      </div>
-                      <p className="sub-header-metric font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
-                        Active Policies
-                      </p>
-                    </div>
-                    
-                    {/* Quotes Awaiting Approval */}
-                    <div className="w-[43%] xl:w-[12%] metric-card-item">
-                      <div className="font-montserrat relative w-fit text-[46px] xl:text-[46px] font-normal text-black flex items-baseline metric-value">
-                        <span className="text-black tracking-[1.28px]">3.</span>
-                        <img 
-                          className="w-7 ml-1.5 metric-arrow" 
-                          src="/dashboard/arrow.svg" 
-                          alt="Arrow" 
-                          style={{ width: '28px', marginLeft: '6px' }}
-                        />
-                        <span className="absolute -left-5 top-3 text-[12px]">%</span>
-                        <span className="absolute -right-5 top-3 text-[12px]">
-                          <img src="/dashboard/top-arrow.svg" alt="" />
-                        </span>
-                      </div>
-                      <p className="sub-header-metric font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
-                        Quotes Awaiting Approval
-                      </p>
-                    </div>
-                    
-                    {/* Contracts Due to Expire */}
-                    <div className="w-[43%] xl:w-[12%] metric-card-item">
-                      <div className="font-montserrat relative w-fit text-[46px] xl:text-[46px] font-normal text-black flex items-baseline metric-value">
-                        <span className="text-black tracking-[1.28px]">2.</span>
-                        <img 
-                          className="w-7 ml-1.5 metric-arrow" 
-                          src="/dashboard/arrow.svg" 
-                          alt="Arrow"
-                          style={{ width: '28px', marginLeft: '6px' }}
-                        />
-                        <span className="absolute -left-5 top-3 text-[12px]">%</span>
-                        <span className="absolute -right-5 top-3 text-[12px]">
-                          <img src="/dashboard/top-arrow.svg" alt="" />
-                        </span>
-                      </div>
-                      <p className="sub-header-metric font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
-                        Contracts Due to Expire
-                      </p>
-                    </div>
-                    
-                    {/* Required Document Uploads */}
-                    <div className="w-[43%] xl:w-[12%] metric-card-item">
-                      <div className="font-montserrat relative w-fit text-[46px] xl:text-[46px] font-normal text-black flex items-baseline metric-value">
-                        <span className="text-black tracking-[1.28px]">1.</span>
-                        <img 
-                          className="w-7 ml-1.5 metric-arrow" 
-                          src="/dashboard/arrow.svg" 
-                          alt="Arrow"
-                          style={{ width: '28px', marginLeft: '6px' }}
-                        />
-                        <span className="absolute -left-5 top-3 text-[12px]">%</span>
-                        <span className="absolute -right-5 top-3 text-[12px]">
-                          <img src="/dashboard/top-arrow.svg" alt="" />
-                        </span>
-                      </div>
-                      <p className="sub-header-metric font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1">
-                        Required Document Uploads
-                      </p>
-                    </div>
-                  </div>
-                </section>
-
-                <RecentActivityTable 
-                  title="Recent Activity"
-                  showMobileHeader={false}
-                />
+                </div>
               </div>
+            </div>
 
-             {/* Right Column - 25% */}
-<div className="max-h-[89%] min-h-[88%] flex flex-col gap-2 right right-column">
-  {/* Welcome Widget */}
-  <div className="relative rounded-2xl overflow-hidden w-full welcome-widget transition-shadow duration-300 flex-grow"
-       style={{ minHeight: 'calc(41% - 4px)' }}>
-    <img 
-      src="https://c.animaapp.com/mjiggi0jSqvoj5/img/frame-76.png" 
-      alt="Background" 
-      className="absolute inset-0 w-full h-full object-cover"
-    />
-    <div className="relative z-10 p-4 h-full flex flex-col action-content">
-      <h2 className="font-montserrat text-[20px] font-normal text-white mb-0 welcome-title">
-        Welcome back, Lucas!
-      </h2>
-      <p className="font-montserrat text-[14px] font-normal text-[#ffffffd9] mb-auto max-w-[224px] welcome-subtitle action-subtitle">
-        Everything's under control — let's make this day productive.
-      </p>
-      
-      <div className="flex items-end justify-between gap-[40px] action-buttons">
-        <h3 className="font-montserrat text-[24px] !font-medium text-white leading-[27px] tracking-[0.64px] max-w-[224px] cta-title">
-          Get Your New Quote Instantly
-        </h3>
-
-        <img 
-          src="https://c.animaapp.com/mjiggi0jSqvoj5/img/group-84.png" 
-          alt="Arrow" 
-          className="outline-[4px] outline-[#f4f4f1] rounded-full w-[42px] h-[42px] hover:scale-102 transition-transform duration-300"
-        />
-      </div>
-    </div>
-  </div>
-
-  {/* Middle Widget */}
-  <div className="relative w-full font-['Montserrat'] flex-grow"
-       style={{ minHeight: 'calc(29% - 4px)' }}>
-    {/* Background */}
-    <div className="absolute top-0 left-0 w-full h-full bg-[#fafcffcc] rounded-xl"></div>
-    
-    {/* Content */}
-    <div className="relative z-10 p-4 flex flex-col h-full justify-between">
-      {/* Header */}
-      <div className="flex justify-between items-start mb-2">
-        <h3 className="text-[#3c3c3c] text-[16px] font-normal tracking-[0.24px] w-[60%] leading-tight">
-          High-value cargo insured this month
-        </h3>
-
-        <div className="relative">
-          <span className="absolute -left-1 top-0 text-[#ffffffd6] text-[4px] tracking-[0.08px]">$</span>
-          <div className="bg-[#71a3ef] rounded-[20px] px-2 py-0.5 flex items-center justify-center">
-            <span className="text-white text-xs tracking-[0.24px]">
-              <span className="tracking-[0.04px]">MTD · 62,</span>
-              <span className="text-white/80 tracking-[0.04px]">3k</span>
-            </span>
+            {/* Quote Conversion Rate */}
+            <div className="
+              flex-grow min-h-[calc(30%-4px)] xl:flex-[0_0_30%] xl:min-h-auto xl:h-auto
+              max-[1336px]:flex-grow max-[1336px]:min-h-auto max-[1336px]:h-auto
+              max-[1280px]:flex-grow max-[1280px]:min-h-auto max-[1280px]:h-auto max-[1280px]:block
+              max-[1024px]:w-full max-[1024px]:min-h-[180px] max-[1024px]:max-h-[200px]
+              max-[1024px]:block
+              max-[768px]:flex-shrink-0 max-[768px]:w-[85%] max-[768px]:min-h-[250px] 
+              max-[768px]:max-h-[280px]
+            ">
+              <ConversionChart />
+            </div>
           </div>
-        </div>
-      </div>
-
-      <div>
-        {/* Percentage Section */}
-        <div className="flex mb-3 items-end justify-start">
-          <div className="flex items-start gap-0.5 mb-0.5">
-            <span className="text-black text-[42px] tracking-[0.84px] leading-none">
-              <span className="tracking-[0.54px]">75.</span>
-              <span className="text-[#c7c7c7] tracking-[0.54px]">55</span>
-            </span>
-            <span className="text-black text-[7px] tracking-[0.14px] mt-[9px]">%</span>
-          </div>
-          
-          <p className="text-[#c7c7c7] text-xs tracking-[0.24px] text-right leading-tight w-[50%] text-left mb-1">
-            of total insured value this month
-          </p>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="space-y-1">
-          <div className="relative h-5">
-            <div className="absolute top-1 left-0 w-[75%] h-3 bg-gradient-to-r from-[#bfd5f8] to-[#669cee] rounded-l-[40px] rounded-r-none"></div>
-            <div className="absolute top-1 left-[75%] w-[25%] h-3 bg-gradient-to-r from-[#6da1ef4f] to-[#f6f8fa40] rounded-r-[40px] rounded-l-none"></div>
-            <img 
-              className="absolute top-[-0.5px] left-[72%] w-[20px] h-[20px]" 
-              src="https://c.animaapp.com/mk1qdxa5LsxC7P/img/polygon-1.svg" 
-              alt="Progress marker"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  {/* Quote Conversion Rate */}
-  <div className="flex-grow"
-       style={{ minHeight: 'calc(30% - 4px)' }}>
-    <ConversionChart />
-  </div>
-</div>
-            </main>
-          </div>
-
-          <style jsx>{` 
-            .dashboard-main-content {
-              height: calc(100vh - 140px);
-            }
-            
-            .left-column, .right-column {
-              min-height: 85vh !important;
-              max-height: 89vh !important;
-              overflow: hidden;
-              display: flex;
-              flex-direction: column;
-            }
-            
-            .left-column > *:last-child {
-              flex: 1;
-              min-height: 0;
-              overflow: hidden;
-              display: flex;
-              flex-direction: column;
-            }
-            
-            .left-column > *:last-child > :global(.block-2) {
-              flex: 1;
-              min-height: 0;
-              overflow: hidden;
-              display: flex;
-              flex-direction: column;
-            }
-            
-            .left-column > *:last-child > :global(.block-2) > :global(.table-rows-cont) {
-              flex: 1;
-              min-height: 0;
-              overflow-y: auto;
-            }
-            
-            .right-column > *:last-child {
-              // flex: 1;
-              min-height: 0;
-            }
-           
-            @media screen and (max-width: 1336px) {
-                .block-2 {
-                  overflow: scroll !important;
-                }
-                .activity-header {
-                    display: block;
-                }
-                
-                .activity-filters {
-                    justify-content: flex-end;
-                }
-                
-                .action-content {
-                    height: 100%;
-                }
-                
-                .action-subtitle {
-                    max-width: 100%;
-                }
-                
-                .action-center {
-                    height: 254px;
-                }
-                
-                .action-bg {
-                    top: 0;
-                }
-
-                .action-buttons {
-                    max-width: 100%;
-                }
-                
-                .welcome-widget {
-                    height: 352px;
-                }
-                
-                .cta-title {
-                    font-size: 26px;
-                    font-weight: 500;
-                    line-height: 33px;
-                    letter-spacing: 0.64px;
-                    max-width: 224px;
-                }
-            }
-
-            @media screen and (max-width: 1280px) {
-                .main-content {
-                        grid-template-columns: 76.5% 23%;
-                }
-                
-                .right {
-                    display: flex;
-                    gap: 16px;
-                }
-                
-                .action-center {
-                    height: 100%;
-                    width: 40%;
-                }
-                
-                .action-bg {
-                    width: 840px;
-                    height: 328px !important;
-                }
-
-                .welcome-title {
-                    font-size: 18px;
-                    margin-bottom: 6px;
-                }
-                
-                .welcome-subtitle {
-                    max-width: 100%;
-                    font-size: 12px;
-                }
-                
-                .cta-title {
-                    font-size: 22px;
-                    line-height: 28px;
-                }
-
-                .quote-conversion.performance-section {
-                    width: 100%;
-                    position: relative;
-                    justify-content: space-between;
-                    display: flex;
-                    flex-direction: column;
-                }
-                
-                .navigation {
-                    display: none;
-                }
-                
-               
-                
-              
-                .welcome-widget {
-                    height: 260px;
-                    width: 100%;
-                }
-                
-                .showin-result-ittle-info {
-                    display: none;
-                }
-                
-                .hamburger-menu {
-                    display: block;
-                }
-                
-                /* Hide desktop navigation completely */
-                .navigation {
-                    display: none;
-                }
-            }
-
-            @media screen and (max-width: 1024px) {
-              .dashboard-main-content {
-                height: auto;
-                display: flex;
-                flex-direction: column-reverse;
-              }
-              
-              .left-column, .right-column {
-                min-height: auto !important;
-                max-height: none !important;
-              }
-              
-              .right.jsx-d116e6d599512e01 {
-                gap: 8px;
-                display: flex;
-                flex-direction: row;
-              }
-              
-              .welcome-widget, .quote-conversion.performance-section.jsx-be524dc674521ed {
-                max-height: 100% !important
-                width: 49%;
-              }
-              
-              .right {
-                gap: 8px;
-                display: flex;
-                flex-direction: row;
-              }
-              
-              .action-center, .conv-rate {
-                display: none;
-              }
-              
-              .rate-mob-hid {
-                display: none !important;
-              }
-              
-              .quote-conversion.performance-section {
-                width: 62%;
-                min-height: 170px;
-              }
-
-              .action-content {
-                justify-content: space-between;
-              }
-              
-              .action-title, .section-title {
-                font-size: 16px;
-              }
-              
-              .action-subtitle {
-                margin-bottom: 0px;
-              }
-              
-              .metrics-grid {
-                display: flex;
-                gap: 35px;
-                padding-left: 20px;
-              }
-              
-              .metric-card-item {
-                width: 43%;
-              }
-              
-              .section-header {
-                align-items: center;
-              }
-              
-              .activity-header {
-                display: none;
-              }
-              
-              
-              .activity-table {
-                margin-top: 0px;
-              }
-              
-              .table-row {
-                min-width: 100%;
-                display: flex;
-                background-color: rgba(250, 252, 255, 0.8);
-                border-radius: 16px;
-                flex-wrap: wrap;
-                gap: 12px;
-                justify-content: space-between;
-                padding: 16px;
-              }
-              
-              .table-row button {
-                width: 100%;
-              }
-              
-              .logo-text {
-                display: none;
-              }
-              
-              .id-link {
-                color: #2563eb !important;
-              }
-              
-              .row-cell {
-                font-family: 'Poppins', sans-serif;
-                font-size: 14px;
-                color: #000000;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                width: 45.5%;
-                gap: 8px;
-              }
-              
-              .container {
-                max-width: 94% !important;
-                display: block;
-              }
-              
-              .header {
-                margin-bottom: 16px;
-              }
-              
-              .user-avatar img {
-                width: 44px;
-                height: 44px;
-              }
-
-              .notification-wrapper {
-                width: 44px;
-                height: 44px;
-              }
-
-              .notification-icon img {
-                width: 18px;
-              }
-
-              .notification-badge {
-                top: 12px;
-                right: 13px;
-                width: 6px;
-                height: 6px;
-              }
-            }
-
-            @media screen and (max-width: 768px) {
-              .recent-activity button {
-                padding: 6px 12px;
-                font-size: 12px;
-              }
-              
-              .recent-activity h3 {
-                font-size: 16px;
-              }
-              
-              .table-rows-cont {
-                padding: 0 !important;
-                margin: 0 !important;
-                width: 101%;
-              }
-              
-              
-              .quote-conversion.performance-section {
-                width: 100%;
-              }
-              
-              .metrics-grid {
-                flex-wrap: wrap;
-              }
-              
-              .activity-section {
-                border: none !important;
-                background: transparent;
-                padding: 0;
-              }
-              
-              .metric-value, .metric-value2 {
-                font-size: 38px;
-                font-weight: 300 !important;
-              }
-
-              .metrics-grid {
-                gap: 16px 32px;
-                justify-content: flex-start;
-              }
-              
-              .performance-section {
-                padding: 16px;
-              }
-              
-              .action-title, .section-title {
-                font-size: 14px;
-              }
-              
-              .mobile-nav-container {
-                width: 100%;
-              }
-              
-              .hamburger-btn {
-                width: 40px;
-                height: 40px;
-              }
-              
-              .left-column, .right-column {
-                min-height: auto !important;
-                max-height: none !important;
-              }
-            }
-
-            /* Prevent scrolling when menu is open */
-            body.menu-open {
-                overflow: hidden;
-            }
-
-            .metric-arrow {
-                width: 28px;
-                margin-left: 6px;
-            }
-
-            .btn-primary {
-              width: 100%;
-            }
-
-            /* Mobile action button styles for Dashboard page */
-            .mobile-action-btn {
-              color: #ffffff;
-              cursor: pointer;
-              background-color: #2563EB;
-              border: 1px solid rgba(255, 255, 255, 0.22);
-              border-radius: 8px;
-              align-items: center;
-              gap: 8px;
-              padding: 12px 16px;
-              font-family: 'Inter', sans-serif;
-              font-size: 14px;
-              transition: background-color 0.3s;
-              display: flex;
-              text-align: center;
-              justify-content: center;
-              width: 100%;
-              height: 44px;
-              border: 1px solid rgba(0, 0, 255, 0.169);
-            }
-
-            .mobile-action-btn.primary-btn {
-              background-color: #2563EB;
-              color: #ffffff;
-              border: 1px solid rgba(255, 255, 255, 0.22);
-            }
-
-            .mobile-action-btn.secondary-btn {
-              background-color: transparent;
-              color: #374151;
-              border: 1px solid #e3e6ea;
-            }
-
-            .mobile-action-btn:hover {
-              background-color: #1d4ed8;
-            }
-
-            .mobile-action-btn.secondary-btn:hover {
-              background-color: #f3f4f6;
-              border-color: #d1d5db;
-            }
-
-            /* Mobile status badge - fit content */
-            .mobile-status-badge {
-              width: fit-content !important;
-              min-width: fit-content !important;
-              white-space: nowrap !important;
-              padding-left: 12px !important;
-              padding-right: 12px !important;
-              height: 26px;
-              display: inline-flex !important;
-              align-items: center !important;
-            }
-
-            /* Mobile specific styles for Dashboard page */
-            @media screen and (max-width: 1024px) {
-              .table-row {
-                min-width: 100%;
-                display: flex;
-                background-color: rgba(250, 252, 255, 0.8);
-                border-radius: 16px;
-                flex-wrap: wrap;
-                gap: 16px;
-                justify-content: space-between;
-                padding: 20px;
-                margin-bottom: 12px;
-              }
-              
-              .row-cell {
-                font-family: 'Poppins', sans-serif;
-                font-size: 14px;
-                color: #000000;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                width: auto !important;
-                min-width: fit-content !important;
-              }
-              
-              /* Status badge in mobile */
-              .table-row .mobile-status-badge {
-                font-size: 11px !important;
-                padding: 6px 10px !important;
-                height: 24px;
-              }
-              
-              /* Mobile layout spacing */
-              .table-row > .xl\\:hidden {
-                display: flex;
-                flex-direction: column;
-                gap: 16px;
-              }
-              
-              .table-row .xl\\:hidden > div {
-                width: 100%;
-              }
-            }
-            
-            .tab-item {
-              margin: 0;
-              background-color: #f9f9f6;
-              border: none;
-              border-bottom: 1px solid #d1d1d140;
-            }
-            
-            .tab-item:hover  {
-              background-color: #f6f6ecff;
-            }
-            
-            @media screen and (max-width: 768px) {
-              .sub-header-metric {
-                margin-top: -8px !important;
-                font-size: 10px !important;
-                width: 74% !important;
-              }
-              
-              .mobile-action-btn {
-                height: 44px;
-                font-size: 14px;
-                font-weight: 500;
-              }
-              
-              .mobile-status-badge {
-                font-size: 10px !important;
-                padding: 5px 8px !important;
-                height: 22px;
-              }
-              
-              .table-row {
-                padding: 16px;
-                gap: 12px;
-                margin-bottom: 12px;
-              }
-            }
-
-
-            .right-column {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-
-  .right-column > * {
-    flex-shrink: 0;
-  }
-
-  /* Desktop: հստակ բաժանում 41% 27% 30% */
-  @media screen and (min-width: 1025px) {
-    .welcome-widget {
-      flex: 0 0 38%;
-      min-height: auto !important;
-      height: auto;
-    }
-
-    .right-column > .relative.w-full.font-\\[\\'Montserrat\\'\\] {
-      flex: 0 0 27%;
-      min-height: auto !important;
-      height: auto;
-    }
-
-    .right-column > .flex-grow:last-child {
-      flex: 0 0 30%;
-      min-height: auto !important;
-      height: auto;
-    }
-
-    .right-column > * {
-      max-height: none !important;
-    }
-  }
-
-  /* Laptop (1024px և ցածր) - 100% բարձրություն */
-  @media screen and (max-width: 1024px) and (min-width: 769px) {
-    .right-column {
-      flex-direction: row;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .right-column > * {
-      flex: 1 0 calc(50% - 4px);
-      min-height: 180px !important;
-      max-height: 200px !important;
-    }
-
-    .right-column > *:last-child {
-      flex: 1 0 100%;
-      min-height: 180px !important;
-    }
-  }
-
-  /* Tablet (768px և ցածր) - հորիզոնական սքրոլ */
-  @media screen and (max-width: 768px) {
-    .right-column {
-      flex-direction: row;
-      overflow-x: auto;
-      overflow-y: hidden;
-      gap: 12px;
-      padding-bottom: 8px;
-      scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .right-column > * {
-      flex: 0 0 85%;
-      min-height: 250px !important;
-      max-height: 280px !important;
-      scroll-snap-align: start;
-      min-width: 0;
-    }
-
-    /* Սքրոլի բարի ոճավորում */
-    .right-column::-webkit-scrollbar {
-      height: 6px;
-    }
-
-    .right-column::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 3px;
-    }
-
-    .right-column::-webkit-scrollbar-thumb {
-      background: #888;
-      border-radius: 3px;
-    }
-
-    .right-column::-webkit-scrollbar-thumb:hover {
-      background: #555;
-    }
-  }
-
-  /* ConversionChart-ի հարմարվողականություն */
-  @media screen and (max-width: 1024px) {
-    .quote-conversion.performance-section {
-      height: 100%;
-      min-height: 100%;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .chart-cont {
-      flex: 1;
-      min-height: 0;
-    }
-
-    .chaart, .chaart2 {
-      min-height: 26px;
-    }
-  }
-
-  /* Mobile օպտիմիզացիա */
-  @media screen and (max-width: 480px) {
-    .right-column > * {
-      flex: 0 0 92%;
-      min-height: 220px !important;
-    }
-
-    .welcome-title {
-      font-size: 18px !important;
-    }
-
-    .cta-title {
-      font-size: 20px !important;
-      line-height: 24px !important;
-    }
-  }
-
-  /* Ապահովում, որ բոլոր վիջեթները լրացնում են իրենց կոնտեյները */
-  .welcome-widget .action-content,
-  .right-column > .relative.w-full.font-\\[\\'Montserrat\\'\\] > .relative,
-  .quote-conversion.performance-section {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* Դինամիկ բարձրությունների համար */
-  .right-column > * {
-    transition: all 0.3s ease;
-  }
-
-  @media screen and (max-width: 768px) {
-  .right-column {
-    flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
-    gap: 12px;
-    padding-bottom: 16px; /* Բարձրացրել ենք padding-bottom-ը ինդիկատորների համար */
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    position: relative; /* Ինդիկատորների համար */
-  }
-
-  .right-column > * {
-    flex: 0 0 85%;
-    min-height: 250px !important;
-    max-height: 280px !important;
-    scroll-snap-align: start;
-    min-width: 0;
-  }
-
-  /* Սքրոլի բարի ոճավորում */
-  .right-column::-webkit-scrollbar {
-    height: 6px;
-  }
-
-  .right-column::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;
-  }
-
-  .right-column::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 3px;
-  }
-
-  .right-column::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
-
-  /* Ինդիկատորների կոնտեյներ */
-  .scroll-indicators {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 12px;
-    padding-bottom: 8px;
-  }
-
-  .scroll-indicator {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: #d1d1d1;
-    transition: all 0.3s ease;
-    cursor: pointer;
-  }
-
-  .scroll-indicator.active {
-    background-color: #2563EB;
-    transform: scale(1.2);
-  }
-}
-          `}</style>
-        </div>
+        </main>
       </div>
     </DashboardLayout>
   )
