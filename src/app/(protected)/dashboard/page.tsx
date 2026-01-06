@@ -206,6 +206,7 @@ export default function DashboardPage() {
       </div>
     )
   }
+  
 
   return (
     <DashboardLayout>
@@ -1095,6 +1096,69 @@ export default function DashboardPage() {
   .right-column > * {
     transition: all 0.3s ease;
   }
+
+  @media screen and (max-width: 768px) {
+  .right-column {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 12px;
+    padding-bottom: 16px; /* Բարձրացրել ենք padding-bottom-ը ինդիկատորների համար */
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    position: relative; /* Ինդիկատորների համար */
+  }
+
+  .right-column > * {
+    flex: 0 0 85%;
+    min-height: 250px !important;
+    max-height: 280px !important;
+    scroll-snap-align: start;
+    min-width: 0;
+  }
+
+  /* Սքրոլի բարի ոճավորում */
+  .right-column::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .right-column::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+
+  .right-column::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+  }
+
+  .right-column::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  /* Ինդիկատորների կոնտեյներ */
+  .scroll-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding-bottom: 8px;
+  }
+
+  .scroll-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #d1d1d1;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .scroll-indicator.active {
+    background-color: #2563EB;
+    transform: scale(1.2);
+  }
+}
           `}</style>
         </div>
       </div>

@@ -134,7 +134,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
           md:px-[16px] xs:p-0 xs:m-0 xs:w-full">
           {filteredRows.length > 0 ? (
             filteredRows.map((row, idx) => (
-              <div key={idx} className="tab-item md:grid sm:grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 p-4 md:p-3 bg-[#f9f9f6] md:bg-[#f9f9f6] rounded-lg md:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300
+              <div key={idx} className="mob-ly-item tab-item md:grid sm:grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 p-4 md:p-3 bg-[#f9f9f6] md:bg-[#f9f9f6] rounded-lg md:rounded-lg flex flex-wrap items-center hover:bg-[#f0f4f9] transition-colors duration-300
                 xs:min-w-full xs:flex xs:bg-[rgba(250,252,255,0.8)] xs:rounded-[16px] xs:flex-wrap xs:gap-4 xs:justify-between xs:p-5 xs:mb-3 xs:border-b xs:border-solid xs:border-[#d1d1d140]
                 xs:hover:bg-[#f6f6ec]">
                 {/* Desktop Layout */}
@@ -150,7 +150,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
                 <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.date}</div>
                 
                 {/* Mobile Layout */}
-                <div className="md:hidden w-full">
+                <div className="infoo md:hidden w-full mob-lay">
                   {/* Top row: Type/ID on left, Status on right */}
                   <div className="flex justify-between items-center mb-4">
                     <div className="flex items-center gap-2">
