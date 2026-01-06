@@ -130,8 +130,17 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
         />
 
         {/* Table Rows */}
-        <div className="table-rows-cont px-4 xl:px-4 block-2 space-y-2 activity-table overflow-y-scroll 
-          md:px-[16px] xs:p-0 xs:m-0 xs:w-full">
+        <div className="
+          table-rows-cont
+  px-0
+  md:px-4
+  xl:px-4
+  block-2
+  space-y-2
+  activity-table
+  overflow-y-scroll
+  xs:p-0 xs:m-0 xs:w-full
+        ">
           {filteredRows.length > 0 ? (
             filteredRows.map((row, idx) => (
               <div key={idx} className="mob-ly-item tab-item md:grid sm:grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 p-4 md:p-3 bg-[#f9f9f6] md:bg-[#f9f9f6] rounded-lg md:rounded-lg flex flex-wrap items-center hover:bg-[#f0f4f9] transition-colors duration-300
