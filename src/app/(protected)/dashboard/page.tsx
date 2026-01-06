@@ -205,7 +205,7 @@ export default function DashboardPage() {
   
   return (
     <DashboardLayout>
-      <div className="w-full max-w-[99%] sm:max-w-[97.5%] mx-auto">
+      <div className="w-full max-w-[99%] sm:max-w-[99%] mx-auto">
         {/* Mobile Header for Activity Section */}
         <div className="flex gap-2 items-center mb-4 xl:hidden">
           <img src="/dashboard/hashtag.svg" alt="" className="w-5 h-5" />
