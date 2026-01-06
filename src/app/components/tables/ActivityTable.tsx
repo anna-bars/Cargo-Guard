@@ -274,7 +274,6 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
   );
 };
 
-// Default data
 const DEFAULT_ROWS = [
   {
     type: 'Quote',
@@ -348,73 +347,73 @@ const DEFAULT_ROWS = [
   },
   {
     type: 'Quote',
-    id: 'Q-007',
-    cargo: 'Food Products',
-    value: '$1,100.00',
+    id: 'Q-008',
+    cargo: 'Pharmaceuticals',
+    value: '$6,250.00',
     status: { 
-      text: 'Declined', 
-      color: 'bg-[#8ea0b0]/10', 
-      dot: 'bg-[#8ea0b0]', 
-      textColor: 'text-[#8ea0b0]' 
+      text: 'Pending Approval', 
+      color: 'bg-[#cbd03c]/10', 
+      dot: 'bg-[#cbd03c]', 
+      textColor: 'text-[#cbd03c]' 
     },
-    date: 'Sept 28, 9:30PM',
-    button: { text: 'View Details', variant: 'secondary' }
+    date: 'Sept 30, 11:45AM',
+    button: { text: 'Approve Quote', variant: 'primary' }
+  },
+  {
+    type: 'Policy',
+    id: 'P-022',
+    cargo: 'Auto Parts',
+    value: '$12,900.00',
+    status: { 
+      text: 'Active', 
+      color: 'bg-[#16a34a]/10', 
+      dot: 'bg-[#16a34a]', 
+      textColor: 'text-[#16a34a]' 
+    },
+    date: 'Oct 02, 3:15PM',
+    button: { text: 'Download Cert', variant: 'secondary' }
   },
   {
     type: 'Quote',
-    id: 'Q-007',
-    cargo: 'Food Products',
-    value: '$1,100.00',
+    id: 'Q-009',
+    cargo: 'Luxury Watches',
+    value: '$22,000.00',
     status: { 
       text: 'Declined', 
       color: 'bg-[#8ea0b0]/10', 
       dot: 'bg-[#8ea0b0]', 
       textColor: 'text-[#8ea0b0]' 
     },
-    date: 'Sept 28, 9:30PM',
+    date: 'Oct 05, 7:50PM',
     button: { text: 'View Details', variant: 'secondary' }
   },
   {
-    type: 'Quote',
-    id: 'Q-007',
-    cargo: 'Food Products',
-    value: '$1,100.00',
+    type: 'Policy',
+    id: 'P-023',
+    cargo: 'Construction Materials',
+    value: '$31,500.00',
     status: { 
-      text: 'Declined', 
-      color: 'bg-[#8ea0b0]/10', 
-      dot: 'bg-[#8ea0b0]', 
-      textColor: 'text-[#8ea0b0]' 
+      text: 'Expires 01 Dec 2025', 
+      color: 'bg-[#eab308]/10', 
+      dot: 'bg-[#eab308]', 
+      textColor: 'text-[#eab308]' 
     },
-    date: 'Sept 28, 9:30PM',
-    button: { text: 'View Details', variant: 'secondary' }
+    date: 'Oct 08, 10:10AM',
+    button: { text: 'Renew Policy', variant: 'secondary' }
   },
   {
     type: 'Quote',
-    id: 'Q-007',
-    cargo: 'Food Products',
-    value: '$1,100.00',
+    id: 'Q-010',
+    cargo: 'Medical Equipment',
+    value: '$18,750.00',
     status: { 
-      text: 'Declined', 
-      color: 'bg-[#8ea0b0]/10', 
-      dot: 'bg-[#8ea0b0]', 
-      textColor: 'text-[#8ea0b0]' 
+      text: 'Pending Approval', 
+      color: 'bg-[#cbd03c]/10', 
+      dot: 'bg-[#cbd03c]', 
+      textColor: 'text-[#cbd03c]' 
     },
-    date: 'Sept 28, 9:30PM',
-    button: { text: 'View Details', variant: 'secondary' }
-  },
-  {
-    type: 'Quote',
-    id: 'Q-007',
-    cargo: 'Food Products',
-    value: '$1,100.00',
-    status: { 
-      text: 'Declined', 
-      color: 'bg-[#8ea0b0]/10', 
-      dot: 'bg-[#8ea0b0]', 
-      textColor: 'text-[#8ea0b0]' 
-    },
-    date: 'Sept 28, 9:30PM',
-    button: { text: 'View Details', variant: 'secondary' }
+    date: 'Oct 10, 1:40PM',
+    button: { text: 'Approve Quote', variant: 'primary' }
   }
 ];
 
