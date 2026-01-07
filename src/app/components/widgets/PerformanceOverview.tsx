@@ -1,5 +1,5 @@
 // components/widgets/PerformanceOverview.tsx
-import React from 'react';
+import React, { useState } from 'react';
 
 interface MetricItem {
   id: string;
@@ -68,6 +68,36 @@ export const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({
     }
   ]
 }) => {
+  const [hoveredMetricId, setHoveredMetricId] = useState<string | null>(null);
+
+  const getMetricColor = (metric: MetricItem, isDecimal: boolean = false) => {
+    if (hoveredMetricId !== metric.id) {
+      return isDecimal ? '#c7c7c7' : 'black';
+    }
+    
+    if (metric.arrowDirection === 'up') {
+      return isDecimal ? '#BDD4F9' : '#669CEE';
+    } else if (metric.arrowDirection === 'down') {
+      return '#EE6666';
+    }
+    
+    return isDecimal ? '#c7c7c7' : 'black';
+  };
+
+  const getArrowFilter = (metric: MetricItem) => {
+    if (hoveredMetricId !== metric.id) {
+      return '';
+    }
+    
+    if (metric.arrowDirection === 'up') {
+      return 'invert(49%) sepia(57%) saturate(4783%) hue-rotate(192deg) brightness(95%) contrast(95%)';
+    } else if (metric.arrowDirection === 'down') {
+      return 'invert(39%) sepia(89%) saturate(1720%) hue-rotate(331deg) brightness(95%) contrast(99%)';
+    }
+    
+    return '';
+  };
+
   return (
     <section className="
       border border-[#d1d1d1]/33 bg-[#fafaf7]/80 rounded-2xl p-4 h-auto
@@ -119,8 +149,12 @@ export const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({
               max-[1336px]:w-[12%]
               max-[1280px]:w-[12%]
               max-[1024px]:w-[43%]
+              cursor-pointer group
             "
+            onMouseEnter={() => setHoveredMetricId(metric.id)}
+            onMouseLeave={() => setHoveredMetricId(null)}
           >
+            {/* Main metric block with hover effects */}
             <div className="relative">
               <div className="w-fit
                 font-montserrat text-[46px] xl:text-[46px] font-normal text-black 
@@ -129,39 +163,93 @@ export const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({
                 max-[1280px]:text-[46px]
                 max-[768px]:text-[38px] max-[768px]:font-light
               ">
-                <span className="text-black tracking-[1.28px]">{metric.value}.</span>
+                <span 
+                  className="tracking-[1.28px] transition-colors duration-300 group-hover:text-[#669CEE]"
+                  style={{ 
+                    color: hoveredMetricId === metric.id 
+                      ? (metric.arrowDirection === 'down' ? '#EE6666' : '#669CEE')
+                      : 'black'
+                  }}
+                >
+                  {metric.value}.
+                </span>
                 
                 {/* Decimal part or Arrow */}
                 {metric.decimal ? (
-                  <span className="text-[#c7c7c7] tracking-[1.28px]">{metric.decimal}</span>
+                  <span 
+                    className="tracking-[1.28px] transition-colors duration-300 group-hover:text-[#BDD4F9]"
+                    style={{ 
+                      color: hoveredMetricId === metric.id 
+                        ? (metric.arrowDirection === 'up' ? '#BDD4F9' : '#c7c7c7')
+                        : '#c7c7c7'
+                    }}
+                  >
+                    {metric.decimal}
+                  </span>
                 ) : metric.hasArrow ? (
                   <img 
-                    className="w-7 ml-1.5" 
+                    className="w-7 ml-1.5 transition-all duration-300 group-hover:translate-y-0.5" 
                     src="/dashboard/arrow.svg" 
                     alt="Arrow" 
-                    style={{ width: '28px', marginLeft: '6px' }}
+                    style={{ 
+                      width: '28px', 
+                      marginLeft: '6px',
+                      filter: getArrowFilter(metric)
+                    }}
                   />
                 ) : null}
                 
                 {/* Prefix/Suffix - սլաները ձախից */}
                 {metric.prefix && (
-                  <span className="absolute -left-5 top-3 text-[12px]">{metric.prefix}</span>
+                  <span 
+                    className="absolute -left-5 top-3 text-[12px] transition-colors duration-300 group-hover:text-[#669CEE]"
+                    style={{ 
+                      color: hoveredMetricId === metric.id 
+                        ? '#669CEE'
+                        : 'inherit' 
+                    }}
+                  >
+                    {metric.prefix}
+                  </span>
                 )}
                 
                 {metric.suffix && (
-                  <span className="absolute -left-5 top-3 text-[12px]">{metric.suffix}</span>
+                  <span 
+                    className="absolute -left-5 top-3 text-[12px] transition-colors duration-300 group-hover:text-[#669CEE]"
+                    style={{ 
+                      color: hoveredMetricId === metric.id 
+                        ? (metric.arrowDirection === 'up' ? '#669CEE' : '#EE6666')
+                        : 'inherit' 
+                    }}
+                  >
+                    {metric.suffix}
+                  </span>
                 )}
                 
                 {/* Arrow indicators - սլաները աջից */}
                 {metric.hasArrow && metric.arrowDirection === 'up' && (
                   <span className="absolute -right-5 top-3 text-[12px]">
-                    <img src="/dashboard/top-arrow.svg" alt="Up arrow" />
+                    <img 
+                      src="/dashboard/top-arrow.svg" 
+                      alt="Up arrow" 
+                      className="transition-all duration-300 group-hover:-translate-y-0.5"
+                      style={{ 
+                        filter: getArrowFilter(metric)
+                      }}
+                    />
                   </span>
                 )}
                 
                 {metric.hasArrow && metric.arrowDirection === 'down' && (
                   <span className="absolute -right-5 top-3 text-[12px]">
-                    <img src="/dashboard/bottom-arrow.svg" alt="Down arrow" />
+                    <img 
+                      src="/dashboard/bottom-arrow.svg" 
+                      alt="Down arrow" 
+                      className="transition-all duration-300 group-hover:translate-y-0.5"
+                      style={{ 
+                        filter: getArrowFilter(metric)
+                      }}
+                    />
                   </span>
                 )}
               </div>
@@ -169,6 +257,7 @@ export const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({
             <p className="
               font-montserrat text-[12px] font-normal text-[#c7c7c7] mt-1
               max-[768px]:mt-[-8px] max-[768px]:text-[10px] max-[768px]:w-[74%]
+              transition-colors duration-300 group-hover:text-[#a0a0a0]
             ">
               {metric.label}
             </p>
