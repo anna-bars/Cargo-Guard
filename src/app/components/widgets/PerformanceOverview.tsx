@@ -161,7 +161,7 @@ export const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({
                 
                 {metric.hasArrow && metric.arrowDirection === 'down' && (
                   <span className="absolute -right-5 top-3 text-[12px]">
-                    <img src="/dashboard/top-arrow.svg" alt="Down arrow" />
+                    <img src="/dashboard/bottom-arrow.svg" alt="Down arrow" />
                   </span>
                 )}
               </div>
