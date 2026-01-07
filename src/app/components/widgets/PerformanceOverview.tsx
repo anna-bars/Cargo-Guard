@@ -122,7 +122,7 @@ export const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({
             "
           >
             <div className="relative">
-              <div className="
+              <div className="w-fit
                 font-montserrat text-[46px] xl:text-[46px] font-normal text-black 
                 flex items-baseline relative
                 max-[1336px]:text-[46px]
