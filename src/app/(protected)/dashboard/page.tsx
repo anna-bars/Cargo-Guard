@@ -444,7 +444,7 @@ export default function DashboardPage() {
             max-h-[89%] min-h-[88%] flex flex-col gap-2 xl:min-h-[100vh] xl:max-h-[89vh]
             max-[1336px]:flex max-[1336px]:flex-col max-[1336px]:gap-2
             max-[1280px]:min-h-auto max-[1280px]:max-h-none max-[1280px]:row-start-1
-            max-[1280px]:flex max-[1280px]:flex-col max-[1280px]:gap-2 max-[1280px]:mb-2
+            max-[1280px]:flex max-[1280px]:flex-row max-[1280px]:gap-2 max-[1280px]:mb-2
             max-[1024px]:min-h-auto max-[1024px]:max-h-none
             max-[1024px]:flex-row max-[1024px]:gap-2
             max-[768px]:flex-row max-[768px]:overflow-x-auto max-[768px]:overflow-y-hidden
