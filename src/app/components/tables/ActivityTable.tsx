@@ -143,9 +143,13 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
         ">
           {filteredRows.length > 0 ? (
             filteredRows.map((row, idx) => (
-              <div key={idx} className="mob-ly-item tab-item md:grid sm:grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 p-4 md:p-3 bg-[#f9f9f6] md:bg-[#f9f9f6] rounded-lg md:rounded-lg flex flex-wrap items-center hover:bg-[#f0f4f9] transition-colors duration-300
-                xs:min-w-full xs:flex xs:bg-[rgba(250,252,255,0.8)] xs:rounded-[16px] xs:flex-wrap xs:gap-4 xs:justify-between xs:p-5 xs:mb-3 xs:border-b xs:border-solid xs:border-[#d1d1d140]
-                xs:hover:bg-[#f6f6ec]">
+             <div key={idx} className="mob-ly-item tab-item md:grid sm:grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 p-4 md:p-3 bg-[#f9f9f6] md:bg-[#f9f9f6] rounded-lg md:rounded-lg flex flex-wrap items-center hover:bg-[#f0f4f9] transition-colors duration-300
+  xs:min-w-full xs:flex xs:bg-[rgba(250,252,255,0.8)] xs:rounded-[16px] xs:flex-wrap xs:gap-4 xs:justify-between xs:p-5 xs:mb-3 xs:border-b xs:border-solid xs:border-[#d1d1d140]
+  xs:hover:bg-[#f6f6ec]
+  
+  /* Desktop styles */
+  md:!m-0 md:!border-b md:!border-solid md:!border-[#ededf3] md:!rounded-none
+  md:hover:!bg-[#f0f0f5e8]">
                 {/* Desktop Layout */}
                 <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.type}</div>
                 <div className="hidden md:block md:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">{row.id}</div>
