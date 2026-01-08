@@ -122,6 +122,7 @@ export default function DashboardPage() {
             max-[1024px]:flex-row max-[1024px]:gap-2
             max-[768px]:flex-row max-[768px]:overflow-x-auto max-[768px]:overflow-y-hidden
             max-[768px]:pb-4 max-[768px]:gap-3
+            max-[480px]:pb-0 max-[480px]:mb-0
           ">
             {/* Welcome Widget */}
             <WelcomeWidget userName="Lucas" />
