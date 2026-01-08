@@ -100,7 +100,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
   return (
     <>
       {/* Recent Activity Table */}
-      <section
+<section
   className="
     block-2 flex flex-col h-full relative py-4 xl:py-4
     border border-[#d1d1d12b] bg-[#f9f9f6ba] rounded-[16px] overflow-hidden
@@ -108,7 +108,8 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
     /* Desktop/MD - 768px and up */
     md:border md:border-solid md:border-[#d1d1d154]
     md:bg-[#fafaf7]/80 md:rounded-[16px]
-    md:pt-[16px] md:pb-0
+    md:pt-[16px]
+    md:!pb-0
     
     /* Mobile - below 768px */
     max-[767px]:border-none 
@@ -117,6 +118,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
     max-[767px]:rounded-none
   "
 >
+
   {/* Filter Component */}
   <ActivityTableFilter
     searchQuery={searchQuery}
