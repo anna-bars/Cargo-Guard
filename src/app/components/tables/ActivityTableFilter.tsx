@@ -158,25 +158,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
           </div>
         )}
         
-        {/* Desktop Table Header */}
-        <div className="mt-3 px-4 sm:px-4 py-2 mb-2 hidden md:grid grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 pb-2 mb-0 table-header w-[97%] bg-[#ededed7a] mx-auto my-3.5 rounded-[4px]">
-          {['Type', 'ID', 'Cargo / Value', 'Status / Due Date', 'Last Update', 'Action'].map((header, idx) => (
-            <div
-              key={idx}
-              className={`flex items-center gap-2 font-poppins text-sm font-normal text-[#606068]
-                ${header === 'Action' ? 'justify-end' : ''}`}
-            >
-              <span>{header}</span>
-              {header !== 'Action' && (
-                <img
-                  src="https://c.animaapp.com/mjiggi0jSqvoj5/img/filter--1--7.png"
-                  alt="Sort"
-                  className="w-3 h-3"
-                />
-              )}
-            </div>
-          ))}
-        </div>
+        
       </div>
 
       {/* Active filters display */}

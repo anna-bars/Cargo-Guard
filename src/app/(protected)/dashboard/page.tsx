@@ -281,7 +281,9 @@ export default function DashboardPage() {
                 }
               ]}
             />
-
+ 
+              
+              
             <RecentActivityTable 
               title="Recent Activity"
               showMobileHeader={false}
