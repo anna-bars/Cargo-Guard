@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CustomDropdown } from './CustomDropdown'; // Կամ ճիշտ path-ը
+import { CustomDropdown } from './CustomDropdown';
 
 interface ActivityTableFilterProps {
   searchQuery: string;
@@ -29,6 +29,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
   onReset
 }) => {
   const [showFilter, setShowFilter] = useState(false);
+  const [showDesktopFilters, setShowDesktopFilters] = useState(false);
 
   const handleReset = () => {
     setSelectedFilter('All Activity');
@@ -68,68 +69,18 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
           <h2 className="block">{title}</h2>
           <div className='header-btn flex justify-between gap-2'>
             <div className='desktop-filter-cont hidden md:flex items-center gap-4 bg-[#f9f9f6] rounded-lg mx-4'>
-              <div className="flex items-center gap-2">
-                {/* Activity Filter - Custom Dropdown */}
-                <CustomDropdown
-                  options={activityOptions}
-                  value={selectedFilter}
-                  onChange={setSelectedFilter}
-                  className="min-w-[140px]"
-                />
-                
-                {/* Timeframe Filter - Custom Dropdown */}
-                <CustomDropdown
-                  options={timeframeOptions}
-                  value={selectedTimeframe}
-                  onChange={setSelectedTimeframe}
-                  className="min-w-[140px]"
-                />
-                
-                {/* Sort By Filter - Custom Dropdown */}
-                <CustomDropdown
-                  options={sortOptions}
-                  value={selectedSort}
-                  onChange={setSelectedSort}
-                  className="min-w-[120px]"
-                />
-                
-                <div className="hidden md:flex items-center gap-2 w-[180px] bg-[#f9f9f6] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm relative">
-                  <img src="dashboard/icons/search-01-stroke-rounded.svg" alt="Search" className="w-[16px] h-[16px]" />
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-transparent outline-none border-none text-[#6e6d6d] placeholder:text-[#6e6d6d] font-poppins text-sm font-normal"
-                  />
-                  {searchQuery && (
-                    <button 
-                      onClick={() => setSearchQuery('')}
-                      className="absolute right-2 text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  )}
-                </div>
-                
-                {/* Reset Button */}
-                <button
-                  onClick={handleReset}
-                  className="flex items-center gap-1 px-3 py-2 text-sm font-poppins text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  Reset
-                </button>
-              </div>
+             
             </div>
             
             <button 
-              className="md:hidden flex items-center gap-1 bg-[#F5F4F7] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300 relative"
-              onClick={() => setShowFilter(!showFilter)}
+              className="flex items-center gap-1 bg-[#F5F4F7] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300 relative"
+              onClick={() => {
+                setShowFilter(!showFilter);
+                // For desktop, toggle the filter panel
+                if (window.innerWidth >= 768) {
+                  setShowDesktopFilters(!showDesktopFilters);
+                }
+              }}
             >
               <img src="dashboard/icons/filter-stroke-rounded.svg" alt="" className="w-[16px] h-[16px]" />
               Filter
@@ -143,8 +94,72 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
           </div>
         </div>
         
+        {/* Desktop Filters Panel - Initially hidden, shows on Filter click */}
+        {showDesktopFilters && (
+          <div className="hidden md:flex justify-between items-center relative mx-auto w-[97%] bg-white/47 p-[6px] rounded-[12px] mt-[8px] border-2 border-dashed border-[#ececec] animate-fade-in">
+            <div className="flex items-center gap-2">
+              {/* Activity Filter - Custom Dropdown */}
+              <CustomDropdown
+                options={activityOptions}
+                value={selectedFilter}
+                onChange={setSelectedFilter}
+                className="min-w-[140px]"
+              />
+              
+              {/* Timeframe Filter - Custom Dropdown */}
+              <CustomDropdown
+                options={timeframeOptions}
+                value={selectedTimeframe}
+                onChange={setSelectedTimeframe}
+                className="min-w-[140px]"
+              />
+              
+              {/* Sort By Filter - Custom Dropdown */}
+              <CustomDropdown
+                options={sortOptions}
+                value={selectedSort}
+                onChange={setSelectedSort}
+                className="min-w-[120px]"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="hidden md:flex items-center gap-2 w-[180px] bg-[#f9f9f6] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm relative">
+                <img src="dashboard/icons/search-01-stroke-rounded.svg" alt="Search" className="w-[16px] h-[16px]" />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-transparent outline-none border-none text-[#6e6d6d] placeholder:text-[#6e6d6d] font-poppins text-sm font-normal"
+                />
+                {searchQuery && (
+                  <button 
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+              
+              {/* Reset Button */}
+              <button
+                onClick={handleReset}
+                className="flex items-center gap-1 px-3 py-2 text-sm font-poppins text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Reset
+              </button>
+            </div>
+          </div>
+        )}
+        
         {/* Desktop Table Header */}
-        <div className="px-4 sm:px-4 py-2 mb-2 hidden md:grid grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 pb-2 mb-0 table-header w-[97%] bg-[#ededed7a] mx-auto my-3.5 rounded-[4px]">
+        <div className="mt-3 px-4 sm:px-4 py-2 mb-2 hidden md:grid grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 pb-2 mb-0 table-header w-[97%] bg-[#ededed7a] mx-auto my-3.5 rounded-[4px]">
           {['Type', 'ID', 'Cargo / Value', 'Status / Due Date', 'Last Update', 'Action'].map((header, idx) => (
             <div
               key={idx}
@@ -248,7 +263,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
             </div>
             
             {/* Filter Content - Improved */}
-            <div className="p-5 space-y-6">
+            <div className="p-5 space-y-4">
               {/* Search Input for Mobile */}
               <div>
                 <h4 className="font-poppins font-medium text-sm text-gray-900 mb-3">Search</h4>
@@ -358,8 +373,8 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
 
       <style jsx global>{`
         @keyframes fade-in {
-          from { opacity: 0; }
-          to { opacity: 1; }
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
         }
         
         @keyframes slide-up {
