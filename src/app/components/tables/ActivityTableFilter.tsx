@@ -64,7 +64,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
       )}
 
       <div className='block-1'>
-        <div className='flex px-0 md:px-4 justify-between items-center md:border-b md:border-b-[#d1d1d154] pb-3 relative'>
+        <div className='flex px-0 md:px-4 justify-between items-center relative'>
           <h2 className="block">{title}</h2>
           <div className='header-btn flex justify-between gap-2'>
             <div className='desktop-filter-cont hidden md:flex items-center gap-4 bg-[#f9f9f6] rounded-lg mx-4'>
@@ -144,7 +144,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
         </div>
         
         {/* Desktop Table Header */}
-        <div className="px-4 sm:px-4 py-2 mb-0.5 hidden md:grid grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 pb-2 mb-0 table-header w-[97%] bg-[#ededed7a] mx-auto my-3.5 rounded-[4px]">
+        <div className="px-4 sm:px-4 py-2 mb-2 hidden md:grid grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 pb-2 mb-0 table-header w-[97%] bg-[#ededed7a] mx-auto my-3.5 rounded-[4px]">
           {['Type', 'ID', 'Cargo / Value', 'Status / Due Date', 'Last Update', 'Action'].map((header, idx) => (
             <div
               key={idx}
