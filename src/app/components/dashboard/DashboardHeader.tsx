@@ -391,7 +391,7 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
         /* Add padding to main content to avoid overlap with bottom nav */
         @media (max-width: 1279px) {
           main {
-            padding-bottom: 50px !important;
+            padding-bottom: 60px !important;
           }
         }
       `}</style>
