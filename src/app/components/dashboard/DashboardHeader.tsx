@@ -12,7 +12,6 @@ interface DashboardHeaderProps {
 
 export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
   const [activeNavItem, setActiveNavItem] = useState('Dashboard')
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false)
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
@@ -74,20 +73,6 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
     )
   }
   
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen)
-    if (!isMobileMenuOpen) {
-      document.body.classList.add('overflow-hidden')
-    } else {
-      document.body.classList.remove('overflow-hidden')
-    }
-  }
-  
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false)
-    document.body.classList.remove('overflow-hidden')
-  }
-  
   const toggleProfileModal = () => {
     setIsProfileModalOpen(!isProfileModalOpen)
   }
@@ -122,24 +107,24 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
   }, [isUserDropdownOpen])
   
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard', href: '/dashboard' },
-    { id: 'quotes', label: 'Quotes', href: '/quotes' },
-    { id: 'shipments', label: 'Shipments', href: '/shipments' },
-    { id: 'documents', label: 'Documents', href: '/documents' },
-    { id: 'profile', label: 'Profile', href: '/profile' }
+    { id: 'dashboard', label: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
+    { id: 'quotes', label: 'Quotes', href: '/quotes', icon: 'quotes' },
+    { id: 'shipments', label: 'Shipments', href: '/shipments', icon: 'shipments' },
+    { id: 'documents', label: 'Documents', href: '/documents', icon: 'documents' },
+    { id: 'profile', label: 'Profile', href: '/profile', icon: 'settings' }
   ]
   
   const handleNavClick = (itemLabel: string) => {
     setActiveNavItem(itemLabel)
-    closeMobileMenu()
   }
   
   const handleProfileSetting = () => {
-    closeMobileMenu()
     setIsProfileModalOpen(false)
   }
   
   const userDisplayName = userEmail?.split('@')[0] || 'User'
+  
+  const isActive = (itemLabel: string) => activeNavItem === itemLabel
   
   return (
     <>
@@ -174,9 +159,9 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
                 key={item.id}
                 href={item.href}
                 onClick={() => handleNavClick(item.label)}
-                className={`h-[54px] flex items-center justify-center px-9 rounded-lg transition-all duration-300 cursor-pointer group no-underline ${activeNavItem === item.label ? 'bg-white shadow-sm' : 'bg-[#f7f7f7] border border-white/22 hover:bg-white'}`}
+                className={`h-[54px] flex items-center justify-center px-9 rounded-lg transition-all duration-300 cursor-pointer group no-underline ${isActive(item.label) ? 'bg-white shadow-sm' : 'bg-[#f7f7f7] border border-white/22 hover:bg-white'}`}
               >
-                <span className={`font-inter text-[16px] font-normal transition-all duration-300 ${activeNavItem === item.label ? 'text-black' : 'text-black group-hover:text-black/80'}`}>
+                <span className={`font-inter text-[16px] font-normal transition-all duration-300 ${isActive(item.label) ? 'text-black' : 'text-black group-hover:text-black/80'}`}>
                   {item.label}
                 </span>
               </Link>
@@ -351,8 +336,45 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
           </div>
         )}
       </div>
-      
-      <style jsx>{`
+
+      {/* Mobile Bottom Navigation - Updated with transparent background and no text */}
+      <div className="xl:hidden fixed bottom-0 left-0 right-0 z-40">
+        <div className="flex justify-center gap-2 items-center h-[70px] px-2">
+          {navItems.map((item) => {
+            const active = isActive(item.label)
+            const iconSrc = active 
+              ? `/nav/${item.icon}-active.svg`
+              : `/nav/${item.icon}.svg`
+            
+            return (
+              <Link
+                key={item.id}
+                href={item.href}
+                onClick={() => handleNavClick(item.label)}
+                className="flex items-center justify-center no-underline"
+              >
+                <div 
+                  className={`w-[50px] h-[50px] flex items-center justify-center rounded-[6px] transition-all duration-200 ${
+                    active 
+                      ? 'bg-black' 
+                      : 'bg-[#F3F3F6] border border-[#EDEDED]'
+                  }`}
+                  style={{ padding: '14px' }}
+                >
+                  <img 
+                    src={iconSrc}
+                    alt={item.label}
+                    className="w-6 h-6"
+                  />
+                </div>
+              </Link>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Padding for mobile bottom nav */}
+      <style jsx global>{`
         @keyframes slideUp {
           from {
             transform: translateY(100%);
@@ -364,6 +386,13 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
         
         .animate-slideUp {
           animation: slideUp 0.3s ease-out;
+        }
+        
+        /* Add padding to main content to avoid overlap with bottom nav */
+        @media (max-width: 1279px) {
+          main {
+            padding-bottom: 50px !important;
+          }
         }
       `}</style>
     </>
