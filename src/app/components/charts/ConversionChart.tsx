@@ -297,9 +297,9 @@ export const ConversionChart = () => {
       min-height: 180px;
     }
     
-    .chaart, .chaart2 {
-      min-height: 20px;
-    }
+    // .chaart, .chaart2 {
+    //   min-height: 20px;
+    // }
   }
   
   @media screen and (max-width: 768px) {
@@ -307,9 +307,9 @@ export const ConversionChart = () => {
       min-height: 240px;
     }
     
-    .chaart, .chaart2 {
-      min-height: 24px;
-    }
+    // .chaart, .chaart2 {
+    //   min-height: 24px;
+    // }
   }
       `}</style>
     </div>

@@ -47,7 +47,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#f3f3f6] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0a3d62]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#778B8E]"></div>
       </div>
     )
   }
@@ -57,8 +57,14 @@ export default function DashboardPage() {
       <div className="w-full max-w-[99%] sm:max-w-[99%] mx-auto">
         {/* Mobile Header for Activity Section */}
         <div className="flex gap-2 items-center mb-4 xl:hidden">
-          <img src="/dashboard/hashtag.svg" alt="" className="w-5 h-5" />
-          <h2 className="font-normal text-lg">Dashboard</h2>
+          <img
+            src="/dashboard/hashtag.svg"
+            alt=""
+            className="w-[26px] h-[26px] sm:w-5 sm:h-5"
+          />
+          <h2 className="font-normal text-[26px] sm:text-lg">
+            Dashboard
+          </h2>
         </div>
 
         {/* Main Content Grid */}
@@ -174,7 +180,7 @@ export default function DashboardPage() {
             >
               {/* Welcome Widget */}
               <div className="
-                flex-shrink-0 w-[90%] h-full
+                flex-shrink-0 w-[72%] h-full
                 snap-center
               ">
                 <WelcomeWidget userName="Lucas" />
@@ -207,7 +213,7 @@ export default function DashboardPage() {
                   onClick={() => scrollToWidget(index)}
                   className={`w-2 h-2 rounded-full transition-all duration-300 ${
                     activeWidget === index 
-                      ? 'bg-[#0a3d62] w-8' 
+                      ? 'bg-[#778B8E] w-8' 
                       : 'bg-gray-300'
                   }`}
                   aria-label={`Go to widget ${index + 1}`}

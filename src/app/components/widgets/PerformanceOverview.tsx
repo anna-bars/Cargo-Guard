@@ -139,7 +139,7 @@ export const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({
         max-[1336px]:justify-around max-[1336px]:gap-2
         max-[1280px]:justify-around max-[1280px]:gap-2
         max-[1024px]:flex max-[1024px]:gap-8 max-[1024px]:px-5
-        max-[768px]:flex-wrap max-[768px]:gap-4 max-[768px]:gap-y-8 max-[768px]:justify-start
+        max-[768px]:flex-wrap max-[768px]:gap-4 max-[768px]:gap-y-8 max-[768px]:justify-between
       ">
         {metrics.map((metric) => (
           <div 

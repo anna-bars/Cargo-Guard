@@ -166,23 +166,28 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
     </div>
     
     {/* Table Rows Container with Scroll */}
-    <div className="
-  table-rows-cont
-  px-0
-  md:px-4
-  xl:px-4
-  block-2
-  space-y-2
-  activity-table
-  overflow-y-auto
-  flex-1
-  max-h-[calc(100vh-300px)]
-  min-h-[400px]
-  xs:p-0 xs:m-0 xs:w-full
-  
-  /* Mobile background */
-  xs:bg-[#eff1f1]
-">
+  <div
+  className="
+    table-rows-cont
+    px-0
+    md:px-4
+    xl:px-4
+    block-2
+    space-y-2
+    activity-table
+    overflow-y-auto
+    flex-1
+    max-h-[calc(100vh-300px)]
+    min-h-[400px]
+    xs:p-0 xs:m-0 xs:w-full
+
+    /* Mobile background */
+    xs:bg-[#eff1f1]
+
+    /* Mobile max-height */
+    xs:max-h-[80vh]
+  "
+>
       {filteredRows.length > 0 ? (
         filteredRows.map((row, idx) => (
           <div key={idx} className="
