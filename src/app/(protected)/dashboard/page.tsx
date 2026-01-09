@@ -1,7 +1,7 @@
 'use client'
 
 import DashboardLayout from '../DashboardLayout'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { ConversionChart } from '../../components/charts/ConversionChart'
 import { RecentActivityTable } from '@/app/components/tables/ActivityTable'
 import { WelcomeWidget } from '@/app/components/widgets/WelcomeWidget'
@@ -10,6 +10,8 @@ import { PerformanceOverview } from '@/app/components/widgets/PerformanceOvervie
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
+  const [activeWidget, setActiveWidget] = useState(0)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     // Simulate loading data
@@ -19,6 +21,28 @@ export default function DashboardPage() {
     
     return () => clearTimeout(timer)
   }, [])
+
+  const handleScroll = () => {
+    if (!scrollContainerRef.current) return
+    
+    const container = scrollContainerRef.current
+    const scrollLeft = container.scrollLeft
+    const widgetWidth = container.clientWidth
+    const currentIndex = Math.round(scrollLeft / widgetWidth)
+    
+    setActiveWidget(currentIndex)
+  }
+
+  const scrollToWidget = (index: number) => {
+    if (!scrollContainerRef.current) return
+    
+    const container = scrollContainerRef.current
+    const widgetWidth = container.clientWidth
+    container.scrollTo({
+      left: index * widgetWidth,
+      behavior: 'smooth'
+    })
+  }
 
   if (loading) {
     return (
@@ -38,7 +62,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Main Content Grid */}
-        <main className="
+        <div className="
           grid grid-cols-1 xl:grid-cols-[76.5%_23%] gap-2 
           h-[calc(100vh-140px)] xl:min-h-[100vh] xl:max-h-[100vh]
           max-[1336px]:grid-cols-[76.5%_23%]
@@ -103,8 +127,6 @@ export default function DashboardPage() {
                 }
               ]}
             />
- 
-              
               
             <RecentActivityTable 
               title="Recent Activity"
@@ -112,39 +134,90 @@ export default function DashboardPage() {
             />
           </div>
 
-          {/* Right Column - 25% */}
+          {/* Right Column - 25% - Desktop View */}
           <div className="
             max-h-[89%] min-h-[88%] flex flex-col gap-2 xl:min-h-[100vh] xl:max-h-[89vh]
             max-[1336px]:flex max-[1336px]:flex-col max-[1336px]:gap-2
             max-[1280px]:min-h-auto max-[1280px]:max-h-none max-[1280px]:row-start-1
-            max-[1280px]:flex max-[1280px]:flex-row max-[1280px]:gap-2 max-[1280px]:mb-2
-            max-[1024px]:min-h-auto max-[1024px]:max-h-none
-            max-[1024px]:flex-row max-[1024px]:gap-2
-            max-[768px]:flex-row max-[768px]:overflow-x-auto max-[768px]:overflow-y-hidden
-            max-[768px]:pb-4 max-[768px]:gap-3
-            max-[480px]:pb-0 max-[480px]:mb-0
+            max-[1280px]:hidden
           ">
             {/* Welcome Widget */}
             <WelcomeWidget userName="Lucas" />
 
             {/* Quote Conversion Rate */}
-            <div className="
-              flex-grow min-h-[calc(31%-4px)] xl:flex-[0_0_31%] xl:min-h-auto xl:h-auto
-              max-[1336px]:flex-grow max-[1336px]:min-h-auto max-[1336px]:h-auto
-              max-[1280px]:flex-grow max-[1280px]:min-h-auto max-[1280px]:h-auto max-[1280px]:block
-              max-[1024px]:w-full max-[1024px]:min-h-[180px] max-[1024px]:max-h-[200px]
-              max-[1024px]:block
-              max-[768px]:flex-shrink-0 max-[768px]:w-[85%] max-[768px]:min-h-[250px] 
-              max-[768px]:max-h-[280px]
-            ">
+            <div className="flex-grow min-h-[calc(31%-4px)] xl:flex-[0_0_31%] xl:min-h-auto xl:h-auto">
               <ConversionChart />
             </div>
 
             {/* High-Value Cargo Share Widget */}
             <HighValueCargoWidget percentage={75.55} mtdValue="62,3k" />
+          </div>
+
+          {/* Mobile/Tablet View - Horizontal Scroll with Snap */}
+          <div className="
+            hidden max-[1280px]:block max-[1280px]:row-start-1
+            max-[1280px]:w-full max-[1280px]:mb-2
+          ">
+
+            {/* Horizontal Scroll Container */}
+            <div 
+              ref={scrollContainerRef}
+              className="
+                flex overflow-x-auto snap-x snap-mandatory
+                w-full h-[240px]
+                [&::-webkit-scrollbar]:hidden
+                [-ms-overflow-style:none]
+                [scrollbar-width:none]
+                gap-2
+              "
+              onScroll={handleScroll}
+            >
+              {/* Welcome Widget */}
+              <div className="
+                flex-shrink-0 w-[90%] h-full
+                snap-center
+              ">
+                <WelcomeWidget userName="Lucas" />
+              </div>
+
+              {/* Conversion Chart */}
+              <div className="
+                flex-shrink-0 w-[90%] h-full
+                snap-center
+              ">
+                <div className="h-full w-full">
+                  <ConversionChart />
+                </div>
+              </div>
+
+              {/* High Value Cargo */}
+              <div className="
+                flex-shrink-0 w-[90%] h-full
+                snap-center
+              ">
+                <HighValueCargoWidget percentage={75.55} mtdValue="62,3k" />
+              </div>
+            </div>
+
+            {/* Scroll Indicator */}
+            <div className="mt-4 flex justify-start gap-2 mb-0">
+              {[0, 1, 2].map((index) => (
+                <button
+                  key={index}
+                  onClick={() => scrollToWidget(index)}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                    activeWidget === index 
+                      ? 'bg-[#0a3d62] w-8' 
+                      : 'bg-gray-300'
+                  }`}
+                  aria-label={`Go to widget ${index + 1}`}
+                />
+              ))}
+            </div>
+
 
           </div>
-        </main>
+        </div>
       </div>
     </DashboardLayout>
   )
