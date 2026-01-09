@@ -15,9 +15,9 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false)
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const pathname = usePathname()
   
-  // Ավելացրեք notifications state-երը (համարենք այնքանով, հետո կարող եք տեղափոխել context կամ redux)
   const [notifications, setNotifications] = useState([
     {
       id: '1',
@@ -27,7 +27,22 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
       read: false,
       created_at: new Date(Date.now() - 3600000).toISOString()
     },
-    // ... ձեր notification-ները
+    {
+      id: '2',
+      title: 'Shipment Update',
+      message: 'Your shipment #12345 has been dispatched',
+      type: 'success' as const,
+      read: false,
+      created_at: new Date(Date.now() - 7200000).toISOString()
+    },
+    {
+      id: '3',
+      title: 'Document Expiry',
+      message: 'Your insurance document expires in 7 days',
+      type: 'warning' as const,
+      read: true,
+      created_at: new Date(Date.now() - 86400000).toISOString()
+    }
   ])
   
   const [unreadCount, setUnreadCount] = useState(0)
@@ -38,7 +53,6 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
   }, [notifications])
   
   useEffect(() => {
-    // Update active nav item based on current path
     const currentPath = pathname.split('/').pop() || 'dashboard'
     const navItem = navItems.find(item => item.id === currentPath)
     if (navItem) {
@@ -74,8 +88,12 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
     document.body.classList.remove('overflow-hidden')
   }
   
-  const toggleUserDropdown = () => {
-    setIsUserDropdownOpen(!isUserDropdownOpen)
+  const toggleProfileModal = () => {
+    setIsProfileModalOpen(!isProfileModalOpen)
+  }
+  
+  const closeProfileModal = () => {
+    setIsProfileModalOpen(false)
   }
   
   const closeUserDropdown = () => {
@@ -114,13 +132,11 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
   const handleNavClick = (itemLabel: string) => {
     setActiveNavItem(itemLabel)
     closeMobileMenu()
-    closeUserDropdown()
   }
   
   const handleProfileSetting = () => {
-    // Navigate to profile page
     closeMobileMenu()
-    setIsUserDropdownOpen(false)
+    setIsProfileModalOpen(false)
   }
   
   const userDisplayName = userEmail?.split('@')[0] || 'User'
@@ -137,7 +153,8 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
               alt="Cargo Guard Logo" 
               className="w-[22px] h-[29px] object-cover"
             />
-            <h2 className="font-montserrat text-[18px] sm:text-[24px] font-normal text-[#0a3d62]">
+            {/* Hide text on mobile, show only on desktop */}
+            <h2 className="hidden sm:block font-montserrat text-[18px] sm:text-[24px] font-normal text-[#0a3d62]">
               Cargo Guard
             </h2>
           </div>
@@ -168,6 +185,7 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
           
           {/* Header Actions */}
           <div className="flex items-center gap-2.5">
+            {/* Notifications Button - Updated with count badge */}
             <div className="relative">
               <button 
                 className="w-[44px] h-[44px] sm:w-[54px] sm:h-[54px] bg-[#f7f7f7] rounded-lg border border-white/22 flex items-center justify-center relative cursor-pointer hover:bg-white transition-colors duration-300"
@@ -180,7 +198,9 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
                   className="w-[24px]"
                 />
                 {unreadCount > 0 && (
-                  <span className="absolute top-4 right-[19px] bg-[#f86464] w-[6px] h-[6px] rounded-full"></span>
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-[#f86464] text-white text-[10px] font-inter font-medium rounded-full flex items-center justify-center px-1">
+                    {unreadCount}
+                  </span>
                 )}
               </button>
               
@@ -199,7 +219,7 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
               <div 
                 id="user-avatar"
                 className="relative cursor-pointer"
-                onClick={toggleUserDropdown}
+                onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
               >
                 <img 
                   src="/dashboard/avatar-img.png" 
@@ -229,7 +249,6 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
                     borderRadius: '12px'
                   }}
                 >
-                  {/* User Info */}
                   <div className="px-4 py-3 border-b border-gray-100">
                     <div className="font-inter text-sm font-medium text-gray-900">
                       {userDisplayName}
@@ -239,10 +258,9 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
                     </div>
                   </div>
                   
-                  {/* Profile Setting Button */}
                   <Link 
                     href="/profile"
-                    onClick={handleProfileSetting}
+                    onClick={() => setIsUserDropdownOpen(false)}
                     className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-colors duration-200 text-left no-underline"
                   >
                     <div className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-lg">
@@ -253,7 +271,6 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
                     <span className="font-inter text-sm font-medium text-gray-800">Profile Setting</span>
                   </Link>
                   
-                  {/* Logout Button */}
                   <div className="border-t border-gray-100">
                     <LogoutButton desktopVersion />
                   </div>
@@ -261,118 +278,92 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
               )}
             </div>
             
-            <div className="xl:hidden">
-              <img 
-                src="/dashboard/avatar-img.png" 
-                alt="User Avatar"
-                className="w-[44px] h-[44px] rounded-lg object-cover"
-              />
+            {/* Mobile User Avatar - Click opens profile modal */}
+            <div className="xl:hidden relative">
+              <div 
+                className="relative cursor-pointer"
+                onClick={toggleProfileModal}
+              >
+                <img 
+                  src="/dashboard/avatar-img.png" 
+                  alt="User Avatar"
+                  className="w-[44px] h-[44px] rounded-lg object-cover hover:opacity-90 transition-opacity duration-300"
+                />
+              </div>
             </div>
-            
-            {/* Hamburger Menu Button */}
-            <button 
-              className="xl:hidden w-[44px] h-[44px] bg-[#f7f7f7] rounded-lg border border-white/22 flex flex-col justify-center items-center gap-1 p-2.5 cursor-pointer hover:bg-white transition-colors duration-300"
-              onClick={toggleMobileMenu}
-              aria-label="Toggle menu"
-            >
-              <span className={`w-5 h-0.5 bg-black transition-all duration-300 ${isMobileMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`}></span>
-              <span className={`w-5 h-0.5 bg-black transition-all duration-300 ${isMobileMenuOpen ? 'opacity-0' : ''}`}></span>
-              <span className={`w-5 h-0.5 bg-black transition-all duration-300 ${isMobileMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`}></span>
-            </button>
           </div>
         </header>
 
-        {/* Mobile Navigation Menu */}
-        <div className={`fixed inset-0 z-50 transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-          <div 
-            className="absolute inset-0 bg-black/50"
-            onClick={closeMobileMenu}
-          ></div>
-          <div className={`absolute top-0 right-0 w-[300px] h-full bg-white p-5 transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-            <div className="flex justify-end mb-7">
-              <button 
-                className="w-[44px] h-[44px] bg-[#f7f7f7] rounded-lg border border-white/22 flex items-center justify-center cursor-pointer text-2xl text-black hover:bg-gray-100 transition-colors duration-300"
-                onClick={closeMobileMenu}
-              >
-                ×
-              </button>
-            </div>
-            
-            {/* User Info Section */}
-            <div className="flex items-center gap-3 mb-6 p-3 bg-[#f7f7f7] rounded-lg hover:bg-gray-50 transition-colors duration-300 cursor-pointer">
-              <img 
-                src="/dashboard/avatar-img.png" 
-                alt="User Avatar"
-                className="w-10 h-10 rounded-lg object-cover"
-              />
-              <div>
-                <div className="font-inter text-sm font-medium text-black">
-                  {userDisplayName}
-                </div>
-                <div className="font-inter text-xs text-gray-600 truncate max-w-[180px]">
-                  {userEmail || 'user@example.com'}
+        {/* Profile Modal for Mobile */}
+        {isProfileModalOpen && (
+          <div className="fixed inset-0 z-[9999] transition-opacity duration-300">
+            <div 
+              className="absolute inset-0 bg-black/50"
+              onClick={closeProfileModal}
+            ></div>
+            <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl p-5 transition-transform duration-300 animate-slideUp">
+              {/* Close button */}
+              <div className="flex justify-end mb-6">
+                <button 
+                  className="w-[44px] h-[44px] bg-[#f7f7f7] rounded-lg border border-white/22 flex items-center justify-center cursor-pointer text-2xl text-black hover:bg-gray-100 transition-colors duration-300"
+                  onClick={closeProfileModal}
+                >
+                  ×
+                </button>
+              </div>
+              
+              {/* User Info */}
+              <div className="flex items-center gap-3 mb-6 p-4 bg-[#f7f7f7] rounded-lg">
+                <img 
+                  src="/dashboard/avatar-img.png" 
+                  alt="User Avatar"
+                  className="w-12 h-12 rounded-lg object-cover"
+                />
+                <div>
+                  <div className="font-inter text-base font-medium text-black">
+                    {userDisplayName}
+                  </div>
+                  <div className="font-inter text-sm text-gray-600 truncate max-w-[200px]">
+                    {userEmail || 'user@example.com'}
+                  </div>
                 </div>
               </div>
-            </div>
-          
-            {/* Mobile Navigation Links with Hover Effect */}
-            <nav className="flex flex-col gap-3 mb-7">
-              {navItems.map((item) => (
-                <Link 
-                  key={item.id}
-                  href={item.href}
-                  onClick={() => handleNavClick(item.label)}
-                  className={`px-4 py-3 font-inter text-base no-underline rounded-lg transition-all duration-300 ${activeNavItem === item.label ? 'bg-white text-black font-medium shadow-sm' : 'text-black hover:bg-[#f7f7f7]'}`}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-            
-            {/* User Settings Section - Added */}
-            <div className="mt-auto pt-5 border-t border-gray-200">
+              
+              {/* Profile Setting Button */}
               <Link 
                 href="/profile"
                 onClick={handleProfileSetting}
                 className="flex items-center gap-3 px-4 py-3 w-full rounded-lg hover:bg-gray-100 transition-colors duration-300 cursor-pointer mb-3 no-underline"
               >
-                <div className="w-8 h-8 flex items-center justify-center">
+                <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-lg">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <span className="font-inter text-sm font-medium text-gray-800">Profile Setting</span>
+                <span className="font-inter text-base font-medium text-gray-800">Profile Setting</span>
               </Link>
               
-              <div onClick={closeMobileMenu}>
+              {/* Logout Button */}
+              <div onClick={closeProfileModal}>
                 <LogoutButton mobileVersion />
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
       
       <style jsx>{`
-        /* Hamburger Menu Styles */
-        body.menu-open {
-          overflow: hidden;
-        }
-        
-        @media screen and (max-width: 1024px) {
-          .logo-text {
-            display: none;
+        @keyframes slideUp {
+          from {
+            transform: translateY(100%);
+          }
+          to {
+            transform: translateY(0);
           }
         }
         
-        @media screen and (max-width: 768px) {
-          .mobile-nav-container {
-            width: 100%;
-          }
-          
-          .hamburger-btn {
-            width: 40px;
-            height: 40px;
-          }
+        .animate-slideUp {
+          animation: slideUp 0.3s ease-out;
         }
       `}</style>
     </>
