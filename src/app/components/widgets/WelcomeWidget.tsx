@@ -24,7 +24,7 @@ export const WelcomeWidget: React.FC<WelcomeWidgetProps> = ({
         alt="Background" 
         className="absolute inset-0 w-full h-full object-cover"
       />
-      <div className="relative z-10 p-4 h-full flex flex-col justify-between
+      <div className="max-[480px]:min-h-[240px] relative z-10 p-4 h-full flex flex-col justify-between
         max-[1024px]:p-3
         max-[480px]:p-4
       ">

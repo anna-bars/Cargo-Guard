@@ -29,7 +29,7 @@ export const HighValueCargoWidget: React.FC<HighValueCargoWidgetProps> = ({
       <div className="absolute top-0 left-0 w-full h-full bg-[#fafcffcc] rounded-xl"></div>
       
       {/* Content */}
-      <div className="relative z-10 p-4 h-full flex flex-col justify-between">
+      <div className="max-[480px]:min-h-[240px] relative z-10 p-4 h-full flex flex-col justify-between">
         {/* Header */}
         <div className="flex justify-between items-start mb-2">
           <h3 className="
