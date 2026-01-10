@@ -210,7 +210,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
     xs:max-h-[80vh]
 
     max-[767px]:!w-[100%]
-    max-[767px]:!rounded-[12px]
+    max-[767px]:!rounded-[10px]
   "
 >
       {filteredRows.length > 0 ? (
@@ -330,7 +330,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
                 </div>
                 
                 {/* Button */}
-                <div className="w-1/2 xs4:w-full xs:pl-1.5">
+                <div className="w-[47%] xs4:w-full xs:pl-1.5">
                   <button className={`
                     h-[44px] w-full rounded-lg font-inter text-sm justify-center items-center gap-2 transition-colors duration-300
                     ${row.button.variant === 'primary' 
