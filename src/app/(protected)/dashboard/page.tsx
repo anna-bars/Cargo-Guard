@@ -11,6 +11,7 @@ import { PerformanceOverview } from '@/app/components/widgets/PerformanceOvervie
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [activeWidget, setActiveWidget] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -22,8 +23,20 @@ export default function DashboardPage() {
     return () => clearTimeout(timer)
   }, [])
 
+  useEffect(() => {
+    // Check screen size for mobile
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+    
+    checkScreenSize()
+    window.addEventListener('resize', checkScreenSize)
+    
+    return () => window.removeEventListener('resize', checkScreenSize)
+  }, [])
+
   const handleScroll = () => {
-    if (!scrollContainerRef.current) return
+    if (!scrollContainerRef.current || !isMobile) return
     
     const container = scrollContainerRef.current
     const scrollLeft = container.scrollLeft
@@ -34,7 +47,7 @@ export default function DashboardPage() {
   }
 
   const scrollToWidget = (index: number) => {
-    if (!scrollContainerRef.current) return
+    if (!scrollContainerRef.current || !isMobile) return
     
     const container = scrollContainerRef.current
     const widgetWidth = container.clientWidth
@@ -159,12 +172,39 @@ export default function DashboardPage() {
             <HighValueCargoWidget percentage={75.55} mtdValue="62,3k" />
           </div>
 
-          {/* Mobile/Tablet View - Horizontal Scroll with Snap */}
+          {/* Tablet View (768px - 1279px) - Three Widgets Side by Side */}
           <div className="
-            hidden max-[1280px]:block max-[1280px]:row-start-1
-            max-[1280px]:w-full max-[1280px]:mb-2
+            hidden max-[1280px]:block min-[769px]:block
+            max-[768px]:hidden
+            max-[1280px]:row-start-1 max-[1280px]:w-full
+            max-[1280px]:mb-2
           ">
+            <div className="grid grid-cols-3 gap-2 w-full">
+              {/* Welcome Widget */}
+              <div className="w-full h-[240px]">
+                <WelcomeWidget userName="Lucas" />
+              </div>
 
+              {/* Conversion Chart */}
+              <div className="w-full h-[240px]">
+                <div className="h-full w-full">
+                  <ConversionChart />
+                </div>
+              </div>
+
+              {/* High Value Cargo */}
+              <div className="w-full h-[240px]">
+                <HighValueCargoWidget percentage={75.55} mtdValue="62,3k" />
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile View (≤768px) - Horizontal Scroll with Snap */}
+          <div className="
+            hidden max-[768px]:block
+            max-[768px]:row-start-1 max-[768px]:w-full
+            max-[768px]:mb-2
+          ">
             {/* Horizontal Scroll Container */}
             <div 
               ref={scrollContainerRef}
@@ -205,7 +245,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Scroll Indicator */}
+            {/* Scroll Indicator - Only for Mobile */}
             <div className="mt-4 flex justify-start gap-2 mb-0">
               {[0, 1, 2].map((index) => (
                 <button
@@ -220,8 +260,6 @@ export default function DashboardPage() {
                 />
               ))}
             </div>
-
-
           </div>
         </div>
       </div>

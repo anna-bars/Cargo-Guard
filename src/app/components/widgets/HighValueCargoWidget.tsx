@@ -18,8 +18,8 @@ export const HighValueCargoWidget: React.FC<HighValueCargoWidgetProps> = ({
       relative w-full font-montserrat flex-grow min-h-[calc(29%-4px)] 
       xl:flex-[0_0_28%] xl:min-h-auto xl:h-auto
       max-[1336px]:flex-grow max-[1336px]:min-h-auto max-[1336px]:h-auto
-      max-[1280px]:flex-grow max-[1280px]:min-h-auto max-[1280px]:h-auto max-[1280px]:block
-      max-[1024px]:w-[49%] max-[1024px]:min-h-[180px] max-[1024px]:max-h-[200px]
+      max-[1280px]:flex-grow  max-[1280px]:min-h-[240px] max-[1280px]:h-[240px] max-[1280px]:block
+      max-[768px]:w-[49%] max-[1024px]:min-h-[240px] max-[1024px]:max-h-[240px]
       max-[1024px]:block
       max-[768px]:flex-shrink-0 max-[768px]:w-[85%] max-[768px]:min-h-[250px] 
       max-[768px]:max-h-[280px]

@@ -13,8 +13,8 @@ export const WelcomeWidget: React.FC<WelcomeWidgetProps> = ({
       relative rounded-2xl overflow-hidden w-full transition-shadow duration-300 
       flex-grow min-h-[calc(41%-4px)] xl:flex-[0_0_38.5%] xl:min-h-auto xl:h-auto
       max-[1336px]:h-[352px] max-[1336px]:w-full
-      max-[1280px]:h-auto max-[1280px]:min-h-[260px] max-[1280px]:w-full max-[1280px]:flex-grow
-      max-[1024px]:w-[49%] max-[1024px]:min-h-[180px] max-[1024px]:max-h-[200px] max-[1024px]:flex-shrink
+      max-[1280px]:h-auto max-[1280px]:min-h-[240px] max-[1280px]:w-full max-[1280px]:flex-grow
+      max-[768px]:w-[49%] max-[1280px]:min-h-[240px] max-[1024px]:max-h-[240px] max-[1024px]:flex-shrink
       max-[768px]:flex-shrink-0 max-[768px]:w-[85%] max-[768px]:min-h-[250px] 
       max-[768px]:max-h-[280px]
       max-[480px]:w-[100%] max-[480px]:min-h-[100%] max-[480px]:max-h-[100%]
