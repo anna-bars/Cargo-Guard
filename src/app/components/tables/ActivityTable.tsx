@@ -230,35 +230,35 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
   md:hover:!bg-[#f0f0f5e8]">
             
             {/* Type սյունակ - թաքցված 768px-ից 1023px, տեսանելի 1024px-ից */}
-            <div className="hidden lg:block md:w-auto font-poppins text-sm text-black truncate row-cell">
+            <div className="hidden md:block lg:block md:w-auto font-poppins text-sm text-black truncate row-cell">
               {row.type}
             </div>
             
-            {/* ID սյունակ */}
-            <div className="md:block md:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">
+            {/* ID սյունակ - թաքցված մոբայլում */}
+            <div className="hidden md:block md:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">
               {row.id}
             </div>
             
-            {/* Cargo/Value սյունակ */}
-            <div className="md:block md:w-auto font-poppins text-sm text-black truncate row-cell">
+            {/* Cargo/Value սյունակ - թաքցված մոբայլում */}
+            <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">
               {row.cargo} / {row.value}
             </div>
             
-            {/* Status սյունակ */}
-            <div className="md:block md:w-auto row-cell flex justify-end">
+            {/* Status սյունակ - թաքցված մոբայլում */}
+            <div className="hidden md:block md:w-auto row-cell flex justify-end">
               <span className={`!font-medium inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor}`}>
                 <span className={`w-1.5 h-1.5 rounded-full ${row.status.dot}`}></span>
                 {row.status.text}
               </span>
             </div>
             
-            {/* Date սյունակ */}
-            <div className="md:block md:w-auto font-poppins text-sm text-black truncate row-cell">
+            {/* Date սյունակ - թաքցված մոբայլում */}
+            <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">
               {row.date}
             </div>
             
-            {/* Button սյունակ */}
-            <div className="flex justify-end md:flex md:w-auto row-cell">
+            {/* Button սյունակ - թաքցված մոբայլում */}
+            <div className="hidden md:flex justify-end md:w-auto row-cell">
               <button className={`h-9 px-4 rounded-lg font-poppins text-sm font-normal transition-colors duration-300 w-full xl:w-[140px] ${
                 row.button.variant === 'primary' 
                   ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]' 
@@ -268,8 +268,8 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
               </button>
             </div>
             
-            {/* Mobile Layout */}
-            <div className="infoo md:hidden w-full mob-lay">
+            {/* Mobile Layout - ցուցադրվում է միայն մոբայլում */}
+            <div className="md:hidden w-full mob-lay">
               {/* Top row: Type/ID on left, Status on right */}
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2">
