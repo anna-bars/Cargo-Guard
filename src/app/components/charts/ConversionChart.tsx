@@ -60,9 +60,11 @@ const renderBars = () => {
   
   // Յուրաքանչյուր տեսակի գծիկների համար
   barsPerType.forEach((item) => {
-    for (let i = 0; i < item.barCount; i++) {
+    const itemBarCount = item.barCount;
+    
+    for (let i = 0; i < itemBarCount; i++) {
       const isFirst = i === 0;
-      const isLast = i === item.barCount - 1;
+      const isLast = i === itemBarCount - 1;
       
       // Հաշվել բարձրությունը՝ հաշվի առնելով hover էֆֆեկտը
       let height = item.normalHeight;
@@ -74,8 +76,16 @@ const renderBars = () => {
         height = item.hegHeight;
       }
       
-      // Հաշվել գույնի պայծառությունը hover-ի ժամանակ
+      // Հաշվել գույնի գրադիենտը հատկապես approved-ի համար
       let backgroundColor = item.color;
+      
+      if (item.type === 'approved') {
+        // Գրադիենտ approved-ի համար
+        const gradientProgress = itemBarCount > 1 ? i / (itemBarCount - 1) : 0.5;
+        backgroundColor = getGradientColorForApproved(gradientProgress);
+      }
+      
+      // Հաշվել գույնի պայծառությունը hover-ի ժամանակ
       let opacity = 1;
       
       if (hoveredType && hoveredType !== item.type) {
@@ -83,7 +93,7 @@ const renderBars = () => {
         opacity = 0.4;
       } else if (hoveredType === item.type) {
         // Եթե hover է այս տեսակի վրա՝ գույնը պայծառանում է
-        backgroundColor = adjustColorBrightness(item.color, 20);
+        backgroundColor = adjustColorBrightness(backgroundColor, 20);
       }
       
       bars.push(
@@ -111,6 +121,29 @@ const renderBars = () => {
   });
   
   return bars;
+};
+
+// Գրադիենտ գույնի ֆունկցիա approved-ի համար
+const getGradientColorForApproved = (progress: number): string => {
+  // Գույները գրադիենտի համար
+  const startColor = '#BED5F8'; // Սկզբնական գույն
+  const endColor = '#669CEE';   // Վերջնական գույն
+  
+  // RGB արժեքները ստանալ
+  const startR = parseInt(startColor.slice(1, 3), 16);
+  const startG = parseInt(startColor.slice(3, 5), 16);
+  const startB = parseInt(startColor.slice(5, 7), 16);
+  
+  const endR = parseInt(endColor.slice(1, 3), 16);
+  const endG = parseInt(endColor.slice(3, 5), 16);
+  const endB = parseInt(endColor.slice(5, 7), 16);
+  
+  // Ինտերպոլացիա
+  const r = Math.round(startR + (endR - startR) * progress);
+  const g = Math.round(startG + (endG - startG) * progress);
+  const b = Math.round(startB + (endB - startB) * progress);
+  
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 };
 
   // Օգնական ֆունկցիա գույնի պայծառությունը փոխելու համար
@@ -224,17 +257,7 @@ const renderBars = () => {
       </div>
 
       <style jsx global>{`
-        .approved-chart-bar {
-          background-color: #669CEE !important;
-        }
-        
-        .declined-chart-bar {
-          background-color: #EEAF66 !important;
-        }
-        
-        .expired-chart-bar {
-          background-color: #66EE88 !important;
-        }
+     
         
         .empty-chart-bar {
           background: linear-gradient(180deg, #E2E3E4, transparent) !important;
