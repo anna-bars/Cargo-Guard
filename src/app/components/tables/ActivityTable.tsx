@@ -274,77 +274,73 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
             </div>
             
             {/* Mobile Layout - ցուցադրվում է միայն մոբայլում */}
-            <div className="md:hidden w-full mob-lay">
-              {/* Top row: Type/ID on left, Status on right */}
-              <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center gap-2">
-                  <img 
-                    src={row.type === 'Policy' 
-                      ? "/table/document-attachment-stroke-rounded.svg" 
-                      : "/table/document-text-stroke-rounded.svg"
-                    } 
-                    alt={row.type} 
-                    className="w-4 h-4 xs:w-[16px] xs:h-[16px] xs2:w-[14px] xs2:h-[14px] opacity-80 hover:opacity-100"
-                  />
-                  <span className="font-poppins text-sm font-normal text-black xs:text-[16px]">{row.type}</span>
-                  <span className="font-poppins text-sm text-[#2563eb] underline xs:text-[#2563eb]">{row.id}</span>
-                </div>
-                
-                {/* Status badge */}
-                <div className="row-cell flex-shrink-0">
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor} 
-                    w-fit min-w-fit whitespace-nowrap pl-3 pr-3 h-[26px] items-center transition-all duration-300
-                    xs:text-[10px] xs:px-2 xs:py-1.5 xs:h-[22px] xs3:text-[11px] xs3:px-2.5 xs3:py-1.5 xs3:h-[24px]`}>
-                    <span className={`w-2 h-2 rounded-full ${row.status.dot}`}></span>
-                    {row.status.text}
-                  </span>
-                </div>
-              </div>
-              
-              {/* Middle row: Cargo on left, Value on right */}
-              <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center gap-2">
-                  <img 
-                    src="/table/package-stroke-rounded.svg" 
-                    alt="Cargo" 
-                    className="w-4 h-4 xs:w-[16px] xs:h-[16px] xs2:w-[14px] xs2:h-[14px] opacity-80 hover:opacity-100"
-                  />
-                  <span className="font-poppins text-sm text-gray-700">{row.cargo}</span>
-                </div>
-                <div className="font-poppins text-sm font-normal text-black">{row.value}</div>
-              </div>
-              
-              {/* Divider line */}
-              <div className="border-t border-[#f2f2ed] my-3 xs:my-3"></div>
-              
-              {/* Bottom row: Date and Button */}
-              <div className="flex items-center justify-between xs:flex xs:items-center xs:gap-3 xs:w-full xs4:flex-col xs4:gap-2">
-                {/* Date with clock icon */}
-                <div className="flex items-center gap-2 w-1/2 xs4:w-full xs4:justify-center xs4:mb-1">
-                  <img 
-                    src="/table/clock.svg" 
-                    alt="Time" 
-                    className="w-4 h-4 xs:w-[16px] xs:h-[16px] xs2:w-[14px] xs2:h-[14px]"
-                  />
-                  <div className="font-poppins text-sm text-gray-600 xs2:text-[12px]">{row.date}</div>
-                </div>
-                
-                {/* Button */}
-                <div className="w-[47%] xs4:w-full xs:pl-1.5">
-                  <button className={`
-                    h-[44px] w-full rounded-lg font-inter text-sm justify-center items-center gap-2 transition-colors duration-300
-                    ${row.button.variant === 'primary' 
-                      ? 'bg-[#2563EB] text-white border border-[rgba(255,255,255,0.22)] hover:bg-[#1d4ed8] hover:text-white hover:border-[#d1d5db]' 
-                      : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f3f4f6] hover:text-white hover:border-[#d1d5db]'
-                    }
-                    xs:text-[14px] xs:font-medium xs:w-[95%] xs:min-w-0
-                    xs2:text-[13px] xs2:px-1.5 xs2:py-2.5 xs2:h-[40px] xs2:max-w-[95%]
-                  `}>
-                    {row.button.text}
-                  </button>
-                </div>
-              </div>
-            </div>
+{/* Mobile Layout - ցուցադրվում է միայն մոբայլում */}
+<div className="md:hidden w-full mob-lay">
+  {/* Top row: Type/ID on left, Status on right */}
+  <div className="flex justify-between items-center mb-4">
+    <div className="flex items-center gap-2">
+      {/* Հանել իկոնները */}
+      <span className="font-poppins text-sm font-normal text-black xs:text-[16px]">{row.type}</span>
+      <span className="font-poppins text-sm text-[#2563eb] underline xs:text-[#2563eb]">{row.id}</span>
+    </div>
+    
+    {/* Status badge */}
+    <div className="row-cell flex-shrink-0">
+      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor} 
+        w-fit min-w-fit whitespace-nowrap pl-3 pr-3 h-[26px] items-center transition-all duration-300
+        xs:text-[10px] xs:px-2 xs:py-1.5 xs:h-[22px] xs3:text-[11px] xs3:px-2.5 xs3:py-1.5 xs3:h-[24px]`}>
+        <span className={`w-2 h-2 rounded-full ${row.status.dot}`}></span>
+        {row.status.text}
+      </span>
+    </div>
+  </div>
+  
+  {/* Middle row: Cargo on left, Value on right */}
+  <div className="flex justify-between items-center mb-4">
+    <div className="flex items-center gap-2">
+      {/* Cargo իկոնը պահպանել */}
+      <img 
+        src="/table/package-stroke-rounded.svg" 
+        alt="Cargo" 
+        className="w-4 h-4 xs:w-[16px] xs:h-[16px] xs2:w-[14px] xs2:h-[14px] opacity-80 hover:opacity-100"
+      />
+      <span className="font-poppins text-sm text-gray-700">{row.cargo}</span>
+    </div>
+    <div className="font-poppins text-sm font-normal text-black">{row.value}</div>
+  </div>
+  
+  {/* Divider line */}
+  <div className="border-t border-[#f2f2ed] my-3 xs:my-3"></div>
+  
+  {/* Bottom row: Date and Button */}
+  <div className="flex items-center justify-between xs:flex xs:items-center xs:gap-3 xs:w-full xs4:flex-col xs4:gap-2">
+    {/* Date with clock icon */}
+    <div className="flex items-center gap-2 w-1/2 xs4:w-full xs4:justify-center xs4:mb-1">
+      {/* Clock icon պահպանել */}
+      <img 
+        src="/table/clock.svg" 
+        alt="Time" 
+        className="w-4 h-4 xs:w-[16px] xs:h-[16px] xs2:w-[14px] xs2:h-[14px]"
+      />
+      <div className="font-poppins text-sm text-gray-600 xs2:text-[12px]">{row.date}</div>
+    </div>
+    
+    {/* Button */}
+    <div className="w-[47%] xs4:w-full xs:pl-1.5">
+      <button className={`
+        h-[44px] w-full rounded-lg font-inter text-sm justify-center items-center gap-2 transition-colors duration-300
+        ${row.button.variant === 'primary' 
+          ? 'bg-[#2563EB] text-white border border-[rgba(255,255,255,0.22)] hover:bg-[#1d4ed8] hover:text-white hover:border-[#d1d5db]' 
+          : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f3f4f6] hover:text-white hover:border-[#d1d5db]'
+        }
+        xs:text-[14px] xs:font-medium xs:w-[95%] xs:min-w-0
+        xs2:text-[13px] xs2:px-1.5 xs2:py-2.5 xs2:h-[40px] xs2:max-w-[95%]
+      `}>
+        {row.button.text}
+      </button>
+    </div>
+  </div>
+</div>
           </div>
         ))
       ) : (
