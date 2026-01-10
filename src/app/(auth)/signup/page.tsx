@@ -31,7 +31,7 @@ const handleSignUp = async (e: React.FormEvent) => {
           full_name: fullName,
         },
         // ✅ ԱՅՍՏԵՂ ԱՎԵԼԱՑՐԵՔ
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
       },
     })
 
