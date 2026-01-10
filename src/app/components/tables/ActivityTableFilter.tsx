@@ -65,7 +65,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
       )}
 
       <div className='block-1'>
-        <div className='flex px-0 md:px-4 justify-between items-center relative'>
+        <div className='mt-3 mb-2 flex px-0 md:px-4 justify-between items-center relative'>
           <h2 className="block">{title}</h2>
           <div className='header-btn flex justify-between gap-2'>
             <div className='desktop-filter-cont hidden md:flex items-center gap-4 bg-[#f9f9f6] rounded-lg mx-4'>
