@@ -116,7 +116,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
     max-[767px]:bg-transparent 
     max-[767px]:p-0 
     max-[767px]:rounded-none
-    max-[767px]:!w-[101%]
+    max-[767px]:!w-[100%]
     max-[767px]:!overflow-hidden
   "
 >
