@@ -33,99 +33,85 @@ export const ConversionChart = () => {
       window.removeEventListener('resize', updateBarsCount);
     };
   }, [calculateBarsCount]);
-
-  const renderBars = () => {
-    const total = DATA.reduce((sum, item) => sum + item.count, 0);
-    const bars: JSX.Element[] = [];
-    
-    let barIndex = 0;
-    
-    // Յուրաքանչյուր տեսակի գծիկների համար
-    DATA.forEach((item, dataIndex) => {
-      const itemBars = Math.max(1, Math.round((item.count / total) * barsCount));
+const renderBars = () => {
+  const total = DATA.reduce((sum, item) => sum + item.count, 0);
+  const bars: JSX.Element[] = [];
+  
+  // Նախ հաշվել յուրաքանչյուր տեսակի գծիկների քանակը
+  const barsPerType = DATA.map(item => ({
+    ...item,
+    barCount: Math.max(1, Math.floor((item.count / total) * barsCount))
+  }));
+  
+  // Հաշվել ընդհանուր գծիկները
+  const totalBars = barsPerType.reduce((sum, item) => sum + item.barCount, 0);
+  
+  // Եթե ավելի քիչ գծիկներ ենք ունենում, քան պետք է, ավելացնել հավասարաչափ
+  let remainingBars = barsCount - totalBars;
+  
+  // Մնացած գծիկները ավելացնել ամենամեծ տոկոսով տեսակին՝ առանց հերթականությունը փոխելու
+  const sortedIndices = [...barsPerType.keys()].sort((a, b) => barsPerType[b].count - barsPerType[a].count);
+  
+  for (let i = 0; i < remainingBars && i < sortedIndices.length; i++) {
+    barsPerType[sortedIndices[i]].barCount++;
+  }
+  
+  let barIndex = 0;
+  
+  // Յուրաքանչյուր տեսակի գծիկների համար
+  barsPerType.forEach((item) => {
+    for (let i = 0; i < item.barCount; i++) {
+      const isFirst = i === 0;
+      const isLast = i === item.barCount - 1;
       
-      for (let i = 0; i < itemBars; i++) {
-        const isFirst = i === 0;
-        const isLast = i === itemBars - 1;
-        
-        // Հաշվել բարձրությունը՝ հաշվի առնելով hover էֆֆեկտը
-        let height = item.normalHeight;
-        
-        if (isFirst || isLast) {
-          height = item.hegHeight;
-        } else if (hoveredType === item.type) {
-          // Եթե hover է՝ ամեն գծիկ դառնում է hegHeight-ի չափ
-          height = item.hegHeight;
-        }
-        
-        // Հաշվել գույնի պայծառությունը hover-ի ժամանակ
-        let backgroundColor = item.color;
-        let opacity = 1;
-        
-        if (hoveredType && hoveredType !== item.type) {
-          // Եթե hover է մեկ այլ տեսակի վրա՝ այս տեսակի գծիկները դառնում են թափանցիկ
-          opacity = 0.4;
-        } else if (hoveredType === item.type) {
-          // Եթե hover է այս տեսակի վրա՝ գույնը պայծառանում է
-          backgroundColor = adjustColorBrightness(item.color, 20);
-        }
-        
-        bars.push(
-          <div 
-            key={`${item.type}-${i}-${barIndex}`}
-            className={`${item.type}-chart-bar ${isFirst || isLast ? 'heg' : ''}`}
-            style={{
-              width: '1px',
-              transform: 'scaleX(2.7)',
-              transformOrigin: 'left',
-              height: `${height}px`,
-              backgroundColor: backgroundColor,
-              opacity: opacity,
-              transition: 'all 0.3s ease',
-              cursor: 'pointer',
-              borderRadius: '1px'
-            }}
-            onMouseEnter={() => setHoveredType(item.type)}
-            onMouseLeave={() => setHoveredType(null)}
-            title={`${item.type}: ${item.count}`}
-          />
-        );
-        barIndex++;
+      // Հաշվել բարձրությունը՝ հաշվի առնելով hover էֆֆեկտը
+      let height = item.normalHeight;
+      
+      if (isFirst || isLast) {
+        height = item.hegHeight;
+      } else if (hoveredType === item.type) {
+        // Եթե hover է՝ ամեն գծիկ դառնում է hegHeight-ի չափ
+        height = item.hegHeight;
       }
-    });
-    
-    // Մնացած դատարկ գծիկներ
-    const totalDataBars = DATA.reduce((sum, item) => 
-      sum + Math.max(1, Math.round((item.count / total) * barsCount)), 0);
-    const remainingBars = barsCount - totalDataBars;
-    
-    for (let i = 0; i < remainingBars; i++) {
+      
+      // Հաշվել գույնի պայծառությունը hover-ի ժամանակ
+      let backgroundColor = item.color;
       let opacity = 1;
-      if (hoveredType) {
-        opacity = 0.2; // Hover-ի ժամանակ դատարկ գծիկները նույնպես թափանցիկ
+      
+      if (hoveredType && hoveredType !== item.type) {
+        // Եթե hover է մեկ այլ տեսակի վրա՝ այս տեսակի գծիկները դառնում են թափանցիկ
+        opacity = 0.4;
+      } else if (hoveredType === item.type) {
+        // Եթե hover է այս տեսակի վրա՝ գույնը պայծառանում է
+        backgroundColor = adjustColorBrightness(item.color, 20);
       }
       
       bars.push(
         <div 
-          key={`empty-${i}-${barIndex}`}
-          className="empty-chart-bar"
+          key={`${item.type}-${i}-${barIndex}`}
+          className={`${item.type}-chart-bar ${isFirst || isLast ? 'heg' : ''}`}
           style={{
             width: '1px',
             transform: 'scaleX(2.7)',
             transformOrigin: 'left',
-            height: '10px',
-            background: 'linear-gradient(180deg, #E2E3E4, transparent)',
+            height: `${height}px`,
+            backgroundColor: backgroundColor,
             opacity: opacity,
             transition: 'all 0.3s ease',
+            cursor: 'pointer',
             borderRadius: '1px'
           }}
+          onMouseEnter={() => setHoveredType(item.type)}
+          onMouseLeave={() => setHoveredType(null)}
+          title={`${item.type}: ${item.count}`}
         />
       );
       barIndex++;
     }
-    
-    return bars;
-  };
+  });
+  
+  return bars;
+};
 
   // Օգնական ֆունկցիա գույնի պայծառությունը փոխելու համար
   const adjustColorBrightness = (color: string, percent: number): string => {
