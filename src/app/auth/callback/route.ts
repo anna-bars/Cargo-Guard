@@ -9,6 +9,9 @@ export async function GET(request: Request) {
   
   console.log('Code:', code ? 'Present' : 'Missing')
   
+  // Ստանում ենք հիմնական URL-ը environment variable-ից
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
+  
   if (code) {
     try {
       const supabase = await createClient()
@@ -16,16 +19,20 @@ export async function GET(request: Request) {
       
       if (error) {
         console.error('❌ Auth error:', error.message)
-        return NextResponse.redirect('http://localhost:3001/login?error=' + encodeURIComponent(error.message))
+        return NextResponse.redirect(
+          `${baseUrl}/login?error=${encodeURIComponent(error.message)}`
+        )
       }
       
       console.log('✅ Session exchange successful')
     } catch (error: any) {
       console.error('❌ Unexpected error:', error)
-      return NextResponse.redirect('http://localhost:3001/login?error=Authentication+failed')
+      return NextResponse.redirect(
+        `${baseUrl}/login?error=Authentication+failed`
+      )
     }
   }
   
   // Հաջողության դեպքում
-  return NextResponse.redirect('http://localhost:3001/dashboard')
+  return NextResponse.redirect(`${baseUrl}/dashboard`)
 }
