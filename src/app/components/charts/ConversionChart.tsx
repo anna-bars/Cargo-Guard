@@ -33,6 +33,7 @@ export const ConversionChart = () => {
       window.removeEventListener('resize', updateBarsCount);
     };
   }, [calculateBarsCount]);
+
 const renderBars = () => {
   const total = DATA.reduce((sum, item) => sum + item.count, 0);
   const bars: JSX.Element[] = [];
@@ -76,14 +77,9 @@ const renderBars = () => {
         height = item.hegHeight;
       }
       
-      // Հաշվել գույնի գրադիենտը հատկապես approved-ի համար
-      let backgroundColor = item.color;
-      
-      if (item.type === 'approved') {
-        // Գրադիենտ approved-ի համար
-        const gradientProgress = itemBarCount > 1 ? i / (itemBarCount - 1) : 0.5;
-        backgroundColor = getGradientColorForApproved(gradientProgress);
-      }
+      // Հաշվել գույնի գրադիենտը ըստ տեսակի
+      const gradientProgress = itemBarCount > 1 ? i / (itemBarCount - 1) : 0.5;
+      let backgroundColor = getGradientColor(item.type, gradientProgress);
       
       // Հաշվել գույնի պայծառությունը hover-ի ժամանակ
       let opacity = 1;
@@ -123,20 +119,26 @@ const renderBars = () => {
   return bars;
 };
 
-// Գրադիենտ գույնի ֆունկցիա approved-ի համար
-const getGradientColorForApproved = (progress: number): string => {
-  // Գույները գրադիենտի համար
-  const startColor = '#BED5F8'; // Սկզբնական գույն
-  const endColor = '#669CEE';   // Վերջնական գույն
+// Գրադիենտ գույնի ֆունկցիա բոլոր տեսակների համար
+const getGradientColor = (type: string, progress: number): string => {
+  // Գրադիենտի գույները յուրաքանչյուր տեսակի համար
+  const gradients: Record<string, { start: string; end: string }> = {
+    approved: { start: '#BED5F8', end: '#669CEE' },
+    declined: { start: '#FF5343', end: '#F71500' }, // declined-ի համար՝ FF5343 → F71500
+    expired: { start: '#FFCF38', end: '#EAB308' }   // expired-ի համար՝ FFCF38 → EAB308
+  };
+  
+  const gradient = gradients[type];
+  if (!gradient) return '#000000';
   
   // RGB արժեքները ստանալ
-  const startR = parseInt(startColor.slice(1, 3), 16);
-  const startG = parseInt(startColor.slice(3, 5), 16);
-  const startB = parseInt(startColor.slice(5, 7), 16);
+  const startR = parseInt(gradient.start.slice(1, 3), 16);
+  const startG = parseInt(gradient.start.slice(3, 5), 16);
+  const startB = parseInt(gradient.start.slice(5, 7), 16);
   
-  const endR = parseInt(endColor.slice(1, 3), 16);
-  const endG = parseInt(endColor.slice(3, 5), 16);
-  const endB = parseInt(endColor.slice(5, 7), 16);
+  const endR = parseInt(gradient.end.slice(1, 3), 16);
+  const endG = parseInt(gradient.end.slice(3, 5), 16);
+  const endB = parseInt(gradient.end.slice(5, 7), 16);
   
   // Ինտերպոլացիա
   const r = Math.round(startR + (endR - startR) * progress);
@@ -193,9 +195,10 @@ const getGradientColorForApproved = (progress: number): string => {
                   <div 
                     className="w-1.5 h-1.5 rounded-full transition-all duration-300"
                     style={{ 
-                      backgroundColor: item.color,
+                      // Ցույց տալ գրադիենտի միջին գույնը
+                      backgroundColor: getGradientColor(item.type, 0.5),
                       transform: hoveredType === item.type ? 'scale(1.2)' : 'scale(1)',
-                      boxShadow: hoveredType === item.type ? `0 0 8px ${item.color}80` : 'none'
+                      boxShadow: hoveredType === item.type ? `0 0 8px ${getGradientColor(item.type, 0.5)}80` : 'none'
                     }}
                   ></div>
                   <div className="text-[15px] font-medium transition-all duration-300"
@@ -257,8 +260,6 @@ const getGradientColorForApproved = (progress: number): string => {
       </div>
 
       <style jsx global>{`
-     
-        
         .empty-chart-bar {
           background: linear-gradient(180deg, #E2E3E4, transparent) !important;
         }
