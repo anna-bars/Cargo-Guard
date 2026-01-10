@@ -15,7 +15,7 @@ export const WelcomeWidget: React.FC<WelcomeWidgetProps> = ({
       max-[1336px]:h-[352px] max-[1336px]:w-full
       max-[1280px]:h-auto max-[1280px]:min-h-[240px] max-[1280px]:w-full max-[1280px]:flex-grow
       max-[768px]:w-[49%] max-[1280px]:min-h-[240px] max-[1024px]:max-h-[240px] max-[1024px]:flex-shrink
-      max-[768px]:flex-shrink-0 max-[768px]:w-[85%] max-[768px]:min-h-[250px] 
+      max-[768px]:flex-shrink-0 max-[768px]:w-[100%] max-[768px]:min-h-[240px] 
       max-[768px]:max-h-[280px]
       max-[480px]:w-[100%] max-[480px]:min-h-[100%] max-[480px]:max-h-[100%]
     ">
@@ -27,6 +27,7 @@ export const WelcomeWidget: React.FC<WelcomeWidgetProps> = ({
       <div className="max-[480px]:min-h-[240px] relative z-10 p-4 h-full flex flex-col justify-between
         max-[1024px]:p-3
         max-[480px]:p-4
+        max-[768px]:min-h-[240px]
       ">
         <div>
           <h2 className="

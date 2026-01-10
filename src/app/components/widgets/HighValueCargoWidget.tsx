@@ -21,7 +21,7 @@ export const HighValueCargoWidget: React.FC<HighValueCargoWidgetProps> = ({
       max-[1280px]:flex-grow  max-[1280px]:min-h-[240px] max-[1280px]:h-[240px] max-[1280px]:block
       max-[768px]:w-[49%] max-[1024px]:min-h-[240px] max-[1024px]:max-h-[240px]
       max-[1024px]:block
-      max-[768px]:flex-shrink-0 max-[768px]:w-[85%] max-[768px]:min-h-[250px] 
+      max-[768px]:flex-shrink-0 max-[768px]:w-[100%] max-[768px]:min-h-[240px] 
       max-[768px]:max-h-[280px]
       max-[480px]:w-[100%] max-[480px]:min-h-[100%] max-[480px]:max-h-[100%]
     ">
