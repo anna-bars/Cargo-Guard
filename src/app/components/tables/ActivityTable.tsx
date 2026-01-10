@@ -146,8 +146,28 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
 >
 
     {/* Desktop Table Header */}
-    <div className="mt-4 px-4 sm:px-4 py-2 mb-0 hidden md:grid grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 pb-2 mb-0 table-header w-[97%] bg-[#ededed7a] mx-auto my-3.5 rounded-[4px]">
-      {['Type', 'ID', 'Cargo / Value', 'Status / Due Date', 'Last Update', 'Action'].map((header, idx) => (
+    <div className="mt-4 px-4 sm:px-4 py-2 mb-0 hidden md:grid grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] lg:grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 pb-2 mb-0 table-header w-[97%] bg-[#ededed7a] mx-auto my-3.5 rounded-[4px]">
+      {/* Type սյունակ - թաքցված 768px-ից 1023px-ի համար, տեսանելի 1024px-ից */}
+      <div className="hidden lg:flex items-center gap-2 font-poppins text-sm font-normal text-[#606068]">
+        <span>Type</span>
+        <img
+          src="https://c.animaapp.com/mjiggi0jSqvoj5/img/filter--1--7.png"
+          alt="Sort"
+          className="w-3 h-3"
+        />
+      </div>
+      
+      {/* ID սյունակ - ցուցադրվում է բոլոր էկրաններում */}
+      <div className="flex items-center gap-2 font-poppins text-sm font-normal text-[#606068]">
+        <span>ID</span>
+        <img
+          src="https://c.animaapp.com/mjiggi0jSqvoj5/img/filter--1--7.png"
+          alt="Sort"
+          className="w-3 h-3"
+        />
+      </div>
+      
+      {['Cargo / Value', 'Status / Due Date', 'Last Update', 'Action'].map((header, idx) => (
         <div
           key={idx}
           className={`flex items-center gap-2 font-poppins text-sm font-normal text-[#606068]
@@ -192,7 +212,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
         filteredRows.map((row, idx) => (
           <div key={idx} className="
   mob-ly-item tab-item 
-  md:grid sm:grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 
+  md:grid md:grid-cols-[8.5%_1fr_20%_14%_17%] lg:grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 
   p-4 md:p-3 
   bg-[#f9f9f6] rounded-lg 
   flex flex-wrap items-center 
@@ -208,17 +228,45 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
   md:bg-transparent
   md:!m-0 md:!border-b md:!border-solid md:!border-[#ededf3] md:!rounded-none
   md:hover:!bg-[#f0f0f5e8]">
-            {/* Desktop Layout */}
-            <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.type}</div>
-            <div className="hidden md:block md:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">{row.id}</div>
-            <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.cargo} / {row.value}</div>
-            <div className="hidden md:block md:w-auto row-cell flex justify-end">
+            
+            {/* Type սյունակ - թաքցված 768px-ից 1023px, տեսանելի 1024px-ից */}
+            <div className="hidden lg:block md:w-auto font-poppins text-sm text-black truncate row-cell">
+              {row.type}
+            </div>
+            
+            {/* ID սյունակ */}
+            <div className="md:block md:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">
+              {row.id}
+            </div>
+            
+            {/* Cargo/Value սյունակ */}
+            <div className="md:block md:w-auto font-poppins text-sm text-black truncate row-cell">
+              {row.cargo} / {row.value}
+            </div>
+            
+            {/* Status սյունակ */}
+            <div className="md:block md:w-auto row-cell flex justify-end">
               <span className={`!font-medium inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor}`}>
                 <span className={`w-1.5 h-1.5 rounded-full ${row.status.dot}`}></span>
                 {row.status.text}
               </span>
             </div>
-            <div className="hidden md:block md:w-auto font-poppins text-sm text-black truncate row-cell">{row.date}</div>
+            
+            {/* Date սյունակ */}
+            <div className="md:block md:w-auto font-poppins text-sm text-black truncate row-cell">
+              {row.date}
+            </div>
+            
+            {/* Button սյունակ */}
+            <div className="flex justify-end md:flex md:w-auto row-cell">
+              <button className={`h-9 px-4 rounded-lg font-poppins text-sm font-normal transition-colors duration-300 w-full xl:w-[140px] ${
+                row.button.variant === 'primary' 
+                  ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]' 
+                  : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f3f4f6] hover:border-[#d1d5db]'
+              }`}>
+                {row.button.text}
+              </button>
+            </div>
             
             {/* Mobile Layout */}
             <div className="infoo md:hidden w-full mob-lay">
@@ -291,17 +339,6 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
                   </button>
                 </div>
               </div>
-            </div>
-            
-            {/* Desktop button */}
-            <div className="flex justify-end hidden md:flex md:w-auto row-cell">
-              <button className={`h-9 px-4 rounded-lg font-poppins text-sm font-normal transition-colors duration-300 w-full xl:w-[140px] ${
-                row.button.variant === 'primary' 
-                  ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]' 
-                  : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f3f4f6] hover:border-[#d1d5db]'
-              }`}>
-                {row.button.text}
-              </button>
             </div>
           </div>
         ))
