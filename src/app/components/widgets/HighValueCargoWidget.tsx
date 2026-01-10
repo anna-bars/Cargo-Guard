@@ -26,7 +26,7 @@ export const HighValueCargoWidget: React.FC<HighValueCargoWidgetProps> = ({
       max-[480px]:w-[100%] max-[480px]:min-h-[100%] max-[480px]:max-h-[100%]
     ">
       {/* Background */}
-      <div className="absolute top-0 left-0 w-full h-full bg-[#fafcffcc] rounded-xl"></div>
+      <div className="absolute top-0 left-0 w-full h-full bg-[#fdfdf8cf] rounded-xl"></div>
       
       {/* Content */}
       <div className="max-[480px]:min-h-[240px] relative z-10 p-4 h-full flex flex-col justify-between">

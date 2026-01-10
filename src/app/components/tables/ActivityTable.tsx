@@ -136,7 +136,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
 
   <div
   className="
-    block-2 bg-[#fbfbfb] rounded-t-[16px] mt-2
+    block-2 bg-[#fdfdf8cf] rounded-t-[16px] mt-2
     border border-[#8989893b]
     flex flex-col flex-1 overflow-hidden
 
@@ -214,7 +214,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
   mob-ly-item tab-item 
   md:grid md:grid-cols-[8.5%_1fr_20%_14%_17%] lg:grid-cols-[8.5%_8.5%_1fr_20%_14%_17%] gap-2 
   p-4 md:p-3 
-  bg-[#f9f9f6] rounded-lg 
+  bg-[#fdfdf8f5] rounded-lg 
   flex flex-wrap items-center 
   hover:bg-[#f0f4f9] transition-colors duration-300
   

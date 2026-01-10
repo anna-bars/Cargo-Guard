@@ -146,7 +146,7 @@ export const ConversionChart = () => {
   };
 
   return (
-    <div className="flex flex-col justify-between border border-[#d1d1d154] bg-[#fafaf7]/80 rounded-2xl p-4 h-full w-full quote-conversion performance-section hover:shadow-sm transition-shadow duration-300">
+    <div className="flex flex-col justify-between border border-[#d1d1d154] bg-[#fdfdf8cf] rounded-2xl p-4 h-full w-full quote-conversion performance-section hover:shadow-sm transition-shadow duration-300">
       <div className="mb-[4px]">
         <h3 className="font-montserrat text-[18px] font-normal text-black action-title">
           Quote Conversion Rate
