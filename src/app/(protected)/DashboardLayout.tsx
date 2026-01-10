@@ -38,7 +38,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   }
 
   return (
-    <div className="h-[116vh] overflow-hidden bg-[url('/background2.png')] bg-no-repeat bg-cover bg-center bg-top">
+    <div className="
+  h-[116vh]
+  overflow-hidden
+  bg-[#F3F3F6]
+  md:bg-[url('/background2.png')]
+  md:bg-no-repeat
+  md:bg-cover
+  md:bg-center
+  md:bg-top
+">
 
         <div className="h-[116vh] min-h-[116vh] font-montserrat flex flex-col">
       <div className='block-1'><DashboardHeader userEmail={user?.email} /></div>

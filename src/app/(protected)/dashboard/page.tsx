@@ -146,7 +146,11 @@ export default function DashboardPage() {
                 }
               ]}
             />
-              
+
+<div className="block md:hidden">
+  <ConversionChart />
+</div>
+
             <RecentActivityTable 
               title="Recent Activity"
               showMobileHeader={false}
@@ -189,7 +193,7 @@ export default function DashboardPage() {
               <div className="w-full h-[240px]">
                 <div className="h-full w-full">
                   <ConversionChart />
-                </div>
+                </div> 
               </div>
 
               {/* High Value Cargo */}
@@ -199,68 +203,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Mobile View (≤768px) - Horizontal Scroll with Snap */}
-          <div className="
-            hidden max-[768px]:block
-            max-[768px]:row-start-1 max-[768px]:w-full
-            max-[768px]:mb-2
-          ">
-            {/* Horizontal Scroll Container */}
-            <div 
-              ref={scrollContainerRef}
-              className="
-                flex overflow-x-auto snap-x snap-mandatory
-                w-full h-[240px]
-                [&::-webkit-scrollbar]:hidden
-                [-ms-overflow-style:none]
-                [scrollbar-width:none]
-                gap-2
-              "
-              onScroll={handleScroll}
-            >
-              {/* Welcome Widget */}
-              <div className="
-                flex-shrink-0 w-[72%] h-full
-                snap-center
-              ">
-                <WelcomeWidget userName="Lucas" />
-              </div>
-
-              {/* Conversion Chart */}
-              <div className="
-                flex-shrink-0 w-[90%] h-full
-                snap-center
-              ">
-                <div className="h-full w-full">
-                  <ConversionChart />
-                </div>
-              </div>
-
-              {/* High Value Cargo */}
-              <div className="
-                flex-shrink-0 w-[90%] h-full
-                snap-center
-              ">
-                <HighValueCargoWidget percentage={75.55} mtdValue="62,3k" />
-              </div>
-            </div>
-
-            {/* Scroll Indicator - Only for Mobile */}
-            <div className="mt-4 flex justify-start gap-2 mb-0">
-              {[0, 1, 2].map((index) => (
-                <button
-                  key={index}
-                  onClick={() => scrollToWidget(index)}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    activeWidget === index 
-                      ? 'bg-[#778B8E] w-8' 
-                      : 'bg-gray-300'
-                  }`}
-                  aria-label={`Go to widget ${index + 1}`}
-                />
-              ))}
-            </div>
-          </div>
+         
         </div>
       </div>
     </DashboardLayout>

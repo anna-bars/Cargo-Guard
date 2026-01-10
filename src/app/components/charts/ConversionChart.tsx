@@ -304,7 +304,7 @@ export const ConversionChart = () => {
   
   @media screen and (max-width: 768px) {
     .quote-conversion.performance-section {
-      min-height: 240px;
+      min-height: 200px;
     }
     
     // .chaart, .chaart2 {
