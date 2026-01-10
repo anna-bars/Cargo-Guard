@@ -217,11 +217,11 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
   bg-[#fdfdf8f5] rounded-lg 
   flex flex-wrap items-center 
   hover:bg-[#f0f4f9] transition-colors duration-300
-  
+     
   /* Mobile styles */
   xs:min-w-full xs:flex xs:bg-[rgba(250,252,255,0.8)] 
   xs:rounded-[16px] xs:flex-wrap xs:gap-4 xs:justify-between 
-  xs:p-5 xs:mb-3 xs:border-b xs:border-solid xs:border-[#d1d1d140]
+  xs:p-0 xs:mb-3 xs:border-b xs:border-solid xs:border-[#d1d1d140]
   xs:hover:bg-[#f6f6ec]
   
   /* Desktop styles */
