@@ -51,13 +51,13 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
           <h3 className="text-lg font-normal">Recent Activity</h3>
           <div className='flex gap-2'>
             <button 
-              className="flex items-center gap-1 bg-[#F5F4F7] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300"
+              className="max-[768px]:p-2 flex items-center gap-1 bg-[#F5F4F7] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300"
               onClick={() => setShowFilter(!showFilter)}
             >
               <img src="dashboard/icons/filter-stroke-rounded.svg" alt="" className="w-[16px] h-[16px]" />
               Filter
             </button>
-            <button className="bg-[#eb8d25] text-white px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#ff8c0c] transition-colors duration-300">
+            <button className="max-[768px]:p-2 bg-[#eb8d25] text-white px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#ff8c0c] transition-colors duration-300">
               Get New Quote
             </button>
           </div>
@@ -73,7 +73,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
             </div>
             
             <button 
-              className="flex items-center gap-1 bg-[#F5F4F7] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300 relative"
+              className="max-[768px]:p-2 flex items-center gap-1 bg-[#F5F4F7] border border-[#d1d1d154] px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#F2F0F5] transition-colors duration-300 relative"
               onClick={() => {
                 setShowFilter(!showFilter);
                 // For desktop, toggle the filter panel
@@ -88,7 +88,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#2563eb] rounded-full"></span>
               )}
             </button>
-            <button className="bg-[#eb8d25] text-white px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#ff8c0c] transition-colors duration-300">
+            <button className="max-[768px]:p-2 bg-[#eb8d25] text-white px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#ff8c0c] transition-colors duration-300">
               Get New Quote
             </button>
           </div>

@@ -102,6 +102,7 @@ export const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({
     <section className="
       border border-[#d1d1d1]/33 bg-[#fdfdf8cf] rounded-2xl p-4 h-auto
       max-[768px]:p-4
+  max-[768px]:pl-4.5
     ">
       <div className="flex justify-between items-start mb-2 
         max-[1336px]:items-center
@@ -139,7 +140,7 @@ export const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({
         max-[1336px]:justify-around max-[1336px]:gap-2
         max-[1280px]:justify-around max-[1280px]:gap-2
         max-[1024px]:flex max-[1024px]:gap-8 max-[1024px]:px-5
-        max-[768px]:flex-wrap max-[768px]:gap-4 max-[768px]:gap-y-8 max-[768px]:justify-between
+        max-[768px]:flex-wrap max-[768px]:gap-4 max-[768px]:gap-y-4 max-[768px]:justify-between
       ">
         {metrics.map((metric) => (
           <div 
