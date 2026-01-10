@@ -39,7 +39,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <div className="
-  h-[116vh]
+  md:h-[116vh]
   overflow-hidden
   bg-[#F3F3F6]
   md:bg-[url('/background2.png')]
@@ -49,7 +49,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   md:bg-top
 ">
 
-        <div className="h-[116vh] min-h-[116vh] font-montserrat flex flex-col">
+        <div className="md:h-[116vh] md:min-h-[116vh] font-montserrat flex flex-col">
       <div className='block-1'><DashboardHeader userEmail={user?.email} /></div>
       
       <main className="block-2 omblock min-w-[97.5%] max-h-[86%] max-w-[88%] !sm:min-w-[90.5%] scrollbar-thin mx-auto overflow-hidden">
