@@ -73,9 +73,9 @@ export default function DashboardPage() {
           <img
             src="/dashboard/hashtag.svg"
             alt=""
-            className="w-[26px] h-[26px] sm:w-5 sm:h-5"
+            className="w-[22px] h-[22px] sm:w-5 sm:h-5"
           />
-          <h2 className="font-normal text-[26px] sm:text-lg">
+          <h2 className="font-normal text-[18px] sm:text-lg">
             Dashboard
           </h2>
         </div>
