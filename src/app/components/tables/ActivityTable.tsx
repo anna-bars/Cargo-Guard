@@ -138,7 +138,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
 
   <div
   className="
-    block-2 bg-[#fdfdf8cf] rounded-t-[16px] mt-2
+    block-2 bg-[#fdfdf8cf] rounded-t-[12px] mt-2
     border border-[#8989893b]
     flex flex-col flex-1 overflow-hidden
 
