@@ -245,4 +245,4 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
       `}</style>
     </>
   )
-}
+} 
