@@ -184,6 +184,7 @@ body {
 @media screen and (max-width: 768px) {
   .omblock {
     min-width: 90.5% !important;
+    padding-bottom: 50px !important;
   }
 }
 

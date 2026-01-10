@@ -52,7 +52,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <div className="md:h-[116vh] md:min-h-[116vh] font-montserrat flex flex-col">
       <div className='block-1'><DashboardHeader userEmail={user?.email} /></div>
       
-      <main className="block-2 omblock min-w-[97.5%] max-h-[86%] max-w-[88%] !sm:min-w-[90.5%] scrollbar-thin mx-auto overflow-hidden">
+      <main className="block-2 omblock min-w-[97.5%] max-h-[86%] max-w-[88%] !sm:min-w-[90.5%] scrollbar-thin mx-auto overflow-hidden max-[767px]:!overflow-hidden">
   {children}
 </main>
     </div>

@@ -116,6 +116,8 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
     max-[767px]:bg-transparent 
     max-[767px]:p-0 
     max-[767px]:rounded-none
+    max-[767px]:!w-[101%]
+    max-[767px]:!overflow-hidden
   "
 >
 
@@ -141,7 +143,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
     flex flex-col flex-1 overflow-hidden
 
     max-[767px]:border-none
-    max-[767px]:bg-[#eef0f1]
+    max-[767px]:bg-[#f3f3f6] max-[767px]:!w-[99.5%]
   "
 >
 
@@ -206,6 +208,9 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
 
     /* Mobile max-height */
     xs:max-h-[80vh]
+
+    max-[767px]:!w-[100%]
+    max-[767px]:!rounded-[12px]
   "
 >
       {filteredRows.length > 0 ? (
@@ -216,7 +221,7 @@ export const RecentActivityTable: React.FC<RecentActivityTableProps> = ({
   p-4 md:p-3 
   bg-[#fdfdf8f5] rounded-lg 
   flex flex-wrap items-center 
-  hover:bg-[#f0f4f9] transition-colors duration-300
+  hover:bg-[#ffffff] transition-colors duration-300
      
   /* Mobile styles */
   xs:min-w-full xs:flex xs:bg-[rgba(250,252,255,0.8)] 
