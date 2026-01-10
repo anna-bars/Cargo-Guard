@@ -25,7 +25,7 @@ export const WelcomeWidget: React.FC<WelcomeWidgetProps> = ({
         className="absolute inset-0 w-full h-full object-cover"
       />
       <div className="max-[480px]:min-h-[240px] relative z-10 p-4 h-full flex flex-col justify-between
-        max-[1024px]:p-3
+        max-[1024px]:p-3 max-[1024px]:min-h-[240px] max-[1280px]:min-h-[240px]
         max-[480px]:p-4
         max-[768px]:min-h-[240px]
       ">
