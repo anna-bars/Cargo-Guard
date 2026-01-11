@@ -257,7 +257,7 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
 
   // Սյունակները որոնք տեսանելի են դեսկթոփում
   const visibleDesktopColumns = columns.filter(col => !col.hideOnMobile);
-  const desktopGridCols = `repeat(${visibleDesktopColumns.length}, minmax(0, 1fr))`;
+  const desktopGridCols = `0.5fr repeat(${visibleDesktopColumns.length - 3}, minmax(0, 1fr)) 0.7fr 1fr`;
 
   const renderDesktopCell = (column: TableColumn, row: TableRow) => {
     if (column.renderDesktop) {
@@ -373,7 +373,7 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
                   
                   {/* Desktop Columns */}
                   {visibleDesktopColumns.map((column, colIndex) => (
-                    <div key={colIndex} className={`${getColumnVisibilityClass(column)} hidden md:block`}>
+                    <div key={colIndex} className={`${getColumnVisibilityClass(column)} hidden md:flex`}>
                       {renderDesktopCell(column, row)}
                     </div>
                   ))}
