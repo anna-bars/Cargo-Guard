@@ -1,21 +1,27 @@
 'use client'
 
+import { useState } from 'react'
+
 interface QuotesExpirationCardProps {
   activeTab?: string;
   onTabChange?: (tab: string) => void;
 }
 
 const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesExpirationCardProps) => {
-  const tabs = ['This Week', 'Next Week'];
+  const tabs = ['This Week', 'Next Week', 'In 2–4 Weeks', 'Next Month'];
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
-  // Քարտի համար տվյալներ
   const totalQuotes = 22;
   const expiringQuotes = 7;
   const expiringRate = Math.round((expiringQuotes / totalQuotes) * 100);
   
-  // Ստեղծենք գծիկների զանգվածը (32% ակտիվ, մնացածը ոչ ակտիվ)
   const chartItems = Array.from({ length: totalQuotes });
   const activeItemsCount = Math.round((expiringRate / 100) * totalQuotes);
+
+  const handleTabSelect = (tab: string) => {
+    onTabChange?.(tab);
+    setIsDropdownOpen(false);
+  };
 
   return (
     <>
@@ -44,27 +50,51 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
       `}</style>
 
       <div className="stats-card bg-[#fafbf6]/80 rounded-2xl p-4">
-        <div className="card-header mb-6">
+        <div className="card-header mb-6 flex justify-between items-start">
           <h3 className="font-montserrat text-lg font-medium text-black mb-0">Quotes Expiration</h3>
-          <div className="time-tabs flex gap-3 overflow-x-auto py-2">
-            {tabs.map((tab) => (
-              <span 
-                key={tab}
-                onClick={() => onTabChange?.(tab)}
-                className={`
-                  font-montserrat text-xs font-medium tracking-[0.24px] cursor-pointer whitespace-nowrap
-                  ${activeTab === tab 
-                    ? 'text-[#6f6f6f] underline' 
-                    : 'text-[#c7c7c7]'
-                  }
-                `}
+          
+          {/* Dropdown աջ անկյունում */}
+          <div className="relative">
+            <button 
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center gap-1 font-montserrat text-xs font-medium text-[#6f6f6f] tracking-[0.24px] cursor-pointer whitespace-nowrap px-3 py-1 border border-[#e2e3e4] rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              {activeTab}
+              <svg 
+                className={`w-3 h-3 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
               >
-                {tab}
-              </span>
-            ))}
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            
+            {/* Dropdown Menu */}
+            {isDropdownOpen && (
+              <div className="absolute right-0 top-full mt-1 bg-white min-w-[120px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] rounded-lg z-10 py-1">
+                {tabs.map((tab) => (
+                  <div 
+                    key={tab}
+                    onClick={() => handleTabSelect(tab)}
+                    className={`
+                      px-4 py-2 cursor-pointer font-montserrat text-xs font-medium tracking-[0.24px]
+                      hover:bg-gray-50 transition-colors
+                      ${activeTab === tab 
+                        ? 'text-[#6f6f6f] underline' 
+                        : 'text-[#6f6f6f]'
+                      }
+                    `}
+                  >
+                    {tab}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
         
+        {/* ... մնացած նույն կոդը ... */}
         <div className="expiration-stats relative w-[149px] h-[73.5px] mb-6">
           <div className="expiration-left absolute top-0 left-0.5 w-[143px] h-11 flex gap-3">
             <div className="expiration-rate w-20 h-10 flex gap-1 items-baseline">
@@ -83,7 +113,6 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
           </div>
         </div>
         
-        {/* Chart with vertical bars */}
         <div className="chaart">
           {chartItems.map((_, index) => (
             <div 
