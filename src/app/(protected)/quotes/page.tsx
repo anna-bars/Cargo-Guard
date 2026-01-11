@@ -234,57 +234,14 @@ export default function DashboardPage() {
             max-[1280px]:min-h-auto max-[1280px]:max-h-none max-[1280px]:row-start-2
             max-[1024px]:min-h-auto max-[1024px]:max-h-none
           ">
-            {/* Performance Overview */}
-            <PerformanceOverview 
-              title="Performance Overview"
-              timePeriod="This Month"
-              metrics={[
-                {
-                  id: 'insured-amount',
-                  value: '84',
-                  decimal: '5k',
-                  prefix: '$',
-                  label: 'Total Insured Amount',
-                  hasArrow: false
-                },
-                {
-                  id: 'active-policies',
-                  value: '8',
-                  decimal: '47',
-                  suffix: '%',
-                  label: 'Active Policies',
-                  hasArrow: true,
-                  arrowDirection: 'up'
-                },
-                {
-                  id: 'quotes-awaiting',
-                  value: '3',
-                  decimal: '',
-                  suffix: '%',
-                  label: 'Quotes Awaiting Approval',
-                  hasArrow: true,
-                  arrowDirection: 'down'
-                },
-                {
-                  id: 'contracts-expire',
-                  value: '2',
-                  decimal: '',
-                  suffix: '%',
-                  label: 'Contracts Due to Expire',
-                  hasArrow: true,
-                  arrowDirection: 'down'
-                },
-                {
-                  id: 'documents-uploads',
-                  value: '1',
-                  decimal: '',
-                  suffix: '%',
-                  label: 'Required Document Uploads',
-                  hasArrow: true,
-                  arrowDirection: 'down'
-                }
-              ]}
-            />
+            <div className="flex items-center gap-3">
+                  <img
+                    src="/quotes/header-ic.svg"
+                    alt=""
+                    className="w-6 h-6"
+                  />
+                  <h2 className="text-[26px]">Quotes</h2>
+                </div>
 
             <div className="block md:hidden">
               <ConversionChart />
@@ -313,16 +270,141 @@ export default function DashboardPage() {
             max-[1280px]:min-h-auto max-[1280px]:max-h-none max-[1280px]:row-start-1
             max-[1280px]:hidden
           ">
-            {/* Welcome Widget */}
-            <WelcomeWidget userName="Lucas" />
+            <div className="flex justify-end items-center gap-3 !h-[39px]">
+                  <button
+                    className="inline-flex items-center justify-center gap-[10px] px-4 py-2 h-[35.68px] bg-[#f8fbff] border border-[#ffffff30] rounded-[6px] font-poppins text-base font-normal text-black cursor-pointer whitespace-nowrap"
+                  >
+                    <img
+                      src="/quotes/download.svg"
+                      alt=""
+                      className="w-3 h-3 object-cover"
+                    />
+                    Download
+                  </button>
+                  <button className="inline-flex items-center justify-center gap-[10px] px-4 py-2 h-[35.68px] bg-[#0b0b0b] border-0 rounded-[6px] font-poppins text-base font-normal text-white cursor-pointer whitespace-nowrap">
+                    + Get New Quote
+                  </button>
+                </div>
+
+                {/* Improve Your Quote Rate Card */}
+              <div className="stats-card bg-[#fafcff]/80 rounded-2xl p-4">
+                <h3 className="font-montserrat text-lg font-medium text-black mb-6">Improve Your Quote Rate</h3>
+                <div className="stats-content mb-6">
+                  <div className="rate-section relative w-[145px] h-[39px]">
+                    <div className="rate-label absolute top-6 left-24 font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px]">Quotes</div>
+                    <div className="rate-value absolute top-0 left-0 w-20 h-[37px] flex gap-1 items-baseline">
+                      <span className="percentage font-montserrat text-[56px] text-black font-normal tracking-[1.12px] leading-9 w-16">72</span>
+                      <span className="percent-symbol font-montserrat text-xs text-black font-normal tracking-[0.20px] w-2">%</span>
+                    </div>
+                  </div>
+                  <p className="stats-description font-montserrat text-xs font-normal text-[#afaeae] tracking-[0.24px] max-w-[268px]">
+                    Your Quotes are often Declined due to 
+                    <strong className="font-medium tracking-[0.03px]"> Inaccurate Cargo Value</strong>
+                  </p>
+                </div>
+                <div className="stats-footer flex items-end justify-between w-full">
+                  <span className="font-montserrat text-base font-normal text-[#3c3c3c] tracking-[0.32px] max-w-[206px]">
+                    View Full Cargo Type Rules Before Proceeding
+                  </span>
+                  <img 
+                    src="https://c.animaapp.com/mjous28hLTkY2o/img/group-84-1.png" 
+                    alt="Arrow"
+                    className="w-10 h-10"
+                  />
+                </div>
+              </div>
+           
 
             {/* Quote Conversion Rate */}
             <div className="flex-grow min-h-[calc(31%-4px)] xl:flex-[0_0_31%] xl:min-h-auto xl:h-auto">
               <ConversionChart />
             </div>
 
-            {/* High-Value Cargo Share Widget */}
-            <HighValueCargoWidget percentage={75.55} mtdValue="62,3k" />
+            {/* Quotes Expiration Card */}
+  <div className="stats-card bg-[#fafcff]/80 rounded-2xl p-4">
+    <div className="card-header mb-6">
+      <h3 className="font-montserrat text-lg font-medium text-black mb-0">Quotes Expiration</h3>
+      <div className="time-tabs flex gap-3">
+        <span className="active font-montserrat text-xs font-medium text-[#6f6f6f] tracking-[0.24px] underline cursor-pointer whitespace-nowrap">This Week</span>
+        <span className="font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px] cursor-pointer whitespace-nowrap">Next Week</span>
+        <span className="font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px] cursor-pointer whitespace-nowrap">In 2–4 Weeks</span>
+        <span className="font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px] cursor-pointer whitespace-nowrap">Next Month</span>
+      </div>
+    </div>
+    
+    <div className="expiration-stats relative w-[149px] h-[73.5px] mb-6">
+      <div className="expiration-left absolute top-0 left-0.5 w-[143px] h-11 flex gap-3">
+        <div className="expiration-rate w-20 h-10 flex gap-1 items-baseline">
+          <span className="rate-number font-montserrat text-[56px] text-black font-normal tracking-[1.12px] leading-10 w-16">32</span>
+          <span className="rate-symbol font-montserrat text-xs text-black font-normal tracking-[0.20px] w-2">%</span>
+        </div>
+      </div>
+      <div className="expiration-right absolute top-14 left-0">
+        <span className="expiration-total font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px] whitespace-nowrap">
+          Total expiring quotes: 7
+        </span>
+      </div>
+    </div>
+    
+   <div className="chaart">
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+                            <div className="chart-div-active-item"></div>
+
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            <div className="chart-div-item"></div>
+                            
+                        </div>
+    
+    <div className="expiration-chart flex flex-col gap-3">
+      <span className="chart-label font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px]">
+        Total quotes: 22
+      </span>
+    </div>
+  </div>
           </div>
 
           {/* Tablet View (768px - 1279px) - Three Widgets Side by Side */}
