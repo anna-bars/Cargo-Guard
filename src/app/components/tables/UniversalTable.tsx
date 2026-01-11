@@ -257,7 +257,7 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
 
   // Սյունակները որոնք տեսանելի են դեսկթոփում
   const visibleDesktopColumns = columns.filter(col => !col.hideOnMobile);
-  const desktopGridCols = `0.5fr repeat(${visibleDesktopColumns.length - 3}, minmax(0, 1fr)) 0.7fr 1fr`;
+  const desktopGridCols = `0.7fr repeat(${visibleDesktopColumns.length - 3}, minmax(0, 1fr)) 0.7fr 1fr`;
 
   const renderDesktopCell = (column: TableColumn, row: TableRow) => {
     if (column.renderDesktop) {
@@ -320,7 +320,7 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
           <div className="mt-4 px-4 sm:px-4 py-2 mb-0 hidden md:grid gap-2 pb-2 mb-0 table-header w-[97%] bg-[#ededed7a] mx-auto my-3.5 rounded-[4px]" 
                style={{ gridTemplateColumns: desktopGridCols }}>
             {visibleDesktopColumns.map((column, idx) => (
-              <div key={idx} className={`flex items-center gap-2 font-poppins text-sm font-normal text-[#606068] ${getColumnVisibilityClass(column)} ${column.label === 'Action' ? 'justify-end' : ''}`}>
+              <div key={idx} className={`max-w-[80%] flex items-center gap-2 font-poppins text-sm font-normal text-[#606068] ${getColumnVisibilityClass(column)} ${column.label === 'Action' ? 'justify-end' : ''}`}>
                 <span>{column.label}</span>
                 {column.sortable && column.label !== 'Action' && (
                   <img
