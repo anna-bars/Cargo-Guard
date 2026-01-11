@@ -131,7 +131,7 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
           className="chart-bar active-bar"
           style={{
             width: '1px',
-            transform: 'scaleX(2)',
+            transform: 'scaleX(2.7)',
             transformOrigin: 'left',
             height: `${height}px`,
             backgroundColor: getGradientColor(progress, true),
@@ -161,7 +161,7 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
           className="chart-bar inactive-bar"
           style={{
             width: '1px',
-            transform: 'scaleX(2)',
+            transform: 'scaleX(2.7)',
             transformOrigin: 'left',
             height: `${height}px`,
             backgroundColor: getGradientColor(progress, false),
@@ -287,22 +287,7 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
             {renderBars()}
           </div>
           
-          {/* Տակի գրադիենտ գծիկներ */}
-          <div className="chaart" style={{ marginBottom: '8px' }}>
-            {Array.from({ length: barsCount }).map((_, i) => (
-              <div
-                key={`gradient-${i}`}
-                style={{
-                  width: '1px',
-                  height: '8px',
-                  transform: 'scaleX(2)',
-                  transformOrigin: 'left',
-                  background: 'linear-gradient(180deg, #E2E3E4, transparent)',
-                  borderRadius: '1px'
-                }}
-              />
-            ))}
-          </div>
+      
           
           <div className="expiration-chart flex justify-between items-center mt-2">
             <span className="chart-label font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px]">
