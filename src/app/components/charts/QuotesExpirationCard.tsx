@@ -122,7 +122,7 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
       
       let height = 20; // Նորմալ բարձրություն
       if (isFirst || isLast) {
-        height = 24; // Եզրային գծիկներ ավելի բարձր
+        height = 20; // Եզրային գծիկներ ավելի բարձր
       }
       
       bars.push(
@@ -150,9 +150,9 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
       const isLast = i === inactiveBars - 1;
       const progress = inactiveBars > 1 ? i / (inactiveBars - 1) : 0.5;
       
-      let height = 16; // Նորմալ բարձրություն (ավելի ցածր)
+      let height = 26; // Նորմալ բարձրություն (ավելի ցածր)
       if (isFirst || isLast) {
-        height = 20; // Եզրային գծիկներ
+        height = 26; // Եզրային գծիկներ
       }
       
       bars.push(
@@ -298,12 +298,6 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
                 <div className="w-2 h-2 rounded-full bg-[#ee9f66]"></div>
                 <span className="font-montserrat text-xs font-medium text-[#6f6f6f]">
                   Expiring: {expiringQuotes}
-                </span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-[#e2e3e4]"></div>
-                <span className="font-montserrat text-xs font-medium text-[#6f6f6f]">
-                  Non-expiring: {totalQuotes - expiringQuotes}
                 </span>
               </div>
             </div>
