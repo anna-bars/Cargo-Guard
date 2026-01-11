@@ -7,6 +7,7 @@ import { WelcomeWidget } from '@/app/components/widgets/WelcomeWidget'
 import { HighValueCargoWidget } from '@/app/components/widgets/HighValueCargoWidget'
 import { PerformanceOverview } from '@/app/components/widgets/PerformanceOverview'
 import { UniversalTable, renderStatus, renderButton } from '@/app/components/tables/UniversalTable';
+import QuotesExpirationCard from '@/app/components/charts/QuotesExpirationCard'
 
 // Dashboard-ի տվյալներ - ԼՐԱՑՈՒՄ
 const quotesRows = [
@@ -148,6 +149,7 @@ const quotesColumns = [
 ];
  
 export default function DashboardPage() {
+  const [activeTab, setActiveTab] = useState('This Week')
   const [loading, setLoading] = useState(true)
   const [activeWidget, setActiveWidget] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
@@ -248,7 +250,8 @@ export default function DashboardPage() {
             </div>
 
             {/* Universal Table for Recent Activity */}
-        <UniversalTable
+<div className='max-h-[85%'>
+          <UniversalTable
   title="All Insurance Quotes"
   showMobileHeader={true}
   rows={quotesRows}
@@ -261,6 +264,7 @@ export default function DashboardPage() {
     buttonWidth: '47%'
   }}
 />
+</div>
           </div>
 
           {/* Right Column - 25% - Desktop View */}
@@ -287,9 +291,9 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Improve Your Quote Rate Card */}
-              <div className="stats-card bg-[#fafcff]/80 rounded-2xl p-4">
+              <div className="stats-card bg-[#fafbf6]/80 rounded-2xl p-4">
                 <h3 className="font-montserrat text-lg font-medium text-black mb-6">Improve Your Quote Rate</h3>
-                <div className="stats-content mb-6">
+                <div className="stats-content">
                   <div className="rate-section relative w-[145px] h-[39px]">
                     <div className="rate-label absolute top-6 left-24 font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px]">Quotes</div>
                     <div className="rate-value absolute top-0 left-0 w-20 h-[37px] flex gap-1 items-baseline">
@@ -297,20 +301,10 @@ export default function DashboardPage() {
                       <span className="percent-symbol font-montserrat text-xs text-black font-normal tracking-[0.20px] w-2">%</span>
                     </div>
                   </div>
-                  <p className="stats-description font-montserrat text-xs font-normal text-[#afaeae] tracking-[0.24px] max-w-[268px]">
+                  <p className="mt-2 stats-description font-montserrat text-xs font-normal text-[#afaeae] tracking-[0.24px] max-w-[268px]">
                     Your Quotes are often Declined due to 
                     <strong className="font-medium tracking-[0.03px]"> Inaccurate Cargo Value</strong>
                   </p>
-                </div>
-                <div className="stats-footer flex items-end justify-between w-full">
-                  <span className="font-montserrat text-base font-normal text-[#3c3c3c] tracking-[0.32px] max-w-[206px]">
-                    View Full Cargo Type Rules Before Proceeding
-                  </span>
-                  <img 
-                    src="https://c.animaapp.com/mjous28hLTkY2o/img/group-84-1.png" 
-                    alt="Arrow"
-                    className="w-10 h-10"
-                  />
                 </div>
               </div>
            
@@ -321,90 +315,12 @@ export default function DashboardPage() {
             </div>
 
             {/* Quotes Expiration Card */}
-  <div className="stats-card bg-[#fafcff]/80 rounded-2xl p-4">
-    <div className="card-header mb-6">
-      <h3 className="font-montserrat text-lg font-medium text-black mb-0">Quotes Expiration</h3>
-      <div className="time-tabs flex gap-3">
-        <span className="active font-montserrat text-xs font-medium text-[#6f6f6f] tracking-[0.24px] underline cursor-pointer whitespace-nowrap">This Week</span>
-        <span className="font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px] cursor-pointer whitespace-nowrap">Next Week</span>
-        <span className="font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px] cursor-pointer whitespace-nowrap">In 2–4 Weeks</span>
-        <span className="font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px] cursor-pointer whitespace-nowrap">Next Month</span>
-      </div>
-    </div>
-    
-    <div className="expiration-stats relative w-[149px] h-[73.5px] mb-6">
-      <div className="expiration-left absolute top-0 left-0.5 w-[143px] h-11 flex gap-3">
-        <div className="expiration-rate w-20 h-10 flex gap-1 items-baseline">
-          <span className="rate-number font-montserrat text-[56px] text-black font-normal tracking-[1.12px] leading-10 w-16">32</span>
-          <span className="rate-symbol font-montserrat text-xs text-black font-normal tracking-[0.20px] w-2">%</span>
-        </div>
-      </div>
-      <div className="expiration-right absolute top-14 left-0">
-        <span className="expiration-total font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px] whitespace-nowrap">
-          Total expiring quotes: 7
-        </span>
-      </div>
-    </div>
-    
-   <div className="chaart">
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
-                            <div className="chart-div-active-item"></div>
+            <QuotesExpirationCard 
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+            />
 
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            <div className="chart-div-item"></div>
-                            
-                        </div>
-    
-    <div className="expiration-chart flex flex-col gap-3">
-      <span className="chart-label font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px]">
-        Total quotes: 22
-      </span>
-    </div>
-  </div>
+
           </div>
 
           {/* Tablet View (768px - 1279px) - Three Widgets Side by Side */}
