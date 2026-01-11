@@ -194,18 +194,6 @@ const dashboardRows = [
 
 const dashboardColumns = [
   {
-    key: 'type',
-    label: 'Type',
-    sortable: true,
-    // 768px-ից 1023px թաքցնել, 1024px-ից ցույց տալ
-    className: 'hidden md:block lg:hidden xl:block',
-    renderDesktop: (value: string) => (
-      <div className="font-poppins text-sm text-black truncate row-cell">
-        {value}
-      </div>
-    )
-  },
-  {
     key: 'id',
     label: 'ID',
     sortable: true,
@@ -216,15 +204,25 @@ const dashboardColumns = [
     )
   },
   {
-    key: 'cargoValue',
-    label: 'Cargo / Value',
-    sortable: true,
-    renderDesktop: (_: any, row: any) => (
-      <span className="font-poppins text-sm text-black">
-        {row.cargo} / {row.value}
-      </span>
-    )
-  },
+  key: 'cargo',
+  label: 'Cargo',
+  sortable: true,
+  renderDesktop: (_: any, row: any) => (
+    <span className="font-poppins text-sm text-black">
+      {row.cargo}
+    </span>
+  )
+},
+{
+  key: 'value',
+  label: 'Value',
+  sortable: true,
+  renderDesktop: (_: any, row: any) => (
+    <span className="font-poppins text-sm text-black">
+      {row.value}
+    </span>
+  )
+},
   {
     key: 'status',
     label: 'Status / Due Date',
