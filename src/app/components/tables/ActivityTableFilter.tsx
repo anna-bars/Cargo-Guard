@@ -13,6 +13,14 @@ interface ActivityTableFilterProps {
   showMobileHeader?: boolean;
   title?: string;
   onReset?: () => void;
+  filterConfig?: {
+    showActivityFilter?: boolean;
+    showTimeframeFilter?: boolean;
+    showSortFilter?: boolean;
+    activityOptions?: string[];
+    timeframeOptions?: string[];
+    sortOptions?: string[];
+  };
 }
 
 export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
@@ -26,8 +34,21 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
   setSelectedSort,
   showMobileHeader = true,
   title = 'Recent Insurance Activity',
-  onReset
+  onReset,
+  filterConfig = {
+    showActivityFilter: true,
+    showTimeframeFilter: true,
+    showSortFilter: true,
+    activityOptions: ['All Activity', 'Pending', 'Active', 'Expiring', 'Missing', 'Declined'],
+    timeframeOptions: ['Last 7 days', 'Last 30 days', 'Last 3 months', 'All time'],
+    sortOptions: ['Status', 'Date', 'Value', 'Type']
+  },
 }) => {
+  // Use filterConfig values - ԿԱՐԵՎՈՐ՝ ջնջեք կրկնվող փոփոխականների հայտարարումները
+  const activityOptions = filterConfig.activityOptions || ['All Activity', 'Pending', 'Active', 'Expiring', 'Missing', 'Declined'];
+  const timeframeOptions = filterConfig.timeframeOptions || ['Last 7 days', 'Last 30 days', 'Last 3 months', 'All time'];
+  const sortOptions = filterConfig.sortOptions || ['Status', 'Date', 'Value', 'Type'];
+  
   const [showFilter, setShowFilter] = useState(false);
   const [showDesktopFilters, setShowDesktopFilters] = useState(false);
 
@@ -39,9 +60,10 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
     if (onReset) onReset();
   };
 
-  const activityOptions = ['All Activity', 'Pending', 'Active', 'Expiring', 'Missing', 'Declined'];
-  const timeframeOptions = ['Last 7 days', 'Last 30 days', 'Last 3 months', 'All time'];
-  const sortOptions = ['Status', 'Date', 'Value', 'Type'];
+  // ԿԱՐԵՎՈՐ՝ ջնջեք այս կրկնվող տողերը
+  // const activityOptions = ['All Activity', 'Pending', 'Active', 'Expiring', 'Missing', 'Declined'];
+  // const timeframeOptions = ['Last 7 days', 'Last 30 days', 'Last 3 months', 'All time'];
+  // const sortOptions = ['Status', 'Date', 'Value', 'Type'];
 
   return (
     <>

@@ -3,10 +3,246 @@
 import DashboardLayout from '../DashboardLayout'
 import { useEffect, useState, useRef } from 'react'
 import { ConversionChart } from '../../components/charts/ConversionChart'
-import { RecentActivityTable } from '@/app/components/tables/ActivityTable'
 import { WelcomeWidget } from '@/app/components/widgets/WelcomeWidget'
 import { HighValueCargoWidget } from '@/app/components/widgets/HighValueCargoWidget'
 import { PerformanceOverview } from '@/app/components/widgets/PerformanceOverview'
+import { UniversalTable, renderStatus, renderButton } from '@/app/components/tables/UniversalTable';
+
+// Dashboard-ի տվյալներ - ԼՐԱՑՈՒՄ
+const dashboardRows = [
+  {
+    type: 'Quote',
+    id: 'Q-005',
+    cargo: 'Jewelry',
+    value: '$15,400.00',
+    status: { 
+      text: 'Pending Approval', 
+      color: 'bg-[#cbd03c]/10', 
+      dot: 'bg-[#cbd03c]', 
+      textColor: 'text-[#cbd03c]' 
+    },
+    date: 'Oct 25, 9:10PM',
+    button: { 
+      text: 'Approve Quote', 
+      variant: 'primary' as const,
+      onClick: (row: any) => console.log('Approve', row.id)
+    }
+  },
+  {
+    type: 'Policy',
+    id: 'P-021',
+    cargo: 'Textiles',
+    value: '$3,700.00',
+    status: { 
+      text: 'Document Missing', 
+      color: 'bg-[#f97316]/10', 
+      dot: 'bg-[#f97316]', 
+      textColor: 'text-[#f97316]' 
+    },
+    date: 'Oct 20, 6:30PM',
+    button: { 
+      text: 'Upload Docs', 
+      variant: 'secondary' as const,
+      onClick: (row: any) => console.log('Upload Docs', row.id)
+    }
+  },
+  {
+    type: 'Policy',
+    id: 'P-020',
+    cargo: 'Heavy Machinery',
+    value: '$48,400.00',
+    status: { 
+      text: 'Expires 15 Nov 2025', 
+      color: 'bg-[#eab308]/10', 
+      dot: 'bg-[#eab308]', 
+      textColor: 'text-[#eab308]' 
+    },
+    date: 'Oct 15, 4:20AM',
+    button: { 
+      text: 'Renew Policy', 
+      variant: 'secondary' as const,
+      onClick: (row: any) => console.log('Renew Policy', row.id)
+    }
+  },
+  {
+    type: 'Policy',
+    id: 'P-019',
+    cargo: 'Electronics',
+    value: '$8,000.00',
+    status: { 
+      text: 'Active', 
+      color: 'bg-[#16a34a]/10', 
+      dot: 'bg-[#16a34a]', 
+      textColor: 'text-[#16a34a]' 
+    },
+    date: 'Oct 21, 2:30PM',
+    button: { 
+      text: 'Download Cert', 
+      variant: 'secondary' as const,
+      onClick: (row: any) => console.log('Download Cert', row.id)
+    }
+  },
+  {
+    type: 'Quote',
+    id: 'Q-007',
+    cargo: 'Food Products',
+    value: '$1,100.00',
+    status: { 
+      text: 'Declined', 
+      color: 'bg-[#8ea0b0]/10', 
+      dot: 'bg-[#8ea0b0]', 
+      textColor: 'text-[#8ea0b0]' 
+    },
+    date: 'Sept 28, 9:30PM',
+    button: { 
+      text: 'View Details', 
+      variant: 'secondary' as const,
+      onClick: (row: any) => console.log('View Details', row.id)
+    }
+  },
+  {
+    type: 'Quote',
+    id: 'Q-008',
+    cargo: 'Pharmaceuticals',
+    value: '$6,250.00',
+    status: { 
+      text: 'Pending Approval', 
+      color: 'bg-[#cbd03c]/10', 
+      dot: 'bg-[#cbd03c]', 
+      textColor: 'text-[#cbd03c]' 
+    },
+    date: 'Sept 30, 11:45AM',
+    button: { 
+      text: 'Approve Quote', 
+      variant: 'primary' as const,
+      onClick: (row: any) => console.log('Approve Quote', row.id)
+    }
+  },
+  {
+    type: 'Policy',
+    id: 'P-022',
+    cargo: 'Auto Parts',
+    value: '$12,900.00',
+    status: { 
+      text: 'Active', 
+      color: 'bg-[#16a34a]/10', 
+      dot: 'bg-[#16a34a]', 
+      textColor: 'text-[#16a34a]' 
+    },
+    date: 'Oct 02, 3:15PM',
+    button: { 
+      text: 'Download Cert', 
+      variant: 'secondary' as const,
+      onClick: (row: any) => console.log('Download Cert', row.id)
+    }
+  },
+  {
+    type: 'Quote',
+    id: 'Q-009',
+    cargo: 'Luxury Watches',
+    value: '$22,000.00',
+    status: { 
+      text: 'Declined', 
+      color: 'bg-[#8ea0b0]/10', 
+      dot: 'bg-[#8ea0b0]', 
+      textColor: 'text-[#8ea0b0]' 
+    },
+    date: 'Oct 05, 7:50PM',
+    button: { 
+      text: 'View Details', 
+      variant: 'secondary' as const,
+      onClick: (row: any) => console.log('View Details', row.id)
+    }
+  },
+  {
+    type: 'Policy',
+    id: 'P-023',
+    cargo: 'Construction Materials',
+    value: '$31,500.00',
+    status: { 
+      text: 'Expires 01 Dec 2025', 
+      color: 'bg-[#eab308]/10', 
+      dot: 'bg-[#eab308]', 
+      textColor: 'text-[#eab308]' 
+    },
+    date: 'Oct 08, 10:10AM',
+    button: { 
+      text: 'Renew Policy', 
+      variant: 'secondary' as const,
+      onClick: (row: any) => console.log('Renew Policy', row.id)
+    }
+  },
+  {
+    type: 'Quote',
+    id: 'Q-010',
+    cargo: 'Medical Equipment',
+    value: '$18,750.00',
+    status: { 
+      text: 'Pending Approval', 
+      color: 'bg-[#cbd03c]/10', 
+      dot: 'bg-[#cbd03c]', 
+      textColor: 'text-[#cbd03c]' 
+    },
+    date: 'Oct 10, 1:40PM',
+    button: { 
+      text: 'Approve Quote', 
+      variant: 'primary' as const,
+      onClick: (row: any) => console.log('Approve Quote', row.id)
+    }
+  }
+];
+
+const dashboardColumns = [
+  {
+    key: 'type',
+    label: 'Type',
+    sortable: true,
+    className: 'hidden lg:flex items-center',
+    hideOnDesktop: false,
+    renderDesktop: (value: string) => (
+      <div className="font-poppins text-sm text-black truncate row-cell">
+        {value}
+      </div>
+    )
+  },
+  {
+    key: 'id',
+    label: 'ID',
+    sortable: true,
+    renderDesktop: (value: string) => (
+      <span className="font-poppins text-sm text-[#2563eb] underline hover:text-[#1d4ed8] transition-colors duration-300 cursor-pointer">
+        {value}
+      </span>
+    )
+  },
+  {
+    key: 'cargoValue',
+    label: 'Cargo / Value',
+    sortable: true,
+    renderDesktop: (_: any, row: any) => (
+      <span className="font-poppins text-sm text-black">
+        {row.cargo} / {row.value}
+      </span>
+    )
+  },
+  {
+    key: 'status',
+    label: 'Status / Due Date',
+    sortable: true,
+    renderDesktop: (status: any) => renderStatus(status)
+  },
+  {
+    key: 'date',
+    label: 'Last Update',
+    sortable: true
+  },
+  {
+    key: 'button',
+    label: 'Action',
+    renderDesktop: (button: any, row: any) => renderButton(button, row),
+    className: 'flex justify-end'
+  }
+];
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
@@ -147,14 +383,24 @@ export default function DashboardPage() {
               ]}
             />
 
-<div className="block md:hidden">
-  <ConversionChart />
-</div>
+            <div className="block md:hidden">
+              <ConversionChart />
+            </div>
 
-            <RecentActivityTable 
-              title="Recent Activity"
-              showMobileHeader={false}
-            />
+            {/* Universal Table for Recent Activity */}
+            <UniversalTable
+  title="Recent Activity"
+  showMobileHeader={false}
+  rows={dashboardRows}
+  columns={dashboardColumns}
+  mobileDesign={{
+    showType: true,
+    showCargoIcon: true,
+    showDateIcon: true,
+    dateLabel: 'Last Update',
+    buttonWidth: '47%'
+  }}
+/>
           </div>
 
           {/* Right Column - 25% - Desktop View */}
@@ -202,8 +448,6 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
-
-         
         </div>
       </div>
     </DashboardLayout>

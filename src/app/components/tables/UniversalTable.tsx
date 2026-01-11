@@ -6,22 +6,31 @@ interface TableColumn {
   label: string;
   sortable?: boolean;
   className?: string;
-  mobileVisible?: boolean;
-  desktopVisible?: boolean;
-  render?: (value: any, row: TableRow) => React.ReactNode;
-  mobileRender?: (value: any, row: TableRow) => React.ReactNode;
+  mobileOrder?: number; // Կարգը մոբայլում
+  desktopOrder?: number; // Կարգը դեսկթոփում
+  hideOnMobile?: boolean;
+  hideOnDesktop?: boolean;
+  renderDesktop?: (value: any, row: TableRow) => React.ReactNode;
+  renderMobile?: (value: any, row: TableRow) => React.ReactNode;
 }
 
 interface TableRow {
   [key: string]: any;
   id: string | number;
   type?: string;
+  cargo?: string;
+  value?: string;
+  shipmentValue?: string;
+  premiumAmount?: string;
+  expirationDate?: string;
   status?: {
     text: string;
     color: string;
     dot: string;
     textColor: string;
   };
+  date?: string;
+  lastUpdate?: string;
   button?: {
     text: string;
     variant: 'primary' | 'secondary';
@@ -54,6 +63,14 @@ interface UniversalTableProps {
     sort: string;
   }) => void;
   emptyState?: React.ReactNode;
+  // Մոբայլ դիզայնի կոնֆիգուրացիա
+  mobileDesign?: {
+    showType?: boolean;
+    showCargoIcon?: boolean;
+    showDateIcon?: boolean;
+    dateLabel?: string;
+    buttonWidth?: string;
+  };
 }
 
 export const UniversalTable: React.FC<UniversalTableProps> = ({
@@ -76,7 +93,14 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
   },
   onSearch,
   onFilterChange,
-  emptyState
+  emptyState,
+  mobileDesign = {
+    showType: true,
+    showCargoIcon: true,
+    showDateIcon: true,
+    dateLabel: 'Last Update',
+    buttonWidth: '47%'
+  }
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState(initialFilters.activity || 'All Activity');
@@ -145,10 +169,14 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
     if (filterConfig.showSortFilter) {
       if (selectedSort === 'Date') {
         filtered.sort((a, b) => {
-          const dateA = a.date || a.expirationDate || a.lastUpdate;
-          const dateB = b.date || b.expirationDate || b.lastUpdate;
-          return new Date(dateB).getTime() - new Date(dateA).getTime();
-        });
+  const dateA =
+    a.date ?? a.expirationDate ?? a.lastUpdate ?? '1970-01-01';
+  const dateB =
+    b.date ?? b.expirationDate ?? b.lastUpdate ?? '1970-01-01';
+
+  return new Date(dateB).getTime() - new Date(dateA).getTime();
+});
+
       } else if (selectedSort === 'Value') {
         filtered.sort((a, b) => {
           const aValue = parseFloat((a.value || a.shipmentValue || '0').replace(/[^\d.-]/g, ''));
@@ -215,8 +243,27 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
     </div>
   );
 
-  // Calculate grid columns for desktop
-  const desktopGridCols = `repeat(${columns.length}, minmax(0, 1fr))`;
+  // Desktop գրիդի հաշվարկը ըստ սյունակների
+  const visibleDesktopColumns = columns.filter(col => !col.hideOnDesktop);
+  const desktopGridCols = `repeat(${visibleDesktopColumns.length}, minmax(0, 1fr))`;
+
+  // Հիմնական ֆունկցիաներ
+  const renderDesktopCell = (column: TableColumn, row: TableRow) => {
+    if (column.renderDesktop) {
+      return column.renderDesktop(row[column.key], row);
+    }
+    if (column.key === 'status' && row.status) {
+      return renderStatus(row.status);
+    }
+    if (column.key === 'button' && row.button) {
+      return renderButton(row.button, row);
+    }
+    return (
+      <div className="font-poppins text-sm text-black truncate row-cell">
+        {row[column.key]}
+      </div>
+    );
+  };
 
   return (
     <>
@@ -267,7 +314,7 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
           {/* Desktop Table Header */}
           <div className="mt-4 px-4 sm:px-4 py-2 mb-0 hidden md:grid gap-2 pb-2 mb-0 table-header w-[97%] bg-[#ededed7a] mx-auto my-3.5 rounded-[4px]" 
                style={{ gridTemplateColumns: desktopGridCols }}>
-            {columns.map((column, idx) => (
+            {visibleDesktopColumns.map((column, idx) => (
               <div key={idx} className={`flex items-center gap-2 font-poppins text-sm font-normal text-[#606068] ${column.className || ''} ${column.label === 'Action' ? 'justify-end' : ''}`}>
                 <span>{column.label}</span>
                 {column.sortable && column.label !== 'Action' && (
@@ -309,6 +356,7 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
               filteredRows.map((row, rowIndex) => (
                 <div key={rowIndex} className="
                   mob-ly-item tab-item 
+                  md:grid
                   p-4 md:p-3 
                   bg-[#fdfdf8f5] rounded-lg 
                   flex flex-wrap items-center 
@@ -322,30 +370,24 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
                   
                   /* Desktop styles */
                   md:bg-transparent md:!m-0 md:!border-b md:!border-solid md:!border-[#ededf3] md:!rounded-none
-                  md:hover:!bg-[#f0f0f5e8] md:grid"
+                  md:hover:!bg-[#f0f0f5e8]"
                      style={{ 
                        gridTemplateColumns: desktopGridCols
                      }}>
                   
                   {/* Desktop Columns */}
-                  {columns.map((column, colIndex) => (
-                    <div key={colIndex} className={`${column.className || ''} ${column.desktopVisible === false ? 'hidden lg:block' : 'hidden md:block'}`}>
-                      {column.render ? (
-                        column.render(row[column.key], row)
-                      ) : (
-                        <div className="font-poppins text-sm text-black truncate row-cell">
-                          {row[column.key]}
-                        </div>
-                      )}
+                  {visibleDesktopColumns.map((column, colIndex) => (
+                    <div key={colIndex} className={`${column.className || ''} hidden md:block`}>
+                      {renderDesktopCell(column, row)}
                     </div>
                   ))}
                   
-                  {/* Mobile Layout - Դիզայնը օրիգինալի նման */}
+                  {/* Mobile Layout - ՃԻՇՏ ՆՈՒՅՆ ԴԻԶԱՅՆԸ ՈՐՊԵՍ RecentActivityTable-ում */}
                   <div className="md:hidden w-full mob-lay">
                     {/* Top row: Type/ID on left, Status on right */}
                     <div className="flex justify-between items-center mb-4">
                       <div className="flex items-center gap-2">
-                        {row.type && (
+                        {mobileDesign.showType && row.type && (
                           <span className="font-poppins text-sm font-normal text-black xs:text-[16px]">{row.type}</span>
                         )}
                         <span className="font-poppins text-sm text-[#2563eb] underline xs:text-[#2563eb]">{row.id}</span>
@@ -364,72 +406,82 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
                       )}
                     </div>
                     
-                    {/* Middle rows: Other columns */}
-                    {columns
-                      .filter(col => 
-                        col.key !== 'type' && 
-                        col.key !== 'id' && 
-                        col.key !== 'status' && 
-                        col.key !== 'button' &&
-                        (col.mobileVisible !== false)
-                      )
-                      .map((column, idx) => (
-                        <div key={idx} className="flex justify-between items-center mb-4">
-                          <div className="flex items-center gap-2">
-                            {/* Կարող եք ավելացնել իկոններ ըստ key-ի */}
-                            {column.key === 'cargo' && (
-                              <img 
-                                src="/table/package-stroke-rounded.svg" 
-                                alt="Cargo" 
-                                className="w-4 h-4 xs:w-[16px] xs:h-[16px] xs2:w-[14px] xs2:h-[14px] opacity-80 hover:opacity-100"
-                              />
-                            )}
-                            <span className="font-poppins text-sm text-gray-700">{column.label}</span>
-                          </div>
-                          <span className="font-poppins text-sm font-normal text-black">
-                            {column.mobileRender ? column.mobileRender(row[column.key], row) : row[column.key]}
+                    {/* Middle row: Cargo on left, Value on right */}
+                    {(row.cargo || row.shipmentValue) && (
+                      <div className="flex justify-between items-center mb-4">
+                        <div className="flex items-center gap-2">
+                          {mobileDesign.showCargoIcon && (
+                            <img 
+                              src="/table/package-stroke-rounded.svg" 
+                              alt="Cargo" 
+                              className="w-4 h-4 xs:w-[16px] xs:h-[16px] xs2:w-[14px] xs2:h-[14px] opacity-80 hover:opacity-100"
+                            />
+                          )}
+                          <span className="font-poppins text-sm text-gray-700">
+                            {row.cargo || row.shipmentValue ? 'Cargo / Value' : 'Cargo'}
                           </span>
                         </div>
-                      ))
-                    }
+                        <div className="font-poppins text-sm font-normal text-black">
+                          {row.value || row.shipmentValue || row.cargo}
+                          {row.premiumAmount && ` / ${row.premiumAmount}`}
+                        </div>
+                      </div>
+                    )}
                     
-                    {/* Date row if exists */}
-                    {row.date && (
+                    {/* Premium Amount (եթե առանձին է) */}
+                    {row.premiumAmount && !row.value && !row.shipmentValue && (
                       <div className="flex justify-between items-center mb-4">
                         <div className="flex items-center gap-2">
                           <img 
-                            src="/table/clock.svg" 
-                            alt="Time" 
-                            className="w-4 h-4 xs:w-[16px] xs:h-[16px] xs2:w-[14px] xs2:h-[14px]"
+                            src="/table/money-bag.svg" 
+                            alt="Premium" 
+                            className="w-4 h-4 opacity-80"
                           />
-                          <span className="font-poppins text-sm text-gray-700">Date</span>
+                          <span className="font-poppins text-sm text-gray-700">Premium</span>
                         </div>
-                        <div className="font-poppins text-sm text-gray-600 xs2:text-[12px]">{row.date}</div>
+                        <div className="font-poppins text-sm font-normal text-black">{row.premiumAmount}</div>
+                      </div>
+                    )}
+                    
+                    {/* Expiration Date */}
+                    {row.expirationDate && (
+                      <div className="flex justify-between items-center mb-4">
+                        <div className="flex items-center gap-2">
+                          <img 
+                            src="/table/calendar.svg" 
+                            alt="Expiration" 
+                            className="w-4 h-4 opacity-80"
+                          />
+                          <span className="font-poppins text-sm text-gray-700">Expires</span>
+                        </div>
+                        <div className="font-poppins text-sm text-gray-600">{row.expirationDate}</div>
                       </div>
                     )}
                     
                     {/* Divider line */}
                     <div className="border-t border-[#f2f2ed] my-3 xs:my-3"></div>
                     
-                    {/* Bottom row: Button */}
-                    {row.button && (
-                      <div className="flex items-center justify-between xs:flex xs:items-center xs:gap-3 xs:w-full xs4:flex-col xs4:gap-2">
-                        {/* Date with clock icon - only if not already shown */}
-                        {!row.date && (
-                          <div className="flex items-center gap-2 w-1/2 xs4:w-full xs4:justify-center xs4:mb-1">
+                    {/* Bottom row: Date and Button */}
+                    <div className="flex items-center justify-between xs:flex xs:items-center xs:gap-3 xs:w-full xs4:flex-col xs4:gap-2">
+                      {/* Date with clock icon */}
+                      {(row.date || row.lastUpdate) && (
+                        <div className="flex items-center gap-2 w-1/2 xs4:w-full xs4:justify-center xs4:mb-1">
+                          {mobileDesign.showDateIcon && (
                             <img 
                               src="/table/clock.svg" 
                               alt="Time" 
                               className="w-4 h-4 xs:w-[16px] xs:h-[16px] xs2:w-[14px] xs2:h-[14px]"
                             />
-                            <div className="font-poppins text-sm text-gray-600 xs2:text-[12px]">
-                              {row.date || row.expirationDate || 'N/A'}
-                            </div>
+                          )}
+                          <div className="font-poppins text-sm text-gray-600 xs2:text-[12px]">
+                            {row.date || row.lastUpdate || mobileDesign.dateLabel}
                           </div>
-                        )}
-                        
-                        {/* Button */}
-                        <div className={`${!row.date ? 'w-[47%]' : 'w-full'} xs4:w-full xs:pl-1.5`}>
+                        </div>
+                      )}
+                      
+                      {/* Button */}
+                      {row.button && (
+                        <div className={`${row.date || row.lastUpdate ? mobileDesign.buttonWidth : 'w-full'} xs4:w-full xs:pl-1.5`}>
                           <button className={`
                             h-[44px] w-full rounded-lg font-inter text-sm justify-center items-center gap-2 transition-colors duration-300
                             ${row.button.variant === 'primary' 
@@ -443,8 +495,8 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
                             {row.button.text}
                           </button>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
               ))
@@ -479,30 +531,3 @@ export const renderButton = (button: { text: string; variant: 'primary' | 'secon
     {button.text}
   </button>
 );
-
-// Helper function for mobile value rendering with icons
-export const renderMobileValue = (key: string, value: string) => {
-  const icons: Record<string, string> = {
-    'cargo': '/table/package-stroke-rounded.svg',
-    'value': '/table/dollar.svg',
-    'shipmentValue': '/table/dollar.svg',
-    'premiumAmount': '/table/money-bag.svg',
-    'expirationDate': '/table/calendar.svg',
-    'date': '/table/clock.svg'
-  };
-  
-  const icon = icons[key];
-  
-  return (
-    <div className="flex items-center gap-2">
-      {icon && (
-        <img 
-          src={icon} 
-          alt={key} 
-          className="w-4 h-4 xs:w-[16px] xs:h-[16px] xs2:w-[14px] xs2:h-[14px] opacity-80 hover:opacity-100"
-        />
-      )}
-      <span>{value}</span>
-    </div>
-  );
-};
