@@ -98,12 +98,13 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
         <div className="expiration-stats relative w-[149px] h-[73.5px] mb-6">
           <div className="expiration-left absolute top-0 left-0.5 w-[143px] h-11 flex gap-3">
             <div className="expiration-rate w-20 h-10 flex gap-1 items-baseline">
-              <span className="rate-number font-montserrat text-[56px] text-black font-normal tracking-[1.12px] leading-10 w-16">
+              <span className="ml-4 rate-number font-montserrat text-[56px] text-black font-normal tracking-[1.12px] leading-10 w-16">
                 {expiringRate}
               </span>
-              <span className="rate-symbol font-montserrat text-xs text-black font-normal tracking-[0.20px] w-2">
+              <span className="absolute top-[-2px] left-0 rate-symbol font-montserrat text-xs text-black font-normal tracking-[0.20px] w-2">
                 %
               </span>
+              <span className="text-[#C8C8C8] text-[12px] ml-[16px]">Quotes</span>
             </div>
           </div>
           <div className="expiration-right absolute top-14 left-0">

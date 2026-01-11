@@ -297,8 +297,8 @@ export default function DashboardPage() {
                   <div className="rate-section relative w-[145px] h-[39px]">
                     <div className="rate-label absolute top-6 left-24 font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px]">Quotes</div>
                     <div className="rate-value absolute top-0 left-0 w-20 h-[37px] flex gap-1 items-baseline">
-                      <span className="percentage font-montserrat text-[56px] text-black font-normal tracking-[1.12px] leading-9 w-16">72</span>
-                      <span className="percent-symbol font-montserrat text-xs text-black font-normal tracking-[0.20px] w-2">%</span>
+                      <span className="percentage font-montserrat text-[56px] text-black font-normal tracking-[1.12px] leading-9 w-16 ml-4">72</span>
+                      <span className="percent-symbol font-montserrat text-xs text-black font-normal tracking-[0.20px] w-2 absolute top-[-4px] left-0">%</span>
                     </div>
                   </div>
                   <p className="mt-2 stats-description font-montserrat text-xs font-normal text-[#afaeae] tracking-[0.24px] max-w-[268px]">
