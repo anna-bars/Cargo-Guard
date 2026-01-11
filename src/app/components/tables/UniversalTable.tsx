@@ -470,7 +470,7 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
                       {row.button && (
                         <div className={`${row.date || row.lastUpdate ? mobileDesign.buttonWidth : 'w-full'} xs4:w-full xs:pl-1.5`}>
                           <button className={`
-                            h-[44px] w-full rounded-lg font-inter text-sm justify-center items-center gap-2 transition-colors duration-300
+                            h-[36px] px-4 w-full rounded-lg font-inter text-sm justify-center items-center gap-2 transition-colors duration-300
                             ${row.button.variant === 'primary' 
                               ? 'bg-[#2563EB] text-white border border-[rgba(255,255,255,0.22)] hover:bg-[#1d4ed8] hover:text-white hover:border-[#d1d5db]' 
                               : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f3f4f6] hover:text-white hover:border-[#d1d5db]'
