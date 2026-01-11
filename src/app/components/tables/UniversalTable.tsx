@@ -6,12 +6,12 @@ interface TableColumn {
   label: string;
   sortable?: boolean;
   className?: string;
-  mobileOrder?: number; // Կարգը մոբայլում
-  desktopOrder?: number; // Կարգը դեսկթոփում
   hideOnMobile?: boolean;
-  hideOnDesktop?: boolean;
+  // 768px-ից 1023px միջակայքում թաքցնելու համար
+  hideOnMedium?: boolean;
+  // 1024px-ից բարձր տեսանելիության համար
+  showOnLarge?: boolean;
   renderDesktop?: (value: any, row: TableRow) => React.ReactNode;
-  renderMobile?: (value: any, row: TableRow) => React.ReactNode;
 }
 
 interface TableRow {
@@ -63,7 +63,6 @@ interface UniversalTableProps {
     sort: string;
   }) => void;
   emptyState?: React.ReactNode;
-  // Մոբայլ դիզայնի կոնֆիգուրացիա
   mobileDesign?: {
     showType?: boolean;
     showCargoIcon?: boolean;
@@ -72,6 +71,29 @@ interface UniversalTableProps {
     buttonWidth?: string;
   };
 }
+
+// Սյունակի տեսանելիության className-ի հաշվարկ
+const getColumnVisibilityClass = (column: TableColumn): string => {
+  const classes: string[] = [];
+  
+  // Եթե ունի className, ավելացնել
+  if (column.className) {
+    classes.push(column.className);
+  }
+  
+  // Եթե պետք է թաքցնել 768px-ից 1023px
+  if (column.hideOnMedium) {
+    // 768px-ից թաքցնել, 1024px-ից ցույց տալ
+    classes.push('hidden md:block lg:hidden xl:block');
+  }
+  
+  // Եթե պետք է ցույց տալ միայն 1024px-ից
+  if (column.showOnLarge) {
+    classes.push('hidden lg:block');
+  }
+  
+  return classes.join(' ');
+};
 
 export const UniversalTable: React.FC<UniversalTableProps> = ({
   title = 'Recent Activity',
@@ -137,16 +159,12 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
   const getFilteredRows = () => {
     let filtered = [...rows];
     
-    // Apply timeframe filter
     if (filterConfig.showTimeframeFilter) {
       if (selectedTimeframe === 'Last 7 days') {
         filtered = filtered.slice(0, 3);
-      } else if (selectedTimeframe === 'Last 3 months') {
-        // Keep all rows
       }
     }
     
-    // Apply activity filter
     if (filterConfig.showActivityFilter && selectedFilter !== 'All Activity') {
       filtered = filtered.filter(row => {
         if (row.status?.text) {
@@ -165,18 +183,13 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
       });
     }
     
-    // Apply sorting
     if (filterConfig.showSortFilter) {
       if (selectedSort === 'Date') {
         filtered.sort((a, b) => {
-  const dateA =
-    a.date ?? a.expirationDate ?? a.lastUpdate ?? '1970-01-01';
-  const dateB =
-    b.date ?? b.expirationDate ?? b.lastUpdate ?? '1970-01-01';
-
-  return new Date(dateB).getTime() - new Date(dateA).getTime();
-});
-
+          const dateA = a.date ?? a.expirationDate ?? a.lastUpdate ?? '1970-01-01';
+          const dateB = b.date ?? b.expirationDate ?? b.lastUpdate ?? '1970-01-01';
+          return new Date(dateB).getTime() - new Date(dateA).getTime();
+        });
       } else if (selectedSort === 'Value') {
         filtered.sort((a, b) => {
           const aValue = parseFloat((a.value || a.shipmentValue || '0').replace(/[^\d.-]/g, ''));
@@ -220,7 +233,6 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
     setSearchQuery('');
   };
 
-  // Default empty state
   const defaultEmptyState = (
     <div className="flex flex-col items-center justify-center py-12 px-4">
       <div className="text-gray-400 mb-4">
@@ -243,11 +255,10 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
     </div>
   );
 
-  // Desktop գրիդի հաշվարկը ըստ սյունակների
-  const visibleDesktopColumns = columns.filter(col => !col.hideOnDesktop);
+  // Սյունակները որոնք տեսանելի են դեսկթոփում
+  const visibleDesktopColumns = columns.filter(col => !col.hideOnMobile);
   const desktopGridCols = `repeat(${visibleDesktopColumns.length}, minmax(0, 1fr))`;
 
-  // Հիմնական ֆունկցիաներ
   const renderDesktopCell = (column: TableColumn, row: TableRow) => {
     if (column.renderDesktop) {
       return column.renderDesktop(row[column.key], row);
@@ -270,14 +281,10 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
       <section className="
         block-2 flex flex-col h-full relative py-4 xl:py-4
         border border-[#d1d1d12b] bg-[#f9f9f6ba] rounded-[16px] overflow-hidden
-
-        /* Desktop/MD - 768px and up */
         md:border md:border-solid md:border-[#d1d1d154]
         md:bg-[#fafaf7]/80 md:rounded-[16px]
         md:pt-[16px]
         md:!pb-0
-        
-        /* Mobile - below 768px */
         max-[767px]:border-none 
         max-[767px]:bg-transparent 
         max-[767px]:p-0 
@@ -286,7 +293,6 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
         max-[767px]:!overflow-hidden
       ">
         
-        {/* Filter Component */}
         <ActivityTableFilter
           searchQuery={searchQuery}
           setSearchQuery={handleSearchChange}
@@ -306,7 +312,6 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
           block-2 bg-[#fdfdf8cf] rounded-t-[12px] mt-2
           border border-[#8989893b]
           flex flex-col flex-1 overflow-hidden
-
           max-[767px]:border-none
           max-[767px]:bg-[#f3f3f6] max-[767px]:!w-[99.5%]
         ">
@@ -315,7 +320,7 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
           <div className="mt-4 px-4 sm:px-4 py-2 mb-0 hidden md:grid gap-2 pb-2 mb-0 table-header w-[97%] bg-[#ededed7a] mx-auto my-3.5 rounded-[4px]" 
                style={{ gridTemplateColumns: desktopGridCols }}>
             {visibleDesktopColumns.map((column, idx) => (
-              <div key={idx} className={`flex items-center gap-2 font-poppins text-sm font-normal text-[#606068] ${column.className || ''} ${column.label === 'Action' ? 'justify-end' : ''}`}>
+              <div key={idx} className={`flex items-center gap-2 font-poppins text-sm font-normal text-[#606068] ${getColumnVisibilityClass(column)} ${column.label === 'Action' ? 'justify-end' : ''}`}>
                 <span>{column.label}</span>
                 {column.sortable && column.label !== 'Action' && (
                   <img
@@ -342,13 +347,8 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
             max-h-[calc(100vh-300px)]
             min-h-[400px]
             xs:p-0 xs:m-0 xs:w-full
-
-            /* Mobile background */
             xs:bg-[#eff1f1]
-
-            /* Mobile max-height */
             xs:max-h-[80vh]
-
             max-[767px]:!w-[100%]
             max-[767px]:!rounded-[10px]
           ">
@@ -361,14 +361,10 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
                   bg-[#fdfdf8f5] rounded-lg 
                   flex flex-wrap items-center 
                   hover:bg-[#ffffff] transition-colors duration-300
-                     
-                  /* Mobile styles */
                   xs:min-w-full xs:flex xs:bg-[rgba(250,252,255,0.8)] 
                   xs:rounded-[16px] xs:flex-wrap xs:gap-4 xs:justify-between 
                   xs:p-0 xs:mb-3 xs:border-b xs:border-solid xs:border-[#d1d1d140]
                   xs:hover:bg-[#f6f6ec]
-                  
-                  /* Desktop styles */
                   md:bg-transparent md:!m-0 md:!border-b md:!border-solid md:!border-[#ededf3] md:!rounded-none
                   md:hover:!bg-[#f0f0f5e8]"
                      style={{ 
@@ -377,14 +373,13 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
                   
                   {/* Desktop Columns */}
                   {visibleDesktopColumns.map((column, colIndex) => (
-                    <div key={colIndex} className={`${column.className || ''} hidden md:block`}>
+                    <div key={colIndex} className={`${getColumnVisibilityClass(column)} hidden md:block`}>
                       {renderDesktopCell(column, row)}
                     </div>
                   ))}
                   
-                  {/* Mobile Layout - ՃԻՇՏ ՆՈՒՅՆ ԴԻԶԱՅՆԸ ՈՐՊԵՍ RecentActivityTable-ում */}
+                  {/* Mobile Layout */}
                   <div className="md:hidden w-full mob-lay">
-                    {/* Top row: Type/ID on left, Status on right */}
                     <div className="flex justify-between items-center mb-4">
                       <div className="flex items-center gap-2">
                         {mobileDesign.showType && row.type && (
@@ -393,7 +388,6 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
                         <span className="font-poppins text-sm text-[#2563eb] underline xs:text-[#2563eb]">{row.id}</span>
                       </div>
                       
-                      {/* Status badge */}
                       {row.status && (
                         <div className="row-cell flex-shrink-0">
                           <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor} 
@@ -406,7 +400,6 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
                       )}
                     </div>
                     
-                    {/* Middle row: Cargo on left, Value on right */}
                     {(row.cargo || row.shipmentValue) && (
                       <div className="flex justify-between items-center mb-4">
                         <div className="flex items-center gap-2">
@@ -428,7 +421,6 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
                       </div>
                     )}
                     
-                    {/* Premium Amount (եթե առանձին է) */}
                     {row.premiumAmount && !row.value && !row.shipmentValue && (
                       <div className="flex justify-between items-center mb-4">
                         <div className="flex items-center gap-2">
@@ -443,7 +435,6 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
                       </div>
                     )}
                     
-                    {/* Expiration Date */}
                     {row.expirationDate && (
                       <div className="flex justify-between items-center mb-4">
                         <div className="flex items-center gap-2">
@@ -458,12 +449,9 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
                       </div>
                     )}
                     
-                    {/* Divider line */}
                     <div className="border-t border-[#f2f2ed] my-3 xs:my-3"></div>
                     
-                    {/* Bottom row: Date and Button */}
                     <div className="flex items-center justify-between xs:flex xs:items-center xs:gap-3 xs:w-full xs4:flex-col xs4:gap-2">
-                      {/* Date with clock icon */}
                       {(row.date || row.lastUpdate) && (
                         <div className="flex items-center gap-2 w-1/2 xs4:w-full xs4:justify-center xs4:mb-1">
                           {mobileDesign.showDateIcon && (
@@ -479,7 +467,6 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
                         </div>
                       )}
                       
-                      {/* Button */}
                       {row.button && (
                         <div className={`${row.date || row.lastUpdate ? mobileDesign.buttonWidth : 'w-full'} xs4:w-full xs:pl-1.5`}>
                           <button className={`
@@ -510,7 +497,7 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
   );
 };
 
-// Helper function for status rendering
+// Helper functions
 export const renderStatus = (status: { text: string; color: string; dot: string; textColor: string }) => (
   <span className={`!font-medium inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs ${status.color} ${status.textColor}`}>
     <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`}></span>
@@ -518,7 +505,6 @@ export const renderStatus = (status: { text: string; color: string; dot: string;
   </span>
 );
 
-// Helper function for button rendering
 export const renderButton = (button: { text: string; variant: 'primary' | 'secondary'; onClick?: (row: any) => void }, row: any) => (
   <button
     className={`h-9 px-4 rounded-lg font-poppins text-sm font-normal transition-colors duration-300 w-full xl:w-[140px] ${

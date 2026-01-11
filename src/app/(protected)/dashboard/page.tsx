@@ -197,8 +197,8 @@ const dashboardColumns = [
     key: 'type',
     label: 'Type',
     sortable: true,
-    className: 'hidden lg:flex items-center',
-    hideOnDesktop: false,
+    // 768px-ից 1023px թաքցնել, 1024px-ից ցույց տալ
+    className: 'hidden md:block lg:hidden xl:block',
     renderDesktop: (value: string) => (
       <div className="font-poppins text-sm text-black truncate row-cell">
         {value}
