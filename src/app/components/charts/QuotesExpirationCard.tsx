@@ -72,14 +72,14 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
   // Հաշվել գրադիենտ գույնը՝ կախված տոկոսից
   const getGradientColor = (progress: number, isActive: boolean) => {
     if (isActive) {
-      // Ակտիվ գծիկների համար՝ նարնջագույն գրադիենտ
-      const startR = 238; // #EE9F66
-      const startG = 159;
-      const startB = 102;
+      // Ակտիվ գծիկների համար՝ բացից մուգ գրադիենտ (հակառակ ուղղությամբ)
+      const startR = 255;   // պայծառ նարնջագույն
+      const startG = 180;
+      const startB = 120;
       
-      const endR = 255;   // պայծառ նարնջագույն
-      const endG = 180;
-      const endB = 120;
+      const endR = 238;     // մուգ նարնջագույն #EE9F66
+      const endG = 159;
+      const endB = 102;
       
       const r = Math.round(startR + (endR - startR) * progress);
       const g = Math.round(startG + (endG - startG) * progress);
@@ -87,20 +87,8 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
       
       return `rgb(${r}, ${g}, ${b})`;
     } else {
-      // Ոչ ակտիվ գծիկների համար՝ մոխրագույն գրադիենտ
-      const startR = 226; // #E2E3E4
-      const startG = 227;
-      const startB = 228;
-      
-      const endR = 195;   // ավելի մուգ մոխրագույն
-      const endG = 196;
-      const endB = 197;
-      
-      const r = Math.round(startR + (endR - startR) * progress);
-      const g = Math.round(startG + (endG - startG) * progress);
-      const b = Math.round(startB + (endB - startB) * progress);
-      
-      return `rgb(${r}, ${g}, ${b})`;
+      // Ոչ ակտիվ գծիկների համար՝ հստակ մեկ գույն #E2E3E4
+      return `#E2E3E4`;
     }
   };
 
@@ -148,7 +136,7 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
     for (let i = 0; i < inactiveBars; i++) {
       const isFirst = i === 0;
       const isLast = i === inactiveBars - 1;
-      const progress = inactiveBars > 1 ? i / (inactiveBars - 1) : 0.5;
+      // Ոչ ակտիվ գծիկների համար պրոգրեսը պետք չէ, քանի որ գույնը հաստատուն է
       
       let height = 26; // Նորմալ բարձրություն (ավելի ցածր)
       if (isFirst || isLast) {
@@ -164,7 +152,7 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
             transform: 'scaleX(2.7)',
             transformOrigin: 'left',
             height: `${height}px`,
-            backgroundColor: getGradientColor(progress, false),
+            backgroundColor: '#E2E3E4', // Հստակ գույն #E2E3E4
             borderRadius: '1px',
             transition: 'all 0.3s ease',
             cursor: 'pointer'
