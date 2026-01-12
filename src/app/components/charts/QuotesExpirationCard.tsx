@@ -16,7 +16,6 @@ interface ExpirationData {
 const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesExpirationCardProps) => {
   const tabs = ['This Week', 'Next Week', 'In 2–4 Weeks', 'Next Month'];
   
-  // Մոկ տվյալներ յուրաքանչյուր ժամանակահատվածի համար
   const expirationData: Record<string, ExpirationData> = {
     'This Week': { totalQuotes: 22, expiringQuotes: 7, expiringRate: 32 },
     'Next Week': { totalQuotes: 18, expiringQuotes: 5, expiringRate: 28 },
@@ -25,13 +24,13 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
   };
   
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isChartHovered, setIsChartHovered] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [barsCount, setBarsCount] = useState(60);
   const [isAnimating, setIsAnimating] = useState(false);
   
   const { totalQuotes, expiringQuotes, expiringRate } = expirationData[activeTab];
   
-  // Հաշվել գծիկների քանակը՝ կախված container-ի լայնությունից
   const calculateBarsCount = useCallback((width: number) => {
     if (width <= 200) return 40;
     if (width <= 280) return 50;
@@ -55,17 +54,16 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
     };
   }, [calculateBarsCount]);
 
-  // Անիմացիա երբ փոխվում է tab-ը
+  // Smooth tab փոփոխություն
   useEffect(() => {
     setIsAnimating(true);
     const timer = setTimeout(() => {
       setIsAnimating(false);
-    }, 500);
+    }, 600);
     
     return () => clearTimeout(timer);
   }, [activeTab]);
 
-  // Տվյալների մասնաբաժինները գծիկների համար
   const calculateBarDistribution = () => {
     const activePercentage = expiringRate / 100;
     const activeBars = Math.max(1, Math.round(activePercentage * barsCount));
@@ -76,22 +74,40 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
 
   const { activeBars, inactiveBars } = calculateBarDistribution();
 
-  // Հաշվել գրադիենտ գույնը՝ կախված տոկոսից
-  const getGradientColor = (progress: number, isActive: boolean) => {
+  // Գույների ֆունկցիան հովեր համար
+  const getBarColor = (progress: number, isActive: boolean, isHovered: boolean) => {
     if (isActive) {
-      const startR = 255;
-      const startG = 180;
-      const startB = 120;
-      
-      const endR = 238;
-      const endG = 159;
-      const endB = 102;
-      
-      const r = Math.round(startR + (endR - startR) * progress);
-      const g = Math.round(startG + (endG - startG) * progress);
-      const b = Math.round(startB + (endB - startB) * progress);
-      
-      return `rgb(${r}, ${g}, ${b})`;
+      if (isHovered) {
+        // Հովեր ժամանակ՝ #FFD186 դեպի #FF7C1E
+        const startR = 255;  // #FFD186
+        const startG = 209;
+        const startB = 134;
+        
+        const endR = 255;    // #FF7C1E
+        const endG = 124;
+        const endB = 30;
+        
+        const r = Math.round(startR + (endR - startR) * progress);
+        const g = Math.round(startG + (endG - startG) * progress);
+        const b = Math.round(startB + (endB - startB) * progress);
+        
+        return `rgb(${r}, ${g}, ${b})`;
+      } else {
+        // Նորմալ՝ բաց նարնջագույնից մուգ նարնջագույն
+        const startR = 255;
+        const startG = 180;
+        const startB = 120;
+        
+        const endR = 238;     // #EE9F66
+        const endG = 159;
+        const endB = 102;
+        
+        const r = Math.round(startR + (endR - startR) * progress);
+        const g = Math.round(startG + (endG - startG) * progress);
+        const b = Math.round(startB + (endB - startB) * progress);
+        
+        return `rgb(${r}, ${g}, ${b})`;
+      }
     } else {
       return `#E2E3E4`;
     }
@@ -102,22 +118,17 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
     setIsDropdownOpen(false);
   };
 
-  // Գեներացնել գծիկներ
+  // Կառուցել գծիկների array
   const renderBars = () => {
     const bars = [];
     
-    // Ակտիվ գծիկներ (expiring)
+    // Ակտիվ գծիկներ
     for (let i = 0; i < activeBars; i++) {
       const isFirst = i === 0;
       const isLast = i === activeBars - 1;
       const progress = activeBars > 1 ? i / (activeBars - 1) : 0.5;
       
-      let height = 20;
-      if (isFirst || isLast) {
-        height = 20;
-      }
-      
-      const animationDelay = `${(i * 10) % 500}ms`;
+      const baseHeight = isChartHovered ? 24 : 20;
       
       bars.push(
         <div
@@ -127,34 +138,29 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
             width: '1px',
             transform: 'scaleX(2.7)',
             transformOrigin: 'left',
-            height: `${height}px`,
-            backgroundColor: getGradientColor(progress, true),
+            height: `${baseHeight}px`,
+            backgroundColor: getBarColor(progress, true, isChartHovered),
             borderRadius: '1px',
             cursor: 'pointer',
-            // Օգտագործել առանձին animation properties փոխարեն shorthand-ի
             animationName: isAnimating ? 'barAppear' : 'none',
             animationDuration: '0.5s',
             animationTimingFunction: 'ease',
             animationFillMode: 'forwards',
-            animationDelay: animationDelay,
-            opacity: isAnimating ? 0 : 1
+            animationDelay: `${(i * 15) % 600}ms`,
+            opacity: isAnimating ? 0 : 1,
+            transition: 'all 0.3s ease'
           }}
           title={`Expiring quotes: ${expiringQuotes} (${expiringRate}%)`}
         />
       );
     }
     
-    // Ոչ ակտիվ գծիկներ (non-expiring)
+    // Ոչ ակտիվ գծիկներ
     for (let i = 0; i < inactiveBars; i++) {
       const isFirst = i === 0;
       const isLast = i === inactiveBars - 1;
       
-      let height = 26;
-      if (isFirst || isLast) {
-        height = 26;
-      }
-      
-      const animationDelay = `${((activeBars + i) * 10) % 500}ms`;
+      const baseHeight = isChartHovered ? 30 : 26;
       
       bars.push(
         <div
@@ -164,17 +170,17 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
             width: '1px',
             transform: 'scaleX(2.7)',
             transformOrigin: 'left',
-            height: `${height}px`,
+            height: `${baseHeight}px`,
             backgroundColor: '#E2E3E4',
             borderRadius: '1px',
             cursor: 'pointer',
-            // Օգտագործել առանձին animation properties փոխարեն shorthand-ի
             animationName: isAnimating ? 'barAppear' : 'none',
             animationDuration: '0.5s',
             animationTimingFunction: 'ease',
             animationFillMode: 'forwards',
-            animationDelay: animationDelay,
-            opacity: isAnimating ? 0 : 1
+            animationDelay: `${((activeBars + i) * 15) % 600}ms`,
+            opacity: isAnimating ? 0 : 1,
+            transition: 'all 0.3s ease'
           }}
           title={`Non-expiring quotes: ${totalQuotes - expiringQuotes}`}
         />
@@ -184,17 +190,28 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
     return bars;
   };
 
+  // Թաբերի անիմացիաների համար
+  const getTabAnimationDelay = (index: number) => {
+    const delays = {
+      0: '0ms',     // This Week
+      1: '100ms',   // Next Week
+      2: '200ms',   // In 2–4 Weeks
+      3: '300ms'    // Next Month
+    };
+    return delays[index as keyof typeof delays] || '0ms';
+  };
+
   return (
     <>
       <style jsx>{`
         @keyframes barAppear {
           0% {
             opacity: 0;
-            transform: scaleX(2.7) scaleY(0.3);
+            transform: scaleX(2.7) scaleY(0.1);
           }
-          70% {
-            opacity: 0.8;
-            transform: scaleX(2.7) scaleY(1.1);
+          50% {
+            opacity: 0.7;
+            transform: scaleX(2.7) scaleY(1.2);
           }
           100% {
             opacity: 1;
@@ -202,10 +219,10 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
           }
         }
         
-        @keyframes fadeIn {
+        @keyframes slideUpFade {
           from {
             opacity: 0;
-            transform: translateY(5px);
+            transform: translateY(10px);
           }
           to {
             opacity: 1;
@@ -213,14 +230,28 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
           }
         }
         
-        .chart-bar {
-          transition: all 0.3s ease;
+        @keyframes pulse {
+          0% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.02);
+          }
+          100% {
+            transform: scale(1);
+          }
         }
         
-        .chart-bar:hover {
-          opacity: 0.8;
-          transform: scaleX(2) scaleY(1.1) !important;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        @keyframes gradientShift {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
         }
         
         .chaart {
@@ -230,11 +261,7 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
           margin-bottom: 12px;
           display: flex;
           overflow: hidden;
-          min-height: 24px;
-        }
-        
-        .expiration-stats {
-          transition: all 0.3s ease;
+          min-height: 30px;
         }
         
         .stats-card {
@@ -251,28 +278,55 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
           justify-content: flex-end;
         }
         
-        /* Հովեր էֆֆեկտը ողջ կոմպոնենտի համար */
-        .stats-card:hover {
-          box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-          transform: translateY(-2px);
+        .expiration-rate {
+          position: relative;
+          overflow: hidden;
         }
         
-        .card-header {
-          animation: fadeIn 0.4s ease;
+        .expiration-rate::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(90deg, 
+            rgba(255, 209, 134, 0.1) 0%, 
+            rgba(255, 124, 30, 0.1) 50%,
+            rgba(255, 209, 134, 0.1) 100%);
+          background-size: 200% 100%;
+          animation: gradientShift 3s ease infinite;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+        
+        .stats-card:hover .expiration-rate::after {
+          opacity: 0.5;
+        }
+        
+        .tab-transition {
+          animation: slideUpFade 0.5s ease;
         }
       `}</style>
 
-      <div className="stats-card bg-[#fafbf6]/80 rounded-2xl p-4 hover:shadow-lg transition-all duration-300">
+      <div className="stats-card bg-[#fafbf6]/80 rounded-2xl p-4 hover:shadow-xl transition-all duration-300">
         <div className="card-header mb-5 flex justify-between items-start">
-          <h3 className="font-montserrat text-lg font-medium text-black mb-0 transition-all duration-300 hover:opacity-80">
+          <h3 className="font-montserrat text-lg font-medium text-black mb-0 transition-all duration-300">
             Quotes Expiration
           </h3>
           
-          {/* Dropdown աջ անկյունում */}
+          {/* Dropdown */}
           <div className="relative">
             <button 
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="flex items-center gap-1 font-montserrat text-xs font-medium text-[#6f6f6f] tracking-[0.24px] cursor-pointer whitespace-nowrap px-3 py-1 border border-[#e2e3e4] rounded-lg hover:bg-gray-50 hover:border-[#ee9f66] hover:text-[#ee9f66] transition-all duration-300"
+              style={{
+                animationName: 'slideUpFade',
+                animationDuration: '0.4s',
+                animationTimingFunction: 'ease',
+                animationDelay: '150ms',
+                animationFillMode: 'both'
+              }}
             >
               {activeTab}
               <svg 
@@ -290,23 +344,30 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
               <div 
                 className="absolute right-0 top-full mt-1 bg-white min-w-[140px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] rounded-lg z-10 py-1"
                 style={{
-                  animationName: 'fadeIn',
+                  animationName: 'slideUpFade',
                   animationDuration: '0.3s',
                   animationTimingFunction: 'ease'
                 }}
               >
-                {tabs.map((tab) => (
+                {tabs.map((tab, index) => (
                   <div 
                     key={tab}
                     onClick={() => handleTabSelect(tab)}
                     className={`
                       px-4 py-2 cursor-pointer font-montserrat text-xs font-medium tracking-[0.24px]
-                      hover:bg-gray-50 transition-all duration-200 transform hover:translate-x-1
+                      hover:bg-gray-50 transition-all duration-200
                       ${activeTab === tab 
                         ? 'text-[#ee9f66] underline font-semibold bg-orange-50' 
                         : 'text-[#6f6f6f] hover:text-[#ee9f66]'
                       }
                     `}
+                    style={{
+                      animationName: 'slideUpFade',
+                      animationDuration: '0.3s',
+                      animationTimingFunction: 'ease',
+                      animationDelay: getTabAnimationDelay(index),
+                      animationFillMode: 'both'
+                    }}
                   >
                     {tab}
                   </div>
@@ -317,20 +378,18 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
         </div>
         
         <div 
-          className="expiration-stats relative w-[149px] mb-4"
+          className="expiration-stats relative w-[149px] mb-4 tab-transition"
           style={{
-            animationName: 'fadeIn',
-            animationDuration: '0.5s',
-            animationTimingFunction: 'ease'
+            animationDelay: '0.1s'
           }}
         >
           <div className="expiration-left absolute top-0 left-0.5 w-[143px] h-11 flex gap-3">
-            <div className="expiration-rate w-20 h-10 flex gap-1 items-baseline transition-all duration-300">
+            <div className="expiration-rate w-20 h-10 flex gap-1 items-baseline transition-all duration-500">
               <span 
                 className="ml-4 rate-number font-montserrat text-[56px] text-black font-normal tracking-[1.12px] leading-10 w-16 transition-all duration-500"
                 style={{
-                  animationName: 'fadeIn',
-                  animationDuration: '0.4s',
+                  animationName: isAnimating ? 'pulse' : 'none',
+                  animationDuration: '0.6s',
                   animationTimingFunction: 'ease'
                 }}
               >
@@ -345,13 +404,18 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
             </div>
           </div>
           <div className="expiration-right absolute top-14 left-0">
-            <span className="expiration-total font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px] whitespace-nowrap transition-all duration-300 hover:text-gray-600">
+            <span className="expiration-total font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px] whitespace-nowrap transition-all duration-300">
               Total expiring quotes: {expiringQuotes}
             </span>
           </div>
         </div>
         
-        <div className="chart-container" ref={containerRef}>
+        <div 
+          className="chart-container" 
+          ref={containerRef}
+          onMouseEnter={() => setIsChartHovered(true)}
+          onMouseLeave={() => setIsChartHovered(false)}
+        >
           <div className="chaart">
             {renderBars()}
           </div>
@@ -359,12 +423,14 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
           <div 
             className="expiration-chart flex justify-between items-center mt-2 transition-all duration-300"
             style={{
-              animationName: 'fadeIn',
-              animationDuration: '0.6s',
-              animationTimingFunction: 'ease'
+              animationName: 'slideUpFade',
+              animationDuration: '0.5s',
+              animationTimingFunction: 'ease',
+              animationDelay: '0.3s',
+              animationFillMode: 'both'
             }}
           >
-            <span className="chart-label font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px] hover:text-gray-600">
+            <span className="chart-label font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px] transition-all duration-300">
               Total quotes: {totalQuotes}
             </span>
             <div className="flex items-center gap-3">
@@ -372,10 +438,11 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
                 <div 
                   className="w-2 h-2 rounded-full bg-[#ee9f66] transition-all duration-300 group-hover:scale-125"
                   style={{
-                    animationName: 'fadeIn',
+                    animationName: 'slideUpFade',
                     animationDuration: '0.5s',
                     animationTimingFunction: 'ease',
-                    animationDelay: '0.3s'
+                    animationDelay: '0.4s',
+                    animationFillMode: 'both'
                   }}
                 ></div>
                 <span className="font-montserrat text-xs font-medium text-[#6f6f6f] group-hover:text-[#ee9f66] transition-all duration-300">
