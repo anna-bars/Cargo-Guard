@@ -121,7 +121,7 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
     // Ակտիվ գծիկներ - նոր հովեր տրամաբանությամբ
     for (let i = 0; i < activeBars; i++) {
       const progress = activeBars > 1 ? i / (activeBars - 1) : 0.5;
-      const baseHeight = 20; // Միայն ակտիվ գծիկներն են փոխում բարձրությունը
+      const baseHeight = 18; // Միայն ակտիվ գծիկներն են փոխում բարձրությունը
       
       bars.push(
         <div
@@ -150,7 +150,7 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
     
     // Ոչ ակտիվ գծիկներ - FIXED բարձրություն
     for (let i = 0; i < inactiveBars; i++) {
-      const baseHeight = 26; // Ոչ ակտիվ գծիկների ֆիքսված բարձրություն
+      const baseHeight = 24; // Ոչ ակտիվ գծիկների ֆիքսված բարձրություն
       
       bars.push(
         <div
