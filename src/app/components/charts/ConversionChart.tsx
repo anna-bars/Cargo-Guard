@@ -3,13 +3,17 @@ import React, { useRef, useEffect, useState, useCallback, JSX } from 'react';
 export const ConversionChart = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [hoveredType, setHoveredType] = useState<string | null>(null);
+  const [activeTime, setActiveTime] = useState('This Month');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  
+  const timeOptions = ['This Week', 'This Month', 'Last Month', 'Last Quarter'];
   
   const DATA = [
     { 
       type: 'approved', 
       count: 17, 
-      hegHeight: 24, // Սկզբի և վերջի գծիկների բարձրությունը
-      normalHeight: 16 // Ներքին գծիկների բարձրությունը
+      hegHeight: 24,
+      normalHeight: 16
     },
     { 
       type: 'declined', 
@@ -49,23 +53,24 @@ export const ConversionChart = () => {
     };
   }, [calculateBarsCount]);
 
+  const handleTimeSelect = (time: string) => {
+    setActiveTime(time);
+    setIsDropdownOpen(false);
+  };
+
   const renderBars = () => {
     const total = DATA.reduce((sum, item) => sum + item.count, 0);
     const bars: JSX.Element[] = [];
     
-    // Նախ հաշվել յուրաքանչյուր տեսակի գծիկների քանակը
     const barsPerType = DATA.map(item => ({
       ...item,
       barCount: Math.max(1, Math.floor((item.count / total) * barsCount))
     }));
     
-    // Հաշվել ընդհանուր գծիկները
     const totalBars = barsPerType.reduce((sum, item) => sum + item.barCount, 0);
     
-    // Եթե ավելի քիչ գծիկներ ենք ունենում, քան պետք է, ավելացնել հավասարաչափ
     let remainingBars = barsCount - totalBars;
     
-    // Մնացած գծիկները ավելացնել ամենամեծ տոկոսով տեսակին՝ առանց հերթականությունը փոխելու
     const sortedIndices = [...barsPerType.keys()].sort((a, b) => barsPerType[b].count - barsPerType[a].count);
     
     for (let i = 0; i < remainingBars && i < sortedIndices.length; i++) {
@@ -74,7 +79,6 @@ export const ConversionChart = () => {
     
     let barIndex = 0;
     
-    // Յուրաքանչյուր տեսակի գծիկների համար
     barsPerType.forEach((item) => {
       const itemBarCount = item.barCount;
       
@@ -82,28 +86,22 @@ export const ConversionChart = () => {
         const isFirst = i === 0;
         const isLast = i === itemBarCount - 1;
         
-        // Հաշվել բարձրությունը՝ հաշվի առնելով hover էֆֆեկտը
-        let height = item.normalHeight; // 16px բոլոր տեսակների համար
+        let height = item.normalHeight;
         
         if (isFirst || isLast) {
-          height = item.hegHeight; // 24px բոլոր տեսակների համար
+          height = item.hegHeight;
         } else if (hoveredType === item.type) {
-          // Եթե hover է՝ ամեն գծիկ դառնում է hegHeight-ի չափ
           height = item.hegHeight;
         }
         
-        // Հաշվել գույնի գրադիենտը ըստ տեսակի
         const gradientProgress = itemBarCount > 1 ? i / (itemBarCount - 1) : 0.5;
         let backgroundColor = getGradientColor(item.type, gradientProgress);
         
-        // Հաշվել գույնի պայծառությունը hover-ի ժամանակ
         let opacity = 1;
         
         if (hoveredType && hoveredType !== item.type) {
-          // Եթե hover է մեկ այլ տեսակի վրա՝ այս տեսակի գծիկները դառնում են թափանցիկ
           opacity = 0.4;
         } else if (hoveredType === item.type) {
-          // Եթե hover է այս տեսակի վրա՝ գույնը պայծառանում է
           backgroundColor = adjustColorBrightness(backgroundColor, 20);
         }
         
@@ -134,19 +132,16 @@ export const ConversionChart = () => {
     return bars;
   };
 
-  // Գրադիենտ գույնի ֆունկցիա բոլոր տեսակների համար
   const getGradientColor = (type: string, progress: number): string => {
-    // Գրադիենտի գույները յուրաքանչյուր տեսակի համար
     const gradients: Record<string, { start: string; end: string }> = {
-      approved: { start: '#BED5F8', end: '#669CEE' }, // Նույնը մնում է
-      declined: { start: '#F8E2BE', end: '#EEDE66' }, // Նոր գրադիենտ
-      expired: { start: '#FFA4A4', end: '#EB6025' }   // Նոր գրադիենտ
+      approved: { start: '#BED5F8', end: '#669CEE' },
+      declined: { start: '#F8E2BE', end: '#EEDE66' },
+      expired: { start: '#FFA4A4', end: '#EB6025' }
     };
     
     const gradient = gradients[type];
     if (!gradient) return '#000000';
     
-    // RGB արժեքները ստանալ
     const startR = parseInt(gradient.start.slice(1, 3), 16);
     const startG = parseInt(gradient.start.slice(3, 5), 16);
     const startB = parseInt(gradient.start.slice(5, 7), 16);
@@ -155,7 +150,6 @@ export const ConversionChart = () => {
     const endG = parseInt(gradient.end.slice(3, 5), 16);
     const endB = parseInt(gradient.end.slice(5, 7), 16);
     
-    // Ինտերպոլացիա
     const r = Math.round(startR + (endR - startR) * progress);
     const g = Math.round(startG + (endG - startG) * progress);
     const b = Math.round(startB + (endB - startB) * progress);
@@ -163,7 +157,6 @@ export const ConversionChart = () => {
     return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
   };
 
-  // Օգնական ֆունկցիա գույնի պայծառությունը փոխելու համար
   const adjustColorBrightness = (color: string, percent: number): string => {
     if (color.startsWith('#')) {
       let r = parseInt(color.slice(1, 3), 16);
@@ -181,13 +174,64 @@ export const ConversionChart = () => {
 
   return (
     <div className="flex flex-col justify-between border border-[#d1d1d154] bg-[#fdfdf8cf] rounded-2xl p-4 h-full w-full quote-conversion performance-section hover:shadow-sm transition-shadow duration-300">
-      <div className="mb-[4px]">
+      <div className="mb-[4px] flex justify-between items-center">
         <h3 className="font-montserrat text-[18px] font-normal text-black action-title max-[1024px]:text-[14px]">
           Quote Conversion Rate
         </h3>
-        <p className="font-montserrat text-[12px] font-normal text-[#c7c7c7]">
-          This Month
-        </p>
+        
+        {/* Dropdown for time selection */}
+        <div className="relative">
+          <button 
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="flex items-center gap-1 font-montserrat text-xs font-medium text-[#6f6f6f] tracking-[0.24px] cursor-pointer whitespace-nowrap px-3 py-1 border border-[#e2e3e4] rounded-lg hover:bg-gray-50 hover:border-[#669CEE] hover:text-[#669CEE] transition-all duration-300"
+          >
+            {activeTime}
+            <svg 
+              className={`w-3 h-3 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          {/* Dropdown Menu */}
+          {isDropdownOpen && (
+            <div 
+              className="absolute right-0 top-full mt-1 bg-white min-w-[140px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] rounded-lg z-10 py-1"
+              style={{
+                animationName: 'slideUpFade',
+                animationDuration: '0.3s',
+                animationTimingFunction: 'ease'
+              }}
+            >
+              {timeOptions.map((time, index) => (
+                <div 
+                  key={time}
+                  onClick={() => handleTimeSelect(time)}
+                  className={`
+                    px-4 py-2 cursor-pointer font-montserrat text-xs font-medium tracking-[0.24px]
+                    hover:bg-gray-50 transition-all duration-200
+                    ${activeTime === time 
+                      ? 'text-[#669CEE] underline font-semibold bg-blue-50' 
+                      : 'text-[#6f6f6f] hover:text-[#669CEE]'
+                    }
+                  `}
+                  style={{
+                    animationName: 'slideUpFade',
+                    animationDuration: '0.3s',
+                    animationTimingFunction: 'ease',
+                    animationDelay: `${index * 50}ms`,
+                    animationFillMode: 'both'
+                  }}
+                >
+                  {time}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
       
       <div className="block justify-between items-end">
@@ -208,7 +252,6 @@ export const ConversionChart = () => {
                   <div 
                     className="w-1.5 h-1.5 rounded-full transition-all duration-300"
                     style={{ 
-                      // Ցույց տալ գրադիենտի միջին գույնը
                       backgroundColor: getGradientColor(item.type, 0.5),
                       transform: hoveredType === item.type ? 'scale(1.2)' : 'scale(1)',
                       boxShadow: hoveredType === item.type ? `0 0 8px ${getGradientColor(item.type, 0.5)}80` : 'none'
@@ -233,7 +276,7 @@ export const ConversionChart = () => {
                 alignItems: 'end',
                 overflow: 'hidden',
                 marginBottom: '4px',
-                minHeight: '24px' // Ամենաբարձր գծիկի համար (hegHeight)
+                minHeight: '24px'
               }}
             >
               {renderBars()}
@@ -268,18 +311,26 @@ export const ConversionChart = () => {
       </div>
 
       <style jsx global>{`
+        @keyframes slideUpFade {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
         .empty-chart-bar {
           background: linear-gradient(180deg, #E2E3E4, transparent) !important;
         }
-        
-        /* CSS-ում հեռացրել ենք !important կանոնները, որպեսզի անիմացիան աշխատի */
         
         .chart-cont {
           gap: 0px;
           display: grid;
         }
         
-        /* Smooth transitions for all chart bars */
         .approved-chart-bar,
         .declined-chart-bar,
         .expired-chart-bar,
