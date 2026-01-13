@@ -20,30 +20,6 @@ export const ConversionChart = () => {
     'Last Quarter': { approved: 65, declined: 28, expired: 42 }
   };
   
-  // Օգտագործել animatingData-ն, եթե անիմացիան ընթացքի մեջ է, հակառակ դեպքում՝ ընթացիկ տվյալները
-  const currentData = isAnimating && animatingData ? animatingData : timeData[activeTime];
-  
-  const chartData = [
-    { 
-      type: 'approved', 
-      count: currentData.approved, 
-      hegHeight: 24,
-      normalHeight: 16
-    },
-    { 
-      type: 'declined', 
-      count: currentData.declined, 
-      hegHeight: 24, 
-      normalHeight: 16 
-    },
-    { 
-      type: 'expired', 
-      count: currentData.expired, 
-      hegHeight: 24, 
-      normalHeight: 16 
-    }
-  ];
-
   const calculateBarsCount = useCallback((width: number) => {
     if (width <= 320) return 40;
     if (width <= 400) return 45;
@@ -96,27 +72,162 @@ export const ConversionChart = () => {
     }
   };
 
+  // Միշտ օգտագործել ակտիվ ժամանակի տվյալները գծիկների հաշվարկի համար
+  const getCurrentDataForBars = useCallback(() => {
+    if (isAnimating && animatingData) {
+      return animatingData;
+    }
+    return timeData[activeTime];
+  }, [isAnimating, animatingData, activeTime]);
+
+  // Տվյալների թվերի անիմացիայի համար
+  const shouldShowNumber = (type: string) => {
+    if (!isAnimating) return true;
+    
+    if (type === 'approved') return animationStage >= 1;
+    if (type === 'declined') return animationStage >= 2;
+    if (type === 'expired') return animationStage >= 3;
+    
+    return false;
+  };
+
+  // Ստանալ անիմացիայի ժամանակ ցուցադրվող թվերը
+  const getDisplayNumber = (type: string) => {
+    const currentData = getCurrentDataForBars();
+    
+    if (!isAnimating || !animatingData) return currentData[type as keyof typeof currentData];
+    
+    // Եթե այս տեսակի անիմացիան դեռ չի սկսվել՝ ցույց տալ 0
+    if (type === 'approved' && animationStage < 1) return 0;
+    if (type === 'declined' && animationStage < 2) return 0;
+    if (type === 'expired' && animationStage < 3) return 0;
+    
+    return animatingData[type as keyof typeof animatingData];
+  };
+
+  const getGradientColor = (type: string, progress: number): string => {
+    const gradients: Record<string, { start: string; end: string }> = {
+      approved: { start: '#BED5F8', end: '#669CEE' },
+      declined: { start: '#F8E2BE', end: '#EEDE66' },
+      expired: { start: '#FFA4A4', end: '#EB6025' }
+    };
+    
+    const gradient = gradients[type];
+    if (!gradient) return '#000000';
+    
+    const startR = parseInt(gradient.start.slice(1, 3), 16);
+    const startG = parseInt(gradient.start.slice(3, 5), 16);
+    const startB = parseInt(gradient.start.slice(5, 7), 16);
+    
+    const endR = parseInt(gradient.end.slice(1, 3), 16);
+    const endG = parseInt(gradient.end.slice(3, 5), 16);
+    const endB = parseInt(gradient.end.slice(5, 7), 16);
+    
+    const r = Math.round(startR + (endR - startR) * progress);
+    const g = Math.round(startG + (endG - startG) * progress);
+    const b = Math.round(startB + (endB - startB) * progress);
+    
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  };
+
+  const adjustColorBrightness = (color: string, percent: number): string => {
+    if (color.startsWith('#')) {
+      let r = parseInt(color.slice(1, 3), 16);
+      let g = parseInt(color.slice(3, 5), 16);
+      let b = parseInt(color.slice(5, 7), 16);
+      
+      r = Math.min(255, r + (255 - r) * percent / 100);
+      g = Math.min(255, g + (255 - g) * percent / 100);
+      b = Math.min(255, b + (255 - b) * percent / 100);
+      
+      return `#${Math.round(r).toString(16).padStart(2, '0')}${Math.round(g).toString(16).padStart(2, '0')}${Math.round(b).toString(16).padStart(2, '0')}`;
+    }
+    return color;
+  };
+
   const renderBars = () => {
+    const currentDataForBars = getCurrentDataForBars();
+    
+    const chartData = [
+      { 
+        type: 'approved', 
+        count: currentDataForBars.approved, 
+        hegHeight: 24,
+        normalHeight: 16
+      },
+      { 
+        type: 'declined', 
+        count: currentDataForBars.declined, 
+        hegHeight: 24, 
+        normalHeight: 16 
+      },
+      { 
+        type: 'expired', 
+        count: currentDataForBars.expired, 
+        hegHeight: 24, 
+        normalHeight: 16 
+      }
+    ];
+    
     const total = chartData.reduce((sum, item) => sum + item.count, 0);
     if (total === 0) return [];
     
     const bars: JSX.Element[] = [];
     
-    // Հաշվել գծիկների քանակը յուրաքանչյուր տեսակի համար
+    // Հաշվել յուրաքանչյուր տեսակի համար պահանջվող գծիկների քանակը (պրոցենտային)
     const barsPerType = chartData.map(item => ({
       ...item,
-      barCount: Math.max(1, Math.floor((item.count / total) * barsCount))
+      // Կլորացնելով ստանալ ամբողջ թվեր, բայց ապահովել նվազագույնը 1 գծիկ
+      barCount: Math.max(1, Math.round((item.count / total) * barsCount))
     }));
     
+    // Վերահաշվել ընդհանուր գծիկների քանակը
     const totalBars = barsPerType.reduce((sum, item) => sum + item.barCount, 0);
     
-    let remainingBars = barsCount - totalBars;
+    // Տարբերությունը հաշվել և հարմարեցնել
+    let diff = barsCount - totalBars;
     
-    // Մնացած գծիկները ավելացնել ամենամեծ թվով տեսակին
-    const sortedIndices = [...barsPerType.keys()].sort((a, b) => barsPerType[b].count - barsPerType[a].count);
-    
-    for (let i = 0; i < remainingBars && i < sortedIndices.length; i++) {
-      barsPerType[sortedIndices[i]].barCount++;
+    if (diff !== 0) {
+      // Ստեղծել գծիկների քանակների պատճենը
+      const adjustedBarsPerType = [...barsPerType];
+      
+      // Եթե դրական տարբերություն կա՝ ավելացնել ամենամեծ թվով գծիկներ ունեցող տեսակին
+      if (diff > 0) {
+        // Գտնել ամենամեծ քանակով գծիկներ ունեցող տեսակի ինդեքսը
+        const maxIndex = adjustedBarsPerType.reduce((maxIdx, item, idx, arr) => 
+          item.barCount > arr[maxIdx].barCount ? idx : maxIdx, 0);
+        adjustedBarsPerType[maxIndex].barCount += diff;
+      } 
+      // Եթե բացասական տարբերություն կա՝ հանել ամենափոքր թվով գծիկներ ունեցող տեսակից
+      else if (diff < 0) {
+        // Գտնել ամենափոքր քանակով գծիկներ ունեցող տեսակի ինդեքսը
+        const minIndex = adjustedBarsPerType.reduce((minIdx, item, idx, arr) => 
+          item.barCount < arr[minIdx].barCount ? idx : minIdx, 0);
+        // Համոզվել, որ քանակը 0-ից պակաս չի դառնում
+        adjustedBarsPerType[minIndex].barCount = Math.max(1, adjustedBarsPerType[minIndex].barCount + diff);
+      }
+      
+      // Կրկին հաշվել տարբերությունը
+      const newTotalBars = adjustedBarsPerType.reduce((sum, item) => sum + item.barCount, 0);
+      const newDiff = barsCount - newTotalBars;
+      
+      // Եթե դեռ տարբերություն կա, կարգավորել ամենամեծ կամ ամենափոքր քանակով գծիկներ ունեցող տեսակը
+      if (newDiff !== 0) {
+        if (newDiff > 0) {
+          const maxIndex = adjustedBarsPerType.reduce((maxIdx, item, idx, arr) => 
+            item.barCount > arr[maxIdx].barCount ? idx : maxIdx, 0);
+          adjustedBarsPerType[maxIndex].barCount += newDiff;
+        } else {
+          const minIndex = adjustedBarsPerType.reduce((minIdx, item, idx, arr) => 
+            item.barCount < arr[minIdx].barCount ? idx : minIdx, 0);
+          adjustedBarsPerType[minIndex].barCount = Math.max(1, adjustedBarsPerType[minIndex].barCount + newDiff);
+        }
+      }
+      
+      // Այժմ արդեն ունենք barsPerType-ի ճշգրիտ արժեքները
+      for (let i = 0; i < adjustedBarsPerType.length; i++) {
+        barsPerType[i].barCount = adjustedBarsPerType[i].barCount;
+      }
     }
     
     let barIndex = 0;
@@ -198,70 +309,12 @@ export const ConversionChart = () => {
       }
     });
     
+    // Վերջնական ստուգում՝ համոզվել, որ գծիկների ընդհանուր քանակը ճիշտ է
+    console.log(`Active time: ${activeTime}, Total bars required: ${barsCount}, Actual bars: ${bars.length}`);
+    console.log(`Data for bars:`, currentDataForBars);
+    console.log(`Bars per type:`, barsPerType.map(item => `${item.type}: ${item.barCount} bars`));
+    
     return bars;
-  };
-
-  const getGradientColor = (type: string, progress: number): string => {
-    const gradients: Record<string, { start: string; end: string }> = {
-      approved: { start: '#BED5F8', end: '#669CEE' },
-      declined: { start: '#F8E2BE', end: '#EEDE66' },
-      expired: { start: '#FFA4A4', end: '#EB6025' }
-    };
-    
-    const gradient = gradients[type];
-    if (!gradient) return '#000000';
-    
-    const startR = parseInt(gradient.start.slice(1, 3), 16);
-    const startG = parseInt(gradient.start.slice(3, 5), 16);
-    const startB = parseInt(gradient.start.slice(5, 7), 16);
-    
-    const endR = parseInt(gradient.end.slice(1, 3), 16);
-    const endG = parseInt(gradient.end.slice(3, 5), 16);
-    const endB = parseInt(gradient.end.slice(5, 7), 16);
-    
-    const r = Math.round(startR + (endR - startR) * progress);
-    const g = Math.round(startG + (endG - startG) * progress);
-    const b = Math.round(startB + (endB - startB) * progress);
-    
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-  };
-
-  const adjustColorBrightness = (color: string, percent: number): string => {
-    if (color.startsWith('#')) {
-      let r = parseInt(color.slice(1, 3), 16);
-      let g = parseInt(color.slice(3, 5), 16);
-      let b = parseInt(color.slice(5, 7), 16);
-      
-      r = Math.min(255, r + (255 - r) * percent / 100);
-      g = Math.min(255, g + (255 - g) * percent / 100);
-      b = Math.min(255, b + (255 - b) * percent / 100);
-      
-      return `#${Math.round(r).toString(16).padStart(2, '0')}${Math.round(g).toString(16).padStart(2, '0')}${Math.round(b).toString(16).padStart(2, '0')}`;
-    }
-    return color;
-  };
-
-  // Տվյալների թվերի անիմացիայի համար
-  const shouldShowNumber = (type: string) => {
-    if (!isAnimating) return true;
-    
-    if (type === 'approved') return animationStage >= 1;
-    if (type === 'declined') return animationStage >= 2;
-    if (type === 'expired') return animationStage >= 3;
-    
-    return false;
-  };
-
-  // Ստանալ անիմացիայի ժամանակ ցուցադրվող թվերը
-  const getDisplayNumber = (type: keyof typeof currentData) => {
-    if (!isAnimating || !animatingData) return currentData[type];
-    
-    // Եթե այս տեսակի անիմացիան դեռ չի սկսվել՝ ցույց տալ 0
-    if (type === 'approved' && animationStage < 1) return 0;
-    if (type === 'declined' && animationStage < 2) return 0;
-    if (type === 'expired' && animationStage < 3) return 0;
-    
-    return animatingData[type];
   };
 
   return (
@@ -329,51 +382,59 @@ export const ConversionChart = () => {
       <div className="block justify-between items-end">
         <div className="w-full">
           <div className="flex w-[96%] justify-between mb-3.5">
-            {chartData.map((item) => {
-              const typeKey = item.type as keyof typeof currentData;
-              const showNumber = shouldShowNumber(item.type);
-              const displayNumber = getDisplayNumber(typeKey);
+            {(() => {
+              const currentDataForDisplay = getCurrentDataForBars();
+              const displayData = [
+                { type: 'approved', count: currentDataForDisplay.approved },
+                { type: 'declined', count: currentDataForDisplay.declined },
+                { type: 'expired', count: currentDataForDisplay.expired }
+              ];
               
-              return (
-                <div 
-                  key={item.type}
-                  className={`transition-all duration-300 ${hoveredType === item.type ? 'scale-105' : ''}`}
-                  onMouseEnter={() => setHoveredType(item.type)}
-                  onMouseLeave={() => setHoveredType(null)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <div className="text-[13px] text-[#C8C8C8] capitalize">
-                    {item.type}
-                  </div>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <div 
-                      className="w-1.5 h-1.5 rounded-full transition-all duration-300"
-                      style={{ 
-                        backgroundColor: getGradientColor(item.type, 0.5),
-                        transform: hoveredType === item.type ? 'scale(1.2)' : 'scale(1)',
-                        boxShadow: hoveredType === item.type ? `0 0 8px ${getGradientColor(item.type, 0.5)}80` : 'none',
-                        opacity: showNumber ? 1 : 0.3
-                      }}
-                    ></div>
-                    <div 
-                      className="text-[15px] font-medium transition-all duration-300 relative"
-                      style={{ 
-                        color: hoveredType === item.type ? '#000' : 'inherit'
-                      }}
-                    >
-                      <span 
-                        style={{
-                          opacity: showNumber ? 1 : 0,
-                          transition: 'opacity 0.3s ease'
+              return displayData.map((item) => {
+                const showNumber = shouldShowNumber(item.type);
+                const displayNumber = getDisplayNumber(item.type);
+                
+                return (
+                  <div 
+                    key={item.type}
+                    className={`transition-all duration-300 ${hoveredType === item.type ? 'scale-105' : ''}`}
+                    onMouseEnter={() => setHoveredType(item.type)}
+                    onMouseLeave={() => setHoveredType(null)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <div className="text-[13px] text-[#C8C8C8] capitalize">
+                      {item.type}
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <div 
+                        className="w-1.5 h-1.5 rounded-full transition-all duration-300"
+                        style={{ 
+                          backgroundColor: getGradientColor(item.type, 0.5),
+                          transform: hoveredType === item.type ? 'scale(1.2)' : 'scale(1)',
+                          boxShadow: hoveredType === item.type ? `0 0 8px ${getGradientColor(item.type, 0.5)}80` : 'none',
+                          opacity: showNumber ? 1 : 0.3
+                        }}
+                      ></div>
+                      <div 
+                        className="text-[15px] font-medium transition-all duration-300 relative"
+                        style={{ 
+                          color: hoveredType === item.type ? '#000' : 'inherit'
                         }}
                       >
-                        {displayNumber}
-                      </span>
+                        <span 
+                          style={{
+                            opacity: showNumber ? 1 : 0,
+                            transition: 'opacity 0.3s ease'
+                          }}
+                        >
+                          {displayNumber}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              });
+            })()}
           </div>
 
           <div className='chart-cont' ref={containerRef}>
