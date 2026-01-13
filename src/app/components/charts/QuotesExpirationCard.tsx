@@ -241,6 +241,7 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
           display: flex;
           flex-direction: column;
           justify-content: space-between;
+          max-height: 34%;
         }
         
         .chart-container {
@@ -248,7 +249,6 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
           display: flex;
           flex-direction: column;
           justify-content: flex-end;
-          min-height: 100px;
         }
       `}</style>
 
@@ -313,7 +313,7 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
         </div>
         
         {/* Միջին բլոկ - Տոկոս և տվյալներ (նույն դիզայնը) */}
-        <div className="expiration-stats relative w-[149px] mb-4">
+        <div className="expiration-stats h-[inherit] relative w-[149px]">
           <div className="expiration-left absolute top-0 left-0.5 w-[143px] h-11 flex gap-3">
             <div className="expiration-rate w-20 h-10 flex gap-1 items-baseline">
               <span className="ml-4 rate-number font-montserrat text-[56px] text-black font-normal tracking-[1.12px] leading-10 w-16 transition-all duration-500"
