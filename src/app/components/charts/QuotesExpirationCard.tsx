@@ -223,6 +223,18 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
           }
         }
         
+        @keyframes glowPulse {
+          0% {
+            box-shadow: 0 0 0 0 rgba(238, 159, 102, 0.4);
+          }
+          70% {
+            box-shadow: 0 0 0 4px rgba(238, 159, 102, 0);
+          }
+          100% {
+            box-shadow: 0 0 0 0 rgba(238, 159, 102, 0);
+          }
+        }
+        
         .chaart {
           justify-content: start;
           align-items: center;
@@ -263,9 +275,38 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
           transform: scaleX(2.7) scaleY(0.9) !important;
           transition: transform 0.2s ease;
         }
+        
+        /* Expiring indicator հովեր էֆեկտ */
+        .expiring-indicator-wrapper {
+          transition: all 0.3s ease;
+        }
+        
+        .expiring-indicator {
+          transition: all 0.3s ease;
+          animation: glowPulse 2s infinite;
+        }
+        
+        .chart-hovered .expiring-indicator {
+          transform: scale(1.1);
+          background-color: rgba(238, 159, 102, 0.15);
+          border-color: #EE9F66;
+          animation: glowPulse 1.5s infinite;
+        }
+        
+        .chart-hovered .expiring-dot {
+          transform: scale(1.3);
+          box-shadow: 0 0 10px rgba(238, 159, 102, 0.8);
+        }
+        
+        .chart-hovered .expiring-text {
+          color: #000;
+          font-weight: 500;
+        }
       `}</style>
 
-      <div className="stats-card bg-[#fafbf6]/80 rounded-2xl p-4 border border-[#d1d1d154] hover:shadow-sm transition-all duration-300">
+      <div 
+        className={`stats-card bg-[#fafbf6]/80 rounded-2xl p-4 border border-[#d1d1d154] hover:shadow-sm transition-all duration-300 ${isChartHovered ? 'chart-hovered' : ''}`}
+      >
         {/* Վերին բլոկ - Վերնագիր և Dropdown */}
         <div className="card-header mb-5 flex justify-between items-start">
           <h3 className="font-montserrat text-lg font-medium text-black mb-0">Quotes Expiration</h3>
@@ -367,9 +408,27 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
               Total quotes: {totalQuotes}
             </span>
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-[#ee9f66]"></div>
-                <span className="font-montserrat text-xs font-medium text-[#6f6f6f]">
+              <div 
+                className="expiring-indicator-wrapper flex items-center gap-1 px-2 py-1 rounded-md transition-all duration-300"
+                style={{
+                  backgroundColor: isChartHovered ? 'rgba(238, 159, 102, 0.1)' : 'transparent',
+                  border: isChartHovered ? '1px solid rgba(238, 159, 102, 0.3)' : '1px solid transparent'
+                }}
+              >
+                <div 
+                  className="expiring-dot w-2 h-2 rounded-full transition-all duration-300"
+                  style={{ 
+                    backgroundColor: '#EE9F66',
+                    transform: isChartHovered ? 'scale(1.3)' : 'scale(1)',
+                    boxShadow: isChartHovered ? '0 0 8px rgba(238, 159, 102, 0.8)' : 'none'
+                  }}
+                />
+                <span 
+                  className="expiring-text font-montserrat text-xs font-medium transition-all duration-300"
+                  style={{ 
+                    color: isChartHovered ? '#000' : '#6f6f6f'
+                  }}
+                >
                   Expiring: {expiringQuotes}
                 </span>
               </div>
