@@ -211,16 +211,7 @@ export default function DashboardPage() {
     <DashboardLayout>
       <div className="w-full max-w-[99%] sm:max-w-[99%] mx-auto">
         {/* Mobile Header for Activity Section */}
-        <div className="flex gap-2 items-center mb-2 xl:hidden">
-          <img
-            src="/dashboard/hashtag.svg"
-            alt=""
-            className="w-[22px] h-[22px] sm:w-5 sm:h-5"
-          />
-          <h2 className="font-normal text-[18px] sm:text-lg">
-            Dashboard
-          </h2>
-        </div>
+       
 
         {/* Main Content Grid */}
         <div className="
@@ -248,6 +239,12 @@ export default function DashboardPage() {
 
             <div className="block md:hidden">
               <ConversionChart />
+            </div>
+            <div className="block md:hidden">
+              <QuotesExpirationCard 
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+              />
             </div>
 
             {/* Universal Table for Recent Activity */}
