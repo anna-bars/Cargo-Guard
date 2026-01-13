@@ -251,21 +251,21 @@ export default function DashboardPage() {
             </div>
 
             {/* Universal Table for Recent Activity */}
-<div className='max-h-[85%'>
-          <UniversalTable
-  title="All Insurance Quotes"
-  showMobileHeader={true}
-  rows={quotesRows}
-  columns={quotesColumns}
-  mobileDesign={{
-    showType: false, // Quotes-ում type չկա
-    showCargoIcon: true,
-    showDateIcon: true,
-    dateLabel: 'Expires',
-    buttonWidth: '47%'
-  }}
-/>
-</div>
+            <div className='max-h-[85%'>
+                      <UniversalTable
+              title="Quotes Overview"
+              showMobileHeader={true}
+              rows={quotesRows}
+              columns={quotesColumns}
+              mobileDesign={{
+                showType: false, // Quotes-ում type չկա
+                showCargoIcon: true,
+                showDateIcon: true,
+                dateLabel: 'Expires',
+                buttonWidth: '47%'
+              }}
+            />
+            </div>
           </div>
 
           {/* Right Column - 25% - Desktop View */}
