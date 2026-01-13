@@ -5,25 +5,40 @@ export const ConversionChart = () => {
   const [hoveredType, setHoveredType] = useState<string | null>(null);
   const [activeTime, setActiveTime] = useState('This Month');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [animationStage, setAnimationStage] = useState(0); // 0: no animation, 1: approved, 2: declined, 3: expired
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [animatingData, setAnimatingData] = useState<{approved: number, declined: number, expired: number} | null>(null);
+  const [animatingTime, setAnimatingTime] = useState<string | null>(null);
   
   const timeOptions = ['This Week', 'This Month', 'Last Month', 'Last Quarter'];
   
-  const DATA = [
+  // Տվյալներ յուրաքանչյուր ժամանակահատվածի համար
+  const timeData: Record<string, {approved: number, declined: number, expired: number}> = {
+    'This Week': { approved: 12, declined: 5, expired: 8 },
+    'This Month': { approved: 17, declined: 9, expired: 18 },
+    'Last Month': { approved: 22, declined: 7, expired: 15 },
+    'Last Quarter': { approved: 65, declined: 28, expired: 42 }
+  };
+  
+  // Օգտագործել animatingData-ն, եթե անիմացիան ընթացքի մեջ է, հակառակ դեպքում՝ ընթացիկ տվյալները
+  const currentData = isAnimating && animatingData ? animatingData : timeData[activeTime];
+  
+  const chartData = [
     { 
       type: 'approved', 
-      count: 17, 
+      count: currentData.approved, 
       hegHeight: 24,
       normalHeight: 16
     },
     { 
       type: 'declined', 
-      count: 9, 
+      count: currentData.declined, 
       hegHeight: 24, 
       normalHeight: 16 
     },
     { 
       type: 'expired', 
-      count: 18, 
+      count: currentData.expired, 
       hegHeight: 24, 
       normalHeight: 16 
     }
@@ -54,15 +69,41 @@ export const ConversionChart = () => {
   }, [calculateBarsCount]);
 
   const handleTimeSelect = (time: string) => {
-    setActiveTime(time);
-    setIsDropdownOpen(false);
+    if (time !== activeTime) {
+      setIsDropdownOpen(false);
+      setIsAnimating(true);
+      setAnimatingTime(time);
+      setAnimatingData(timeData[time]); // Սկսել անիմացիան նոր տվյալներով
+      setAnimationStage(1); // Սկսել անիմացիան approved-ից
+      
+      // Անիմացիայի փուլերը
+      setTimeout(() => {
+        setAnimationStage(2); // declined
+        setTimeout(() => {
+          setAnimationStage(3); // expired
+          setTimeout(() => {
+            // Ավարտել անիմացիան և սահմանել նոր ակտիվ ժամանակ
+            setActiveTime(time);
+            setAnimationStage(0);
+            setIsAnimating(false);
+            setAnimatingData(null);
+            setAnimatingTime(null);
+          }, 300);
+        }, 300);
+      }, 300);
+    } else {
+      setIsDropdownOpen(false);
+    }
   };
 
   const renderBars = () => {
-    const total = DATA.reduce((sum, item) => sum + item.count, 0);
+    const total = chartData.reduce((sum, item) => sum + item.count, 0);
+    if (total === 0) return [];
+    
     const bars: JSX.Element[] = [];
     
-    const barsPerType = DATA.map(item => ({
+    // Հաշվել գծիկների քանակը յուրաքանչյուր տեսակի համար
+    const barsPerType = chartData.map(item => ({
       ...item,
       barCount: Math.max(1, Math.floor((item.count / total) * barsCount))
     }));
@@ -71,6 +112,7 @@ export const ConversionChart = () => {
     
     let remainingBars = barsCount - totalBars;
     
+    // Մնացած գծիկները ավելացնել ամենամեծ թվով տեսակին
     const sortedIndices = [...barsPerType.keys()].sort((a, b) => barsPerType[b].count - barsPerType[a].count);
     
     for (let i = 0; i < remainingBars && i < sortedIndices.length; i++) {
@@ -79,12 +121,34 @@ export const ConversionChart = () => {
     
     let barIndex = 0;
     
-    barsPerType.forEach((item) => {
+    // Յուրաքանչյուր տեսակի գծիկների համար
+    barsPerType.forEach((item, typeIndex) => {
       const itemBarCount = item.barCount;
+      const barType = item.type;
+      
+      // Որոշել արդյոք այս տեսակի գծիկները պետք է ցուցադրվեն
+      let showBars = false;
+      let animationDelay = 0;
+      
+      if (isAnimating) {
+        if (barType === 'approved' && animationStage >= 1) {
+          showBars = true;
+          animationDelay = 0; // approved-ը առաջինն է
+        } else if (barType === 'declined' && animationStage >= 2) {
+          showBars = true;
+          animationDelay = 300; // 300ms ուշացում declined-ի համար
+        } else if (barType === 'expired' && animationStage >= 3) {
+          showBars = true;
+          animationDelay = 600; // 600ms ուշացում expired-ի համար
+        }
+      } else {
+        showBars = true; // Երբ անիմացիան ավարտված է՝ ցույց տալ բոլորը
+      }
       
       for (let i = 0; i < itemBarCount; i++) {
         const isFirst = i === 0;
         const isLast = i === itemBarCount - 1;
+        const barKey = `${barType}-${i}-${barIndex}-${activeTime}`;
         
         let height = item.normalHeight;
         
@@ -95,34 +159,39 @@ export const ConversionChart = () => {
         }
         
         const gradientProgress = itemBarCount > 1 ? i / (itemBarCount - 1) : 0.5;
-        let backgroundColor = getGradientColor(item.type, gradientProgress);
+        let backgroundColor = getGradientColor(barType, gradientProgress);
         
         let opacity = 1;
         
-        if (hoveredType && hoveredType !== item.type) {
+        if (hoveredType && hoveredType !== barType) {
           opacity = 0.4;
-        } else if (hoveredType === item.type) {
+        } else if (hoveredType === barType) {
           backgroundColor = adjustColorBrightness(backgroundColor, 20);
         }
         
+        // Հաշվել յուրաքանչյուր գծիկի անհատական ուշացում
+        const individualDelay = animationDelay + (i * 20); // Յուրաքանչյուր գծիկի համար փոքր ուշացում
+        
         bars.push(
           <div 
-            key={`${item.type}-${i}-${barIndex}`}
-            className={`${item.type}-chart-bar ${isFirst || isLast ? 'heg' : ''}`}
+            key={barKey}
+            className={`${barType}-chart-bar ${isFirst || isLast ? 'heg' : ''}`}
             style={{
               width: '1px',
               transform: 'scaleX(2.7)',
               transformOrigin: 'left',
-              height: `${height}px`,
+              height: showBars ? `${height}px` : '0px',
               backgroundColor: backgroundColor,
-              opacity: opacity,
-              transition: 'all 0.3s ease',
+              opacity: showBars ? opacity : 0,
+              transition: showBars ? 
+                `height 0.3s ease ${individualDelay}ms, opacity 0.3s ease ${individualDelay}ms` : 
+                'all 0.3s ease',
               cursor: 'pointer',
               borderRadius: '1px'
             }}
-            onMouseEnter={() => setHoveredType(item.type)}
+            onMouseEnter={() => setHoveredType(barType)}
             onMouseLeave={() => setHoveredType(null)}
-            title={`${item.type}: ${item.count}`}
+            title={`${barType}: ${item.count}`}
           />
         );
         barIndex++;
@@ -172,6 +241,29 @@ export const ConversionChart = () => {
     return color;
   };
 
+  // Տվյալների թվերի անիմացիայի համար
+  const shouldShowNumber = (type: string) => {
+    if (!isAnimating) return true;
+    
+    if (type === 'approved') return animationStage >= 1;
+    if (type === 'declined') return animationStage >= 2;
+    if (type === 'expired') return animationStage >= 3;
+    
+    return false;
+  };
+
+  // Ստանալ անիմացիայի ժամանակ ցուցադրվող թվերը
+  const getDisplayNumber = (type: keyof typeof currentData) => {
+    if (!isAnimating || !animatingData) return currentData[type];
+    
+    // Եթե այս տեսակի անիմացիան դեռ չի սկսվել՝ ցույց տալ 0
+    if (type === 'approved' && animationStage < 1) return 0;
+    if (type === 'declined' && animationStage < 2) return 0;
+    if (type === 'expired' && animationStage < 3) return 0;
+    
+    return animatingData[type];
+  };
+
   return (
     <div className="flex flex-col justify-between border border-[#d1d1d154] bg-[#fdfdf8cf] rounded-2xl p-4 h-full w-full quote-conversion performance-section hover:shadow-sm transition-shadow duration-300">
       <div className="mb-[4px] flex justify-between items-center">
@@ -185,7 +277,7 @@ export const ConversionChart = () => {
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="flex items-center gap-1 font-montserrat text-xs font-medium text-[#6f6f6f] tracking-[0.24px] cursor-pointer whitespace-nowrap px-3 py-1 border border-[#e2e3e4] rounded-lg hover:bg-gray-50 hover:border-[#669CEE] hover:text-[#669CEE] transition-all duration-300"
           >
-            {activeTime}
+            {isAnimating && animatingTime ? animatingTime : activeTime}
             <svg 
               className={`w-3 h-3 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} 
               fill="none" 
@@ -237,33 +329,51 @@ export const ConversionChart = () => {
       <div className="block justify-between items-end">
         <div className="w-full">
           <div className="flex w-[96%] justify-between mb-3.5">
-            {DATA.map((item) => (
-              <div 
-                key={item.type}
-                className={`transition-all duration-300 ${hoveredType === item.type ? 'scale-105' : ''}`}
-                onMouseEnter={() => setHoveredType(item.type)}
-                onMouseLeave={() => setHoveredType(null)}
-                style={{ cursor: 'pointer' }}
-              >
-                <div className="text-[13px] text-[#C8C8C8] capitalize">
-                  {item.type}
-                </div>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <div 
-                    className="w-1.5 h-1.5 rounded-full transition-all duration-300"
-                    style={{ 
-                      backgroundColor: getGradientColor(item.type, 0.5),
-                      transform: hoveredType === item.type ? 'scale(1.2)' : 'scale(1)',
-                      boxShadow: hoveredType === item.type ? `0 0 8px ${getGradientColor(item.type, 0.5)}80` : 'none'
-                    }}
-                  ></div>
-                  <div className="text-[15px] font-medium transition-all duration-300"
-                       style={{ color: hoveredType === item.type ? '#000' : 'inherit' }}>
-                    {item.count}
+            {chartData.map((item) => {
+              const typeKey = item.type as keyof typeof currentData;
+              const showNumber = shouldShowNumber(item.type);
+              const displayNumber = getDisplayNumber(typeKey);
+              
+              return (
+                <div 
+                  key={item.type}
+                  className={`transition-all duration-300 ${hoveredType === item.type ? 'scale-105' : ''}`}
+                  onMouseEnter={() => setHoveredType(item.type)}
+                  onMouseLeave={() => setHoveredType(null)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <div className="text-[13px] text-[#C8C8C8] capitalize">
+                    {item.type}
+                  </div>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <div 
+                      className="w-1.5 h-1.5 rounded-full transition-all duration-300"
+                      style={{ 
+                        backgroundColor: getGradientColor(item.type, 0.5),
+                        transform: hoveredType === item.type ? 'scale(1.2)' : 'scale(1)',
+                        boxShadow: hoveredType === item.type ? `0 0 8px ${getGradientColor(item.type, 0.5)}80` : 'none',
+                        opacity: showNumber ? 1 : 0.3
+                      }}
+                    ></div>
+                    <div 
+                      className="text-[15px] font-medium transition-all duration-300 relative"
+                      style={{ 
+                        color: hoveredType === item.type ? '#000' : 'inherit'
+                      }}
+                    >
+                      <span 
+                        style={{
+                          opacity: showNumber ? 1 : 0,
+                          transition: 'opacity 0.3s ease'
+                        }}
+                      >
+                        {displayNumber}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className='chart-cont' ref={containerRef}>
