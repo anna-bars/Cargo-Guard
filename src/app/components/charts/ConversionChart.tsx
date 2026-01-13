@@ -5,9 +5,24 @@ export const ConversionChart = () => {
   const [hoveredType, setHoveredType] = useState<string | null>(null);
   
   const DATA = [
-    { type: 'approved', count: 17, color: '#669CEE', hegHeight: 26, normalHeight: 20 },
-    { type: 'declined', count: 9, color: '#EEAF66', hegHeight: 24, normalHeight: 16 },
-    { type: 'expired', count: 18, color: '#66EE88', hegHeight: 18, normalHeight: 14 }
+    { 
+      type: 'approved', 
+      count: 17, 
+      hegHeight: 24, // Սկզբի և վերջի գծիկների բարձրությունը
+      normalHeight: 16 // Ներքին գծիկների բարձրությունը
+    },
+    { 
+      type: 'declined', 
+      count: 9, 
+      hegHeight: 24, 
+      normalHeight: 16 
+    },
+    { 
+      type: 'expired', 
+      count: 18, 
+      hegHeight: 24, 
+      normalHeight: 16 
+    }
   ];
 
   const calculateBarsCount = useCallback((width: number) => {
@@ -34,125 +49,123 @@ export const ConversionChart = () => {
     };
   }, [calculateBarsCount]);
 
-const renderBars = () => {
-  const total = DATA.reduce((sum, item) => sum + item.count, 0);
-  const bars: JSX.Element[] = [];
-  
-  // Նախ հաշվել յուրաքանչյուր տեսակի գծիկների քանակը
-  const barsPerType = DATA.map(item => ({
-    ...item,
-    barCount: Math.max(1, Math.floor((item.count / total) * barsCount))
-  }));
-  
-  // Հաշվել ընդհանուր գծիկները
-  const totalBars = barsPerType.reduce((sum, item) => sum + item.barCount, 0);
-  
-  // Եթե ավելի քիչ գծիկներ ենք ունենում, քան պետք է, ավելացնել հավասարաչափ
-  let remainingBars = barsCount - totalBars;
-  
-  // Մնացած գծիկները ավելացնել ամենամեծ տոկոսով տեսակին՝ առանց հերթականությունը փոխելու
-  const sortedIndices = [...barsPerType.keys()].sort((a, b) => barsPerType[b].count - barsPerType[a].count);
-  
-  for (let i = 0; i < remainingBars && i < sortedIndices.length; i++) {
-    barsPerType[sortedIndices[i]].barCount++;
-  }
-  
-  let barIndex = 0;
-  
-  // Յուրաքանչյուր տեսակի գծիկների համար
-  barsPerType.forEach((item) => {
-    const itemBarCount = item.barCount;
+  const renderBars = () => {
+    const total = DATA.reduce((sum, item) => sum + item.count, 0);
+    const bars: JSX.Element[] = [];
     
-    for (let i = 0; i < itemBarCount; i++) {
-      const isFirst = i === 0;
-      const isLast = i === itemBarCount - 1;
-      
-      // Հաշվել բարձրությունը՝ հաշվի առնելով hover էֆֆեկտը
-      let height = item.normalHeight;
-      
-      if (isFirst || isLast) {
-        height = item.hegHeight;
-      } else if (hoveredType === item.type) {
-        // Եթե hover է՝ ամեն գծիկ դառնում է hegHeight-ի չափ
-        height = item.hegHeight;
-      }
-      
-      // Հաշվել գույնի գրադիենտը ըստ տեսակի
-      const gradientProgress = itemBarCount > 1 ? i / (itemBarCount - 1) : 0.5;
-      let backgroundColor = getGradientColor(item.type, gradientProgress);
-      
-      // Հաշվել գույնի պայծառությունը hover-ի ժամանակ
-      let opacity = 1;
-      
-      if (hoveredType && hoveredType !== item.type) {
-        // Եթե hover է մեկ այլ տեսակի վրա՝ այս տեսակի գծիկները դառնում են թափանցիկ
-        opacity = 0.4;
-      } else if (hoveredType === item.type) {
-        // Եթե hover է այս տեսակի վրա՝ գույնը պայծառանում է
-        backgroundColor = adjustColorBrightness(backgroundColor, 20);
-      }
-      
-      bars.push(
-        <div 
-          key={`${item.type}-${i}-${barIndex}`}
-          className={`${item.type}-chart-bar ${isFirst || isLast ? 'heg' : ''}`}
-          style={{
-            width: '1px',
-            transform: 'scaleX(2.7)',
-            transformOrigin: 'left',
-            height: `${height}px`,
-            backgroundColor: backgroundColor,
-            opacity: opacity,
-            transition: 'all 0.3s ease',
-            cursor: 'pointer',
-            borderRadius: '1px'
-          }}
-          onMouseEnter={() => setHoveredType(item.type)}
-          onMouseLeave={() => setHoveredType(null)}
-          title={`${item.type}: ${item.count}`}
-        />
-      );
-      barIndex++;
+    // Նախ հաշվել յուրաքանչյուր տեսակի գծիկների քանակը
+    const barsPerType = DATA.map(item => ({
+      ...item,
+      barCount: Math.max(1, Math.floor((item.count / total) * barsCount))
+    }));
+    
+    // Հաշվել ընդհանուր գծիկները
+    const totalBars = barsPerType.reduce((sum, item) => sum + item.barCount, 0);
+    
+    // Եթե ավելի քիչ գծիկներ ենք ունենում, քան պետք է, ավելացնել հավասարաչափ
+    let remainingBars = barsCount - totalBars;
+    
+    // Մնացած գծիկները ավելացնել ամենամեծ տոկոսով տեսակին՝ առանց հերթականությունը փոխելու
+    const sortedIndices = [...barsPerType.keys()].sort((a, b) => barsPerType[b].count - barsPerType[a].count);
+    
+    for (let i = 0; i < remainingBars && i < sortedIndices.length; i++) {
+      barsPerType[sortedIndices[i]].barCount++;
     }
-  });
-  
-  return bars;
-};
-
-// Գրադիենտ գույնի ֆունկցիա բոլոր տեսակների համար
-const getGradientColor = (type: string, progress: number): string => {
-  // Գրադիենտի գույները յուրաքանչյուր տեսակի համար
-  const gradients: Record<string, { start: string; end: string }> = {
-    approved: { start: '#BED5F8', end: '#669CEE' },
-    declined: { start: '#FF5343', end: '#F71500' }, // declined-ի համար՝ FF5343 → F71500
-    expired: { start: '#FFCF38', end: '#EAB308' }   // expired-ի համար՝ FFCF38 → EAB308
+    
+    let barIndex = 0;
+    
+    // Յուրաքանչյուր տեսակի գծիկների համար
+    barsPerType.forEach((item) => {
+      const itemBarCount = item.barCount;
+      
+      for (let i = 0; i < itemBarCount; i++) {
+        const isFirst = i === 0;
+        const isLast = i === itemBarCount - 1;
+        
+        // Հաշվել բարձրությունը՝ հաշվի առնելով hover էֆֆեկտը
+        let height = item.normalHeight; // 16px բոլոր տեսակների համար
+        
+        if (isFirst || isLast) {
+          height = item.hegHeight; // 24px բոլոր տեսակների համար
+        } else if (hoveredType === item.type) {
+          // Եթե hover է՝ ամեն գծիկ դառնում է hegHeight-ի չափ
+          height = item.hegHeight;
+        }
+        
+        // Հաշվել գույնի գրադիենտը ըստ տեսակի
+        const gradientProgress = itemBarCount > 1 ? i / (itemBarCount - 1) : 0.5;
+        let backgroundColor = getGradientColor(item.type, gradientProgress);
+        
+        // Հաշվել գույնի պայծառությունը hover-ի ժամանակ
+        let opacity = 1;
+        
+        if (hoveredType && hoveredType !== item.type) {
+          // Եթե hover է մեկ այլ տեսակի վրա՝ այս տեսակի գծիկները դառնում են թափանցիկ
+          opacity = 0.4;
+        } else if (hoveredType === item.type) {
+          // Եթե hover է այս տեսակի վրա՝ գույնը պայծառանում է
+          backgroundColor = adjustColorBrightness(backgroundColor, 20);
+        }
+        
+        bars.push(
+          <div 
+            key={`${item.type}-${i}-${barIndex}`}
+            className={`${item.type}-chart-bar ${isFirst || isLast ? 'heg' : ''}`}
+            style={{
+              width: '1px',
+              transform: 'scaleX(2.7)',
+              transformOrigin: 'left',
+              height: `${height}px`,
+              backgroundColor: backgroundColor,
+              opacity: opacity,
+              transition: 'all 0.3s ease',
+              cursor: 'pointer',
+              borderRadius: '1px'
+            }}
+            onMouseEnter={() => setHoveredType(item.type)}
+            onMouseLeave={() => setHoveredType(null)}
+            title={`${item.type}: ${item.count}`}
+          />
+        );
+        barIndex++;
+      }
+    });
+    
+    return bars;
   };
-  
-  const gradient = gradients[type];
-  if (!gradient) return '#000000';
-  
-  // RGB արժեքները ստանալ
-  const startR = parseInt(gradient.start.slice(1, 3), 16);
-  const startG = parseInt(gradient.start.slice(3, 5), 16);
-  const startB = parseInt(gradient.start.slice(5, 7), 16);
-  
-  const endR = parseInt(gradient.end.slice(1, 3), 16);
-  const endG = parseInt(gradient.end.slice(3, 5), 16);
-  const endB = parseInt(gradient.end.slice(5, 7), 16);
-  
-  // Ինտերպոլացիա
-  const r = Math.round(startR + (endR - startR) * progress);
-  const g = Math.round(startG + (endG - startG) * progress);
-  const b = Math.round(startB + (endB - startB) * progress);
-  
-  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-};
+
+  // Գրադիենտ գույնի ֆունկցիա բոլոր տեսակների համար
+  const getGradientColor = (type: string, progress: number): string => {
+    // Գրադիենտի գույները յուրաքանչյուր տեսակի համար
+    const gradients: Record<string, { start: string; end: string }> = {
+      approved: { start: '#BED5F8', end: '#669CEE' }, // Նույնը մնում է
+      declined: { start: '#F8E2BE', end: '#EEDE66' }, // Նոր գրադիենտ
+      expired: { start: '#FFA4A4', end: '#EB6025' }   // Նոր գրադիենտ
+    };
+    
+    const gradient = gradients[type];
+    if (!gradient) return '#000000';
+    
+    // RGB արժեքները ստանալ
+    const startR = parseInt(gradient.start.slice(1, 3), 16);
+    const startG = parseInt(gradient.start.slice(3, 5), 16);
+    const startB = parseInt(gradient.start.slice(5, 7), 16);
+    
+    const endR = parseInt(gradient.end.slice(1, 3), 16);
+    const endG = parseInt(gradient.end.slice(3, 5), 16);
+    const endB = parseInt(gradient.end.slice(5, 7), 16);
+    
+    // Ինտերպոլացիա
+    const r = Math.round(startR + (endR - startR) * progress);
+    const g = Math.round(startG + (endG - startG) * progress);
+    const b = Math.round(startB + (endB - startB) * progress);
+    
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  };
 
   // Օգնական ֆունկցիա գույնի պայծառությունը փոխելու համար
   const adjustColorBrightness = (color: string, percent: number): string => {
-    // Պարզեցված տարբերակ - ավելացնում է պայծառությունը
     if (color.startsWith('#')) {
-      // Hex գույնի համար
       let r = parseInt(color.slice(1, 3), 16);
       let g = parseInt(color.slice(3, 5), 16);
       let b = parseInt(color.slice(5, 7), 16);
@@ -220,7 +233,7 @@ const getGradientColor = (type: string, progress: number): string => {
                 alignItems: 'end',
                 overflow: 'hidden',
                 marginBottom: '4px',
-                minHeight: '26px' // Ամենաբարձր գծիկի համար
+                minHeight: '24px' // Ամենաբարձր գծիկի համար (hegHeight)
               }}
             >
               {renderBars()}
@@ -250,11 +263,6 @@ const getGradientColor = (type: string, progress: number): string => {
                 />
               ))}
             </div>
-            
-            {/* <div className='flex justify-between mt-1'>
-              <p className='text-xs text-[#C8C8C8]'>0</p>
-              <p className='text-xs text-[#C8C8C8]'>100</p>
-            </div> */}
           </div>
         </div>
       </div>
@@ -264,17 +272,7 @@ const getGradientColor = (type: string, progress: number): string => {
           background: linear-gradient(180deg, #E2E3E4, transparent) !important;
         }
         
-        .approved-chart-bar.heg {
-          height: 26px !important;
-        }
-        
-        .declined-chart-bar.heg {
-          height: 24px !important;
-        }
-        
-        .expired-chart-bar.heg {
-          height: 18px !important;
-        }
+        /* CSS-ում հեռացրել ենք !important կանոնները, որպեսզի անիմացիան աշխատի */
         
         .chart-cont {
           gap: 0px;
@@ -288,39 +286,32 @@ const getGradientColor = (type: string, progress: number): string => {
         .empty-chart-bar {
           transition: all 0.3s ease !important;
         }
+        
+        .quote-conversion.performance-section {
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+        }
+        
+        .quote-conversion .chart-cont {
+          flex: 1;
+          min-height: 0;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
+        }
+        
+        @media screen and (max-width: 1024px) {
           .quote-conversion.performance-section {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .quote-conversion .chart-cont {
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-  }
-  
-  @media screen and (max-width: 1024px) {
-    .quote-conversion.performance-section {
-      min-height: 180px;
-    }
-    
-    // .chaart, .chaart2 {
-    //   min-height: 20px;
-    // }
-  }
-  
-  @media screen and (max-width: 768px) {
-    .quote-conversion.performance-section {
-      min-height: 200px;
-    }
-    
-    // .chaart, .chaart2 {
-    //   min-height: 24px;
-    // }
-  }
+            min-height: 180px;
+          }
+        }
+        
+        @media screen and (max-width: 768px) {
+          .quote-conversion.performance-section {
+            min-height: 200px;
+          }
+        }
       `}</style>
     </div>
   );
