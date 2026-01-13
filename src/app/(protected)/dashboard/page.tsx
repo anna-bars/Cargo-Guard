@@ -385,8 +385,7 @@ export default function DashboardPage() {
               <ConversionChart />
             </div>
 
-            {/* Universal Table for Recent Activity */}
-            <UniversalTable
+<UniversalTable
   title="Recent Activity"
   showMobileHeader={false}
   rows={dashboardRows}
@@ -398,7 +397,11 @@ export default function DashboardPage() {
     dateLabel: 'Last Update',
     buttonWidth: '47%'
   }}
+  mobileDesignType="dashboard" // ավելացնել
+  desktopGridCols="0.7fr repeat(3, minmax(0, 1fr)) 0.9fr 1fr" // ավելացնել
 />
+
+
           </div>
 
           {/* Right Column - 25% - Desktop View */}

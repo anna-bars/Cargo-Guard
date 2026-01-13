@@ -7,9 +7,7 @@ interface TableColumn {
   sortable?: boolean;
   className?: string;
   hideOnMobile?: boolean;
-  // 768px-ից 1023px միջակայքում թաքցնելու համար
   hideOnMedium?: boolean;
-  // 1024px-ից բարձր տեսանելիության համար
   showOnLarge?: boolean;
   renderDesktop?: (value: any, row: TableRow) => React.ReactNode;
 }
@@ -70,24 +68,21 @@ interface UniversalTableProps {
     dateLabel?: string;
     buttonWidth?: string;
   };
+  desktopGridCols?: string;
+  mobileDesignType?: 'dashboard' | 'quotes';
 }
 
-// Սյունակի տեսանելիության className-ի հաշվարկ
 const getColumnVisibilityClass = (column: TableColumn): string => {
   const classes: string[] = [];
   
-  // Եթե ունի className, ավելացնել
   if (column.className) {
     classes.push(column.className);
   }
   
-  // Եթե պետք է թաքցնել 768px-ից 1023px
   if (column.hideOnMedium) {
-    // 768px-ից թաքցնել, 1024px-ից ցույց տալ
     classes.push('hidden md:block lg:hidden xl:block');
   }
   
-  // Եթե պետք է ցույց տալ միայն 1024px-ից
   if (column.showOnLarge) {
     classes.push('hidden lg:block');
   }
@@ -122,7 +117,9 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
     showDateIcon: true,
     dateLabel: 'Last Update',
     buttonWidth: '47%'
-  }
+  },
+  desktopGridCols,
+  mobileDesignType = 'dashboard'
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState(initialFilters.activity || 'All Activity');
@@ -255,9 +252,8 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
     </div>
   );
 
-  // Սյունակները որոնք տեսանելի են դեսկթոփում
   const visibleDesktopColumns = columns.filter(col => !col.hideOnMobile);
-  const desktopGridCols = `0.7fr repeat(${visibleDesktopColumns.length - 3}, minmax(0, 1fr)) 0.9fr 1fr`;
+  const computedDesktopGridCols = desktopGridCols || `0.7fr repeat(${visibleDesktopColumns.length - 3}, minmax(0, 1fr)) 0.9fr 1fr`;
 
   const renderDesktopCell = (column: TableColumn, row: TableRow) => {
     if (column.renderDesktop) {
@@ -275,6 +271,239 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
       </div>
     );
   };
+
+  const renderQuotesMobileDesign = (row: TableRow) => (
+    <div className="md:hidden w-full mob-lay">
+      {/* 1-ին բլոկ՝ ID և Status */}
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center gap-2">
+          <span className="font-poppins text-sm text-[#2563eb] underline xs:text-[#2563eb]">
+            {row.id}
+          </span>
+        </div>
+        
+        {row.status && (
+          <div className="row-cell flex-shrink-0">
+            <span className={`
+              inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs 
+              ${row.status.color} ${row.status.textColor}
+              w-fit min-w-fit whitespace-nowrap pl-3 pr-3 h-[26px] items-center transition-all duration-300
+              xs:text-[10px] xs:px-2 xs:py-1.5 xs:h-[22px] xs3:text-[11px] xs3:px-2.5 xs3:py-1.5 xs3:h-[24px]
+            `}>
+              <span className={`w-2 h-2 rounded-full ${row.status.dot}`}></span>
+              {row.status.text}
+            </span>
+          </div>
+        )}
+      </div>
+      
+      {/* 2-րդ բլոկ՝ Cargo */}
+      {row.cargo && (
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center gap-2 w-full">
+            <img 
+              src="/table/package-stroke-rounded.svg" 
+              alt="Cargo" 
+              className="w-4 h-4 xs:w-[16px] xs:h-[16px] xs2:w-[14px] xs2:h-[14px] opacity-80 hover:opacity-100"
+            />
+            <div className="font-poppins text-sm flex-1">
+              <span className="text-[#606068]">Cargo</span>
+              <span className="text-[#CCCDD1] mx-1">/</span>
+              <span className="text-black">{row.cargo}</span>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* 3-րդ բլոկ՝ Shipment Value և Premium Amount */}
+      <div className="space-y-3 mb-4">
+        {/* Shipment Value */}
+        {(row.shipmentValue || row.value) && (
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2 w-full">
+              <img 
+                src="/table/money-bag.svg" 
+                alt="Shipment Value" 
+                className="w-4 h-4 opacity-80"
+              />
+              <div className="font-poppins text-sm flex-1">
+                <span className="text-[#606068]">Shipment</span>
+                <span className="text-[#CCCDD1] mx-1">/</span>
+                <span className="text-black">{row.shipmentValue || row.value}</span>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Premium Amount */}
+        {row.premiumAmount && (
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2 w-full">
+              <div className="w-4 h-4 flex items-center justify-center">
+                <svg className="w-4 h-4 opacity-80" fill="none" stroke="#606068" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="font-poppins text-sm flex-1">
+                <span className="text-[#606068]">Premium</span>
+                <span className="text-[#CCCDD1] mx-1">/</span>
+                <span className="text-black">{row.premiumAmount}</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+      
+      <div className="border-t border-[#f2f2ed] my-3 xs:my-3"></div>
+      
+      {/* 4-րդ բլոկ՝ Expiration Date և Button */}
+      <div className="flex items-center justify-between">
+        {/* Expiration Date */}
+        {row.expirationDate && (
+          <div className="flex items-center gap-2">
+            <img 
+              src="/table/calendar.svg" 
+              alt="Expiration" 
+              className="w-4 h-4 xs:w-[16px] xs:h-[16px] xs2:w-[14px] xs2:h-[14px]"
+            />
+            <div className="font-poppins text-sm">
+              <span className="text-black">{row.expirationDate}</span>
+            </div>
+          </div>
+        )}
+        
+        {/* Button */}
+        {row.button && (
+          <div className="flex-1 flex justify-end">
+            <button 
+              className={`
+                h-[36px] px-4 rounded-lg font-inter text-sm justify-center items-center gap-2 
+                transition-colors duration-300 min-w-[140px]
+                ${row.button.variant === 'primary' 
+                  ? 'bg-[#2563EB] text-white border border-[rgba(255,255,255,0.22)] hover:bg-[#1d4ed8]' 
+                  : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f3f4f6]'
+                }
+                xs:text-[14px] xs:font-medium
+                xs2:text-[13px] xs2:px-1.5 xs2:py-2.5 xs2:h-[40px]
+              `}
+              onClick={() => row.button?.onClick?.(row)}
+            >
+              {row.button.text}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderDashboardMobileDesign = (row: TableRow) => (
+    <div className="md:hidden w-full mob-lay">
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center gap-2">
+          {mobileDesign.showType && row.type && (
+            <span className="font-poppins text-sm font-normal text-black xs:text-[16px]">{row.type}</span>
+          )}
+          <span className="font-poppins text-sm text-[#2563eb] underline xs:text-[#2563eb]">{row.id}</span>
+        </div>
+        
+        {row.status && (
+          <div className="row-cell flex-shrink-0">
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor} 
+              w-fit min-w-fit whitespace-nowrap pl-3 pr-3 h-[26px] items-center transition-all duration-300
+              xs:text-[10px] xs:px-2 xs:py-1.5 xs:h-[22px] xs3:text-[11px] xs3:px-2.5 xs3:py-1.5 xs3:h-[24px]`}>
+              <span className={`w-2 h-2 rounded-full ${row.status.dot}`}></span>
+              {row.status.text}
+            </span>
+          </div>
+        )}
+      </div>
+      
+      {(row.cargo || row.shipmentValue) && (
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center gap-2">
+            {mobileDesign.showCargoIcon && (
+              <img 
+                src="/table/package-stroke-rounded.svg" 
+                alt="Cargo" 
+                className="w-4 h-4 xs:w-[16px] xs:h-[16px] xs2:w-[14px] xs2:h-[14px] opacity-80 hover:opacity-100"
+              />
+            )}
+            <span className="font-poppins text-sm text-gray-700">
+              {row.cargo || row.shipmentValue ? 'Cargo / Value' : 'Cargo'}
+            </span>
+          </div>
+          <div className="font-poppins text-sm font-normal text-black">
+            {row.value || row.shipmentValue || row.cargo}
+            {row.premiumAmount && ` / ${row.premiumAmount}`}
+          </div>
+        </div>
+      )}
+      
+      {row.premiumAmount && !row.value && !row.shipmentValue && (
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center gap-2">
+            <img 
+              src="/table/money-bag.svg" 
+              alt="Premium" 
+              className="w-4 h-4 opacity-80"
+            />
+            <span className="font-poppins text-sm text-gray-700">Premium</span>
+          </div>
+          <div className="font-poppins text-sm font-normal text-black">{row.premiumAmount}</div>
+        </div>
+      )}
+      
+      {row.expirationDate && (
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center gap-2">
+            <img 
+              src="/table/calendar.svg" 
+              alt="Expiration" 
+              className="w-4 h-4 opacity-80"
+            />
+            <span className="font-poppins text-sm text-gray-700">Expires</span>
+          </div>
+          <div className="font-poppins text-sm text-gray-600">{row.expirationDate}</div>
+        </div>
+      )}
+      
+      <div className="border-t border-[#f2f2ed] my-3 xs:my-3"></div>
+      
+      <div className="flex items-center justify-between xs:flex xs:items-center xs:gap-3 xs:w-full xs4:flex-col xs4:gap-2">
+        {(row.date || row.lastUpdate) && (
+          <div className="flex items-center gap-2 w-1/2 xs4:w-full xs4:justify-center xs4:mb-1">
+            {mobileDesign.showDateIcon && (
+              <img 
+                src="/table/clock.svg" 
+                alt="Time" 
+                className="w-4 h-4 xs:w-[16px] xs:h-[16px] xs2:w-[14px] xs2:h-[14px]"
+              />
+            )}
+            <div className="font-poppins text-sm text-gray-600 xs2:text-[12px]">
+              {row.date || row.lastUpdate || mobileDesign.dateLabel}
+            </div>
+          </div>
+        )}
+        
+        {row.button && (
+          <div className={`${row.date || row.lastUpdate ? mobileDesign.buttonWidth : 'w-full'} xs4:w-full xs:pl-1.5`}>
+            <button className={`
+              h-[36px] px-4 w-full rounded-lg font-inter text-sm justify-center items-center gap-2 transition-colors duration-300
+              ${row.button.variant === 'primary' 
+                ? 'bg-[#2563EB] text-white border border-[rgba(255,255,255,0.22)] hover:bg-[#1d4ed8] hover:text-white hover:border-[#d1d5db]' 
+                : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f3f4f6] hover:text-white hover:border-[#d1d5db]'
+              }
+              xs:text-[14px] xs:font-medium xs:w-[95%] xs:min-w-0
+              xs2:text-[13px] xs2:px-1.5 xs2:py-2.5 xs2:h-[40px] xs2:max-w-[95%]
+            `}
+            onClick={() => row.button?.onClick?.(row)}>
+              {row.button.text}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 
   return (
     <>
@@ -318,7 +547,7 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
           
           {/* Desktop Table Header */}
           <div className="mt-4 px-4 sm:px-4 py-2 mb-0 hidden md:grid gap-2 pb-2 mb-0 table-header w-[97%] bg-[#ededed7a] mx-auto my-3.5 rounded-[4px]" 
-               style={{ gridTemplateColumns: desktopGridCols }}>
+               style={{ gridTemplateColumns: computedDesktopGridCols }}>
             {visibleDesktopColumns.map((column, idx) => (
               <div key={idx} className={`max-w-[80%] flex items-center gap-2 font-poppins text-sm font-normal text-[#606068] ${getColumnVisibilityClass(column)} ${column.label === 'Action' ? 'justify-end' : ''}`}>
                 <span>{column.label}</span>
@@ -362,7 +591,7 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
                   md:bg-transparent md:!m-0 md:!border-b md:!border-solid md:!border-[#ededf3] md:!rounded-none
                   md:hover:!bg-[#f0f0f5e8]"
                      style={{ 
-                       gridTemplateColumns: desktopGridCols
+                       gridTemplateColumns: computedDesktopGridCols
                      }}>
                   
                   {/* Desktop Columns */}
@@ -373,112 +602,10 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
                   ))}
                   
                   {/* Mobile Layout */}
-                  <div className="md:hidden w-full mob-lay">
-                    <div className="flex justify-between items-center mb-4">
-                      <div className="flex items-center gap-2">
-                        {mobileDesign.showType && row.type && (
-                          <span className="font-poppins text-sm font-normal text-black xs:text-[16px]">{row.type}</span>
-                        )}
-                        <span className="font-poppins text-sm text-[#2563eb] underline xs:text-[#2563eb]">{row.id}</span>
-                      </div>
-                      
-                      {row.status && (
-                        <div className="row-cell flex-shrink-0">
-                          <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor} 
-                            w-fit min-w-fit whitespace-nowrap pl-3 pr-3 h-[26px] items-center transition-all duration-300
-                            xs:text-[10px] xs:px-2 xs:py-1.5 xs:h-[22px] xs3:text-[11px] xs3:px-2.5 xs3:py-1.5 xs3:h-[24px]`}>
-                            <span className={`w-2 h-2 rounded-full ${row.status.dot}`}></span>
-                            {row.status.text}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {(row.cargo || row.shipmentValue) && (
-                      <div className="flex justify-between items-center mb-4">
-                        <div className="flex items-center gap-2">
-                          {mobileDesign.showCargoIcon && (
-                            <img 
-                              src="/table/package-stroke-rounded.svg" 
-                              alt="Cargo" 
-                              className="w-4 h-4 xs:w-[16px] xs:h-[16px] xs2:w-[14px] xs2:h-[14px] opacity-80 hover:opacity-100"
-                            />
-                          )}
-                          <span className="font-poppins text-sm text-gray-700">
-                            {row.cargo || row.shipmentValue ? 'Cargo / Value' : 'Cargo'}
-                          </span>
-                        </div>
-                        <div className="font-poppins text-sm font-normal text-black">
-                          {row.value || row.shipmentValue || row.cargo}
-                          {row.premiumAmount && ` / ${row.premiumAmount}`}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {row.premiumAmount && !row.value && !row.shipmentValue && (
-                      <div className="flex justify-between items-center mb-4">
-                        <div className="flex items-center gap-2">
-                          <img 
-                            src="/table/money-bag.svg" 
-                            alt="Premium" 
-                            className="w-4 h-4 opacity-80"
-                          />
-                          <span className="font-poppins text-sm text-gray-700">Premium</span>
-                        </div>
-                        <div className="font-poppins text-sm font-normal text-black">{row.premiumAmount}</div>
-                      </div>
-                    )}
-                    
-                    {row.expirationDate && (
-                      <div className="flex justify-between items-center mb-4">
-                        <div className="flex items-center gap-2">
-                          <img 
-                            src="/table/calendar.svg" 
-                            alt="Expiration" 
-                            className="w-4 h-4 opacity-80"
-                          />
-                          <span className="font-poppins text-sm text-gray-700">Expires</span>
-                        </div>
-                        <div className="font-poppins text-sm text-gray-600">{row.expirationDate}</div>
-                      </div>
-                    )}
-                    
-                    <div className="border-t border-[#f2f2ed] my-3 xs:my-3"></div>
-                    
-                    <div className="flex items-center justify-between xs:flex xs:items-center xs:gap-3 xs:w-full xs4:flex-col xs4:gap-2">
-                      {(row.date || row.lastUpdate) && (
-                        <div className="flex items-center gap-2 w-1/2 xs4:w-full xs4:justify-center xs4:mb-1">
-                          {mobileDesign.showDateIcon && (
-                            <img 
-                              src="/table/clock.svg" 
-                              alt="Time" 
-                              className="w-4 h-4 xs:w-[16px] xs:h-[16px] xs2:w-[14px] xs2:h-[14px]"
-                            />
-                          )}
-                          <div className="font-poppins text-sm text-gray-600 xs2:text-[12px]">
-                            {row.date || row.lastUpdate || mobileDesign.dateLabel}
-                          </div>
-                        </div>
-                      )}
-                      
-                      {row.button && (
-                        <div className={`${row.date || row.lastUpdate ? mobileDesign.buttonWidth : 'w-full'} xs4:w-full xs:pl-1.5`}>
-                          <button className={`
-                            h-[36px] px-4 w-full rounded-lg font-inter text-sm justify-center items-center gap-2 transition-colors duration-300
-                            ${row.button.variant === 'primary' 
-                              ? 'bg-[#2563EB] text-white border border-[rgba(255,255,255,0.22)] hover:bg-[#1d4ed8] hover:text-white hover:border-[#d1d5db]' 
-                              : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f3f4f6] hover:text-white hover:border-[#d1d5db]'
-                            }
-                            xs:text-[14px] xs:font-medium xs:w-[95%] xs:min-w-0
-                            xs2:text-[13px] xs2:px-1.5 xs2:py-2.5 xs2:h-[40px] xs2:max-w-[95%]
-                          `}
-                          onClick={() => row.button?.onClick?.(row)}>
-                            {row.button.text}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  {mobileDesignType === 'quotes' 
+                    ? renderQuotesMobileDesign(row)
+                    : renderDashboardMobileDesign(row)
+                  }
                 </div>
               ))
             ) : (
