@@ -34,8 +34,8 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
   const calculateBarsCount = useCallback((width: number) => {
     if (width <= 200) return 40;
     if (width <= 280) return 50;
-    if (width <= 350) return 60;
-    return 70;
+    if (width <= 350) return 64;
+    return 64;
   }, []);
 
   useEffect(() => {
@@ -238,7 +238,7 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
         .chaart {
           justify-content: start;
           align-items: center;
-          gap: 4px;
+          gap: 4.5px;
           display: flex;
           overflow: hidden;
           min-height: 30px;
