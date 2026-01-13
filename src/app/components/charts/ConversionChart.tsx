@@ -5,14 +5,13 @@ export const ConversionChart = () => {
   const [hoveredType, setHoveredType] = useState<string | null>(null);
   const [activeTime, setActiveTime] = useState('This Month');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [animationStage, setAnimationStage] = useState(0); // 0: no animation, 1: approved, 2: declined, 3: expired
+  const [animationStage, setAnimationStage] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [animatingData, setAnimatingData] = useState<{approved: number, declined: number, expired: number} | null>(null);
   const [animatingTime, setAnimatingTime] = useState<string | null>(null);
   
   const timeOptions = ['This Week', 'This Month', 'Last Month', 'Last Quarter'];
   
-  // Տվյալներ յուրաքանչյուր ժամանակահատվածի համար
   const timeData: Record<string, {approved: number, declined: number, expired: number}> = {
     'This Week': { approved: 12, declined: 5, expired: 8 },
     'This Month': { approved: 17, declined: 9, expired: 18 },
@@ -23,10 +22,10 @@ export const ConversionChart = () => {
   const calculateBarsCount = useCallback((width: number) => {
     if (width <= 320) return 40;
     if (width <= 400) return 45;
-    return 49;
+    return 60; // Փոխել ենք 49-ից 60, որ matches the design
   }, []);
 
-  const [barsCount, setBarsCount] = useState(49);
+  const [barsCount, setBarsCount] = useState(60);
 
   useEffect(() => {
     const updateBarsCount = () => {
@@ -49,16 +48,14 @@ export const ConversionChart = () => {
       setIsDropdownOpen(false);
       setIsAnimating(true);
       setAnimatingTime(time);
-      setAnimatingData(timeData[time]); // Սկսել անիմացիան նոր տվյալներով
-      setAnimationStage(1); // Սկսել անիմացիան approved-ից
+      setAnimatingData(timeData[time]);
+      setAnimationStage(1);
       
-      // Անիմացիայի փուլերը
       setTimeout(() => {
-        setAnimationStage(2); // declined
+        setAnimationStage(2);
         setTimeout(() => {
-          setAnimationStage(3); // expired
+          setAnimationStage(3);
           setTimeout(() => {
-            // Ավարտել անիմացիան և սահմանել նոր ակտիվ ժամանակ
             setActiveTime(time);
             setAnimationStage(0);
             setIsAnimating(false);
@@ -72,7 +69,6 @@ export const ConversionChart = () => {
     }
   };
 
-  // Միշտ օգտագործել ակտիվ ժամանակի տվյալները գծիկների հաշվարկի համար
   const getCurrentDataForBars = useCallback(() => {
     if (isAnimating && animatingData) {
       return animatingData;
@@ -80,7 +76,6 @@ export const ConversionChart = () => {
     return timeData[activeTime];
   }, [isAnimating, animatingData, activeTime]);
 
-  // Տվյալների թվերի անիմացիայի համար
   const shouldShowNumber = (type: string) => {
     if (!isAnimating) return true;
     
@@ -91,13 +86,11 @@ export const ConversionChart = () => {
     return false;
   };
 
-  // Ստանալ անիմացիայի ժամանակ ցուցադրվող թվերը
   const getDisplayNumber = (type: string) => {
     const currentData = getCurrentDataForBars();
     
     if (!isAnimating || !animatingData) return currentData[type as keyof typeof currentData];
     
-    // Եթե այս տեսակի անիմացիան դեռ չի սկսվել՝ ցույց տալ 0
     if (type === 'approved' && animationStage < 1) return 0;
     if (type === 'declined' && animationStage < 2) return 0;
     if (type === 'expired' && animationStage < 3) return 0;
@@ -174,86 +167,65 @@ export const ConversionChart = () => {
     
     const bars: JSX.Element[] = [];
     
-    // Հաշվել յուրաքանչյուր տեսակի համար պահանջվող գծիկների քանակը (պրոցենտային)
+    // Յուրաքանչյուր տեսակի համար հաշվել գծիկների քանակը ընդհանուր գծիկների քանակի նկատմամբ
     const barsPerType = chartData.map(item => ({
       ...item,
-      // Կլորացնելով ստանալ ամբողջ թվեր, բայց ապահովել նվազագույնը 1 գծիկ
-      barCount: Math.max(1, Math.round((item.count / total) * barsCount))
+      // Հաշվել տոկոսային մասնաբաժինը և բազմապատկել ընդհանուր գծիկների քանակով
+      barCount: Math.round((item.count / total) * barsCount)
     }));
     
     // Վերահաշվել ընդհանուր գծիկների քանակը
-    const totalBars = barsPerType.reduce((sum, item) => sum + item.barCount, 0);
+    let totalBars = barsPerType.reduce((sum, item) => sum + item.barCount, 0);
     
-    // Տարբերությունը հաշվել և հարմարեցնել
+    // Կարգավորել եթե տարբերություն կա
     let diff = barsCount - totalBars;
     
     if (diff !== 0) {
-      // Ստեղծել գծիկների քանակների պատճենը
-      const adjustedBarsPerType = [...barsPerType];
+      // Տեսակները դասավորել ըստ barCount-ի (մեծից փոքր)
+      const sortedIndices = [...barsPerType.keys()].sort(
+        (a, b) => barsPerType[b].barCount - barsPerType[a].barCount
+      );
       
-      // Եթե դրական տարբերություն կա՝ ավելացնել ամենամեծ թվով գծիկներ ունեցող տեսակին
-      if (diff > 0) {
-        // Գտնել ամենամեծ քանակով գծիկներ ունեցող տեսակի ինդեքսը
-        const maxIndex = adjustedBarsPerType.reduce((maxIdx, item, idx, arr) => 
-          item.barCount > arr[maxIdx].barCount ? idx : maxIdx, 0);
-        adjustedBarsPerType[maxIndex].barCount += diff;
-      } 
-      // Եթե բացասական տարբերություն կա՝ հանել ամենափոքր թվով գծիկներ ունեցող տեսակից
-      else if (diff < 0) {
-        // Գտնել ամենափոքր քանակով գծիկներ ունեցող տեսակի ինդեքսը
-        const minIndex = adjustedBarsPerType.reduce((minIdx, item, idx, arr) => 
-          item.barCount < arr[minIdx].barCount ? idx : minIdx, 0);
-        // Համոզվել, որ քանակը 0-ից պակաս չի դառնում
-        adjustedBarsPerType[minIndex].barCount = Math.max(1, adjustedBarsPerType[minIndex].barCount + diff);
-      }
-      
-      // Կրկին հաշվել տարբերությունը
-      const newTotalBars = adjustedBarsPerType.reduce((sum, item) => sum + item.barCount, 0);
-      const newDiff = barsCount - newTotalBars;
-      
-      // Եթե դեռ տարբերություն կա, կարգավորել ամենամեծ կամ ամենափոքր քանակով գծիկներ ունեցող տեսակը
-      if (newDiff !== 0) {
-        if (newDiff > 0) {
-          const maxIndex = adjustedBarsPerType.reduce((maxIdx, item, idx, arr) => 
-            item.barCount > arr[maxIdx].barCount ? idx : maxIdx, 0);
-          adjustedBarsPerType[maxIndex].barCount += newDiff;
-        } else {
-          const minIndex = adjustedBarsPerType.reduce((minIdx, item, idx, arr) => 
-            item.barCount < arr[minIdx].barCount ? idx : minIdx, 0);
-          adjustedBarsPerType[minIndex].barCount = Math.max(1, adjustedBarsPerType[minIndex].barCount + newDiff);
+      // Ավելացնել/հանել տարբերությունը, սկսելով ամենամեծ barCount-ով տեսակից
+      let index = 0;
+      while (diff !== 0) {
+        const currentIndex = sortedIndices[index % sortedIndices.length];
+        
+        if (diff > 0) {
+          barsPerType[currentIndex].barCount++;
+          diff--;
+        } else if (diff < 0 && barsPerType[currentIndex].barCount > 1) {
+          barsPerType[currentIndex].barCount--;
+          diff++;
         }
-      }
-      
-      // Այժմ արդեն ունենք barsPerType-ի ճշգրիտ արժեքները
-      for (let i = 0; i < adjustedBarsPerType.length; i++) {
-        barsPerType[i].barCount = adjustedBarsPerType[i].barCount;
+        
+        index++;
       }
     }
     
     let barIndex = 0;
     
     // Յուրաքանչյուր տեսակի գծիկների համար
-    barsPerType.forEach((item, typeIndex) => {
+    barsPerType.forEach((item) => {
       const itemBarCount = item.barCount;
       const barType = item.type;
       
-      // Որոշել արդյոք այս տեսակի գծիկները պետք է ցուցադրվեն
       let showBars = false;
       let animationDelay = 0;
       
       if (isAnimating) {
         if (barType === 'approved' && animationStage >= 1) {
           showBars = true;
-          animationDelay = 0; // approved-ը առաջինն է
+          animationDelay = 0;
         } else if (barType === 'declined' && animationStage >= 2) {
           showBars = true;
-          animationDelay = 300; // 300ms ուշացում declined-ի համար
+          animationDelay = 300;
         } else if (barType === 'expired' && animationStage >= 3) {
           showBars = true;
-          animationDelay = 600; // 600ms ուշացում expired-ի համար
+          animationDelay = 600;
         }
       } else {
-        showBars = true; // Երբ անիմացիան ավարտված է՝ ցույց տալ բոլորը
+        showBars = true;
       }
       
       for (let i = 0; i < itemBarCount; i++) {
@@ -280,8 +252,7 @@ export const ConversionChart = () => {
           backgroundColor = adjustColorBrightness(backgroundColor, 20);
         }
         
-        // Հաշվել յուրաքանչյուր գծիկի անհատական ուշացում
-        const individualDelay = animationDelay + (i * 20); // Յուրաքանչյուր գծիկի համար փոքր ուշացում
+        const individualDelay = animationDelay + (i * 10);
         
         bars.push(
           <div 
@@ -309,25 +280,27 @@ export const ConversionChart = () => {
       }
     });
     
-    // Վերջնական ստուգում՝ համոզվել, որ գծիկների ընդհանուր քանակը ճիշտ է
-    console.log(`Active time: ${activeTime}, Total bars required: ${barsCount}, Actual bars: ${bars.length}`);
-    console.log(`Data for bars:`, currentDataForBars);
-    console.log(`Bars per type:`, barsPerType.map(item => `${item.type}: ${item.barCount} bars`));
+    console.log(`Bars distribution:`, barsPerType.map(item => 
+      `${item.type}: ${item.count} (${Math.round((item.count/total)*100)}%) -> ${item.barCount} bars`
+    ));
+    console.log(`Total bars: ${bars.length}, Expected: ${barsCount}`);
     
     return bars;
   };
 
   return (
     <div className="flex flex-col justify-between border border-[#d1d1d154] bg-[#fdfdf8cf] rounded-2xl p-4 h-full w-full quote-conversion performance-section hover:shadow-sm transition-shadow duration-300">
-      <div className="mb-[4px] flex justify-between items-center">
+      <div className="mb-[4px] gap-2 flex-col flex justify-between">
         <h3 className="font-montserrat text-[18px] font-normal text-black action-title max-[1024px]:text-[14px]">
           Quote Conversion Rate
         </h3>
         
-        {/* Dropdown for time selection */}
         <div className="relative">
           <button 
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsDropdownOpen(!isDropdownOpen);
+            }}
             className="flex items-center gap-1 font-montserrat text-xs font-medium text-[#6f6f6f] tracking-[0.24px] cursor-pointer whitespace-nowrap px-3 py-1 border border-[#e2e3e4] rounded-lg hover:bg-gray-50 hover:border-[#669CEE] hover:text-[#669CEE] transition-all duration-300"
           >
             {isAnimating && animatingTime ? animatingTime : activeTime}
@@ -341,10 +314,9 @@ export const ConversionChart = () => {
             </svg>
           </button>
           
-          {/* Dropdown Menu */}
           {isDropdownOpen && (
             <div 
-              className="absolute right-0 top-full mt-1 bg-white min-w-[140px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] rounded-lg z-10 py-1"
+              className="absolute left-0 top-full mt-1 bg-white min-w-[140px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] rounded-lg z-20 py-1"
               style={{
                 animationName: 'slideUpFade',
                 animationDuration: '0.3s',
@@ -354,7 +326,10 @@ export const ConversionChart = () => {
               {timeOptions.map((time, index) => (
                 <div 
                   key={time}
-                  onClick={() => handleTimeSelect(time)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleTimeSelect(time);
+                  }}
                   className={`
                     px-4 py-2 cursor-pointer font-montserrat text-xs font-medium tracking-[0.24px]
                     hover:bg-gray-50 transition-all duration-200
@@ -378,6 +353,14 @@ export const ConversionChart = () => {
           )}
         </div>
       </div>
+      
+      {/* Դուրս բերել dropdown-ը դիվից, որպեսզի այն չգերադասի */}
+      {isDropdownOpen && (
+        <div 
+          className="fixed inset-0 z-10"
+          onClick={() => setIsDropdownOpen(false)}
+        />
+      )}
       
       <div className="block justify-between items-end">
         <div className="w-full">
