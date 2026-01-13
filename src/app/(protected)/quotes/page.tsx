@@ -291,7 +291,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Improve Your Quote Rate Card */}
-              <div className="stats-card bg-[#fafbf6]/80 rounded-2xl p-4">
+              <div className="min-h-[calc(26%-4px)] xl:flex-[0_0_26%] stats-card border border-[#d1d1d154] bg-[#fdfdf8cf] rounded-2xl p-4  hover:shadow-sm transition-shadow duration-300">
                 <h3 className="font-montserrat text-lg font-medium text-black mb-6">Improve Your Quote Rate</h3>
                 <div className="stats-content">
                   <div className="rate-section relative w-[145px] h-[39px]">
