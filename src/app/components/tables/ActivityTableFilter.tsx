@@ -88,7 +88,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
               }}
             >
               <img src="dashboard/icons/filter-stroke-rounded.svg" alt="" className="w-[16px] h-[16px]" />
-              Filter
+              <span className='hidden sm:block'>Filter</span>
               {(selectedFilter !== 'All Activity' || selectedTimeframe !== 'Last 30 days' || selectedSort !== 'Status') && (
                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#2563eb] rounded-full"></span>
               )}
