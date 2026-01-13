@@ -21,8 +21,8 @@ export const InfoWidget: React.FC<InfoWidgetProps> = ({
   );
 
   return (
-    <div className={`min-h-[calc(26%-4px)] xl:flex-[0_0_26%] stats-card border border-[#d1d1d154] bg-[#fdfdf8cf] rounded-2xl p-4 hover:shadow-sm transition-shadow duration-300 ${className}`}>
-      <h3 className="font-montserrat text-lg font-medium text-black mb-6">
+    <div className={`min-h-[calc(26%-4px)] xl:flex-[0_0_26%] flex-col flex justify-between stats-card border border-[#d1d1d154] bg-[#fdfdf8cf] rounded-2xl p-4 hover:shadow-sm transition-shadow duration-300 ${className}`}>
+      <h3 className="font-montserrat text-lg font-medium text-black">
         {title}
       </h3>
       <div className="stats-content">
@@ -39,10 +39,10 @@ export const InfoWidget: React.FC<InfoWidgetProps> = ({
             </span>
           </div>
         </div>
-        <p className="mt-2 stats-description font-montserrat text-xs font-normal text-[#afaeae] tracking-[0.24px] max-w-[268px]">
+      </div>
+      <p className="mt-2 stats-description font-montserrat text-xs font-normal text-[#afaeae] tracking-[0.24px] max-w-[268px]">
           {description || defaultDescription}
         </p>
-      </div>
     </div>
   );
 };
