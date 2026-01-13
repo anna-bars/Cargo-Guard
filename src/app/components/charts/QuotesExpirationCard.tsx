@@ -118,10 +118,11 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
   const renderBars = () => {
     const bars = [];
     
-    // Ակտիվ գծիկներ - նոր հովեր տրամաբանությամբ
+    // Ակտիվ գծիկներ - հովեր ժամանակ 24px, նորմալ 18px
     for (let i = 0; i < activeBars; i++) {
       const progress = activeBars > 1 ? i / (activeBars - 1) : 0.5;
-      const baseHeight = 18; // Միայն ակտիվ գծիկներն են փոխում բարձրությունը
+      const normalHeight = 18;
+      const hoverHeight = 24;
       
       bars.push(
         <div
@@ -131,7 +132,7 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
             width: '1px',
             transform: 'scaleX(2.7)',
             transformOrigin: 'left',
-            height: `${isChartHovered ? 24 : baseHeight}px`,
+            height: `${isChartHovered ? hoverHeight : normalHeight}px`,
             backgroundColor: getActiveBarColor(progress, isChartHovered),
             borderRadius: '1px',
             cursor: 'pointer',
@@ -148,9 +149,10 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
       );
     }
     
-    // Ոչ ակտիվ գծիկներ - FIXED բարձրություն
+    // Ոչ ակտիվ գծիկներ - հովեր ժամանակ 18px, նորմալ 24px
     for (let i = 0; i < inactiveBars; i++) {
-      const baseHeight = 24; // Ոչ ակտիվ գծիկների ֆիքսված բարձրություն
+      const normalHeight = 24; // Նորմալ վիճակում բարձր
+      const hoverHeight = 18;  // Հովեր ժամանակ ցածր
       
       bars.push(
         <div
@@ -160,7 +162,7 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
             width: '1px',
             transform: 'scaleX(2.7)',
             transformOrigin: 'left',
-            height: `${baseHeight}px`, // ✅ Միշտ նույն բարձրությունը
+            height: `${isChartHovered ? hoverHeight : normalHeight}px`, // ✅ Հետ շրջված տրամաբանություն
             backgroundColor: '#E2E3E4',
             borderRadius: '1px',
             cursor: 'pointer',
@@ -170,7 +172,7 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
             animationFillMode: 'forwards',
             animationDelay: `${((activeBars + i) * 15) % 600}ms`,
             opacity: isAnimating ? 0 : 1,
-            transition: 'opacity 0.3s ease' // ✅ Միայն opacity-ի transition
+            transition: 'height 0.3s ease, opacity 0.3s ease' // ✅ Height transition ավելացված
           }}
           title={`Non-expiring quotes: ${totalQuotes - expiringQuotes}`}
         />
@@ -245,6 +247,21 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
           display: flex;
           flex-direction: column;
           justify-content: flex-end;
+        }
+        
+        /* Հովեր էֆեկտներ */
+        .chart-bar {
+          transition: height 0.3s ease, background-color 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .active-bar:hover {
+          transform: scaleX(2.7) scaleY(1.1) !important;
+          transition: transform 0.2s ease;
+        }
+        
+        .inactive-bar:hover {
+          transform: scaleX(2.7) scaleY(0.9) !important;
+          transition: transform 0.2s ease;
         }
       `}</style>
 
