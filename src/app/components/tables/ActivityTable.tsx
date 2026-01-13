@@ -269,7 +269,7 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
                style={{ gridTemplateColumns: desktopGridCols }}>
             {columns.map((column, idx) => (
               <div key={idx} className={`flex items-center gap-2 font-poppins text-sm font-normal text-[#606068] ${column.className || ''} ${column.label === 'Action' ? 'justify-end' : ''}`}>
-                <span>{column.label}</span>
+                <span>{column.label}1</span>
                 {column.sortable && column.label !== 'Action' && (
                   <img
                     src="https://c.animaapp.com/mjiggi0jSqvoj5/img/filter--1--7.png"

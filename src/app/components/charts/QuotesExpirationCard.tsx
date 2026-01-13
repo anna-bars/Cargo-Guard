@@ -248,7 +248,7 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
         }
       `}</style>
 
-      <div className="stats-card bg-[#fafbf6]/80 rounded-2xl p-4 hover:shadow-xl transition-all duration-300">
+      <div className="stats-card bg-[#fafbf6]/80 rounded-2xl p-4 border border-[#d1d1d154] hover:shadow-sm transition-all duration-300">
         {/* Վերին բլոկ - Վերնագիր և Dropdown */}
         <div className="card-header mb-5 flex justify-between items-start">
           <h3 className="font-montserrat text-lg font-medium text-black mb-0">Quotes Expiration</h3>

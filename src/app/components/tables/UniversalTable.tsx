@@ -322,13 +322,7 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
             {visibleDesktopColumns.map((column, idx) => (
               <div key={idx} className={`max-w-[80%] flex items-center gap-2 font-poppins text-sm font-normal text-[#606068] ${getColumnVisibilityClass(column)} ${column.label === 'Action' ? 'justify-end' : ''}`}>
                 <span>{column.label}</span>
-                {column.sortable && column.label !== 'Action' && (
-                  <img
-                    src="https://c.animaapp.com/mjiggi0jSqvoj5/img/filter--1--7.png"
-                    alt="Sort"
-                    className="w-3 h-3"
-                  />
-                )}
+                {column.sortable && column.label !== 'Action'}
               </div>
             ))}
           </div>
