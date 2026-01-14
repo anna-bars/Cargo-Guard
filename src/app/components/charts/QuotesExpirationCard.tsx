@@ -18,9 +18,9 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
   
   const expirationData: Record<string, ExpirationData> = {
     'This Week': { totalQuotes: 22, expiringQuotes: 7, expiringRate: 32 },
-    'Next Week': { totalQuotes: 18, expiringQuotes: 5, expiringRate: 28 },
-    'In 2–4 Weeks': { totalQuotes: 35, expiringQuotes: 12, expiringRate: 34 },
-    'Next Month': { totalQuotes: 42, expiringQuotes: 9, expiringRate: 21 }
+    'Next Week': { totalQuotes: 18, expiringQuotes: 12, expiringRate: 67 },
+    'In 2–4 Weeks': { totalQuotes: 35, expiringQuotes: 4, expiringRate: 11 },
+    'Next Month': { totalQuotes: 42, expiringQuotes: 38, expiringRate: 90 }
   };
   
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
