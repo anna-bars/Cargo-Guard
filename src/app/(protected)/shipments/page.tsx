@@ -1,226 +1,210 @@
 'use client'
 
 import DashboardLayout from '../DashboardLayout'
-import { createClient } from '@/lib/supabase/client'
-import { useEffect, useState } from 'react'
-import { redirect } from 'next/navigation'
-import { usePathname } from 'next/navigation'
+import { useEffect, useState, useRef } from 'react'
+import { ConversionChart } from '../../components/charts/ConversionChart'
+import { UniversalTable, renderStatus, renderButton } from '@/app/components/tables/UniversalTable';
+import QuotesExpirationCard from '@/app/components/charts/QuotesExpirationCard'
+import InfoWidget from '@/app/components/widgets/InfoWidget'
 
-interface User {
-  id: string
-  email?: string
-  created_at?: string
-}
-export default function QuotesPage() {
-  const [user, setUser] = useState<User | null>(null)
+// Dashboard-ի տվյալներ - ԼՐԱՑՈՒՄ
+const quotesRows = [
+  {
+    id: 'Q-005',
+    cargo: 'Electronics',
+    shipmentValue: '$15,400.00',
+    premiumAmount: '$450.00',
+    expirationDate: 'Oct 25 – Nov 5',
+    status: { 
+      text: 'Pending Approval', 
+      color: 'bg-[#cbd03c]/10', 
+      dot: 'bg-[#cbd03c]', 
+      textColor: 'text-[#cbd03c]' 
+    },
+    button: { 
+      text: 'Approve Quote', 
+      variant: 'primary' as const,
+      onClick: (row: any) => console.log('Approve Quote', row.id)
+    }
+  },
+  {
+    id: 'Q-021',
+    cargo: 'Furniture',
+    shipmentValue: '$20,000.00',
+    premiumAmount: '$255.00',
+    expirationDate: 'Oct 20 – Nov 1',
+    status: { 
+      text: 'Approved', 
+      color: 'bg-[#16a34a]/10', 
+      dot: 'bg-[#16a34a]', 
+      textColor: 'text-[#16a34a]' 
+    },
+    button: { 
+      text: 'Approve Quote', 
+      variant: 'primary' as const,
+      onClick: (row: any) => console.log('Approve Quote', row.id)
+    }
+  },
+  {
+    id: 'Q-054',
+    cargo: 'Clothing',
+    shipmentValue: '$5,500.00',
+    premiumAmount: '$600.00',
+    expirationDate: 'Oct 22 – Nov 3',
+    status: { 
+      text: 'Declined', 
+      color: 'bg-[#8ea0b0]/10', 
+      dot: 'bg-[#8ea0b0]', 
+      textColor: 'text-[#8ea0b0]' 
+    },
+    button: { 
+      text: 'View Reason', 
+      variant: 'secondary' as const,
+      onClick: (row: any) => console.log('View Reason', row.id)
+    }
+  },
+  {
+    id: 'Q-005-2',
+    cargo: 'Machinery',
+    shipmentValue: '$8,500.00',
+    premiumAmount: '$165.00',
+    expirationDate: 'Oct 24 – Nov 4',
+    status: { 
+      text: 'Pending Approval', 
+      color: 'bg-[#cbd03c]/10', 
+      dot: 'bg-[#cbd03c]', 
+      textColor: 'text-[#cbd03c]' 
+    },
+    button: { 
+      text: 'Approve Quote', 
+      variant: 'primary' as const,
+      onClick: (row: any) => console.log('Approve Quote', row.id)
+    }
+  },
+  {
+    id: 'Q-014',
+    cargo: 'Chemicals',
+    shipmentValue: '$12,800.00',
+    premiumAmount: '$360.00',
+    expirationDate: 'Oct 21 – Nov 2',
+    status: { 
+      text: 'Approved', 
+      color: 'bg-[#16a34a]/10', 
+      dot: 'bg-[#16a34a]', 
+      textColor: 'text-[#16a34a]' 
+    },
+    button: { 
+      text: 'Approve Quote', 
+      variant: 'primary' as const,
+      onClick: (row: any) => console.log('Approve Quote', row.id)
+    }
+  }
+]
+
+const quotesColumns = [
+  {
+    key: 'id',
+    label: 'Quote ID',
+    sortable: true,
+    renderDesktop: (value: string) => (
+      <span className="font-poppins text-sm text-[#2563eb] underline hover:text-[#1d4ed8] transition-colors duration-300 cursor-pointer">
+        {value}
+      </span>
+    )
+  },
+  {
+    key: 'cargo',
+    label: 'Cargo',
+    sortable: true
+  },
+  {
+    key: 'shipmentValue',
+    label: 'Shipment Value',
+    sortable: true
+  },
+  {
+    key: 'premiumAmount',
+    label: 'Premium Amount',
+    sortable: true
+  },
+  {
+    key: 'expirationDate',
+    label: 'Expiration Date',
+    sortable: true
+  },
+  {
+    key: 'status',
+    label: 'Status',
+    sortable: true,
+    renderDesktop: (status: any) => renderStatus(status)
+  },
+  {
+    key: 'button',
+    label: 'Action',
+    renderDesktop: (button: any, row: any) => renderButton(button, row),
+    className: 'flex justify-end'
+  }
+];
+ 
+export default function ShipmentsPage() {
+  const [activeTab, setActiveTab] = useState('This Week')
   const [loading, setLoading] = useState(true)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [activeNavItem, setActiveNavItem] = useState('Dashboard')
-  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false)
-  const pathname = usePathname()
-  
-  // Ավելացրեք notifications state-երը
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
-  const [notifications, setNotifications] = useState([
-    {
-      id: '1',
-      title: 'New Quote Request',
-      message: 'You have a new quote request from Global Shipping Ltd.',
-      type: 'info' as const,
-      read: false,
-      created_at: new Date(Date.now() - 3600000).toISOString()
-    },
-    {
-      id: '2',
-      title: 'Policy Expiring Soon',
-      message: 'Policy #P-020 expires in 15 days. Consider renewal.',
-      type: 'warning' as const,
-      read: false,
-      created_at: new Date(Date.now() - 7200000).toISOString()
-    },
-    {
-      id: '3',
-      title: 'Document Approved',
-      message: 'Your uploaded document has been approved.',
-      type: 'success' as const,
-      read: true,
-      created_at: new Date(Date.now() - 86400000).toISOString()
-    },
-    {
-      id: '4',
-      title: 'Payment Received',
-      message: 'Payment of $2,500 has been processed successfully.',
-      type: 'success' as const,
-      read: true,
-      created_at: new Date(Date.now() - 172800000).toISOString()
-    }
-  ])
-  
-  const [unreadCount, setUnreadCount] = useState(0)
-
-  // Mobile filter states
-  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedActivity, setSelectedActivity] = useState('All Activity')
-  const [selectedTimeframe, setSelectedTimeframe] = useState('Last 30 days')
-  const [selectedSort, setSelectedSort] = useState('Sort by')
-  const [selectedStatus, setSelectedStatus] = useState('Status')
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
-    const count = notifications.filter(n => !n.read).length
-    setUnreadCount(count)
-  }, [notifications])
-
-  const markAsRead = (id: string) => {
-    setNotifications(prev => 
-      prev.map(notification => 
-        notification.id === id ? { ...notification, read: true } : notification
-      )
-    )
-  }
-
-  const markAllAsRead = () => {
-    setNotifications(prev => 
-      prev.map(notification => ({ ...notification, read: true }))
-    )
-  }
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      if (!user) {
-        redirect('/login')
-      }
-      
-      setUser(user)
+    // Simulate loading data
+    const timer = setTimeout(() => {
       setLoading(false)
-    }
-
-    fetchUser()
+    }, 1000)
+    
+    return () => clearTimeout(timer)
   }, [])
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen)
-    if (!isMobileMenuOpen) {
-      document.body.classList.add('overflow-hidden')
-    } else {
-      document.body.classList.remove('overflow-hidden')
-    }
-  }
-
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false)
-    document.body.classList.remove('overflow-hidden')
-  }
-
-  // Mobile filter functions
-  const toggleMobileFilter = () => {
-    setIsMobileFilterOpen(!isMobileFilterOpen)
-  }
-
-  const closeMobileFilter = () => {
-    setIsMobileFilterOpen(false)
-  }
-
-  const applyFilters = () => {
-    console.log('Applying filters:', {
-      searchTerm,
-      selectedActivity,
-      selectedTimeframe,
-      selectedSort,
-      selectedStatus
-    })
-    closeMobileFilter()
-  }
-
-  const resetFilters = () => {
-    setSearchTerm('')
-    setSelectedActivity('All Activity')
-    setSelectedTimeframe('Last 30 days')
-    setSelectedSort('Sort by')
-    setSelectedStatus('Status')
-  }
-
-  const handleProfileSetting = () => {
-    console.log('Navigate to profile settings')
-    closeMobileMenu()
-    setIsUserDropdownOpen(false)
-  }
-
-  const handleLogout = () => {
-    closeMobileMenu()
-    setIsUserDropdownOpen(false)
-  }
-
-  const navItems = [
-    { id: 'dashboard', label: 'Dashboard' },
-    { id: 'quotes', label: 'Quotes' },
-    { id: 'shipments', label: 'Shipments' },
-    { id: 'documents', label: 'Documents' }
-  ]
-
-  const handleNavClick = (itemId: string, itemLabel: string) => {
-    setActiveNavItem(itemLabel)
-    closeMobileMenu()
-  }
-
-  const closeUserDropdown = () => {
-    setIsUserDropdownOpen(false)
-  }
-
-  const toggleUserDropdown = () => {
-    setIsUserDropdownOpen(!isUserDropdownOpen)
-  }
-
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const dropdown = document.getElementById('user-dropdown')
-      const avatar = document.getElementById('user-avatar')
-      
-      if (dropdown && avatar && 
-          !dropdown.contains(event.target as Node) && 
-          !avatar.contains(event.target as Node)) {
-        setIsUserDropdownOpen(false)
-      }
+    // Check screen size for mobile
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth <= 768)
     }
+    
+    checkScreenSize()
+    window.addEventListener('resize', checkScreenSize)
+    
+    return () => window.removeEventListener('resize', checkScreenSize)
+  }, [])
 
-    if (isUserDropdownOpen) {
-      document.addEventListener('click', handleClickOutside)
-    }
 
-    return () => {
-      document.removeEventListener('click', handleClickOutside)
-    }
-  }, [isUserDropdownOpen])
+ 
 
   if (loading) {
     return (
       <div className="min-h-screen bg-[#f3f3f6] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0a3d62]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#778B8E]"></div>
       </div>
     )
   }
-
+  
   return (
     <DashboardLayout>
-      <div className='insult'>
-        <div className='infarkt'>
-          <div className="max-w-[96%] min-w-full sm:max-w-[96%] mx-auto">
-            {/* Header */}
-            
-            {/* Mobile Header for Activity Section */}
-            <div className="flex gap-2 items-center mb-4 xl:hidden">
-              <img src="/dashboard/hashtag.svg" alt="" className="w-5 h-5" />
-              <h4 className="font-normal text-base">Dashboard</h4>
-            </div>
+      <div className="w-full max-w-[99%] sm:max-w-[99%] mx-auto">
+        {/* Mobile Header for Activity Section */}
+       
 
-            {/* Main Content Grid */}
-            <main className="grid grid-cols-1 xl:grid-cols-[75%_24%] gap-4 items-stretch main-content">
-              {/* Left Column - 75% */}
-              <div className="max-h-[99.5%] flex flex-col gap-4">
-                <div className="flex items-center gap-6">
+        {/* Main Content Grid */}
+        <div className="
+          grid grid-cols-1 xl:grid-cols-[76.5%_23%] gap-2 
+          h-[calc(100vh-140px)] xl:min-h-[100vh] xl:max-h-[100vh]
+          max-[1336px]:grid-cols-[76.5%_23%]
+          max-[1280px]:h-auto max-[1280px]:min-h-auto max-[1280px]:max-h-none
+          max-[1280px]:grid-cols-1 max-[1280px]:grid-rows-[auto_auto]
+          max-[1024px]:flex max-[1024px]:flex-col-reverse
+        ">
+          {/* Left Column - 75% */}
+          <div className="
+            max-h-[89%] min-h-[88%] flex flex-col gap-2 xl:min-h-[100vh] xl:max-h-[89vh]
+            max-[1280px]:min-h-auto max-[1280px]:max-h-none max-[1280px]:row-start-2
+            max-[1024px]:min-h-auto max-[1024px]:max-h-none
+          ">
+            <div className="flex items-center gap-3">
                   <img
                     src="/quotes/header-ic.svg"
                     alt=""
@@ -229,1689 +213,124 @@ export default function QuotesPage() {
                   <h2 className="text-[26px]">Shipments / Policies</h2>
                 </div>
 
-                
-                {/* Mobile Activity Header */}
-                <div className="xl:hidden flex items-center justify-between activity-mobile-header activity-section-mob-hd">
-                  <h3 className="text-lg font-normal">All Insurance Quotes</h3>
-                  <div className="flex gap-1">
-                    <button className="p-[10px] bg-[#FBFBFC] border border-[#FBFBFC] rounded-[6px]">
-                      <img src="/dashboard/btn/01.svg" alt="" className="w-4 h-4" />
-                    </button>
+            <div className="block md:hidden">
+              <ConversionChart />
+            </div>
+            <div className="block md:hidden">
+              <QuotesExpirationCard 
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+              />
+            </div>
 
-                    <button className="p-[10px] bg-[#FBFBFC] border border-[#FBFBFC] rounded-[6px]">
-                      <img src="/dashboard/btn/02.svg" alt="" className="w-4 h-4" />
-                    </button>
-
-                    <button className="p-[10px] bg-[#FBFBFC] border border-[#FBFBFC] rounded-[6px]">
-                      <img src="/dashboard/btn/03.svg" alt="" className="w-4 h-4" />
-                    </button>
-
-                    <button 
-                      onClick={toggleMobileFilter}
-                      className="p-[10px] bg-[#FBFBFC] border border-[#FBFBFC] rounded-[6px]"
-                    >
-                      <img src="/dashboard/btn/04.svg" alt="" className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Recent Activity Table */}
-                <section className="block-2 flex flex-col max-h-[100%] activity-section bg-[#fafcff]/80 rounded-2xl p-4 xl:p-4">
-                  {/* Desktop Filters */}
-                  <div className='block-1'>
-                    <h2 className="text-[20px] mb-4">All Insurance Quotes</h2>
-                    <div className="hidden xl:flex justify-between items-center mb-4 activity-header activity-filters">
-                      <div className="flex items-center gap-1.5">
-                        <img 
-                          src="https://c.animaapp.com/mjiggi0jSqvoj5/img/filter-1.png" 
-                          alt="Filter" 
-                          className="w-3 h-3"
-                        />
-                        <span className="font-montserrat text-base font-normal text-[#818181]">
-                          Search Filter
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center gap-4 showin-result-ittle-info">
-                        <div className="w-36 h-[38px] border-b border-[#c7c7c7]/51 flex items-center justify-between px-3 py-2 hover:border-[#a0a0a0]/51 transition-colors duration-300">
-                          <input 
-                            type="text" 
-                            placeholder="Search by..."
-                            className="w-full border-none bg-transparent font-montserrat text-xs text-[#7b7b7b] outline-none"
-                          />
-                          <img 
-                            src="https://c.animaapp.com/mjiggi0jSqvoj5/img/search--1--2.png" 
-                            alt="Search" 
-                            className="w-3 h-3"
-                          />
-                        </div>
-                        
-                        {['All Activity', 'Last 30 days', 'Sort by', 'Status'].map((text, idx) => (
-                          <div key={idx} className="h-[38px] flex items-center gap-6 px-3 py-2 rounded-lg border border-[#c7c7c7]/51 font-montserrat text-xs text-[#7b7b7b] hover:border-[#a0a0a0]/51 transition-colors duration-300">
-                            <span>{text}</span>
-                            <img 
-                              src="https://c.animaapp.com/mjiggi0jSqvoj5/img/arrow-3-1.svg" 
-                              alt="Dropdown"
-                              className="w-2 h-1"
-                            />
-                          </div>
-                        ))}
-                        
-                        <button className="bg-[#F9FBFD] border border-[#C8C8C8]  text-white p-2 rounded-[50%] font-poppins text-sm font-normal hover:bg-[#F1F6FA] transition-colors duration-300">
-                          <img src="/quotes/refresh.svg" className="w-[16px] h-[16px]" alt="" />
-                        </button>
-                      </div>
-                    </div>
-                    
-                    {/* Desktop Table Header - Optimized for no overflow */}
-                    <div className="hidden xl:grid grid-cols-[6.8%_10.8%_9.8%_7.8%_17.7%_24.8%_13.2%] gap-6 pb-2 border-b border-gray-200 mb-2 table-header">
-                      {['Policy ID', 'Cargo', 'Value', 'Premium', 'Coverage Period', 'Status', 'Action'].map((header, idx) => (
-                        <div key={idx} className="flex items-center gap-2 font-poppins text-sm font-normal text-[#606068]">
-                          <span>{header}</span>
-                          {header !== 'Action' && (
-                            <img 
-                              src="https://c.animaapp.com/mjiggi0jSqvoj5/img/filter--1--7.png" 
-                              alt="Sort" 
-                              className="w-3 h-3"
-                            />
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Table Rows - Optimized with stacked status */}
-                  <div className="block-2 space-y-2 activity-table overflow-y-auto overflow-x-hidden">
-                    {/* Row 1 */}
-                    <div className="xl:grid xl:grid-cols-[6.8%_10.8%_9.8%_7.8%_17.7%_24.8%_13.2%] gap-5 p-3 xl:p-3 bg-[#f8fafd] xl:bg-[#f8fafd] rounded-lg xl:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
-                      {/* Desktop Layout */}
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">P-3401</div>
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">Electronics</div>
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">12,500.00</div>
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">170.00</div>
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">Dec 1, '25 - Dec 1, '26</div>
-                      <div className="hidden xl:block xl:w-auto row-cell">
-                        <div className="flex flex-row gap-1">
-                          <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
-                            Active
-                          </span>
-                          <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
-                            All Uploaded
-                          </span>
-                        </div>
-                      </div>
-                      
-                      {/* Mobile Layout */}
-                      <div className="xl:hidden w-full">
-                        <div className="flex justify-between items-start mb-4">
-                          <span className="font-poppins text-sm font-medium text-[#2563eb] underline">P-3401</span>
-                          <div className="flex flex-row items-end gap-1">
-                            <span className="w-fit inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a] mobile-status-badge">
-                              <span className="w-2 h-2 rounded-full bg-[#16a34a]"></span>
-                              Active
-                            </span>
-                            <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
-                            All Uploaded
-                          </span>
-                          </div>
-                        </div>
-                        <div className="flex justify-between items-center mb-2">
-                          <div className="font-poppins text-sm text-gray-700">Electronics</div>
-                          <div className="font-poppins text-sm font-medium text-black">12,500.00</div>
-                        </div>
-                        <div className="flex justify-between items-center mb-4">
-                          <div className="font-poppins text-sm text-gray-700">Premium: 170.00</div>
-                          <div className="font-poppins text-sm text-gray-600">Dec 1, '25 - Dec 1, '26</div>
-                        </div>
-                        <button className="mobile-action-btn primary-btn">
-                          Download Cert
-                        </button>
-                      </div>
-                      
-                      {/* Desktop button */}
-                      <div className="hidden xl:block xl:w-auto row-cell">
-                        <button className="h-9 px-4 rounded-lg font-poppins text-sm font-normal bg-[#2563eb] text-white hover:bg-[#1d4ed8] transition-colors duration-300 w-full xl:w-[100px]">
-                          Download
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Row 2 */}
-                    <div className="xl:grid xl:grid-cols-[6.8%_10.8%_9.8%_7.8%_17.7%_24.8%_13.2%] gap-5 p-3 xl:p-3 bg-[#f8fafd] xl:bg-[#f8fafd] rounded-lg xl:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">P-2015</div>
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">Textiles</div>
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">25,800.00</div>
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">285.00</div>
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">Oct 15, '25 - Dec 15, '25</div>
-                      <div className="hidden xl:block xl:w-auto row-cell">
-                        <div className="flex flex-row gap-1">
-                          <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#f97316]/10 text-[#f97316]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#f97316]"></span>
-                            Expiring Soon
-                          </span>
-                          <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
-                            All Uploaded
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div className="xl:hidden w-full">
-                        <div className="flex justify-between items-start mb-4">
-                          <span className="font-poppins text-sm font-medium text-[#2563eb] underline">P-2015</span>
-                          <div className="flex flex-row  items-end gap-1">
-                            <span className="w-fit inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs bg-[#f97316]/10 text-[#f97316] mobile-status-badge">
-                              <span className="w-2 h-2 rounded-full bg-[#f97316]"></span>
-                              Expiring Soon
-                            </span>
-                            <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
-                            All Uploaded
-                          </span>
-                          </div>
-                        </div>
-                        <div className="flex justify-between items-center mb-2">
-                          <div className="font-poppins text-sm text-gray-700">Textiles</div>
-                          <div className="font-poppins text-sm font-medium text-black">25,800.00</div>
-                        </div>
-                        <div className="flex justify-between items-center mb-4">
-                          <div className="font-poppins text-sm text-gray-700">Premium: 285.00</div>
-                          <div className="font-poppins text-sm text-gray-600">Oct 15, '25 - Dec 15, '25</div>
-                        </div>
-                        <button className="mobile-action-btn primary-btn">
-                          Renew Policy
-                        </button>
-                      </div>
-                      
-                      <div className="hidden xl:block xl:w-auto row-cell">
-                        <button className="h-9 px-4 rounded-lg font-poppins text-sm font-normal bg-[#2563eb] text-white hover:bg-[#1d4ed8] transition-colors duration-300 w-full xl:w-[100px]">
-                          Renew
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Row 3 */}
-                    <div className="xl:grid xl:grid-cols-[6.8%_10.8%_9.8%_7.8%_17.7%_24.8%_13.2%] gap-5 p-3 xl:p-3 bg-[#f8fafd] xl:bg-[#f8fafd] rounded-lg xl:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">P-4809</div>
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">Machinery</div>
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">45,000.00</div>
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">490.00</div>
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">Nov 5, '25 - Nov 5, '26</div>
-                      <div className="hidden xl:block xl:w-auto row-cell">
-                        <div className="flex flex-row gap-1">
-                          <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
-                            Active
-                          </span>
-                          <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
-                            Missing BOL
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div className="xl:hidden w-full">
-                        <div className="flex justify-between items-start mb-4">
-                          <span className="font-poppins text-sm font-medium text-[#2563eb] underline">P-4809</span>
-                          <div className="flex flex-row  items-end gap-1">
-                            <span className="w-fit inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a] mobile-status-badge">
-                              <span className="w-2 h-2 rounded-full bg-[#16a34a]"></span>
-                              Active
-                            </span>
-                            <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
-                            All Uploaded
-                          </span>
-                          </div>
-                        </div>
-                        <div className="flex justify-between items-center mb-2">
-                          <div className="font-poppins text-sm text-gray-700">Machinery</div>
-                          <div className="font-poppins text-sm font-medium text-black">45,000.00</div>
-                        </div>
-                        <div className="flex justify-between items-center mb-4">
-                          <div className="font-poppins text-sm text-gray-700">Premium: 490.00</div>
-                          <div className="font-poppins text-sm text-gray-600">Nov 5, '25 - Nov 5, '26</div>
-                        </div>
-                        <button className="mobile-action-btn primary-btn">
-                          Upload Docs
-                        </button>
-                      </div>
-                      
-                      <div className="hidden xl:block xl:w-auto row-cell">
-                        <button className="h-9 px-4 rounded-lg font-poppins text-sm font-normal bg-[#2563eb] text-white hover:bg-[#1d4ed8] transition-colors duration-300 w-full xl:w-[100px]">
-                          Upload
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Row 4 */}
-                    <div className="xl:grid xl:grid-cols-[6.8%_10.8%_9.8%_7.8%_17.7%_24.8%_13.2%] gap-5 p-3 xl:p-3 bg-[#f8fafd] xl:bg-[#f8fafd] rounded-lg xl:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">P-1244</div>
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">Perishables</div>
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">5,200.00</div>
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">85.00</div>
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">Jan 10, '25 - Jan 10, '26</div>
-                      <div className="hidden xl:block xl:w-auto row-cell">
-                        <div className="flex flex-row gap-1">
-                          <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#8b5cf6]/10 text-[#8b5cf6]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#8b5cf6]"></span>
-                            Claim Filed
-                          </span>
-                          <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
-                            All Uploaded
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div className="xl:hidden w-full">
-                        <div className="flex justify-between items-start mb-4">
-                          <span className="font-poppins text-sm font-medium text-[#2563eb] underline">P-1244</span>
-                          <div className="flex flex-row  items-end gap-1">
-                            <span className="w-fit inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs bg-[#8b5cf6]/10 text-[#8b5cf6] mobile-status-badge">
-                              <span className="w-2 h-2 rounded-full bg-[#8b5cf6]"></span>
-                              Claim Filed
-                            </span>
-                            <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
-                            All Uploaded
-                          </span>
-                          </div>
-                        </div>
-                        <div className="flex justify-between items-center mb-2">
-                          <div className="font-poppins text-sm text-gray-700">Perishables</div>
-                          <div className="font-poppins text-sm font-medium text-black">5,200.00</div>
-                        </div>
-                        <div className="flex justify-between items-center mb-4">
-                          <div className="font-poppins text-sm text-gray-700">Premium: 85.00</div>
-                          <div className="font-poppins text-sm text-gray-600">Jan 10, '25 - Jan 10, '26</div>
-                        </div>
-                        <button className="mobile-action-btn primary-btn">
-                          Claim Status
-                        </button>
-                      </div>
-                      
-                      <div className="hidden xl:block xl:w-auto row-cell">
-                        <button className="h-9 px-4 rounded-lg font-poppins text-sm font-normal bg-[#2563eb] text-white hover:bg-[#1d4ed8] transition-colors duration-300 w-full xl:w-[100px]">
-                          Claim
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Row 5 */}
-                    <div className="xl:grid xl:grid-cols-[6.8%_10.8%_9.8%_7.8%_17.7%_24.8%_13.2%] gap-5 p-3 xl:p-3 bg-[#f8fafd] xl:bg-[#f8fafd] rounded-lg xl:rounded-lg flex flex-wrap items-center table-row hover:bg-[#f0f4f9] transition-colors duration-300">
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-[#2563eb] underline truncate row-cell id-link hover:text-[#1d4ed8] transition-colors duration-300">P-0890</div>
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">Auto Parts</div>
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">33,100.00</div>
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">370.00</div>
-                      <div className="hidden xl:block xl:w-auto font-poppins text-sm text-black truncate row-cell">Aug 1, '24 - Aug 1, '25</div>
-                      <div className="hidden xl:block xl:w-auto row-cell">
-                        <div className="flex flex-row gap-1">
-                          <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#8ea0b0]/10 text-[#8ea0b0]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#8ea0b0]"></span>
-                            Expired
-                          </span>
-                          <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
-                            All Uploaded
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div className="xl:hidden w-full">
-                        <div className="flex justify-between items-start mb-4">
-                          <span className="font-poppins text-sm font-medium text-[#2563eb] underline">P-0890</span>
-                          <div className="flex flex-row  items-end gap-1">
-                            <span className="w-fit inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs bg-[#8ea0b0]/10 text-[#8ea0b0] mobile-status-badge">
-                              <span className="w-2 h-2 rounded-full bg-[#8ea0b0]"></span>
-                              Expired
-                            </span>
-                            <span className="w-fit inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[37px] font-poppins text-xs bg-[#16a34a]/10 text-[#16a34a]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
-                            All Uploaded
-                          </span>
-                          </div>
-                        </div>
-                        <div className="flex justify-between items-center mb-2">
-                          <div className="font-poppins text-sm text-gray-700">Auto Parts</div>
-                          <div className="font-poppins text-sm font-medium text-black">33,100.00</div>
-                        </div>
-                        <div className="flex justify-between items-center mb-4">
-                          <div className="font-poppins text-sm text-gray-700">Premium: 370.00</div>
-                          <div className="font-poppins text-sm text-gray-600">Aug 1, '24 - Aug 1, '25</div>
-                        </div>
-                        <button className="mobile-action-btn primary-btn">
-                          Download Cert
-                        </button>
-                      </div>
-                      
-                      <div className="hidden xl:block xl:w-auto row-cell">
-                        <button className="h-9 px-4 rounded-lg font-poppins text-sm font-normal bg-[#2563eb] text-white hover:bg-[#1d4ed8] transition-colors duration-300 w-full xl:w-[100px]">
-                          Download
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-              </div>
-
-              {/* Right Column - 25% */}
-              <div className="flex max-h-[99.5%] flex-col gap-4 right">
-                <div className="flex justify-end items-center gap-3 !h-[39px]">
-                  <button
-  className="inline-flex items-center justify-center gap-[10px] px-4 py-2 h-[35.68px] bg-[#f8fbff] border border-[#ffffff30] rounded-[6px] font-poppins text-base font-normal text-black cursor-pointer whitespace-nowrap"
->
-  <img
-    src="/quotes/download.svg"
-    alt=""
-    className="w-3 h-3 object-cover"
-  />
-  Download
-                  </button>
-                  <button className="inline-flex items-center justify-center gap-[10px] px-4 py-2 h-[35.68px] bg-[#0b0b0b] border-0 rounded-[6px] font-poppins text-base font-normal text-white cursor-pointer whitespace-nowrap">
-                    Renew Policy
-                  </button>
-                <button className="inline-flex items-center justify-center gap-[10px] px-4 py-2 h-[35.68px] bg-[#0066FF] border-0 rounded-[6px] font-poppins text-base font-normal text-white cursor-pointer whitespace-nowrap">
-                    File a Claim
-                  </button>
-                </div>
-                {/* Stats Cards Section */}
-<div className="flex flex-col gap-4">
-  {/* Reduce Policy Risk Card */}
-  <div className="stats-card bg-[#fafcff]/80 rounded-2xl p-4">
-    <h3 className="font-montserrat text-lg font-medium text-black mb-6">Reduce Policy Risk</h3>
-    <div className="stats-content mb-6">
-      <div className="risk-score relative">
-        <div className="score-display flex items-start gap-1">
-          <span className="percentage-symbol font-montserrat text-xs font-normal text-black">%</span>
-          <span className="score-number font-montserrat text-[56px] font-normal text-black tracking-[1.12px] leading-9">88</span>
-        </div>
-        <span className="score-label font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px]">Policy Risk Score</span>
-      </div>
-      <p className="risk-description font-montserrat text-xs font-normal text-[#c7c7c7] tracking-[0.24px]">
-        <span className="highlight font-medium text-[#afaeae]">7</span> of your active policies are at risk due to <span className="highlight font-medium text-[#afaeae]">Missing Documents</span>
-      </p>
-    </div>
-    <div className="stats-footer flex items-end justify-between w-full">
-      <span className="font-montserrat text-base font-normal text-[#3c3c3c] tracking-[0.32px] max-w-[206px]">
-        View<br />Required Documents
-      </span>
-      <button className="action-button bg-transparent border-none p-0 cursor-pointer">
-        <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="21" cy="21" r="21" fill="#000"/>
-          <path d="M21 15L27 21L21 27M27 21H15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-    </div>
-  </div>
-
-  {/* Policy Expiration Timeline Card */}
-  <div className="stats-card bg-[#fafcff]/80 rounded-2xl p-4">
-    <div className="card-header mb-6">
-      <h3 className="font-montserrat text-lg font-medium text-black mb-0">Policy Expiration Timeline</h3>
-    </div>
-    
-    <div className="expiration-stats relative mb-6">
-      <div className="expiration-score">
-        <div className="score-display flex items-center gap-1">
-          <span className="percentage-symbol font-montserrat text-xs font-normal text-black">%</span>
-          <span className="score-number font-montserrat text-[56px] font-normal text-black tracking-[1.12px] leading-10">71</span>
-          <svg width="6" height="8" viewBox="0 0 6 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 0L6 8H0L3 0Z" fill="#000"/>
-          </svg>
-        </div>
-        <span className="score-label font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px]">Policies</span>
-      </div>
-    </div>
-    
-    <p className="expiration-info font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px] mb-4">
-      Total expiring policies: 7
-    </p>
-    
-    <div className="chart-container mb-4">
-      <div className="chart-labels flex justify-between items-center mb-2">
-        <span className="chart-label font-montserrat text-base font-normal text-[#c7c7c7] tracking-[0.32px]">0%</span>
-        <span className="chart-label-center font-montserrat text-base font-normal text-black tracking-[0.32px]">50%</span>
-        <span className="chart-label font-montserrat text-base font-normal text-[#c7c7c7] tracking-[0.32px]">100%</span>
-      </div>
-      <div className="progress-wrapper relative">
-        <div className="progress-track absolute top-1/2 left-0 w-full h-1 bg-[#FCDCA2]/50 rounded-full transform -translate-y-1/2"></div>
-        {/* <div className="progress-fill absolute top-1/2 left-0 h-1 bg-[#FCDCA2] rounded-full transform -translate-y-1/2" style={{ width: '71%' }}></div> */}
-        <div className="progress-fill absolute top-0 left-0 w-full">
-          <img src="/shipments/bar.svg" alt="Gradient bar" className="w-full h-4" />
-        </div>
-        <div className="triangle-pointer absolute top-0 left-[calc(71%-13.5px)] w-6 h-6">
-          <img src="/shipments/bar0.svg" alt="Triangle pointer" className="w-full h-full" />
-        </div>
-      </div>
-    </div>
-    
-    <p className="total-policies font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px]">
-      Total policies: 22
-    </p>
-  </div>
-</div>
-              </div>
-            </main>
+            {/* Universal Table for Recent Activity */}
+            <div className='max-h-[85%'>
+            <UniversalTable
+              title="Polices Overview"
+              showMobileHeader={true}
+              rows={quotesRows}
+              columns={quotesColumns}
+              mobileDesign={{
+                showType: false,
+                showCargoIcon: true,
+                showDateIcon: true,
+                dateLabel: 'Expires',
+                buttonWidth: '47%'
+              }}
+              mobileDesignType="quotes" // ավելացնել
+              desktopGridCols="0.7fr repeat(2, minmax(0, 1fr)) 1.1fr 1fr 0.9fr 1fr" // ավելացնել
+            />
+            </div>
           </div>
 
-          {/* Mobile Filter Overlay */}
-          {isMobileFilterOpen && (
-            <div className="mobile-filter-overlay active">
-              <div className="mobile-filter-container">
-                <div className="mobile-filter-header">
-                  <h3 className="mobile-filter-title">Filters</h3>
-                  <button onClick={closeMobileFilter} className="mobile-close-filter-btn">
-                    <img src="/dashboard/close.svg" alt="Close" className="w-5 h-5" />
+          {/* Right Column - 25% - Desktop View */}
+          <div className="
+            max-h-[89%] min-h-[88%] flex flex-col gap-2 xl:min-h-[100vh] xl:max-h-[89vh]
+            max-[1336px]:flex max-[1336px]:flex-col max-[1336px]:gap-2
+            max-[1280px]:min-h-auto max-[1280px]:max-h-none max-[1280px]:row-start-1
+            max-[1280px]:hidden
+          ">
+            <div className="flex justify-end items-center gap-3 !h-[39px]">
+                  <button
+                    className="inline-flex items-center justify-center gap-[10px] px-4 py-2 h-[35.68px] bg-[#f8fbff] border border-[#ffffff30] rounded-[6px] font-poppins text-base font-normal text-black cursor-pointer whitespace-nowrap"
+                  >
+                    <img
+                      src="/quotes/download.svg"
+                      alt=""
+                      className="w-3 h-3 object-cover"
+                    />
+                    Download
+                  </button>
+                  <button className="inline-flex items-center justify-center gap-[10px] px-4 py-2 h-[35.68px] bg-[#0b0b0b] border-0 rounded-[6px] font-poppins text-base font-normal text-white cursor-pointer whitespace-nowrap">
+                    + Get New Quote
                   </button>
                 </div>
-                
-                <div className="mobile-filter-content">
-                  {/* Search Input */}
-                  <div className="mobile-filter-group">
-                    <label className="mobile-filter-label">Search by...</label>
-                    <div className="mobile-search-input">
-                      <input
-                        type="text"
-                        placeholder="Type to search..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="mobile-search-field"
-                      />
-                      <img 
-                        src="https://c.animaapp.com/mjiggi0jSqvoj5/img/search--1--2.png" 
-                        alt="Search" 
-                        className="mobile-search-icon"
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* All Activity Dropdown */}
-                  <div className="mobile-filter-group">
-                    <label className="mobile-filter-label">All Activity</label>
-                    <div className="mobile-dropdown">
-                      <select 
-                        value={selectedActivity}
-                        onChange={(e) => setSelectedActivity(e.target.value)}
-                        className="mobile-dropdown-select"
-                      >
-                        <option value="All Activity">All Activity</option>
-                        <option value="Quotes Only">Quotes Only</option>
-                        <option value="Shipments Only">Shipments Only</option>
-                        <option value="Documents Only">Documents Only</option>
-                      </select>
-                      <img 
-                        src="https://c.animaapp.com/mjiggi0jSqvoj5/img/arrow-3-1.svg" 
-                        alt="Dropdown"
-                        className="mobile-dropdown-arrow"
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* Last 30 days Dropdown */}
-                  <div className="mobile-filter-group">
-                    <label className="mobile-filter-label">Timeframe</label>
-                    <div className="mobile-dropdown">
-                      <select 
-                        value={selectedTimeframe}
-                        onChange={(e) => setSelectedTimeframe(e.target.value)}
-                        className="mobile-dropdown-select"
-                      >
-                        <option value="Last 30 days">Last 30 days</option>
-                        <option value="Last 7 days">Last 7 days</option>
-                        <option value="Last 24 hours">Last 24 hours</option>
-                        <option value="Last 3 months">Last 3 months</option>
-                        <option value="All time">All time</option>
-                      </select>
-                      <img 
-                        src="https://c.animaapp.com/mjiggi0jSqvoj5/img/arrow-3-1.svg" 
-                        alt="Dropdown"
-                        className="mobile-dropdown-arrow"
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* Sort by Dropdown */}
-                  <div className="mobile-filter-group">
-                    <label className="mobile-filter-label">Sort by</label>
-                    <div className="mobile-dropdown">
-                      <select 
-                        value={selectedSort}
-                        onChange={(e) => setSelectedSort(e.target.value)}
-                        className="mobile-dropdown-select"
-                      >
-                        <option value="Sort by">Sort by</option>
-                        <option value="Newest first">Newest first</option>
-                        <option value="Oldest first">Oldest first</option>
-                        <option value="Status">Status</option>
-                        <option value="Value">Value</option>
-                      </select>
-                      <img 
-                        src="https://c.animaapp.com/mjiggi0jSqvoj5/img/arrow-3-1.svg" 
-                        alt="Dropdown"
-                        className="mobile-dropdown-arrow"
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* Status Dropdown */}
-                  <div className="mobile-filter-group">
-                    <label className="mobile-filter-label">Status</label>
-                    <div className="mobile-dropdown">
-                      <select 
-                        value={selectedStatus}
-                        onChange={(e) => setSelectedStatus(e.target.value)}
-                        className="mobile-dropdown-select"
-                      >
-                        <option value="Status">Status</option>
-                        <option value="All Status">All Status</option>
-                        <option value="Pending Approval">Pending Approval</option>
-                        <option value="Approved">Approved</option>
-                        <option value="Declined">Declined</option>
-                        <option value="Expired">Expired</option>
-                      </select>
-                      <img 
-                        src="https://c.animaapp.com/mjiggi0jSqvoj5/img/arrow-3-1.svg" 
-                        alt="Dropdown"
-                        className="mobile-dropdown-arrow"
-                      />
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="mobile-filter-actions">
-                  <button onClick={resetFilters} className="mobile-filter-reset">
-                    Reset Filters
-                  </button>
-                  <button onClick={applyFilters} className="mobile-filter-apply">
-                    Apply Filters
-                  </button>
-                </div>
-              </div>
+
+                {/* Improve Your Quote Rate Card */}
+              <InfoWidget 
+                title="Reduce Policy Risk"
+                rateValue={88}
+                description={
+                  <>
+                    7 of your active policies are at risk due to
+                    <strong className="font-medium tracking-[0.03px]"> Missing Documents</strong>
+                  </>
+                }
+                perecntageInfo="Policy Risk Score"
+              />
+           
+
+            {/* Quote Conversion Rate */}
+            <div className="flex-grow min-h-[calc(31%-4px)] xl:flex-[0_0_31%] xl:min-h-auto xl:h-auto">
+              <ConversionChart />
             </div>
-          )}
 
-          {/* CSS Styles */}
-          <style jsx>{`
-            /* Hamburger Menu Styles */
-            .hamburger-menu {
-                display: none;
-            }
+            {/* Quotes Expiration Card */}
+            <QuotesExpirationCard 
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+            />
 
-            .hamburger-btn {
-                width: 44px;
-                height: 44px;
-                background-color: #f7f7f7;
-                border-radius: 8px;
-                border: 1px solid rgba(255, 255, 255, 0.22);
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                gap: 4px;
-                cursor: pointer;
-                padding: 10px;
-            }
 
-            .hamburger-line {
-                width: 20px;
-                height: 2px;
-                background-color: #000000;
-                transition: all 0.3s ease;
-            }
+          </div>
 
-            .hamburger-btn.active .hamburger-line:nth-child(1) {
-                transform: translateY(6px) rotate(45deg);
-            }
-
-            .hamburger-btn.active .hamburger-line:nth-child(2) {
-                opacity: 0;
-            }
-
-            .hamburger-btn.active .hamburger-line:nth-child(3) {
-                transform: translateY(-6px) rotate(-45deg);
-            }
-
-            /* Mobile Navigation Overlay */
-            .mobile-nav-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0, 0, 0, 0.5);
-                z-index: 1000;
-                display: none;
-                opacity: 0;
-                transition: opacity 0.3s ease;
-            }
-
-            .mobile-nav-overlay.active {
-                display: block;
-                opacity: 1;
-            }
-
-            .mobile-nav-container {
-                position: absolute;
-                top: 0;
-                right: 0;
-                width: 300px;
-                height: 100%;
-                background-color: #ffffff;
-                padding: 20px;
-                transform: translateX(100%);
-                transition: transform 0.3s ease;
-                overflow-y: auto;
-            }
-
-            .mobile-nav-overlay.active .mobile-nav-container {
-                transform: translateX(0);
-            }
-
-            .mobile-nav-header {
-                display: flex;
-                justify-content: flex-end;
-                margin-bottom: 30px;
-            }
-
-            .mobile-close-btn {
-                width: 44px;
-                height: 44px;
-                background-color: #f7f7f7;
-                border-radius: 8px;
-                border: 1px solid rgba(255, 255, 255, 0.22);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                font-size: 24px;
-                color: #000000;
-            }
-
-            /* Mobile Filter Overlay - Updated as requested */
-            .mobile-filter-overlay {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                height: 100vh;
-                background-color: rgba(0, 0, 0, 0.5);
-                z-index: 70007;
-                display: none;
-                opacity: 0;
-                transition: opacity 0.3s ease;
-                top: 0;
-            }
-
-            .mobile-filter-overlay.active {
-                display: block;
-                opacity: 1;
-            }
-
-            .mobile-filter-container {
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                height: 75vh;
-                background-color: #ffffff;
-                border-top-left-radius: 20px;
-                border-top-right-radius: 20px;
-                padding: 24px;
-                transform: translateY(100%);
-                transition: transform 0.3s ease;
-                display: flex;
-                flex-direction: column;
-            }
-
-            .mobile-filter-overlay.active .mobile-filter-container {
-                transform: translateY(0);
-            }
-
-            .mobile-filter-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 24px;
-                padding-bottom: 16px;
-                border-bottom: 1px solid #f0f0f0;
-            }
-
-            .mobile-filter-title {
-                font-family: 'Montserrat', sans-serif;
-                font-size: 20px;
-                font-weight: 600;
-                color: #000000;
-            }
-
-            .mobile-close-filter-btn {
-                width: 40px;
-                height: 40px;
-                background-color: #f7f7f7;
-                border-radius: 8px;
-                border: 1px solid rgba(255, 255, 255, 0.22);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-            }
-
-            .mobile-filter-content {
-                flex: 1;
-                overflow-y: auto;
-                padding-right: 8px;
-            }
-
-            .mobile-filter-group {
-                margin-bottom: 20px;
-            }
-
-            .mobile-filter-label {
-                display: block;
-                font-family: 'Montserrat', sans-serif;
-                font-size: 14px;
-                font-weight: 500;
-                color: #606068;
-                margin-bottom: 8px;
-            }
-
-            .mobile-search-input {
-                position: relative;
-                width: 100%;
-            }
-
-            .mobile-search-field {
-                width: 100%;
-                height: 48px;
-                padding: 0 16px 0 40px;
-                border: 1px solid #e3e6ea;
-                border-radius: 8px;
-                font-family: 'Montserrat', sans-serif;
-                font-size: 14px;
-                color: #7b7b7b;
-                background-color: #ffffff;
-                outline: none;
-                transition: border-color 0.3s;
-            }
-
-            .mobile-search-field:focus {
-                border-color: #2563eb;
-            }
-
-            .mobile-search-icon {
-                position: absolute;
-                left: 12px;
-                top: 50%;
-                transform: translateY(-50%);
-                width: 16px;
-                height: 16px;
-                opacity: 0.5;
-            }
-
-            .mobile-dropdown {
-                position: relative;
-                width: 100%;
-            }
-
-            .mobile-dropdown-select {
-                width: 100%;
-                height: 48px;
-                padding: 0 16px;
-                border: 1px solid #e3e6ea;
-                border-radius: 8px;
-                font-family: 'Montserrat', sans-serif;
-                font-size: 14px;
-                color: #7b7b7b;
-                background-color: #ffffff;
-                outline: none;
-                appearance: none;
-                cursor: pointer;
-                transition: border-color 0.3s;
-            }
-
-            .mobile-dropdown-select:focus {
-                border-color: #2563eb;
-            }
-
-            .mobile-dropdown-arrow {
-                position: absolute;
-                right: 12px;
-                top: 50%;
-                transform: translateY(-50%);
-                width: 12px;
-                height: 8px;
-                pointer-events: none;
-            }
-
-            .mobile-filter-actions {
-                display: flex;
-                gap: 12px;
-                margin-top: 20px;
-                padding-top: 16px;
-                border-top: 1px solid #f0f0f0;
-            }
-
-            .mobile-filter-reset {
-                flex: 1;
-                height: 48px;
-                border: 1px solid #e3e6ea;
-                border-radius: 8px;
-                background-color: transparent;
-                font-family: 'Montserrat', sans-serif;
-                font-size: 14px;
-                font-weight: 500;
-                color: #374151;
-                cursor: pointer;
-                transition: all 0.3s;
-            }
-
-            .mobile-filter-reset:hover {
-                background-color: #f3f4f6;
-                border-color: #d1d5db;
-            }
-
-            .mobile-filter-apply {
-                flex: 1;
-                height: 48px;
-                border: none;
-                border-radius: 8px;
-                background-color: #2563eb;
-                font-family: 'Montserrat', sans-serif;
-                font-size: 14px;
-                font-weight: 500;
-                color: #ffffff;
-                cursor: pointer;
-                transition: background-color 0.3s;
-            }
-
-            .mobile-filter-apply:hover {
-                background-color: #1d4ed8;
-            }
-
-            .mobile-nav-search {
-                width: 100%;
-                height: 44px;
-                background-color: #f7f7f7;
-                border-radius: 8px;
-                border: 1px solid rgba(255, 255, 255, 0.22);
-                display: flex;
-                align-items: center;
-                padding: 0 12px;
-                margin-bottom: 20px;
-            }
-
-            .mobile-nav-search input {
-                flex: 1;
-                border: none;
-                background: transparent;
-                font-family: 'Inter', sans-serif;
-                font-size: 14px;
-                color: #000000;
-                outline: none;
-            }
-
-            .mobile-nav-search img {
-                width: 18px;
-                height: 18px;
-            }
-
-            .mobile-nav-links {
-                display: flex;
-                flex-direction: column;
-                gap: 12px;
-                margin-bottom: 30px;
-            }
-
-            .mobile-nav-link {
-                padding: 12px 16px;
-                font-family: 'Inter', sans-serif;
-                font-size: 16px;
-                color: #000000;
-                text-decoration: none;
-                border-radius: 8px;
-                transition: background-color 0.3s ease;
-            }
-
-            .mobile-nav-link.active {
-                background-color: #f7f7f7;
-            }
-
-            .mobile-nav-link:hover {
-                background-color: #ffffff !important;
-            }
-
-            .mobile-nav-actions {
-                display: flex;
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .mobile-action-btn {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                padding: 12px 16px;
-                background-color: #f7f7f7;
-                border: 1px solid rgba(255, 255, 255, 0.22);
-                border-radius: 8px;
-                font-family: 'Inter', sans-serif;
-                font-size: 14px;
-                color: #000000;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            }
-
-            .mobile-action-btn:hover {
-                background-color: #e9e9e9;
-            }
-
-            .mobile-action-btn img {
-                width: 20px;
-                height: 20px;
-            }
-
-            /* User Dropdown Styles */
-            .user-dropdown-arrow {
-                transition: transform 0.2s ease;
-            }
-
-            .user-dropdown-arrow.open {
-                transform: rotate(180deg);
-            }
-
-            @media screen and (max-width: 1336px) {
-            .block-2 {
-        overflow: scroll !important;
-    }
-
-                .activity-header {
-                    display: block;
+          {/* Tablet View (768px - 1279px) - Three Widgets Side by Side */}
+          <div className="
+            hidden max-[1280px]:block min-[769px]:block
+            max-[768px]:hidden
+            max-[1280px]:row-start-1 max-[1280px]:w-full
+            max-[1280px]:mb-2
+          ">
+            <div className="grid grid-cols-3 gap-2 w-full">
+            
+             {/* Improve Your Quote Rate Card */}
+              <InfoWidget 
+                title="Improve Your Quote Rate"
+                rateValue={72}
+                description={
+                  <>
+                    Your Quotes are often Declined due to 
+                    <strong className="font-medium tracking-[0.03px]"> Inaccurate Cargo Value</strong>
+                  </>
                 }
-                
-                .activity-filters {
-                    justify-content: flex-end;
-                }
-                
-                .action-content {
-                    height: 100%;
-                }
-                
-                .action-subtitle {
-                    max-width: 100%;
-                }
-                
-                .action-center {
-                    height: 254px;
-                }
-                
-                .action-bg {
-                    top: 0;
-                }
+              />
+           
 
-                .action-buttons {
-                    max-width: 100%;
-                }
-                
-                .welcome-widget {
-                    height: 352px;
-                }
-                
-                .cta-title {
-                    font-size: 26px;
-                    font-weight: 500;
-                    line-height: 33px;
-                    letter-spacing: 0.64px;
-                    max-width: 224px;
-                }
-            }
+            {/* Quote Conversion Rate */}
+            <div className="flex-grow min-h-[calc(31%-4px)] xl:flex-[0_0_31%] xl:min-h-auto xl:h-auto">
+              <ConversionChart />
+            </div>
 
-            @media screen and (max-width: 1280px) {
-                .main-content {
-                    display: flex;
-                    flex-direction: column-reverse;
-                }
-                
-                .right {
-                    display: flex;
-                    flex-direction: row;
-                    width: 100%;
-                    gap: 16px;
-                }
-                
-                .action-center {
-                    height: 100%;
-                    width: 40%;
-                }
-                
-                .action-bg {
-                    width: 840px;
-                    height: 328px !important;
-                }
-
-                .welcome-title {
-                    font-size: 18px;
-                    margin-bottom: 6px;
-                }
-                
-                .welcome-subtitle {
-                    max-width: 100%;
-                    font-size: 12px;
-                }
-                
-                .cta-title {
-                    font-size: 22px;
-                    line-height: 28px;
-                }
-
-                .quote-conversion.performance-section {
-                    width: 49%;
-                    position: relative;
-                    justify-content: space-between;
-                    display: flex;
-                    flex-direction: column;
-                }
-                
-                .navigation {
-                    display: none;
-                }
-                
-                .activity-mobile-header {
-                    display: flex;
-                    margin-bottom: 16px;
-                }
-                
-                .activity-section-mob-hd {
-                    display: flex;
-                }
-                
-                .welcome-widget {
-                    height: 260px;
-                    width: 49%;
-                }
-                
-                .showin-result-ittle-info {
-                    display: none;
-                }
-                
-                .activity-table {
-                    margin-top: -12px;
-                }
-                
-                .hamburger-menu {
-                    display: block;
-                }
-                
-                /* Hide desktop navigation completely */
-                .navigation {
-                    display: none;
-                }
-            }
-
-            @media screen and (max-width: 1024px) {
-                .welcome-widget, .action-center, .conv-rate {
-                    display: none;
-                }
-                .rate-mob-hid {
-                  display: none !important;
-                }
-                .quote-conversion.performance-section {
-                    width: 100%;
-                    min-height: 170px;
-                }
-                
-                .action-title, .section-title {
-                    font-size: 16px;
-                }
-                
-                .action-subtitle {
-                    margin-bottom: 0px;
-                }
-                
-                .metrics-grid {
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 35px;
-                    padding-left: 20px;
-                }
-                
-                .metric-card-item {
-                    width: 43%;
-                }
-                
-                .section-header {
-                    align-items: center;
-                }
-                
-                .activity-header {
-                    display: none;
-                }
-                
-                .table-header {
-                    display: none;
-                }
-                
-                .activity-table {
-                    margin-top: 0px;
-                }
-                
-                .table-row {
-                    min-width: 100%;
-                    display: flex;
-                    background-color: rgba(250, 252, 255, 0.8);
-                    border-radius: 16px;
-                    flex-wrap: wrap;
-                    gap: 12px;
-                    justify-content: space-between;
-                    padding: 16px;
-                }
-                .table-row button {
-                  width: 100%;
-                }
-                .logo-text {
-                    display: none;
-                }
-                
-                .id-link {
-                    color: #2563eb !important;
-                }
-                
-                .activity-section {
-                    padding: 0;
-                    background-color: transparent;
-                    margin-top: -12px;
-                }
-                
-                .row-cell {
-                    font-family: 'Poppins', sans-serif;
-                    font-size: 14px;
-                    color: #000000;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    width: 45.5%;
-                    gap: 8px;
-                }
-                
-                .container {
-                    max-width: 94% !important;
-                    display: block;
-                }
-                
-                .header {
-                    margin-bottom: 16px;
-                }
-                
-                .user-avatar img {
-                    width: 44px;
-                    height: 44px;
-                }
-
-                .notification-wrapper {
-                    width: 44px;
-                    height: 44px;
-                }
-
-                .notification-icon img {
-                    width: 18px;
-                }
-
-                .notification-badge {
-                    top: 12px;
-                    right: 13px;
-                    width: 6px;
-                    height: 6px;
-                }
-            }
-
-            @media screen and (max-width: 768px) {
-                .metric-value, .metric-value2 {
-                    font-size: 32px;
-                    font-weight: 200;
-                }
-
-                .metrics-grid {
-                    gap: 22px;
-                }
-                
-                .performance-section {
-                    padding: 16px;
-                }
-                
-                .action-title, .section-title {
-                    font-size: 14px;
-                }
-                
-                .mobile-nav-container {
-                    width: 100%;
-                }
-                
-                .hamburger-btn {
-                    width: 40px;
-                    height: 40px;
-                }
-            }
-
-            /* Prevent scrolling when menu is open */
-            body.menu-open {
-                overflow: hidden;
-            }
-
-            .metric-arrow {
-                width: 28px;
-                margin-left: 6px;
-            }
-
-            .btn-primary {
-        width: 100%;
-    }
-
-
-    /* Mobile action button styles for Quotes page */
-.mobile-action-btn {
-  color: #ffffff;
-  cursor: pointer;
-  background-color: #2563EB;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 8px;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  transition: background-color 0.3s;
-  display: flex;
-  text-align: center;
-  justify-content: center;
-  width: 100%;
-  height: 44px;
-  border: 1px solid rgba(0, 0, 255, 0.169);
-}
-
-.mobile-action-btn.primary-btn {
-  background-color: #2563EB;
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-}
-
-.mobile-action-btn.secondary-btn {
-  background-color: transparent;
-  color: #374151;
-  border: 1px solid #e3e6ea;
-}
-
-.mobile-action-btn:hover {
-  background-color: #1d4ed8;
-}
-
-.mobile-action-btn.secondary-btn:hover {
-  background-color: #f3f4f6;
-  border-color: #d1d5db;
-}
-
-/* Mobile status badge - fit content */
-.mobile-status-badge {
-  width: fit-content !important;
-  min-width: fit-content !important;
-  white-space: nowrap !important;
-  padding-left: 12px !important;
-  padding-right: 12px !important;
-  height: 26px;
-  display: inline-flex !important;
-  align-items: center !important;
-}
-
-/* Mobile specific styles for Quotes page */
-@media screen and (max-width: 1024px) {
-  .table-row {
-    min-width: 100%;
-    display: flex;
-    background-color: rgba(250, 252, 255, 0.8);
-    border-radius: 16px;
-    flex-wrap: wrap;
-    gap: 16px;
-    justify-content: space-between;
-    padding: 20px;
-    margin-bottom: 12px;
-  }
-  
-  .row-cell {
-    font-family: 'Poppins', sans-serif;
-    font-size: 14px;
-    color: #000000;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: auto !important;
-    min-width: fit-content !important;
-  }
-  
-  /* Status badge in mobile */
-  .table-row .mobile-status-badge {
-    font-size: 11px !important;
-    padding: 6px 10px !important;
-    height: 24px;
-  }
-  
-  /* Mobile layout spacing */
-  .table-row > .xl\\:hidden {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-  
-  .table-row .xl\\:hidden > div {
-    width: 100%;
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .mobile-action-btn {
-    height: 44px;
-    font-size: 14px;
-    font-weight: 500;
-  }
-  
-  .mobile-status-badge {
-    font-size: 10px !important;
-    padding: 5px 8px !important;
-    height: 22px;
-  }
-  
-  .table-row {
-    padding: 16px;
-    gap: 12px;
-  }
-}
-  /* Additional Styles for Stats Cards */
-.stats-card {
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.3s ease;
-}
-
-.stats-card:hover {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Responsive adjustments for stats cards */
-@media screen and (max-width: 1280px) {
-  .stats-card {
-    width: 49%;
-    min-height: 260px;
-  }
-  
-  .right {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-  
-  .right > div {
-    width: 100%;
-  }
-  
-  .right > .flex.flex-col.gap-4 {
-    flex-direction: row;
-    width: 100%;
-  }
-  
-  .right > .flex.flex-col.gap-4 > .stats-card {
-    width: 49%;
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .right > .flex.flex-col.gap-4 {
-    flex-direction: column;
-  }
-  
-  .right > .flex.flex-col.gap-4 > .stats-card {
-    width: 100%;
-  }
-  
-  .stats-description {
-    max-width: 100% !important;
-  }
-  
-  .card-header {
-    width: 100% !important;
-  }
-  
-  .time-tabs {
-    flex-wrap: wrap;
-  }
-} 
-  /* Stats Cards */
-.stats-card {
-    background-color: #fafcffcc;
-    border-radius: 16px;
-    padding: 24px;
-    width: 100%;
-}
-
-.stats-card h3 {
-    font-family: "Montserrat", Helvetica;
-    font-size: 18px;
-    font-weight: 500;
-    color: #000000;
-    letter-spacing: 0.36px;
-    line-height: normal;
-}
-
-.stats-content {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin-bottom: 24px;
-}
-
-.risk-score {
-    flex-direction: row;
-    gap: 16px;
-    display: flex;
-    align-items: end;
-}
-
-.score-display {
-    display: flex;
-    align-items: flex-start;
-    gap: 3px;
-}
-
-.percentage-symbol {
-    font-size: 10px;
-    font-weight: 400;
-    color: #000000;
-    letter-spacing: 0.20px;
-    line-height: 12px;
-}
-
-.score-number {
-    font-size: 56px;
-    font-weight: 400;
-    color: #000000;
-    letter-spacing: 1.12px;
-    line-height: 36px;
-}
-
-.expiration-score .score-display {
-    align-items: center;
-}
-
-.expiration-score .score-display svg {
-    margin-top: 3px;
-}
-
-.score-label {
-    font-size: 12px;
-    font-weight: 500;
-    color: #c7c7c7;
-    letter-spacing: 0.24px;
-    line-height: normal;
-}
-
-.risk-description {
-    font-size: 12px;
-    font-weight: 400;
-    color: #c7c7c7;
-    letter-spacing: 0.24px;
-    line-height: normal;
-}
-
-.risk-description .highlight {
-    font-weight: 500;
-    color: #afaeae;
-}
-
-.action-button {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: fit-content;
-    padding: 0;
-    background: none;
-    border: none;
-    cursor: pointer;
-    margin-top: auto;
-}
-
-.action-button span {
-    font-size: 16px;
-    font-weight: 400;
-    color: #3c3c3c;
-    letter-spacing: 0.32px;
-    line-height: normal;
-    text-align: left;
-}
-
-.action-button:hover {
-    opacity: 0.8;
-}
-
-.action-button:focus {
-    outline: 2px solid #4a90e2;
-    outline-offset: 2px;
-    border-radius: 4px;
-}
-
-.expiration-info,
-.total-policies {
-    font-size: 12px;
-    font-weight: 500;
-    color: #c7c7c7;
-    letter-spacing: 0.24px;
-    line-height: normal;
-}
-
-.chart-container {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.chart-labels {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.chart-label {
-    font-size: 16px;
-    font-weight: 400;
-    color: #c7c7c7;
-    letter-spacing: 0.32px;
-}
-
-.chart-label-center {
-    font-size: 16px;
-    font-weight: 400;
-    color: #000000;
-    letter-spacing: 0.32px;
-}
-
-.progress-wrapper {
-    position: relative;
-    width: 100%;
-    height: 28px;
-}
-
-.progress-track {
-    position: absolute;
-    top: 10px;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background-color: rgba(252, 220, 162, 0.5);
-    border-radius: 58px;
-}
-
-.progress-fill {
-    background-color: #fca2a200;
-    border-radius: 58px;
-    height: 100%;
-    transition: width .3s;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 78%;
-}
-
-.gradient-bar {
-    position: absolute;
-    top: 4px;
-    left: 0;
-    width: 100%;
-    height: 16px;
-}
-
-.gradient-bar img {
-    display: block;
-    width: 100%;
-    height: 100%;
-}
-
-.triangle-pointer {
-    position: absolute;
-    top: -1px;
-    width: 27px;
-    height: 25px;
-    pointer-events: none;
-    transition: left 0.3s ease;
-}
-
-.triangle-pointer img {
-    display: block;
-    width: 100%;
-    height: 100%;
-}
-
-/* Chart styles */
-.chart-div-item {
-    height: 24px;
-    background-color: #E2E3E4;
-}
-.chart-div-active-item {
-    height: 20px;
-    background-color: #EE9F66;
-}
-.chaart {
-    display: flex;
-    gap: 4px;
-    justify-content: start;
-    align-items: center;
-    overflow: hidden;
-    margin-bottom: 12px;
-}
-.chart-div-item,
-.chart-div-active-item {
-    width: 1px;
-    transform: scaleX(2);
-    transform-origin: left;
-}
-          `}</style>
+            {/* Quotes Expiration Card */}
+            <div className="w-full h-[100%]">
+              <QuotesExpirationCard 
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+            />
+            </div>
+            
+            </div>
+          </div>
         </div>
       </div>
     </DashboardLayout>

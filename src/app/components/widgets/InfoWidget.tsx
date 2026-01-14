@@ -5,13 +5,15 @@ interface InfoWidgetProps {
   rateValue?: number;
   description?: React.ReactNode;
   className?: string;
+  perecntageInfo?: string
 }
 
 export const InfoWidget: React.FC<InfoWidgetProps> = ({
   title = "Improve Your Quote Rate",
   rateValue = 72,
   description,
-  className = ""
+  className = "",
+  perecntageInfo="Quotes"
 }) => {
   const defaultDescription = (
     <>
@@ -28,9 +30,9 @@ export const InfoWidget: React.FC<InfoWidgetProps> = ({
       </h3>
       
       <div className="stats-content">
-        <div className="rate-section relative w-[120px] md:w-[145px] h-[32px] md:h-[39px]">
+        <div className="rate-section relative w-[120px] md:w-[100%] h-[32px] md:h-[39px]">
           <div className="rate-label absolute top-5 md:top-6 left-20 md:left-24 font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px]">
-            Quotes
+            {perecntageInfo}
           </div>
           <div className="rate-value absolute top-0 left-0 w-16 md:w-20 h-[30px] md:h-[37px] flex gap-1 items-baseline">
             {/* Percentage value - responsive text size */}

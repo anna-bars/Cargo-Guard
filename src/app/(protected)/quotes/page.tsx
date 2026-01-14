@@ -3,9 +3,6 @@
 import DashboardLayout from '../DashboardLayout'
 import { useEffect, useState, useRef } from 'react'
 import { ConversionChart } from '../../components/charts/ConversionChart'
-import { WelcomeWidget } from '@/app/components/widgets/WelcomeWidget'
-import { HighValueCargoWidget } from '@/app/components/widgets/HighValueCargoWidget'
-import { PerformanceOverview } from '@/app/components/widgets/PerformanceOverview'
 import { UniversalTable, renderStatus, renderButton } from '@/app/components/tables/UniversalTable';
 import QuotesExpirationCard from '@/app/components/charts/QuotesExpirationCard'
 import InfoWidget from '@/app/components/widgets/InfoWidget'
@@ -152,9 +149,7 @@ const quotesColumns = [
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState('This Week')
   const [loading, setLoading] = useState(true)
-  const [activeWidget, setActiveWidget] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     // Simulate loading data
@@ -177,27 +172,8 @@ export default function DashboardPage() {
     return () => window.removeEventListener('resize', checkScreenSize)
   }, [])
 
-  const handleScroll = () => {
-    if (!scrollContainerRef.current || !isMobile) return
-    
-    const container = scrollContainerRef.current
-    const scrollLeft = container.scrollLeft
-    const widgetWidth = container.clientWidth
-    const currentIndex = Math.round(scrollLeft / widgetWidth)
-    
-    setActiveWidget(currentIndex)
-  }
 
-  const scrollToWidget = (index: number) => {
-    if (!scrollContainerRef.current || !isMobile) return
-    
-    const container = scrollContainerRef.current
-    const widgetWidth = container.clientWidth
-    container.scrollTo({
-      left: index * widgetWidth,
-      behavior: 'smooth'
-    })
-  }
+ 
 
   if (loading) {
     return (
@@ -352,22 +328,6 @@ export default function DashboardPage() {
             />
             </div>
             
-
-
-              {/* <div className="w-full h-[240px]">
-                <WelcomeWidget userName="Lucas" />
-              </div>
-
-              <div className="w-full h-[240px]">
-                <div className="h-full w-full">
-                  <ConversionChart />
-                </div> 
-              </div>
-
-              <div className="w-full h-[240px]">
-                <HighValueCargoWidget percentage={75.55} mtdValue="62,3k" />
-              </div> */}
-
             </div>
           </div>
         </div>
