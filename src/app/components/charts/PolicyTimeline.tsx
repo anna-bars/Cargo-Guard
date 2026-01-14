@@ -131,17 +131,19 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
 
           {/* Gradient Bar */}
           <div className="
-            absolute top-[4px] left-0 w-[281px] h-[16px]
-            max-[1024px]:w-[250px]
-            max-[768px]:w-[270px]
-            max-[480px]:w-[calc(100%-40px)] max-[480px]:top-[3px] max-[480px]:h-[14px]
-          ">
+            absolute top-[4px] left-0 h-[16px]
+            max-[1024px]:h-[16px]
+            max-[768px]:h-[16px]
+            max-[480px]:h-[14px] max-[480px]:top-[3px]
+            " 
+            style={{ width: `${percentage + 10}%` }}
+            >
             <img 
-              src="/shipments/bar.svg" 
-              alt="Gradient bar" 
-              className="w-full h-full object-cover"
+                src="/shipments/bar.svg" 
+                alt="Gradient bar" 
+                className="w-full h-full object-contain"
             />
-          </div>
+            </div>
 
           {/* Triangle Pointer */}
           <div 
@@ -156,7 +158,7 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
             <img 
               src="/shipments/bar0.svg" 
               alt="Progress pointer"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
             />
           </div>
         </div>
