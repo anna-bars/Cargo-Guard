@@ -2,7 +2,7 @@
 
 import DashboardLayout from '../DashboardLayout'
 import { useEffect, useState, useRef } from 'react'
-import { ConversionChart } from '../../components/charts/ConversionChart'
+import { ConversionChart, ConversionChartData } from '../../components/charts/ConversionChart'
 import { UniversalTable, renderStatus, renderButton } from '@/app/components/tables/UniversalTable';
 import QuotesExpirationCard from '@/app/components/charts/QuotesExpirationCard'
 import InfoWidget from '@/app/components/widgets/InfoWidget'
@@ -147,13 +147,18 @@ const quotesColumns = [
 ];
  
 export default function DocumentsPage() {
-  const quotesData = {
-    'Upcoming Expirations & Conversions': { 
-      approved: 17,  // Pending Approval
-      declined: 2,   // Declined
-      expired: 18    // Converted This Month
-    }
-  };
+  const quotesDatas = {
+  'This Week': { approved: 17, declined: 2, expired: 18 },
+  'This Month': { approved: 35, declined: 5, expired: 42 },
+  'Last Month': { approved: 28, declined: 3, expired: 31 },
+  'Last Quarter': { approved: 120, declined: 15, expired: 135 }
+};
+  const defaultData: Record<string, ConversionChartData> = {
+      'This Week': { approved: 12, declined: 5, expired: 8 },
+      'This Month': { approved: 17, declined: 9, expired: 18 },
+      'Last Month': { approved: 22, declined: 7, expired: 15 },
+      'Last Quarter': { approved: 65, declined: 28, expired: 42 }
+    };
   const quotesData2 = {
     'This Week': { totalQuotes: 22, expiringQuotes: 7, expiringRate: 32 },
     'Next Week': { totalQuotes: 18, expiringQuotes: 12, expiringRate: 67 },
@@ -164,8 +169,8 @@ export default function DocumentsPage() {
   // Quotes էջի հատուկ լեյբլները
   const quotesTypeLabels = {
     approved: 'Pending',
-    declined: 'Declined',
-    expired: 'Converted'
+    declined: 'Missing',
+    expired: 'Rejected'
   };
   const [activeTab, setActiveTab] = useState('This Week')
   const [loading, setLoading] = useState(true)
@@ -235,18 +240,23 @@ export default function DocumentsPage() {
 
             <div className="block md:hidden">
               <ConversionChart 
-                title="Upcoming Expirations & Conversions"
-                data={quotesData}
-                defaultActiveTime="Upcoming Expirations & Conversions"
-                showTimeDropdown={false} // Քանի որ միայն մեկ ժամանակահատված կա
+                title="Documents Requiring Action"
+                data={quotesDatas}
+                defaultActiveTime="This Week"
+                showTimeDropdown={true} // Քանի որ միայն մեկ ժամանակահատված կա
                 typeLabels={quotesTypeLabels}
               />
             </div>
             <div className="block md:hidden">
-              <QuotesExpirationCard 
+               <QuotesExpirationCard 
         activeTab={activeTab}
         onTabChange={setActiveTab}
         data={quotesData2}
+        title='Documents Requiring Action'
+         info = 'Policies with Missing Docs'
+        total = 'Total policies'
+        sub = 'Policies Missing Docs'
+        percentageInfo = 'Policies'
       />
             </div>
 
@@ -310,10 +320,10 @@ export default function DocumentsPage() {
             {/* Quote Conversion Rate */}
             <div className="flex-grow min-h-[calc(31%-4px)] xl:flex-[0_0_31%] xl:min-h-auto xl:h-auto">
              <ConversionChart 
-                title="Upcoming Expirations & Conversions"
-                data={quotesData}
-                defaultActiveTime="Upcoming Expirations & Conversions"
-                showTimeDropdown={false} // Քանի որ միայն մեկ ժամանակահատված կա
+                title="Documents Requiring Action"
+                data={quotesDatas}
+                defaultActiveTime="This Week"
+                showTimeDropdown={true} // Քանի որ միայն մեկ ժամանակահատված կա
                 typeLabels={quotesTypeLabels}
               />
             </div>
@@ -323,8 +333,12 @@ export default function DocumentsPage() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         data={quotesData2}
+        title='Documents Requiring Action'
+         info = 'Policies with Missing Docs'
+        total = 'Total policies'
+        sub = 'Policies Missing Docs'
+        percentageInfo = 'Policies'
       />
-
 
           </div>
 
@@ -354,10 +368,10 @@ export default function DocumentsPage() {
             {/* Quote Conversion Rate */}
             <div className="flex-grow min-h-[calc(31%-4px)] xl:flex-[0_0_31%] xl:min-h-auto xl:h-auto">
               <ConversionChart 
-                title="Upcoming Expirations & Conversions"
-                data={quotesData}
-                defaultActiveTime="Upcoming Expirations & Conversions"
-                showTimeDropdown={false} // Քանի որ միայն մեկ ժամանակահատված կա
+                title="Documents Requiring Action"
+                data={quotesDatas}
+                defaultActiveTime="This Week"
+                showTimeDropdown={true} // Քանի որ միայն մեկ ժամանակահատված կա
                 typeLabels={quotesTypeLabels}
               />
             </div>
@@ -368,6 +382,11 @@ export default function DocumentsPage() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         data={quotesData2}
+        title='Documents Requiring Action'
+         info = 'Policies with Missing Docs'
+        total = 'Total policies'
+        sub = 'Policies Missing Docs'
+        percentageInfo = 'Policies'
       />
             </div>
             
