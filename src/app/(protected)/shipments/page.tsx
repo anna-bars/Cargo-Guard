@@ -287,6 +287,7 @@ export default function ShipmentsPage() {
                     <strong className="font-medium tracking-[0.03px]"> Inaccurate Cargo Value</strong>
                   </>
                 }
+                perecntageInfo="Approved Submissions"
               />
            
 
