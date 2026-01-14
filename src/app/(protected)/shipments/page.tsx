@@ -6,6 +6,7 @@ import { ConversionChart } from '../../components/charts/ConversionChart'
 import { UniversalTable, renderStatus, renderButton } from '@/app/components/tables/UniversalTable';
 import QuotesExpirationCard from '@/app/components/charts/QuotesExpirationCard'
 import InfoWidget from '@/app/components/widgets/InfoWidget'
+import { PolicyTimelineWidget } from '@/app/components/charts/PolicyTimeline';
 
 // Dashboard-ի տվյալներ - ԼՐԱՑՈՒՄ
 const quotesRows = [
@@ -280,10 +281,11 @@ export default function ShipmentsPage() {
               />
            
 
-            {/* Quote Conversion Rate */}
-            <div className="flex-grow min-h-[calc(31%-4px)] xl:flex-[0_0_31%] xl:min-h-auto xl:h-auto">
-              <ConversionChart />
-            </div>
+            <PolicyTimelineWidget 
+            percentage={65}
+            expiringPolicies={5}
+            totalPolicies={15}
+          />
 
             {/* Quotes Expiration Card */}
             <QuotesExpirationCard 
