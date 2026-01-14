@@ -325,22 +325,49 @@ export default function DashboardPage() {
             max-[1280px]:mb-2
           ">
             <div className="grid grid-cols-3 gap-2 w-full">
-              {/* Welcome Widget */}
-              <div className="w-full h-[240px]">
+            
+             {/* Improve Your Quote Rate Card */}
+              <InfoWidget 
+                title="Improve Your Quote Rate"
+                rateValue={72}
+                description={
+                  <>
+                    Your Quotes are often Declined due to 
+                    <strong className="font-medium tracking-[0.03px]"> Inaccurate Cargo Value</strong>
+                  </>
+                }
+              />
+           
+
+            {/* Quote Conversion Rate */}
+            <div className="flex-grow min-h-[calc(31%-4px)] xl:flex-[0_0_31%] xl:min-h-auto xl:h-auto">
+              <ConversionChart />
+            </div>
+
+            {/* Quotes Expiration Card */}
+            <div className="w-full h-[100%]">
+              <QuotesExpirationCard 
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+            />
+            </div>
+            
+
+
+              {/* <div className="w-full h-[240px]">
                 <WelcomeWidget userName="Lucas" />
               </div>
 
-              {/* Conversion Chart */}
               <div className="w-full h-[240px]">
                 <div className="h-full w-full">
                   <ConversionChart />
                 </div> 
               </div>
 
-              {/* High Value Cargo */}
               <div className="w-full h-[240px]">
                 <HighValueCargoWidget percentage={75.55} mtdValue="62,3k" />
-              </div>
+              </div> */}
+
             </div>
           </div>
         </div>

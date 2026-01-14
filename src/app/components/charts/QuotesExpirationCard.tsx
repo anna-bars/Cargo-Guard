@@ -253,7 +253,11 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
           justify-content: space-between;
           max-height: 34%;
         }
-        
+       @media (max-width: 1280px) {
+  .stats-card {
+    max-height: 100%;
+  }
+}
         .chart-container {
           flex: 1;
           display: flex;
@@ -367,7 +371,7 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
         </div>
         
         {/* Միջին բլոկ - Տոկոս և տվյալներ */}
-        <div className="expiration-stats h-[inherit] relative w-[149px] hidden md:block">
+        <div className="expiration-stats h-[inherit] relative w-[149px] hidden xl:block">
           <div className="expiration-left absolute top-0 left-0.5 w-[143px] h-11 flex gap-3">
             <div className="expiration-rate w-20 h-10 flex gap-1 items-baseline">
               <span className="ml-4 rate-number font-montserrat text-[56px] text-black font-normal tracking-[1.12px] leading-10 w-16 transition-all duration-500"
