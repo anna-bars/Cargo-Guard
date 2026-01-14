@@ -146,7 +146,21 @@ const quotesColumns = [
   }
 ];
  
-export default function DashboardPage() {
+export default function QuotesPage() {
+  const quotesData = {
+    'Upcoming Expirations & Conversions': { 
+      approved: 17,  // Pending Approval
+      declined: 2,   // Declined
+      expired: 18    // Converted This Month
+    }
+  };
+  
+  // Quotes էջի հատուկ լեյբլները
+  const quotesTypeLabels = {
+    approved: 'Pending',
+    declined: 'Declined',
+    expired: 'Converted'
+  };
   const [activeTab, setActiveTab] = useState('This Week')
   const [loading, setLoading] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
@@ -214,7 +228,13 @@ export default function DashboardPage() {
                 </div> 
 
             <div className="block md:hidden">
-              <ConversionChart />
+              <ConversionChart 
+                title="Upcoming Expirations & Conversions"
+                data={quotesData}
+                defaultActiveTime="Upcoming Expirations & Conversions"
+                showTimeDropdown={false} // Քանի որ միայն մեկ ժամանակահատված կա
+                typeLabels={quotesTypeLabels}
+              />
             </div>
             <div className="block md:hidden">
               <QuotesExpirationCard 
@@ -281,7 +301,13 @@ export default function DashboardPage() {
 
             {/* Quote Conversion Rate */}
             <div className="flex-grow min-h-[calc(31%-4px)] xl:flex-[0_0_31%] xl:min-h-auto xl:h-auto">
-              <ConversionChart />
+             <ConversionChart 
+                title="Upcoming Expirations & Conversions"
+                data={quotesData}
+                defaultActiveTime="Upcoming Expirations & Conversions"
+                showTimeDropdown={false} // Քանի որ միայն մեկ ժամանակահատված կա
+                typeLabels={quotesTypeLabels}
+              />
             </div>
 
             {/* Quotes Expiration Card */}
@@ -317,7 +343,13 @@ export default function DashboardPage() {
 
             {/* Quote Conversion Rate */}
             <div className="flex-grow min-h-[calc(31%-4px)] xl:flex-[0_0_31%] xl:min-h-auto xl:h-auto">
-              <ConversionChart />
+              <ConversionChart 
+                title="Upcoming Expirations & Conversions"
+                data={quotesData}
+                defaultActiveTime="Upcoming Expirations & Conversions"
+                showTimeDropdown={false} // Քանի որ միայն մեկ ժամանակահատված կա
+                typeLabels={quotesTypeLabels}
+              />
             </div>
 
             {/* Quotes Expiration Card */}

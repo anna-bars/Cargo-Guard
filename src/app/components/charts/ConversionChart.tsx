@@ -1,28 +1,83 @@
 import React, { useRef, useEffect, useState, useCallback, JSX } from 'react';
 
-export const ConversionChart = () => {
+// Սահմանել տիպեր տարբեր տվյալների համար
+export interface ConversionChartData {
+  approved: number;
+  declined: number;
+  expired: number;
+}
+
+export interface ConversionChartProps {
+  // Տեսականու անվանում
+  title?: string;
+  // Տվյալներ տարբեր ժամանակահատվածների համար
+  data?: Record<string, ConversionChartData>;
+  // Լռելյայն ակտիվ ժամանակահատված
+  defaultActiveTime?: string;
+  // Օգտագործել dropdown-ը ժամանակահատվածների ընտրության համար
+  showTimeDropdown?: boolean;
+  // Տեսակների տեքստերը (կարող են լինել կամայական)
+  typeLabels?: {
+    approved: string;
+    declined: string;
+    expired: string;
+  };
+  // Գույների կարգավորումներ (ըստ ցանկության)
+  colors?: {
+    approved: { start: string; end: string };
+    declined: { start: string; end: string };
+    expired: { start: string; end: string };
+  };
+  // Հատուկ մշակում հովերի համար
+  onHoverType?: (type: string | null) => void;
+  // Հատուկ մշակում ժամանակահատվածի ընտրության համար
+  onTimeChange?: (time: string) => void;
+}
+
+export const ConversionChart: React.FC<ConversionChartProps> = ({
+  title = 'Quote Conversion Rate',
+  data: externalData,
+  defaultActiveTime = 'This Month',
+  showTimeDropdown = true,
+  typeLabels = {
+    approved: 'approved',
+    declined: 'declined',
+    expired: 'expired'
+  },
+  colors = {
+    approved: { start: '#BED5F8', end: '#669CEE' },
+    declined: { start: '#F8E2BE', end: '#EEDE66' },
+    expired: { start: '#FFA4A4', end: '#EB6025' }
+  },
+  onHoverType,
+  onTimeChange
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [hoveredType, setHoveredType] = useState<string | null>(null);
-  const [activeTime, setActiveTime] = useState('This Month');
+  const [activeTime, setActiveTime] = useState(defaultActiveTime);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [animationStage, setAnimationStage] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [animatingData, setAnimatingData] = useState<{approved: number, declined: number, expired: number} | null>(null);
+  const [animatingData, setAnimatingData] = useState<ConversionChartData | null>(null);
   const [animatingTime, setAnimatingTime] = useState<string | null>(null);
   
-  const timeOptions = ['This Week', 'This Month', 'Last Month', 'Last Quarter'];
-  
-  const timeData: Record<string, {approved: number, declined: number, expired: number}> = {
+  // Լռելյայն տվյալներ, եթե չեն տրամադրվել
+  const defaultData: Record<string, ConversionChartData> = {
     'This Week': { approved: 12, declined: 5, expired: 8 },
     'This Month': { approved: 17, declined: 9, expired: 18 },
     'Last Month': { approved: 22, declined: 7, expired: 15 },
     'Last Quarter': { approved: 65, declined: 28, expired: 42 }
   };
   
+  const data = externalData || defaultData;
+  
+  // Ստանալ առկա ժամանակահատվածները
+  const timeOptions = Object.keys(data);
+  
   const calculateBarsCount = useCallback((width: number) => {
     if (width <= 320) return 40;
     if (width <= 400) return 45;
-    return 60; // Փոխել ենք 49-ից 60, որ matches the design
+    return 60;
   }, []);
 
   const [barsCount, setBarsCount] = useState(60);
@@ -43,12 +98,18 @@ export const ConversionChart = () => {
     };
   }, [calculateBarsCount]);
 
+  useEffect(() => {
+    if (onHoverType) {
+      onHoverType(hoveredType);
+    }
+  }, [hoveredType, onHoverType]);
+
   const handleTimeSelect = (time: string) => {
     if (time !== activeTime) {
       setIsDropdownOpen(false);
       setIsAnimating(true);
       setAnimatingTime(time);
-      setAnimatingData(timeData[time]);
+      setAnimatingData(data[time]);
       setAnimationStage(1);
       
       setTimeout(() => {
@@ -61,6 +122,11 @@ export const ConversionChart = () => {
             setIsAnimating(false);
             setAnimatingData(null);
             setAnimatingTime(null);
+            
+            // Կանչել callback, եթե կա
+            if (onTimeChange) {
+              onTimeChange(time);
+            }
           }, 300);
         }, 300);
       }, 300);
@@ -73,8 +139,8 @@ export const ConversionChart = () => {
     if (isAnimating && animatingData) {
       return animatingData;
     }
-    return timeData[activeTime];
-  }, [isAnimating, animatingData, activeTime]);
+    return data[activeTime];
+  }, [isAnimating, animatingData, activeTime, data]);
 
   const shouldShowNumber = (type: string) => {
     if (!isAnimating) return true;
@@ -89,23 +155,17 @@ export const ConversionChart = () => {
   const getDisplayNumber = (type: string) => {
     const currentData = getCurrentDataForBars();
     
-    if (!isAnimating || !animatingData) return currentData[type as keyof typeof currentData];
+    if (!isAnimating || !animatingData) return currentData[type as keyof ConversionChartData];
     
     if (type === 'approved' && animationStage < 1) return 0;
     if (type === 'declined' && animationStage < 2) return 0;
     if (type === 'expired' && animationStage < 3) return 0;
     
-    return animatingData[type as keyof typeof animatingData];
+    return animatingData[type as keyof ConversionChartData];
   };
 
   const getGradientColor = (type: string, progress: number): string => {
-    const gradients: Record<string, { start: string; end: string }> = {
-      approved: { start: '#BED5F8', end: '#669CEE' },
-      declined: { start: '#F8E2BE', end: '#EEDE66' },
-      expired: { start: '#FFA4A4', end: '#EB6025' }
-    };
-    
-    const gradient = gradients[type];
+    const gradient = colors[type as keyof typeof colors];
     if (!gradient) return '#000000';
     
     const startR = parseInt(gradient.start.slice(1, 3), 16);
@@ -167,10 +227,9 @@ export const ConversionChart = () => {
     
     const bars: JSX.Element[] = [];
     
-    // Յուրաքանչյուր տեսակի համար հաշվել գծիկների քանակը ընդհանուր գծիկների քանակի նկատմամբ
+    // Յուրաքանչյուր տեսակի համար հաշվել գծիկների քանակը
     const barsPerType = chartData.map(item => ({
       ...item,
-      // Հաշվել տոկոսային մասնաբաժինը և բազմապատկել ընդհանուր գծիկների քանակով
       barCount: Math.round((item.count / total) * barsCount)
     }));
     
@@ -181,12 +240,10 @@ export const ConversionChart = () => {
     let diff = barsCount - totalBars;
     
     if (diff !== 0) {
-      // Տեսակները դասավորել ըստ barCount-ի (մեծից փոքր)
       const sortedIndices = [...barsPerType.keys()].sort(
         (a, b) => barsPerType[b].barCount - barsPerType[a].barCount
       );
       
-      // Ավելացնել/հանել տարբերությունը, սկսելով ամենամեծ barCount-ով տեսակից
       let index = 0;
       while (diff !== 0) {
         const currentIndex = sortedIndices[index % sortedIndices.length];
@@ -273,17 +330,12 @@ export const ConversionChart = () => {
             }}
             onMouseEnter={() => setHoveredType(barType)}
             onMouseLeave={() => setHoveredType(null)}
-            title={`${barType}: ${item.count}`}
+            title={`${typeLabels[barType as keyof typeof typeLabels]}: ${item.count}`}
           />
         );
         barIndex++;
       }
     });
-    
-    console.log(`Bars distribution:`, barsPerType.map(item => 
-      `${item.type}: ${item.count} (${Math.round((item.count/total)*100)}%) -> ${item.barCount} bars`
-    ));
-    console.log(`Total bars: ${bars.length}, Expected: ${barsCount}`);
     
     return bars;
   };
@@ -292,69 +344,70 @@ export const ConversionChart = () => {
     <div className="flex flex-col justify-between border border-[#d1d1d154] bg-[#fdfdf8cf] rounded-2xl p-4 h-full w-full quote-conversion performance-section hover:shadow-sm transition-shadow duration-300">
       <div className="mb-[4px] gap-2 md:flex-col flex justify-between flex-row">
         <h3 className="font-montserrat text-[18px] font-normal text-black action-title max-[1024px]:text-[14px]">
-          Quote Conversion Rate
+          {title}
         </h3>
         
-        <div className="relative">
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsDropdownOpen(!isDropdownOpen);
-            }}
-            className="flex items-center gap-1 font-montserrat text-xs font-medium text-[#6f6f6f] tracking-[0.24px] cursor-pointer whitespace-nowrap px-3 py-1 border border-[#e2e3e4] rounded-lg hover:bg-gray-50 hover:border-[#669CEE] hover:text-[#669CEE] transition-all duration-300"
-          >
-            {isAnimating && animatingTime ? animatingTime : activeTime}
-            <svg 
-              className={`w-3 h-3 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          
-          {isDropdownOpen && (
-            <div 
-              className="absolute left-0 top-full mt-1 bg-white min-w-[140px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] rounded-lg z-20 py-1"
-              style={{
-                animationName: 'slideUpFade',
-                animationDuration: '0.3s',
-                animationTimingFunction: 'ease'
+        {showTimeDropdown && timeOptions.length > 1 && (
+          <div className="relative">
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsDropdownOpen(!isDropdownOpen);
               }}
+              className="flex items-center gap-1 font-montserrat text-xs font-medium text-[#6f6f6f] tracking-[0.24px] cursor-pointer whitespace-nowrap px-3 py-1 border border-[#e2e3e4] rounded-lg hover:bg-gray-50 hover:border-[#669CEE] hover:text-[#669CEE] transition-all duration-300"
             >
-              {timeOptions.map((time, index) => (
-                <div 
-                  key={time}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleTimeSelect(time);
-                  }}
-                  className={`
-                    px-4 py-2 cursor-pointer font-montserrat text-xs font-medium tracking-[0.24px]
-                    hover:bg-gray-50 transition-all duration-200
-                    ${activeTime === time 
-                      ? 'text-[#669CEE] underline font-semibold bg-blue-50' 
-                      : 'text-[#6f6f6f] hover:text-[#669CEE]'
-                    }
-                  `}
-                  style={{
-                    animationName: 'slideUpFade',
-                    animationDuration: '0.3s',
-                    animationTimingFunction: 'ease',
-                    animationDelay: `${index * 50}ms`,
-                    animationFillMode: 'both'
-                  }}
-                >
-                  {time}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+              {isAnimating && animatingTime ? animatingTime : activeTime}
+              <svg 
+                className={`w-3 h-3 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            
+            {isDropdownOpen && (
+              <div 
+                className="absolute left-0 top-full mt-1 bg-white min-w-[140px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] rounded-lg z-20 py-1"
+                style={{
+                  animationName: 'slideUpFade',
+                  animationDuration: '0.3s',
+                  animationTimingFunction: 'ease'
+                }}
+              >
+                {timeOptions.map((time, index) => (
+                  <div 
+                    key={time}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleTimeSelect(time);
+                    }}
+                    className={`
+                      px-4 py-2 cursor-pointer font-montserrat text-xs font-medium tracking-[0.24px]
+                      hover:bg-gray-50 transition-all duration-200
+                      ${activeTime === time 
+                        ? 'text-[#669CEE] underline font-semibold bg-blue-50' 
+                        : 'text-[#6f6f6f] hover:text-[#669CEE]'
+                      }
+                    `}
+                    style={{
+                      animationName: 'slideUpFade',
+                      animationDuration: '0.3s',
+                      animationTimingFunction: 'ease',
+                      animationDelay: `${index * 50}ms`,
+                      animationFillMode: 'both'
+                    }}
+                  >
+                    {time}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
       
-      {/* Դուրս բերել dropdown-ը դիվից, որպեսզի այն չգերադասի */}
       {isDropdownOpen && (
         <div 
           className="fixed inset-0 z-10"
@@ -386,7 +439,7 @@ export const ConversionChart = () => {
                     style={{ cursor: 'pointer' }}
                   >
                     <div className="text-[13px] text-[#C8C8C8] capitalize">
-                      {item.type}
+                      {typeLabels[item.type as keyof typeof typeLabels]}
                     </div>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <div 
