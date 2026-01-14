@@ -13,16 +13,36 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
 }) => {
   const scoreNumber = percentage.toString();
   const [isHovered, setIsHovered] = useState(false);
-  const [animatedPercentage, setAnimatedPercentage] = useState(0);
+  const [animatedPercentage, setAnimatedPercentage] = useState(percentage);
 
-  // Անիմացիա համար
+  // Smooth անիմացիա համար hover-ի ժամանակ
   useEffect(() => {
     if (isHovered) {
-      const timer = setTimeout(() => {
-        setAnimatedPercentage(percentage);
-      }, 50);
-      return () => clearTimeout(timer);
+      // Smooth անիմացիա hover-ի սկզբում
+      let startValue = 0;
+      const endValue = percentage;
+      const duration = 700;
+      const startTime = Date.now();
+
+      const animate = () => {
+        const currentTime = Date.now();
+        const elapsedTime = currentTime - startTime;
+        const progress = Math.min(elapsedTime / duration, 1);
+        
+        // Ease out cubic ֆունկցիա
+        const easeProgress = 1 - Math.pow(1 - progress, 3);
+        const currentValue = startValue + (endValue - startValue) * easeProgress;
+        
+        setAnimatedPercentage(currentValue);
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      };
+
+      requestAnimationFrame(animate);
     } else {
+      // Արագ վերադառնալ սկզբնական արժեքին
       setAnimatedPercentage(percentage);
     }
   }, [isHovered, percentage]);
@@ -42,6 +62,7 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
         backdrop-blur-[10px] rounded-[16px] p-4 justify-between
         flex flex-col gap-0 border border-[#d1d1d154] bg-[#fdfdf8cf] rounded-2xl p-4 
         hover:shadow-sm transition-all duration-300 ease-out
+        group
       "
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -53,6 +74,7 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
         max-[768px]:text-[17px]
         max-[480px]:text-[15px]
         transition-all duration-300 ease-out
+        group-hover:text-[#2a2a2a]
       ">
         Policy Expiration Timeline
       </h3>
@@ -65,6 +87,8 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
             max-[1024px]:text-[9px]
             max-[480px]:text-[8px]
             absolute -top-[5px]
+            transition-all duration-300 ease-out
+            group-hover:text-[#2a2a2a]
           ">%</span>
           
           <span className="
@@ -74,6 +98,7 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
             max-[480px]:text-[42px] max-[480px]:tracking-[0.84px]
             ml-4
             transition-all duration-300 ease-out
+            group-hover:text-[#2a2a2a]
           ">
             {scoreNumber}
           </span>
@@ -85,6 +110,7 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
           max-[1024px]:text-[11px]
           max-[480px]:text-[10px]
           transition-all duration-300 ease-out
+          group-hover:text-[#b0b0b0]
         ">
           Policies
         </span>
@@ -96,6 +122,7 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
         max-[1024px]:text-[11px]
         max-[480px]:text-[10px]
         transition-all duration-300 ease-out
+        group-hover:text-[#b0b0b0]
       ">
         Total expiring policies: {expiringPolicies} / {totalPolicies}
       </p>
@@ -113,6 +140,7 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
           <span className="
             text-[12px] font-normal text-[#c7c7c7] tracking-[0.32px]
             transition-all duration-300 ease-out
+            group-hover:text-[#b0b0b0]
           ">
             0%
           </span>
@@ -120,6 +148,7 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
           <span className="
             text-[12px] font-normal text-black tracking-[0.32px]
             transition-all duration-300 ease-out
+            group-hover:text-[#2a2a2a]
           ">
             50%
           </span>
@@ -127,21 +156,19 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
           <span className="
             text-[12px] font-normal text-[#c7c7c7] tracking-[0.32px]
             transition-all duration-300 ease-out
+            group-hover:text-[#b0b0b0]
           ">
             100%
           </span>
         </div>
 
         {/* Progress Bar Container */}
-        <div 
-          className="
-            relative w-[340px] h-[28px] max-w-full
-            max-[1024px]:w-[300px]
-            max-[768px]:w-[320px]
-            max-[480px]:w-full max-[480px]:h-[24px]
-            group
-          "
-        >
+        <div className="
+          relative w-[340px] h-[28px] max-w-full
+          max-[1024px]:w-[300px]
+          max-[768px]:w-[320px]
+          max-[480px]:w-full max-[480px]:h-[24px]
+        ">
           {/* Progress Track */}
           <div className="
             absolute top-[10px] left-0 w-full h-[4px]
@@ -149,13 +176,14 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
             max-[480px]:top-[8px] max-[480px]:h-[3px]
             transition-all duration-300 ease-out
             overflow-hidden
+            group-hover:bg-[rgba(252,220,162,0.6)]
           ">
             {/* Progress Fill with Glow Effect */}
             <div 
               className="
                 absolute top-0 left-0 h-full bg-[#FCDCA2] rounded-[58px]
                 transition-all duration-700 ease-out
-                group-hover:shadow-[0_0_15px_rgba(252,220,162,0.8)]
+                group-hover:shadow-[0_0_12px_rgba(252,220,162,0.7)]
                 group-hover:brightness-110
               "
               style={{ width: `${animatedPercentage}%` }}
@@ -165,7 +193,7 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
                 absolute inset-0 w-full h-full
                 bg-gradient-to-r from-transparent via-white/20 to-transparent
                 opacity-0 group-hover:opacity-100
-                transition-opacity duration-500 ease-out
+                transition-opacity duration-700 ease-out
               "></div>
             </div>
           </div>
@@ -178,30 +206,20 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
               max-[768px]:h-[16px]
               max-[480px]:h-[14px] max-[480px]:top-[3px]
               transition-all duration-700 ease-out
-              group-hover:scale-y-110
+              group-hover:scale-y-[1.08]
               group-hover:origin-bottom
             " 
-            style={{ width: `${animatedPercentage + 10}%` }}
+            style={{ width: `${Math.min(animatedPercentage + 10, 100)}%` }}
           >
             <img 
               src="/shipments/bar.svg" 
               alt="Gradient bar" 
               className="
                 w-full h-full object-contain
-                transition-all duration-500 ease-out
-                group-hover:brightness-125
-                group-hover:contrast-110
+                transition-all duration-700 ease-out
+                group-hover:brightness-110
               "
             />
-            
-            {/* Overlay Glow Effect */}
-            <div className="
-              absolute inset-0 w-full h-full
-              opacity-0 group-hover:opacity-40
-              transition-opacity duration-500 ease-out
-              bg-gradient-to-r from-transparent via-yellow-100 to-transparent
-              blur-[2px]
-            "></div>
           </div>
 
           {/* Triangle Pointer with Enhanced Hover */}
@@ -211,13 +229,10 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
               pointer-events-none transition-all duration-700 ease-out
               max-[1024px]:w-[24px] max-[1024px]:h-[22px]
               max-[480px]:w-[20px] max-[480px]:h-[18px]
-              group-hover:scale-110
-              group-hover:drop-shadow-[0_0_8px_rgba(252,220,162,0.9)]
-              group-hover:z-10
+              group-hover:scale-105
             "
             style={{ 
               left: `calc(${animatedPercentage}% - ${window.innerWidth < 480 ? 10 : window.innerWidth < 1024 ? 12 : 13.5}px)`,
-              transform: isHovered ? 'translateY(-2px)' : 'translateY(0)'
             }}
           >
             <img 
@@ -225,36 +240,25 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
               alt="Progress pointer"
               className="
                 w-full h-full object-contain
-                transition-all duration-500 ease-out
+                transition-all duration-700 ease-out
                 group-hover:brightness-110
               "
             />
-            
-            {/* Pointer Glow */}
-            <div className="
-              absolute inset-0 w-full h-full
-              opacity-0 group-hover:opacity-100
-              transition-opacity duration-500 ease-out
-              bg-gradient-to-b from-yellow-200/30 to-transparent
-              blur-[3px]
-            "></div>
           </div>
 
-          {/* Pulse Effect on Hover */}
-          {isHovered && (
-            <div className="
+          {/* Pulse Effect Container */}
+          <div 
+            className="
               absolute top-[10px] h-[4px]
               rounded-[58px]
               transition-all duration-300 ease-out
-              animate-pulse
+              opacity-0 group-hover:opacity-100
             "
             style={{ 
               width: `${animatedPercentage}%`,
               background: 'linear-gradient(90deg, rgba(252,220,162,0.3) 0%, rgba(252,220,162,0.6) 50%, rgba(252,220,162,0.3) 100%)',
-              boxShadow: '0 0 20px rgba(252,220,162,0.4)'
-            }}>
-            </div>
-          )}
+            }}
+          />
         </div>
       </div>
     </div>
