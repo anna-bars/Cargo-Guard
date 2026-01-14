@@ -16,7 +16,7 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
   return (
     <div className="
       relative w-full font-montserrat flex-grow min-h-[calc(29%-4px)] 
-      xl:flex-[0_0_28%] xl:min-h-auto xl:h-auto
+      xl:flex-[0_0_31%] xl:min-h-auto xl:h-auto
       max-[1336px]:flex-grow max-[1336px]:min-h-auto max-[1336px]:h-auto
       max-[1280px]:flex-grow max-[1280px]:min-h-[240px] max-[1280px]:h-[240px] max-[1280px]:block
       max-[768px]:w-[49%] max-[1024px]:min-h-[240px] max-[1024px]:max-h-[240px]
@@ -24,26 +24,27 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
       max-[768px]:flex-shrink-0 max-[768px]:w-[100%] max-[768px]:min-h-[240px] 
       max-[768px]:max-h-[280px]
       max-[480px]:w-[100%] max-[480px]:min-h-[100%] max-[480px]:max-h-[100%]
-      backdrop-blur-[10px] rounded-[16px] p-6
-      flex flex-col gap-5 border border-[#d1d1d154] bg-[#fdfdf8cf] rounded-2xl p-4 hover:shadow-sm transition-shadow duration-300
+      backdrop-blur-[10px] rounded-[16px] p-4 justify-between
+      flex flex-col gap-0 border border-[#d1d1d154] bg-[#fdfdf8cf] rounded-2xl p-4 hover:shadow-sm transition-shadow duration-300
     ">
       {/* Card Title */}
-      <h2 className="
+      <h3 className="
         text-[18px] font-medium text-black tracking-[0.36px] leading-normal
         max-[1024px]:text-[16px]
         max-[768px]:text-[17px]
         max-[480px]:text-[15px]
       ">
         Policy Expiration Timeline
-      </h2>
+      </h3>
 
       {/* Score Display */}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-row items-end relative gap-4">
         <div className="flex items-center gap-[3px]">
           <span className="
             text-[10px] font-normal text-black tracking-[0.20px] leading-[12px]
             max-[1024px]:text-[9px]
             max-[480px]:text-[8px]
+            absolute -top-[5px]
           ">%</span>
           
           <span className="
@@ -51,6 +52,7 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
             max-[1024px]:text-[48px] max-[1024px]:tracking-[0.96px]
             max-[768px]:text-[50px]
             max-[480px]:text-[42px] max-[480px]:tracking-[0.84px]
+            ml-4
           ">
             {scoreNumber}
           </span>
@@ -72,11 +74,11 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
         max-[1024px]:text-[11px]
         max-[480px]:text-[10px]
       ">
-        Total expiring policies: {expiringPolicies}
+        Total expiring policies: {expiringPolicies} / {totalPolicies}
       </p>
 
       {/* Chart Container */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 flex-col-reverse">
         {/* Chart Labels */}
         <div className="
           flex justify-between items-center
@@ -86,25 +88,19 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
           max-[480px]:w-full
         ">
           <span className="
-            text-[16px] font-normal text-[#c7c7c7] tracking-[0.32px]
-            max-[1024px]:text-[14px]
-            max-[480px]:text-[12px]
+            text-[12px] font-normal text-[#c7c7c7] tracking-[0.32px]
           ">
             0%
           </span>
           
           <span className="
-            text-[16px] font-normal text-black tracking-[0.32px]
-            max-[1024px]:text-[14px]
-            max-[480px]:text-[12px]
+            text-[12px] font-normal text-black tracking-[0.32px]
           ">
             50%
           </span>
           
           <span className="
-            text-[16px] font-normal text-[#c7c7c7] tracking-[0.32px]
-            max-[1024px]:text-[14px]
-            max-[480px]:text-[12px]
+            text-[12px] font-normal text-[#c7c7c7] tracking-[0.32px]
           ">
             100%
           </span>
@@ -166,14 +162,7 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
         </div>
       </div>
 
-      {/* Total Policies */}
-      <p className="
-        text-[12px] font-medium text-[#c7c7c7] tracking-[0.24px] leading-normal mt-2
-        max-[1024px]:text-[11px]
-        max-[480px]:text-[10px]
-      ">
-        Total policies: {totalPolicies}
-      </p>
+      
     </div>
   );
 };
