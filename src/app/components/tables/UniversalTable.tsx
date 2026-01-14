@@ -316,16 +316,11 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
       )}
       
       {/* 3-րդ բլոկ՝ Shipment Value և Premium Amount */}
-      <div className="space-y-3 mb-4">
+      <div className="space-y-3 mb-4 flex items-center justify-between">
         {/* Shipment Value */}
         {(row.shipmentValue || row.value) && (
-          <div className="flex justify-between items-center">
+          <div className="mb-0">
             <div className="flex items-center gap-2 w-full">
-              <img 
-                src="/table/money-bag.svg" 
-                alt="Shipment Value" 
-                className="w-4 h-4 opacity-80"
-              />
               <div className="font-poppins text-sm flex-1">
                 <span className="text-[#606068]">Shipment</span>
                 <span className="text-[#CCCDD1] mx-1">/</span>
@@ -337,13 +332,8 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
         
         {/* Premium Amount */}
         {row.premiumAmount && (
-          <div className="flex justify-between items-center">
+          <div className="mb-0">
             <div className="flex items-center gap-2 w-full">
-              <div className="w-4 h-4 flex items-center justify-center">
-                <svg className="w-4 h-4 opacity-80" fill="none" stroke="#606068" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
               <div className="font-poppins text-sm flex-1">
                 <span className="text-[#606068]">Premium</span>
                 <span className="text-[#CCCDD1] mx-1">/</span>
@@ -362,7 +352,7 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
         {row.expirationDate && (
           <div className="flex items-center gap-2">
             <img 
-              src="/table/calendar.svg" 
+              src="/table/clock.svg" 
               alt="Expiration" 
               className="w-4 h-4 xs:w-[16px] xs:h-[16px] xs2:w-[14px] xs2:h-[14px]"
             />
