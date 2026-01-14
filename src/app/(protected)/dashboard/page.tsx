@@ -420,7 +420,7 @@ export default function DashboardPage() {
             </div>
 
             {/* High-Value Cargo Share Widget */}
-            <HighValueCargoWidget percentage={75.55} mtdValue="62,3k" />
+            <HighValueCargoWidget percentage={45.55} mtdValue="62,3k" />
           </div>
 
           {/* Tablet View (768px - 1279px) - Three Widgets Side by Side */}
@@ -445,7 +445,7 @@ export default function DashboardPage() {
 
               {/* High Value Cargo */}
               <div className="w-full h-[240px]">
-                <HighValueCargoWidget percentage={75.55} mtdValue="62,3k" />
+                <HighValueCargoWidget percentage={45.55} mtdValue="62,3k" />
               </div>
             </div>
           </div>

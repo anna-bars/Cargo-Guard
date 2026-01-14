@@ -14,7 +14,7 @@ export const HighValueCargoWidget: React.FC<HighValueCargoWidgetProps> = ({
   const [whole, decimal] = percentageStr.split('.');
 
   return (
-    <div className="
+    <div className="group
       relative w-full font-montserrat flex-grow min-h-[calc(29%-4px)] 
       xl:flex-[0_0_28%] xl:min-h-auto xl:h-auto
       max-[1336px]:flex-grow max-[1336px]:min-h-auto max-[1336px]:h-auto
@@ -93,26 +93,38 @@ export const HighValueCargoWidget: React.FC<HighValueCargoWidgetProps> = ({
             <div className="relative h-5
               max-[1024px]:h-4
               max-[480px]:h-3.5">
+              
+              {/* Filled progress bar with hover effect */}
               <div 
                 className="absolute top-1 left-0 h-3 
                   bg-gradient-to-r from-[#bfd5f8] to-[#669cee] 
                   rounded-l-[40px] rounded-r-none
                   max-[1024px]:top-0.5 max-[1024px]:h-2.5
-                  max-[480px]:top-0.5 max-[480px]:h-2"
+                  max-[480px]:top-0.5 max-[480px]:h-2
+                  transition-all duration-300 ease-out
+                  group-hover:from-[#a0c2ff] group-hover:to-[#4a8cff]"
                 style={{ width: `${percentage}%` }}
               ></div>
+              
+              {/* Empty progress bar with hover effect */}
               <div 
                 className="absolute top-1 h-3 
                   bg-gradient-to-r from-[#6da1ef4f] to-[#f6f8fa40] 
                   rounded-r-[40px] rounded-l-none
                   max-[1024px]:top-0.5 max-[1024px]:h-2.5
-                  max-[480px]:top-0.5 max-[480px]:h-2"
+                  max-[480px]:top-0.5 max-[480px]:h-2
+                  transition-all duration-300 ease-out
+                  group-hover:from-[#a0c2ff33] group-hover:to-[#f6f8fa66]"
                 style={{ left: `${percentage}%`, width: `${100 - percentage}%` }}
               ></div>
+              
+              {/* Marker with hover effect */}
               <img 
                 className="absolute top-[-0.5px] w-[20px] h-[20px]
                   max-[1024px]:w-[16px] max-[1024px]:h-[16px] max-[1024px]:top-[-1px]
-                  max-[480px]:w-[12px] max-[480px]:h-[12px]" 
+                  max-[480px]:w-[12px] max-[480px]:h-[12px]
+                  transition-all duration-300 ease-out
+                  group-hover:brightness-110 group-hover:drop-shadow-[0_0_6px_rgba(102,156,238,0.4)]" 
                 src="https://c.animaapp.com/mk1qdxa5LsxC7P/img/polygon-1.svg" 
                 alt="Progress marker"
                 style={{ left: `calc(${percentage}% - ${window.innerWidth < 480 ? 6 : window.innerWidth < 1024 ? 8 : 10}px)` }}
@@ -124,7 +136,8 @@ export const HighValueCargoWidget: React.FC<HighValueCargoWidgetProps> = ({
               text-[8px] tracking-[0.16px]
               max-[1024px]:text-[7px]
               max-[480px]:text-[6px]
-              lg:hidden">
+              lg:hidden
+              group-hover:text-gray-400 transition-colors duration-300">
               <span>0%</span>
               <span>100%</span>
             </div>
