@@ -179,6 +179,10 @@ export default function ShipmentsPage() {
         onTabChange={setActiveTab}
         data={shipmentsData}
         title='Docs Compliance'
+         info = 'Policies with Missing Docs'
+        total = 'Total policies'
+        sub = 'Policies Missing Docs'
+        percentageInfo = 'Policies'
       />
             </div>
 
@@ -255,6 +259,10 @@ export default function ShipmentsPage() {
         onTabChange={setActiveTab}
         data={shipmentsData}
         title='Docs Compliance'
+         info = 'Policies with Missing Docs'
+        total = 'Total policies'
+        sub = 'Policies Missing Docs'
+        percentageInfo = 'Policies'
       />
 
 
@@ -294,6 +302,10 @@ export default function ShipmentsPage() {
         onTabChange={setActiveTab}
         data={shipmentsData}
         title='Docs Compliance'
+        info = 'Policies with Missing Docs'
+        total = 'Total policies'
+        sub = 'Policies Missing Docs'
+        percentageInfo = 'Policies'
       />
             </div>
             

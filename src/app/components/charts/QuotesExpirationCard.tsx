@@ -12,14 +12,22 @@ interface QuotesExpirationCardProps {
   activeTab?: string;
   onTabChange?: (tab: string) => void;
   data?: Record<string, ExpirationData>;
-  title?: string
+  title?: string,
+  info?:string,
+  total?: string,
+  sub?: string,
+  percentageInfo?: string
 }
 
 const QuotesExpirationCard = ({ 
   activeTab = 'This Week', 
   onTabChange, 
   data ,
-  title = 'Quotes Expiration'
+  title = 'Quotes Expiration',
+  info = 'Total expiring quotes',
+  total = 'Total quotes',
+  sub = 'Expiring',
+  percentageInfo = 'Quotes'
 }: QuotesExpirationCardProps) => {
   const tabs = ['This Week', 'Next Week', 'In 2–4 Weeks', 'Next Month'];
   console.log(data)
@@ -159,7 +167,7 @@ const QuotesExpirationCard = ({
             opacity: isAnimating ? 0 : 1,
             transition: 'height 0.3s ease, background-color 0.3s ease'
           }}
-          title={`Expiring quotes: ${expiringQuotes} (${expiringRate}%)`}
+          title={`${sub}: ${expiringQuotes} (${expiringRate}%)`}
         />
       );
     }
@@ -403,12 +411,12 @@ const QuotesExpirationCard = ({
               <span className="absolute top-[-2px] left-0 rate-symbol font-montserrat text-xs text-black font-normal tracking-[0.20px] w-2">
                 %
               </span>
-              <span className="text-[#C8C8C8] text-[12px] ml-[16px]">Quotes</span>
+              <span className="text-[#C8C8C8] text-[12px] ml-[16px]">{percentageInfo}</span>
             </div>
           </div>
           <div className="expiration-right absolute top-14 left-0">
             <span className="expiration-total font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px] whitespace-nowrap">
-              Total expiring quotes: {expiringQuotes}
+              {info} : {expiringQuotes}
             </span>
           </div>
         </div>
@@ -426,7 +434,7 @@ const QuotesExpirationCard = ({
           
           <div className="expiration-chart flex justify-between items-center mt-2">
             <span className="chart-label font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px]">
-              Total quotes: {totalQuotes}
+              {total}: {totalQuotes}
             </span>
             <div className="flex items-center gap-3">
               <div 
