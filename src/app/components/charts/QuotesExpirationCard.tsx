@@ -2,26 +2,37 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 
-interface QuotesExpirationCardProps {
-  activeTab?: string;
-  onTabChange?: (tab: string) => void;
-}
-
 interface ExpirationData {
   totalQuotes: number;
   expiringQuotes: number;
   expiringRate: number;
 }
 
-const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesExpirationCardProps) => {
+interface QuotesExpirationCardProps {
+  activeTab?: string;
+  onTabChange?: (tab: string) => void;
+  data?: Record<string, ExpirationData>;
+  title?: string
+}
+
+const QuotesExpirationCard = ({ 
+  activeTab = 'This Week', 
+  onTabChange, 
+  data ,
+  title = 'Quotes Expiration'
+}: QuotesExpirationCardProps) => {
   const tabs = ['This Week', 'Next Week', 'In 2–4 Weeks', 'Next Month'];
-  
-  const expirationData: Record<string, ExpirationData> = {
+  console.log(data)
+  // Ստանդարտ տվյալներ, եթե data prop-ը չի տրամադրվել
+  const defaultExpirationData: Record<string, ExpirationData> = {
     'This Week': { totalQuotes: 22, expiringQuotes: 7, expiringRate: 32 },
     'Next Week': { totalQuotes: 18, expiringQuotes: 12, expiringRate: 67 },
     'In 2–4 Weeks': { totalQuotes: 35, expiringQuotes: 4, expiringRate: 11 },
     'Next Month': { totalQuotes: 42, expiringQuotes: 38, expiringRate: 90 }
   };
+  
+  // Օգտագործել տրամադրված տվյալները կամ ստանդարտները
+  const expirationData = data || defaultExpirationData;
   
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isChartHovered, setIsChartHovered] = useState(false);
@@ -29,7 +40,11 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
   const [barsCount, setBarsCount] = useState(60);
   const [isAnimating, setIsAnimating] = useState(false);
   
-  const { totalQuotes, expiringQuotes, expiringRate } = expirationData[activeTab];
+  const { totalQuotes, expiringQuotes, expiringRate } = expirationData[activeTab] || { 
+    totalQuotes: 0, 
+    expiringQuotes: 0, 
+    expiringRate: 0 
+  };
   
   const calculateBarsCount = useCallback((width: number) => {
     if (width <= 200) return 40;
@@ -162,7 +177,7 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
             width: '1px',
             transform: 'scaleX(2.7)',
             transformOrigin: 'left',
-            height: `${isChartHovered ? hoverHeight : normalHeight}px`, // ✅ Հետ շրջված տրամաբանություն
+            height: `${isChartHovered ? hoverHeight : normalHeight}px`,
             backgroundColor: '#E2E3E4',
             borderRadius: '1px',
             cursor: 'pointer',
@@ -172,7 +187,7 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
             animationFillMode: 'forwards',
             animationDelay: `${((activeBars + i) * 15) % 600}ms`,
             opacity: isAnimating ? 0 : 1,
-            transition: 'height 0.3s ease, opacity 0.3s ease' // ✅ Height transition ավելացված
+            transition: 'height 0.3s ease, opacity 0.3s ease'
           }}
           title={`Non-expiring quotes: ${totalQuotes - expiringQuotes}`}
         />
@@ -253,11 +268,13 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
           justify-content: space-between;
           max-height: 34%;
         }
-       @media (max-width: 1280px) {
-  .stats-card {
-    max-height: 100%;
-  }
-}
+        
+        @media (max-width: 1280px) {
+          .stats-card {
+            max-height: 100%;
+          }
+        }
+        
         .chart-container {
           flex: 1;
           display: flex;
@@ -313,7 +330,7 @@ const QuotesExpirationCard = ({ activeTab = 'This Week', onTabChange }: QuotesEx
       >
         {/* Վերին բլոկ - Վերնագիր և Dropdown */}
         <div className="card-header mb-5 flex justify-between items-start">
-          <h3 className="font-montserrat text-lg font-medium text-black mb-0">Quotes Expiration</h3>
+          <h3 className="font-montserrat text-lg font-medium text-black mb-0">{title}</h3>
           
           {/* Dropdown աջ անկյունում */}
           <div className="relative">

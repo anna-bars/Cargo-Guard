@@ -154,6 +154,12 @@ export default function QuotesPage() {
       expired: 18    // Converted This Month
     }
   };
+  const quotesData2 = {
+    'This Week': { totalQuotes: 22, expiringQuotes: 7, expiringRate: 32 },
+    'Next Week': { totalQuotes: 18, expiringQuotes: 12, expiringRate: 67 },
+    'In 2–4 Weeks': { totalQuotes: 35, expiringQuotes: 4, expiringRate: 11 },
+    'Next Month': { totalQuotes: 42, expiringQuotes: 38, expiringRate: 90 }
+  }
   
   // Quotes էջի հատուկ լեյբլները
   const quotesTypeLabels = {
@@ -238,9 +244,10 @@ export default function QuotesPage() {
             </div>
             <div className="block md:hidden">
               <QuotesExpirationCard 
-                activeTab={activeTab}
-                onTabChange={setActiveTab}
-              />
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        data={quotesData2}
+      />
             </div>
 
             {/* Universal Table for Recent Activity */}
@@ -312,9 +319,10 @@ export default function QuotesPage() {
 
             {/* Quotes Expiration Card */}
             <QuotesExpirationCard 
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-            />
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        data={quotesData2}
+      />
 
 
           </div>
@@ -355,9 +363,10 @@ export default function QuotesPage() {
             {/* Quotes Expiration Card */}
             <div className="w-full h-[100%]">
               <QuotesExpirationCard 
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-            />
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        data={quotesData2}
+      />
             </div>
             
             </div>

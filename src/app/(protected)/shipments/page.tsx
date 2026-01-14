@@ -2,7 +2,6 @@
 
 import DashboardLayout from '../DashboardLayout'
 import { useEffect, useState, useRef } from 'react'
-import { ConversionChart } from '../../components/charts/ConversionChart'
 import { UniversalTable, renderStatus, renderButton } from '@/app/components/tables/UniversalTable';
 import QuotesExpirationCard from '@/app/components/charts/QuotesExpirationCard'
 import InfoWidget from '@/app/components/widgets/InfoWidget'
@@ -98,6 +97,13 @@ export default function ShipmentsPage() {
   const [loading, setLoading] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
 
+   const shipmentsData = {
+    'This Week': { totalQuotes: 15, expiringQuotes: 7, expiringRate: 47 },
+    'Next Week': { totalQuotes: 20, expiringQuotes: 5, expiringRate: 25 },
+    'In 2–4 Weeks': { totalQuotes: 30, expiringQuotes: 10, expiringRate: 33 },
+    'Next Month': { totalQuotes: 25, expiringQuotes: 15, expiringRate: 60 }
+  }
+
   useEffect(() => {
     // Simulate loading data
     const timer = setTimeout(() => {
@@ -169,9 +175,11 @@ export default function ShipmentsPage() {
             </div>
             <div className="block md:hidden">
               <QuotesExpirationCard 
-                activeTab={activeTab}
-                onTabChange={setActiveTab}
-              />
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        data={shipmentsData}
+        title='Docs Compliance'
+      />
             </div>
 
                
@@ -243,9 +251,11 @@ export default function ShipmentsPage() {
 
             {/* Quotes Expiration Card */}
             <QuotesExpirationCard 
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-            />
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        data={shipmentsData}
+        title='Docs Compliance'
+      />
 
 
           </div>
@@ -280,9 +290,11 @@ export default function ShipmentsPage() {
             {/* Quotes Expiration Card */}
             <div className="w-full h-[100%]">
               <QuotesExpirationCard 
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-            />
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        data={shipmentsData}
+        title='Docs Compliance'
+      />
             </div>
             
             </div>
