@@ -356,8 +356,8 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
               alt="Expiration" 
               className="w-4 h-4 xs:w-[16px] xs:h-[16px] xs2:w-[14px] xs2:h-[14px]"
             />
-            <div className="font-poppins text-sm">
-              <span className="text-black">{row.expirationDate}</span>
+            <div className="font-poppins">
+              <span className="text-black text-[13px]">{row.expirationDate}</span>
             </div>
           </div>
         )}

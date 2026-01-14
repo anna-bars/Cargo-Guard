@@ -15,7 +15,7 @@ const quotesRows = [
     cargo: 'Electronics',
     shipmentValue: '$15,400.00',
     premiumAmount: '$450.00',
-    expirationDate: 'Oct 25 – Nov 5',
+    expirationDate: `Oct 25, '25 – Nov 5, '25`,
     status: { 
       text: 'Pending Approval', 
       color: 'bg-[#cbd03c]/10', 
@@ -33,7 +33,7 @@ const quotesRows = [
     cargo: 'Furniture',
     shipmentValue: '$20,000.00',
     premiumAmount: '$255.00',
-    expirationDate: 'Oct 20 – Nov 1',
+    expirationDate: `Oct 20, '25 – Nov 1, '25`,
     status: { 
       text: 'Approved', 
       color: 'bg-[#16a34a]/10', 
@@ -51,7 +51,7 @@ const quotesRows = [
     cargo: 'Clothing',
     shipmentValue: '$5,500.00',
     premiumAmount: '$600.00',
-    expirationDate: 'Oct 22 – Nov 3',
+    expirationDate: `Oct 22, '25 – Nov 3, '25`,
     status: { 
       text: 'Declined', 
       color: 'bg-[#8ea0b0]/10', 
@@ -69,7 +69,7 @@ const quotesRows = [
     cargo: 'Machinery',
     shipmentValue: '$8,500.00',
     premiumAmount: '$165.00',
-    expirationDate: 'Oct 24 – Nov 4',
+    expirationDate: `Oct 24, '25 – Nov 4, '25`,
     status: { 
       text: 'Pending Approval', 
       color: 'bg-[#cbd03c]/10', 
@@ -87,7 +87,7 @@ const quotesRows = [
     cargo: 'Chemicals',
     shipmentValue: '$12,800.00',
     premiumAmount: '$360.00',
-    expirationDate: 'Oct 21 – Nov 2',
+    expirationDate: `Oct 21, '25 – Nov 2, '25`,
     status: { 
       text: 'Approved', 
       color: 'bg-[#16a34a]/10', 
@@ -120,12 +120,12 @@ const quotesColumns = [
   },
   {
     key: 'shipmentValue',
-    label: 'Shipment Value',
+    label: 'Value',
     sortable: true
   },
   {
     key: 'premiumAmount',
-    label: 'Premium Amount',
+    label: 'Premium',
     sortable: true
   },
   {
@@ -247,7 +247,7 @@ export default function ShipmentsPage() {
                 buttonWidth: '47%'
               }}
               mobileDesignType="quotes" // ավելացնել
-              desktopGridCols="0.7fr repeat(2, minmax(0, 1fr)) 1.1fr 1fr 0.9fr 1fr" // ավելացնել
+              desktopGridCols="0.5fr 0.8fr  0.8fr 0.7fr 1.1fr 0.9fr 1fr" // ավելացնել
             />
             </div>
           </div>
