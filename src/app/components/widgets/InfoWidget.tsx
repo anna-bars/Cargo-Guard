@@ -22,27 +22,33 @@ export const InfoWidget: React.FC<InfoWidgetProps> = ({
 
   return (
     <div className={`min-h-[calc(26%-4px)] xl:flex-[0_0_26%] flex-col flex justify-between stats-card border border-[#d1d1d154] bg-[#fdfdf8cf] rounded-2xl p-4 hover:shadow-sm transition-shadow duration-300 ${className}`}>
-      <h3 className="font-montserrat text-lg font-medium text-black">
+      {/* Title - responsive text size */}
+      <h3 className="font-montserrat text-base md:text-lg font-medium text-black">
         {title}
       </h3>
+      
       <div className="stats-content">
-        <div className="rate-section relative w-[145px] h-[39px]">
-          <div className="rate-label absolute top-6 left-24 font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px]">
+        <div className="rate-section relative w-[120px] md:w-[145px] h-[32px] md:h-[39px]">
+          <div className="rate-label absolute top-5 md:top-6 left-20 md:left-24 font-montserrat text-xs font-medium text-[#c7c7c7] tracking-[0.24px]">
             Quotes
           </div>
-          <div className="rate-value absolute top-0 left-0 w-20 h-[37px] flex gap-1 items-baseline">
-            <span className="percentage font-montserrat text-[56px] text-black font-normal tracking-[1.12px] leading-9 w-16 ml-4">
+          <div className="rate-value absolute top-0 left-0 w-16 md:w-20 h-[30px] md:h-[37px] flex gap-1 items-baseline">
+            {/* Percentage value - responsive text size */}
+            <span className="percentage font-montserrat text-[40px] md:text-[56px] text-black font-normal tracking-[0.8px] md:tracking-[1.12px] leading-7 md:leading-9 w-12 md:w-16 ml-3 md:ml-4">
               {rateValue}
             </span>
-            <span className="percent-symbol font-montserrat text-xs text-black font-normal tracking-[0.20px] w-2 absolute top-[-4px] left-0">
+            {/* Percent symbol - responsive positioning */}
+            <span className="percent-symbol font-montserrat text-xs text-black font-normal tracking-[0.20px] w-2 absolute top-[-2px] md:top-[-4px] left-0">
               %
             </span>
           </div>
         </div>
       </div>
-      <p className="mt-2 stats-description font-montserrat text-xs font-normal text-[#afaeae] tracking-[0.24px] max-w-[268px]">
-          {description || defaultDescription}
-        </p>
+      
+      {/* Description - responsive text size and max-width */}
+      <p className="mt-2 stats-description font-montserrat text-xs font-normal text-[#afaeae] tracking-[0.20px] md:tracking-[0.24px] max-w-[220px] md:max-w-[268px]">
+        {description || defaultDescription}
+      </p>
     </div>
   );
 };
