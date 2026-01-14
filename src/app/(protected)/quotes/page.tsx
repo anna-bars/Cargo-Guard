@@ -204,7 +204,7 @@ export default function DashboardPage() {
             max-[1280px]:min-h-auto max-[1280px]:max-h-none max-[1280px]:row-start-2
             max-[1024px]:min-h-auto max-[1024px]:max-h-none
           ">
-             <div className="flex items-center gap-3">
+             <div className="flex items-center gap-3 mt-4 mb-2 xl:hidden">
                   <img
                     src="/quotes/header-ic.svg"
                     alt=""
