@@ -155,10 +155,10 @@ export default function ShipmentsPage() {
                   <img
                     src="/quotes/header-ic.svg"
                     alt=""
-                    className="w-6 h-6"
+                    className="w-[22px] h-[22px] sm:w-5 sm:h-5"
                   />
-                  <h2 className="text-[26px]">Shipments / Policies</h2>
-                </div>
+                  <h2 className="font-normal text-[18px] sm:text-lg">Shipments / Policies</h2>
+                </div> 
 
             <div className="block md:hidden">
               <PolicyTimelineWidget 

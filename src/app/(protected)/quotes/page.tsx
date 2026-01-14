@@ -204,14 +204,14 @@ export default function DashboardPage() {
             max-[1280px]:min-h-auto max-[1280px]:max-h-none max-[1280px]:row-start-2
             max-[1024px]:min-h-auto max-[1024px]:max-h-none
           ">
-            <div className="flex items-center gap-3">
+             <div className="flex items-center gap-3">
                   <img
                     src="/quotes/header-ic.svg"
                     alt=""
-                    className="w-6 h-6"
+                    className="w-[22px] h-[22px] sm:w-5 sm:h-5"
                   />
-                  <h2 className="text-[26px]">Quotes</h2>
-                </div>
+                  <h2 className="font-normal text-[18px] sm:text-lg">Quotes</h2>
+                </div> 
 
             <div className="block md:hidden">
               <ConversionChart />
