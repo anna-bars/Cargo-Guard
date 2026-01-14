@@ -50,15 +50,13 @@ export const PolicyTimelineWidget: React.FC<PolicyTimelineWidgetProps> = ({
   return (
     <div 
       className="
-        relative w-full font-montserrat flex-grow min-h-[calc(29%-4px)] 
+        relative w-full font-montserrat flex-grow min-h-[calc(29%-4px)] flex flex-col justify-between 
         xl:flex-[0_0_31%] xl:min-h-auto xl:h-auto
         max-[1336px]:flex-grow max-[1336px]:min-h-auto max-[1336px]:h-auto
-        max-[1280px]:flex-grow max-[1280px]:min-h-[240px] max-[1280px]:h-[240px] max-[1280px]:block
-        max-[768px]:w-[49%] max-[1024px]:min-h-[240px] max-[1024px]:max-h-[240px]
-        max-[1024px]:block
-        max-[768px]:flex-shrink-0 max-[768px]:w-[100%] max-[768px]:min-h-[240px] 
-        max-[768px]:max-h-[280px]
-        max-[480px]:w-[100%] max-[480px]:min-h-[100%] max-[480px]:max-h-[100%]
+        max-[768px]:flex-shrink-0 max-[768px]:w-[100%] max-[768px]:min-h-[200px] 
+        max-[768px]:max-h-[220px] max-[768px]:min-h-[200px]
+        max-[768px]:flex-col max-[768px]:justify-between max-[768px]:flex
+        max-[480px]:w-[100%]
         backdrop-blur-[10px] rounded-[16px] p-4 justify-between
         flex flex-col gap-0 border border-[#d1d1d154] bg-[#fdfdf8cf] rounded-2xl p-4 
         hover:shadow-sm transition-all duration-300 ease-out

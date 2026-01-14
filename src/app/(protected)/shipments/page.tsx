@@ -215,7 +215,11 @@ export default function ShipmentsPage() {
                 </div>
 
             <div className="block md:hidden">
-              <ConversionChart />
+              <PolicyTimelineWidget 
+                percentage={65}
+                expiringPolicies={5}
+                totalPolicies={15}
+              />
             </div>
             <div className="block md:hidden">
               <QuotesExpirationCard 
@@ -223,6 +227,10 @@ export default function ShipmentsPage() {
                 onTabChange={setActiveTab}
               />
             </div>
+
+               
+
+           
 
             {/* Universal Table for Recent Activity */}
             <div className='max-h-[85%'>
@@ -318,11 +326,11 @@ export default function ShipmentsPage() {
               />
            
 
-            {/* Quote Conversion Rate */}
-            <div className="flex-grow min-h-[calc(31%-4px)] xl:flex-[0_0_31%] xl:min-h-auto xl:h-auto">
-              <ConversionChart />
-            </div>
-
+            <PolicyTimelineWidget 
+            percentage={65}
+            expiringPolicies={5}
+            totalPolicies={15}
+          />
             {/* Quotes Expiration Card */}
             <div className="w-full h-[100%]">
               <QuotesExpirationCard 
