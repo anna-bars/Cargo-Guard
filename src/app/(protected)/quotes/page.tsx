@@ -238,7 +238,7 @@ export default function DashboardPage() {
                 buttonWidth: '47%'
               }}
               mobileDesignType="quotes" // ավելացնել
-              desktopGridCols="0.5fr 0.8fr  0.8fr 0.7fr 1.1fr 0.9fr 1fr" // ավելացնել
+              desktopGridCols="0.6fr 0.8fr  0.8fr 0.7fr 1.1fr 0.9fr 1fr" // ավելացնել
             />
             </div>
           </div>
