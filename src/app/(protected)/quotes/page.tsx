@@ -249,21 +249,21 @@ export default function DashboardPage() {
 
             {/* Universal Table for Recent Activity */}
             <div className='max-h-[85%'>
-<UniversalTable
-  title="Quotes Overview"
-  showMobileHeader={true}
-  rows={quotesRows}
-  columns={quotesColumns}
-  mobileDesign={{
-    showType: false,
-    showCargoIcon: true,
-    showDateIcon: true,
-    dateLabel: 'Expires',
-    buttonWidth: '47%'
-  }}
-  mobileDesignType="quotes" // ավելացնել
-  desktopGridCols="0.7fr repeat(4, minmax(0, 1fr)) 0.9fr 1fr" // ավելացնել
-/>
+            <UniversalTable
+              title="Quotes Overview"
+              showMobileHeader={true}
+              rows={quotesRows}
+              columns={quotesColumns}
+              mobileDesign={{
+                showType: false,
+                showCargoIcon: true,
+                showDateIcon: true,
+                dateLabel: 'Expires',
+                buttonWidth: '47%'
+              }}
+              mobileDesignType="quotes" // ավելացնել
+              desktopGridCols="0.7fr repeat(2, minmax(0, 1fr)) 1.1fr 1fr 0.9fr 1fr" // ավելացնել
+            />
             </div>
           </div>
 
