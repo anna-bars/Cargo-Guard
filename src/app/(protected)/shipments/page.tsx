@@ -11,101 +11,47 @@ import { PolicyTimelineWidget } from '@/app/components/charts/PolicyTimeline';
 // Dashboard-ի տվյալներ - ԼՐԱՑՈՒՄ
 const quotesRows = [
   {
-    id: 'Q-005',
+    id: 'P-3401',
     cargo: 'Electronics',
-    shipmentValue: '$15,400.00',
-    premiumAmount: '$450.00',
-    expirationDate: `Oct 25, '25 – Nov 5, '25`,
+    shipmentValue: '$12,500.00',
+    premiumAmount: '$170.00',
+    expirationDate: `Dec 1, '25 – Dec 1, '26`,
     status: { 
-      text: 'Pending Approval', 
-      color: 'bg-[#cbd03c]/10', 
-      dot: 'bg-[#cbd03c]', 
-      textColor: 'text-[#cbd03c]' 
-    },
-    button: { 
-      text: 'Approve Quote', 
-      variant: 'primary' as const,
-      onClick: (row: any) => console.log('Approve Quote', row.id)
-    }
-  },
-  {
-    id: 'Q-021',
-    cargo: 'Furniture',
-    shipmentValue: '$20,000.00',
-    premiumAmount: '$255.00',
-    expirationDate: `Oct 20, '25 – Nov 1, '25`,
-    status: { 
-      text: 'Approved', 
+      text: 'Active', 
       color: 'bg-[#16a34a]/10', 
       dot: 'bg-[#16a34a]', 
       textColor: 'text-[#16a34a]' 
     },
     button: { 
-      text: 'Approve Quote', 
+      text: 'Download Cert', 
       variant: 'primary' as const,
-      onClick: (row: any) => console.log('Approve Quote', row.id)
+      onClick: (row: any) => console.log('Download Certificate', row.id)
     }
   },
   {
-    id: 'Q-054',
-    cargo: 'Clothing',
-    shipmentValue: '$5,500.00',
-    premiumAmount: '$600.00',
-    expirationDate: `Oct 22, '25 – Nov 3, '25`,
+    id: 'P-2015',
+    cargo: 'Textiles',
+    shipmentValue: '$25,800.00',
+    premiumAmount: '$285.00',
+    expirationDate: `Oct 15, '25 – Dec 15, '25`,
     status: { 
-      text: 'Declined', 
-      color: 'bg-[#8ea0b0]/10', 
-      dot: 'bg-[#8ea0b0]', 
-      textColor: 'text-[#8ea0b0]' 
-    },
-    button: { 
-      text: 'View Reason', 
-      variant: 'secondary' as const,
-      onClick: (row: any) => console.log('View Reason', row.id)
-    }
-  },
-  {
-    id: 'Q-005-2',
-    cargo: 'Machinery',
-    shipmentValue: '$8,500.00',
-    premiumAmount: '$165.00',
-    expirationDate: `Oct 24, '25 – Nov 4, '25`,
-    status: { 
-      text: 'Pending Approval', 
+      text: 'Expiring Soon', 
       color: 'bg-[#cbd03c]/10', 
       dot: 'bg-[#cbd03c]', 
       textColor: 'text-[#cbd03c]' 
     },
     button: { 
-      text: 'Approve Quote', 
+      text: 'Renew Policy', 
       variant: 'primary' as const,
-      onClick: (row: any) => console.log('Approve Quote', row.id)
-    }
-  },
-  {
-    id: 'Q-014',
-    cargo: 'Chemicals',
-    shipmentValue: '$12,800.00',
-    premiumAmount: '$360.00',
-    expirationDate: `Oct 21, '25 – Nov 2, '25`,
-    status: { 
-      text: 'Approved', 
-      color: 'bg-[#16a34a]/10', 
-      dot: 'bg-[#16a34a]', 
-      textColor: 'text-[#16a34a]' 
-    },
-    button: { 
-      text: 'Approve Quote', 
-      variant: 'primary' as const,
-      onClick: (row: any) => console.log('Approve Quote', row.id)
+      onClick: (row: any) => console.log('Renew Policy', row.id)
     }
   }
-]
+];
 
 const quotesColumns = [
   {
     key: 'id',
-    label: 'Quote ID',
+    label: 'Policy ID',
     sortable: true,
     renderDesktop: (value: string) => (
       <span className="font-poppins text-sm text-[#2563eb] underline hover:text-[#1d4ed8] transition-colors duration-300 cursor-pointer">
@@ -125,17 +71,17 @@ const quotesColumns = [
   },
   {
     key: 'premiumAmount',
-    label: 'Premium',
+    label: 'Premium Paid',
     sortable: true
   },
   {
     key: 'expirationDate',
-    label: 'Expiration Date',
+    label: 'Coverage Period',
     sortable: true
   },
   {
     key: 'status',
-    label: 'Status',
+    label: 'Policy Status',
     sortable: true,
     renderDesktop: (status: any) => renderStatus(status)
   },
@@ -235,20 +181,20 @@ export default function ShipmentsPage() {
             {/* Universal Table for Recent Activity */}
             <div className='max-h-[85%'>
             <UniversalTable
-              title="Polices Overview"
-              showMobileHeader={true}
-              rows={quotesRows}
-              columns={quotesColumns}
-              mobileDesign={{
-                showType: false,
-                showCargoIcon: true,
-                showDateIcon: true,
-                dateLabel: 'Expires',
-                buttonWidth: '47%'
-              }}
-              mobileDesignType="quotes" // ավելացնել
-              desktopGridCols="0.5fr 0.8fr  0.8fr 0.7fr 1.1fr 0.9fr 1fr" // ավելացնել
-            />
+  title="Policies Overview"  // Changed from "Polices Overview" to "Policies Overview"
+  showMobileHeader={true}
+  rows={quotesRows}
+  columns={quotesColumns}
+  mobileDesign={{
+    showType: false,
+    showCargoIcon: true,
+    showDateIcon: true,
+    dateLabel: 'Expires',
+    buttonWidth: '47%'
+  }}
+  mobileDesignType="quotes"
+  desktopGridCols="0.5fr 0.8fr 0.8fr 0.7fr 1.1fr 0.9fr 1fr"
+/>
             </div>
           </div>
 
