@@ -398,7 +398,7 @@ export default function DashboardPage() {
     buttonWidth: '47%'
   }}
   mobileDesignType="dashboard" // ավելացնել
-  desktopGridCols="0.7fr 1.2fr repeat(2, minmax(0, 1fr)) 0.9fr 1fr" // ավելացնել
+  desktopGridCols="0.7fr 1fr 0.7fr 1fr 0.7fr 1fr" // ավելացնել
 />
 
 
