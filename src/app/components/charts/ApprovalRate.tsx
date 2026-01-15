@@ -32,7 +32,7 @@ export interface ApprovalRateProps {
 
 export const ApprovalRate: React.FC<ApprovalRateProps> = ({
   title = 'Document Approval Rate',
-  subtitle = 'Shows the percentage of approved documents.',
+  subtitle = 'Approved quotes percentage',
   approvalPercentage = 85,
   approvedCount = 85,
   typeLabel = 'Document',
@@ -111,7 +111,7 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
     ? Math.round(count + (approvedCount - count) * animationProgress)
     : count;
 
-  // Հաշվարկել առաջընթացի գույնը
+  // Հաշվարկել առաջընթացի գույնը հովերի ժամանակ
   const getProgressGradient = () => {
     if (isAnimating) {
       const intensity = 0.5 + 0.5 * Math.sin(animationProgress * Math.PI * 4);
@@ -140,6 +140,8 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
   return (
     <article 
       className="frame approval-rate-container w-full box-border relative flex flex-col items-start gap-6 p-4 bg-[#fafcfc] rounded-2xl border border-[#e2e8f0]"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {/* Վերնագիր և ենթավերնագիր */}
       <header 
@@ -197,8 +199,6 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
       <section 
         className="progress-section relative w-full h-[68px]"
         aria-label="Document approval progress"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
       >
         <div 
           className="progress-wrapper flex flex-col w-full"
@@ -231,7 +231,7 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
           {/* Առաջընթացի տող */}
           <div 
             ref={progressBarRef}
-            className="progress-bar-container mt-1.5 w-full h-6 rounded overflow-hidden relative flex transition-all duration-200 ease-out"
+            className="progress-bar-container mt-1.5 w-full h-6 rounded overflow-hidden relative flex"
           >
             <div 
               className="progress-bar-fill relative top-0 left-0 h-full rounded transition-all duration-500 ease-in-out"
@@ -243,8 +243,8 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
               style={{
                 width: `${animatedPercentage}%`,
                 background: getProgressGradient(),
-                transition: isAnimating ? 'width 0.5s ease' : 'width 0.3s ease',
-                boxShadow: isAnimating ? '0 0 10px rgba(255, 200, 100, 0.5)' : 'none',
+                transition: isAnimating ? 'width 0.5s ease, background 0.3s ease' : 'width 0.3s ease, background 0.3s ease',
+                boxShadow: isAnimating ? '0 0 10px rgba(255, 200, 100, 0.5)' : isHovered ? '0 0 12px rgba(39, 100, 235, 0.25)' : 'none',
                 zIndex: 2
               }}
             >
@@ -263,7 +263,7 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
               {/* Shimmer effect on hover */}
               {isHovered && (
                 <div 
-                  className="progress-shimmer absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"
+                  className="progress-shimmer absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 hover:opacity-100"
                   style={{
                     animation: 'shimmer 1.5s infinite'
                   }}
@@ -292,13 +292,13 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
             className="progress-scale mt-1 flex items-center justify-between w-full h-[17px] relative"
           >
             <span 
-              className="scale-min relative w-fit mt-[-1px] font-['Montserrat',_Helvetica,_Arial,_sans-serif] font-normal text-[14px] tracking-[0.28px] leading-normal"
+              className="text-[10px] scale-min relative w-fit mt-[-1px] font-['Montserrat',_Helvetica,_Arial,_sans-serif] font-normal tracking-[0.28px] leading-normal"
               style={{ color: colors.textSecondary }}
             >
               0
             </span>
             <span 
-              className="scale-max relative w-fit mt-[-1px] font-['Montserrat',_Helvetica,_Arial,_sans-serif] font-normal text-[14px] tracking-[0.28px] leading-normal"
+              className="text-[10px] scale-max relative w-fit mt-[-1px] font-['Montserrat',_Helvetica,_Arial,_sans-serif] font-normal tracking-[0.28px] leading-normal"
               style={{ color: colors.textSecondary }}
             >
               100
@@ -332,12 +332,7 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
         }
         
         .progress-bar-fill {
-          animation: ${isAnimating ? 'pulse 0.5s ease-in-out infinite' : 'none'};
-        }
-        
-        .progress-bar-container:hover .progress-bar-fill {
-          animation: pulse 1s ease-in-out infinite;
-          box-shadow: 0 0 12px rgba(39, 100, 235, 0.25);
+          animation: ${isAnimating ? 'pulse 0.5s ease-in-out infinite' : isHovered ? 'pulse 1s ease-in-out infinite' : 'none'};
         }
         
         .progress-shimmer {

@@ -230,24 +230,7 @@ export default function DocumentsPage() {
             max-[1280px]:min-h-auto max-[1280px]:max-h-none max-[1280px]:row-start-2
             max-[1024px]:min-h-auto max-[1024px]:max-h-none
           ">
-             <div style={{ maxWidth: '380px' }}>
-      <ApprovalRate 
-        title="Quote Approval Rate"
-        subtitle="Shows the percentage of approved quotes."
-        approvalPercentage={78}
-        approvedCount={42}
-        typeLabel="Quote"
-        autoUpdate={false}
-        colors={{
-          primary: '#1a202c',
-          secondary: '#718096',
-          progressStart: 'rgba(102, 156, 238, 0.3)',
-          progressEnd: 'rgba(66, 153, 225, 0.6)',
-          textPrimary: '#2d3748',
-          textSecondary: '#4a5568'
-        }}
-      />
-    </div>
+             
              <div className="flex items-center gap-3 mt-4 mb-2 xl:hidden">
                   <img
                     src="/quotes/header-ic.svg"
@@ -267,16 +250,24 @@ export default function DocumentsPage() {
               />
             </div>
             <div className="block md:hidden">
-               <QuotesExpirationCard 
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        data={quotesData2}
-        title='Documents Requiring Action'
-         info = 'Policies with Missing Docs'
-        total = 'Total policies'
-        sub = 'Policies Missing Docs'
-        percentageInfo = 'Policies'
-      />
+               <div style={{ maxWidth: '380px' }}>
+              <ApprovalRate 
+                title="Quote Approval Rate"
+                subtitle="Approved quotes percentage."
+                approvalPercentage={78}
+                approvedCount={42}
+                typeLabel="Quote"
+                autoUpdate={false}
+                colors={{
+                  primary: '#1a202c',
+                  secondary: '#718096',
+                  progressStart: 'rgba(102, 156, 238, 0.3)',
+                  progressEnd: 'rgba(66, 153, 225, 0.6)',
+                  textPrimary: '#2d3748',
+                  textSecondary: '#4a5568'
+                }}
+              />
+            </div>
             </div>
 
             {/* Universal Table for Recent Activity */}
@@ -348,16 +339,24 @@ export default function DocumentsPage() {
             </div>
 
             {/* Quotes Expiration Card */}
-            <QuotesExpirationCard 
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        data={quotesData2}
-        title='Documents Requiring Action'
-         info = 'Policies with Missing Docs'
-        total = 'Total policies'
-        sub = 'Policies Missing Docs'
-        percentageInfo = 'Policies'
-      />
+            <div style={{ maxWidth: '380px' }}>
+              <ApprovalRate 
+                title="Quote Approval Rate"
+                subtitle="Approved quotes percentage."
+                approvalPercentage={78}
+                approvedCount={42}
+                typeLabel="Quote"
+                autoUpdate={false}
+                colors={{
+                  primary: '#1a202c',
+                  secondary: '#718096',
+                  progressStart: 'rgba(102, 156, 238, 0.3)',
+                  progressEnd: 'rgba(66, 153, 225, 0.6)',
+                  textPrimary: '#2d3748',
+                  textSecondary: '#4a5568'
+                }}
+              />
+            </div>
 
           </div>
 
@@ -397,16 +396,24 @@ export default function DocumentsPage() {
 
             {/* Quotes Expiration Card */}
             <div className="w-full h-[100%]">
-              <QuotesExpirationCard 
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        data={quotesData2}
-        title='Documents Requiring Action'
-         info = 'Policies with Missing Docs'
-        total = 'Total policies'
-        sub = 'Policies Missing Docs'
-        percentageInfo = 'Policies'
-      />
+              <div style={{ maxWidth: '380px' }}>
+              <ApprovalRate 
+                title="Quote Approval Rate"
+                subtitle="Approved quotes percentage."
+                approvalPercentage={78}
+                approvedCount={42}
+                typeLabel="Quote"
+                autoUpdate={false}
+                colors={{
+                  primary: '#1a202c',
+                  secondary: '#718096',
+                  progressStart: 'rgba(102, 156, 238, 0.3)',
+                  progressEnd: 'rgba(66, 153, 225, 0.6)',
+                  textPrimary: '#2d3748',
+                  textSecondary: '#4a5568'
+                }}
+              />
+            </div>
             </div>
             
             </div>
