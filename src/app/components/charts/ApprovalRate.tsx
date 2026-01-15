@@ -127,24 +127,21 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
     )`;
   };
 
-  // Հաշվարկել առաջընթացի լայնությունը
-  const progressWidth = (animatedPercentage / 100) * 221;
-
   return (
     <article 
       className="frame approval-rate-container"
       style={{
         display: 'flex',
-        flexDirection: 'column' as const,
+        flexDirection: 'column',
         alignItems: 'flex-start',
         gap: '24px',
         padding: '24px',
-        position: 'relative' as const,
+        position: 'relative',
         backgroundColor: '#fafcfc',
         borderRadius: '8px',
         border: '1px solid #e2e8f0',
         width: '100%',
-        boxSizing: 'border-box' as const
+        boxSizing: 'border-box'
       }}
     >
       {/* Վերնագիր և ենթավերնագիր */}
@@ -152,18 +149,18 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
         className="approval-rate-header"
         style={{
           display: 'flex',
-          flexDirection: 'column' as const,
+          flexDirection: 'column',
           alignItems: 'flex-start',
           gap: '4px',
           width: '100%',
           flex: '0 0 auto',
-          position: 'relative' as const
+          position: 'relative'
         }}
       >
         <h1 
           className="approval-rate-title"
           style={{
-            position: 'relative' as const,
+            position: 'relative',
             alignSelf: 'stretch',
             marginTop: '-1px',
             fontFamily: '"Montserrat", Helvetica, Arial, sans-serif',
@@ -180,7 +177,7 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
         <p 
           className="approval-rate-subtitle"
           style={{
-            position: 'relative' as const,
+            position: 'relative',
             alignSelf: 'stretch',
             fontFamily: '"Montserrat", Helvetica, Arial, sans-serif',
             fontWeight: 500,
@@ -200,7 +197,7 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
         className="approval-percentage-section"
         aria-label="Approval percentage"
         style={{
-          position: 'relative' as const,
+          position: 'relative',
           width: '161px',
           height: '40px'
         }}
@@ -208,7 +205,7 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
         <div 
           className="percentage-container"
           style={{
-            position: 'absolute' as const,
+            position: 'absolute',
             top: 0,
             left: 0,
             display: 'flex',
@@ -230,7 +227,7 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
               fontSize: '10px',
               letterSpacing: '0.20px',
               lineHeight: 'normal',
-              whiteSpace: 'nowrap' as const,
+              whiteSpace: 'nowrap',
               paddingTop: '6px'
             }}
           >
@@ -248,7 +245,7 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
               fontSize: '48px',
               letterSpacing: '0.96px',
               lineHeight: '36px',
-              whiteSpace: 'nowrap' as const,
+              whiteSpace: 'nowrap',
               transition: isAnimating ? 'all 0.3s ease' : 'none',
               transform: isAnimating ? 'scale(1.05)' : 'scale(1)'
             }}
@@ -259,7 +256,7 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
         <span 
           className="type-label"
           style={{
-            position: 'absolute' as const,
+            position: 'absolute',
             top: '25px',
             left: '91px',
             fontFamily: '"Montserrat", Helvetica, Arial, sans-serif',
@@ -279,7 +276,7 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
         className="progress-section"
         aria-label="Document approval progress"
         style={{
-          position: 'relative' as const,
+          position: 'relative',
           width: '100%',
           maxWidth: '348px',
           height: '68px'
@@ -289,7 +286,7 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
           className="progress-wrapper"
           style={{
             display: 'flex',
-            flexDirection: 'column' as const,
+            flexDirection: 'column',
             width: '100%'
           }}
         >
@@ -298,7 +295,7 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
             className="progress-header"
             style={{
               display: 'flex',
-              flexDirection: 'column' as const,
+              flexDirection: 'column',
               width: '100%'
             }}
           >
@@ -310,13 +307,13 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
                 justifyContent: 'space-between',
                 width: '100%',
                 height: '17px',
-                position: 'relative' as const
+                position: 'relative'
               }}
             >
               <span 
                 className="progress-title"
                 style={{
-                  position: 'relative' as const,
+                  position: 'relative',
                   width: 'fit-content',
                   fontFamily: '"Montserrat", Helvetica, Arial, sans-serif',
                   fontWeight: 500,
@@ -331,7 +328,7 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
               <span 
                 className="progress-count"
                 style={{
-                  position: 'relative' as const,
+                  position: 'relative',
                   width: 'fit-content',
                   marginTop: '-1px',
                   fontFamily: '"Montserrat", Helvetica, Arial, sans-serif',
@@ -356,8 +353,8 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
               width: '100%',
               height: '24px',
               borderRadius: '4px',
-             overflow: 'hidden' as const,
-              position: 'relative' as const,
+              overflow: 'hidden',
+              position: 'relative',
               display: 'flex'
             }}
           >
@@ -369,21 +366,22 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
               aria-valuemax={100}
               aria-label="Document approval progress bar"
               style={{
-                position: 'relative' as const,
+                position: 'relative',
                 top: 0,
                 left: 0,
-                width: `${progressWidth}px`,
+                width: `${animatedPercentage}%`,
                 height: '100%',
                 background: getProgressGradient(),
                 borderRadius: '4px',
                 transition: isAnimating ? 'width 0.5s ease' : 'width 0.3s ease',
-                boxShadow: isAnimating ? '0 0 10px rgba(255, 200, 100, 0.5)' : 'none'
+                boxShadow: isAnimating ? '0 0 10px rgba(255, 200, 100, 0.5)' : 'none',
+                zIndex: 2
               }}
             >
               <div 
                 className="progress-indicator"
                 style={{
-                  position: 'absolute' as const,
+                  position: 'absolute',
                   right: '3px',
                   top: '50%',
                   transform: 'translateY(-50%)',
@@ -394,26 +392,42 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
                 }}
               />
             </div>
-             {/* Առաջադեմ ցուցիչ (եթե միացված է) */}
-        {showAdvancedIndicator && (
-          <img
-            className="advanced-indicator"
-            src="https://c.animaapp.com/mke04k24NQdDHI/img/group-195.png"
-            alt="Progress indicator marks"
-            role="presentation"
-            style={{
-              
-              opacity: isAnimating ? 0.8 : 1,
-              transition: 'opacity 0.3s ease'
-            }}
-          />
-        )}
+            
+            {/* Առաջադեմ ցուցիչ (գծիկներ) */}
+            {showAdvancedIndicator && (
+              <div 
+                className="advanced-indicator-container"
+                style={{
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  display: 'inline-flex',
+                  gap: '4.5px',
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-end',
+                  overflow: 'hidden',
+                  paddingBottom: '4px',
+                  zIndex: 1
+                }}
+              >
+                {Array.from({ length: 40 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="indicator-line"
+                    style={{
+                      width: '2px',
+                      height: '18px',
+                      backgroundColor: '#E8E8E8',
+                      flexShrink: 0
+                    }}
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
-          
-        </div>
-
-{/* Սանդղակ */}
+          {/* Սանդղակ */}
           <div 
             className="progress-scale"
             style={{
@@ -423,13 +437,13 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
               justifyContent: 'space-between',
               width: '100%',
               height: '17px',
-              position: 'relative' as const
+              position: 'relative'
             }}
           >
             <span 
               className="scale-min"
               style={{
-                position: 'relative' as const,
+                position: 'relative',
                 width: 'fit-content',
                 marginTop: '-1px',
                 fontFamily: '"Montserrat", Helvetica, Arial, sans-serif',
@@ -445,7 +459,7 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
             <span 
               className="scale-max"
               style={{
-                position: 'relative' as const,
+                position: 'relative',
                 width: 'fit-content',
                 marginTop: '-1px',
                 fontFamily: '"Montserrat", Helvetica, Arial, sans-serif',
@@ -459,8 +473,7 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
               100
             </span>
           </div>
-
-       
+        </div>
       </section>
 
       {/* Հավելյալ ոճեր */}
