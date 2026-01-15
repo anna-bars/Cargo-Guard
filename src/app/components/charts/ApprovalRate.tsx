@@ -354,12 +354,11 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
             style={{
               marginTop: '6px',
               width: '100%',
-              maxWidth: '221px',
               height: '24px',
               borderRadius: '4px',
-              background: 'linear-gradient(180deg, rgba(216, 228, 254, 0.52) 0%, rgba(39, 100, 235, 0.35) 100%)',
-              overflow: 'hidden' as const,
-              position: 'relative' as const
+             overflow: 'hidden' as const,
+              position: 'relative' as const,
+              display: 'flex'
             }}
           >
             <div 
@@ -370,7 +369,7 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
               aria-valuemax={100}
               aria-label="Document approval progress bar"
               style={{
-                position: 'absolute' as const,
+                position: 'relative' as const,
                 top: 0,
                 left: 0,
                 width: `${progressWidth}px`,
@@ -395,9 +394,26 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
                 }}
               />
             </div>
+             {/* Առաջադեմ ցուցիչ (եթե միացված է) */}
+        {showAdvancedIndicator && (
+          <img
+            className="advanced-indicator"
+            src="https://c.animaapp.com/mke04k24NQdDHI/img/group-195.png"
+            alt="Progress indicator marks"
+            role="presentation"
+            style={{
+              
+              opacity: isAnimating ? 0.8 : 1,
+              transition: 'opacity 0.3s ease'
+            }}
+          />
+        )}
           </div>
 
-          {/* Սանդղակ */}
+          
+        </div>
+
+{/* Սանդղակ */}
           <div 
             className="progress-scale"
             style={{
@@ -406,7 +422,6 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
               alignItems: 'center',
               justifyContent: 'space-between',
               width: '100%',
-              maxWidth: '221px',
               height: '17px',
               position: 'relative' as const
             }}
@@ -444,26 +459,8 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
               100
             </span>
           </div>
-        </div>
 
-        {/* Առաջադեմ ցուցիչ (եթե միացված է) */}
-        {showAdvancedIndicator && (
-          <img
-            className="advanced-indicator"
-            src="https://c.animaapp.com/mke04k24NQdDHI/img/group-195.png"
-            alt="Progress indicator marks"
-            role="presentation"
-            style={{
-              position: 'absolute' as const,
-              top: '26px',
-              left: '224px',
-              width: '124px',
-              height: '18px',
-              opacity: isAnimating ? 0.8 : 1,
-              transition: 'opacity 0.3s ease'
-            }}
-          />
-        )}
+       
       </section>
 
       {/* Հավելյալ ոճեր */}
