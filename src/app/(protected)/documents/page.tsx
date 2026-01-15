@@ -230,7 +230,7 @@ export default function DocumentsPage() {
             max-[1280px]:min-h-auto max-[1280px]:max-h-none max-[1280px]:row-start-2
             max-[1024px]:min-h-auto max-[1024px]:max-h-none
           ">
-             <div style={{ padding: '20px', maxWidth: '400px' }}>
+             <div style={{ maxWidth: '380px' }}>
       <ApprovalRate 
         title="Quote Approval Rate"
         subtitle="Shows the percentage of approved quotes."

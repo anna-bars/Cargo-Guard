@@ -278,7 +278,6 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
         style={{
           position: 'relative',
           width: '100%',
-          maxWidth: '348px',
           height: '68px'
         }}
       >
