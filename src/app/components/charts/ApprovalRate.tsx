@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 export interface ApprovalRateProps {
   /** Գլխավոր վերնագիր */
@@ -53,6 +53,8 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
   const [count, setCount] = useState(approvedCount);
   const [isAnimating, setIsAnimating] = useState(false);
   const [animationProgress, setAnimationProgress] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const progressBarRef = useRef<HTMLDivElement>(null);
 
   // Ավտոմատ թարմացում
   useEffect(() => {
@@ -117,6 +119,14 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
         180deg,
         rgba(255, 255, 200, ${0.3 + intensity * 0.3}) 0%,
         rgba(255, 200, 100, ${0.2 + intensity * 0.2}) 100%
+      )`;
+    }
+    
+    if (isHovered) {
+      return `linear-gradient(
+        180deg,
+        rgba(216, 228, 254, 0.7) 0%,
+        rgba(39, 100, 235, 0.5) 100%
       )`;
     }
     
@@ -187,6 +197,8 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
       <section 
         className="progress-section relative w-full h-[68px]"
         aria-label="Document approval progress"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
         <div 
           className="progress-wrapper flex flex-col w-full"
@@ -218,7 +230,8 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
 
           {/* Առաջընթացի տող */}
           <div 
-            className="progress-bar-container mt-1.5 w-full h-6 rounded overflow-hidden relative flex"
+            ref={progressBarRef}
+            className="progress-bar-container mt-1.5 w-full h-6 rounded overflow-hidden relative flex transition-all duration-200 ease-out"
           >
             <div 
               className="progress-bar-fill relative top-0 left-0 h-full rounded transition-all duration-500 ease-in-out"
@@ -236,8 +249,26 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
               }}
             >
               <div 
-                className="progress-indicator absolute right-[3px] top-1/2 transform -translate-y-1/2 w-[3px] h-[18px] bg-[#f6f8fa] rounded-[1px]"
+                className="progress-indicator absolute right-[3px] top-1/2 transform -translate-y-1/2 w-[3px] h-[18px] bg-[#f6f8fa] rounded-[1px] transition-all duration-200 ease-out"
+                style={{
+                  ...(isHovered ? {
+                    background: '#ffffff',
+                    boxShadow: '0 0 6px rgba(255, 255, 255, 0.8)',
+                    width: '4px',
+                    height: '20px'
+                  } : {})
+                }}
               />
+              
+              {/* Shimmer effect on hover */}
+              {isHovered && (
+                <div 
+                  className="progress-shimmer absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"
+                  style={{
+                    animation: 'shimmer 1.5s infinite'
+                  }}
+                />
+              )}
             </div>
             
             {/* Առաջադեմ ցուցիչ (գծիկներ) */}
@@ -287,12 +318,30 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
           }
         }
         
+        @keyframes shimmer {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
+        }
+        
         .approval-rate-container {
           transition: all 0.3s ease;
         }
         
         .progress-bar-fill {
           animation: ${isAnimating ? 'pulse 0.5s ease-in-out infinite' : 'none'};
+        }
+        
+        .progress-bar-container:hover .progress-bar-fill {
+          animation: pulse 1s ease-in-out infinite;
+          box-shadow: 0 0 12px rgba(39, 100, 235, 0.25);
+        }
+        
+        .progress-shimmer {
+          animation: shimmer 2s infinite linear;
         }
         
         @media screen and (max-width: 768px) {
