@@ -6,6 +6,7 @@ import { ConversionChart, ConversionChartData } from '../../components/charts/Co
 import { UniversalTable, renderStatus, renderButton } from '@/app/components/tables/UniversalTable';
 import QuotesExpirationCard from '@/app/components/charts/QuotesExpirationCard'
 import InfoWidget from '@/app/components/widgets/InfoWidget'
+import { ApprovalRate } from '@/app/components/charts/ApprovalRate';
 
 // Dashboard-ի տվյալներ - ԼՐԱՑՈՒՄ
 const quotesRows = [
@@ -229,6 +230,24 @@ export default function DocumentsPage() {
             max-[1280px]:min-h-auto max-[1280px]:max-h-none max-[1280px]:row-start-2
             max-[1024px]:min-h-auto max-[1024px]:max-h-none
           ">
+             <div style={{ padding: '20px', maxWidth: '400px' }}>
+      <ApprovalRate 
+        title="Quote Approval Rate"
+        subtitle="Shows the percentage of approved quotes."
+        approvalPercentage={78}
+        approvedCount={42}
+        typeLabel="Quote"
+        autoUpdate={false}
+        colors={{
+          primary: '#1a202c',
+          secondary: '#718096',
+          progressStart: 'rgba(102, 156, 238, 0.3)',
+          progressEnd: 'rgba(66, 153, 225, 0.6)',
+          textPrimary: '#2d3748',
+          textSecondary: '#4a5568'
+        }}
+      />
+    </div>
              <div className="flex items-center gap-3 mt-4 mb-2 xl:hidden">
                   <img
                     src="/quotes/header-ic.svg"
