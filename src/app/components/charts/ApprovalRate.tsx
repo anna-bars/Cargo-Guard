@@ -408,7 +408,8 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
                   alignItems: 'flex-end',
                   overflow: 'hidden',
                   paddingBottom: '4px',
-                  zIndex: 1
+                  zIndex: 1,
+                  marginLeft: '-2px'
                 }}
               >
                 {Array.from({ length: 40 }).map((_, index) => (
@@ -416,10 +417,11 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
                     key={index}
                     className="indicator-line"
                     style={{
-                      width: '2px',
+                      width: '1px',
                       height: '18px',
                       backgroundColor: '#E8E8E8',
-                      flexShrink: 0
+                      flexShrink: 0,
+                      transform: 'scaleX(2.7)'
                     }}
                   />
                 ))}
