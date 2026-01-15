@@ -327,16 +327,7 @@ export default function DocumentsPage() {
               />
            
 
-            {/* Quote Conversion Rate */}
-            <div className="flex-grow min-h-[calc(31%-4px)] xl:flex-[0_0_31%] xl:min-h-auto xl:h-auto">
-             <ConversionChart 
-                title="Documents Requiring Action"
-                data={quotesDatas}
-                defaultActiveTime="This Week"
-                showTimeDropdown={true} // Քանի որ միայն մեկ ժամանակահատված կա
-                typeLabels={quotesTypeLabels}
-              />
-            </div>
+            
 
             {/* Quotes Expiration Card */}
             <div style={{ maxWidth: '380px' }}>
@@ -358,6 +349,16 @@ export default function DocumentsPage() {
               />
             </div>
 
+{/* Quote Conversion Rate */}
+            <div className="flex-grow min-h-[calc(31%-4px)] xl:flex-[0_0_31%] xl:min-h-auto xl:h-auto">
+             <ConversionChart 
+                title="Documents Requiring Action"
+                data={quotesDatas}
+                defaultActiveTime="This Week"
+                showTimeDropdown={true} // Քանի որ միայն մեկ ժամանակահատված կա
+                typeLabels={quotesTypeLabels}
+              />
+            </div>
           </div>
 
           {/* Tablet View (768px - 1279px) - Three Widgets Side by Side */}

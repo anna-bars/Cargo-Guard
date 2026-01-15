@@ -139,7 +139,7 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
 
   return (
     <article 
-      className="frame approval-rate-container w-full box-border relative flex flex-col items-start gap-6 p-4 bg-[#fafcfc] rounded-2xl border border-[#e2e8f0]"
+      className="frame approval-rate-container w-full box-border relative flex flex-col items-start gap-6 p-4 border border-[#d1d1d154] bg-[#fdfdf8cf] rounded-2xl p-4 hover:shadow-sm transition-shadow duration-300"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -154,7 +154,7 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
           {title}
         </h1>
         <p 
-          className="approval-rate-subtitle w-full relative font-['Montserrat',_Helvetica,_Arial,_sans-serif] font-medium text-[14px] tracking-[0.28px] leading-normal m-0"
+          className="text-[#C8C8C8] approval-rate-subtitle w-full relative font-['Montserrat',_Helvetica,_Arial,_sans-serif] font-medium text-[14px] tracking-[0.28px] leading-normal m-0"
           style={{ color: colors.textSecondary }}
         >
           {subtitle}
