@@ -243,7 +243,7 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
             {/* Առաջադեմ ցուցիչ (գծիկներ) */}
             {showAdvancedIndicator && (
               <div 
-                className="advanced-indicator-container top-0 left-0 h-full inline-flex gap-[4.5px] ml-[2px] justify-start items-end overflow-hidden pb-1 z-10 -ml-0.5"
+                className="advanced-indicator-container top-0 left-0 h-full inline-flex gap-[4.5px] ml-[2px] justify-start items-center overflow-hidden z-10 -ml-0.5"
                 style={{ width: `${100 - animatedPercentage}%` }}
               >
                 {Array.from({ length: 40 }).map((_, index) => (
