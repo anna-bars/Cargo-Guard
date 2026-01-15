@@ -135,10 +135,10 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
         flexDirection: 'column',
         alignItems: 'flex-start',
         gap: '24px',
-        padding: '24px',
+        padding: '16px',
         position: 'relative',
         backgroundColor: '#fafcfc',
-        borderRadius: '8px',
+        borderRadius: '16px',
         border: '1px solid #e2e8f0',
         width: '100%',
         boxSizing: 'border-box'
@@ -494,8 +494,7 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
         }
         
         .approval-rate-container:hover {
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          transform: translateY(-2px);
+          
         }
         
         .progress-bar-fill {
