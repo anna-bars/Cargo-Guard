@@ -400,7 +400,7 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
                 style={{
                   top: 0,
                   left: 0,
-                  width: '100%',
+                  width: `${100 - animatedPercentage}%`,
                   height: '100%',
                   display: 'inline-flex',
                   gap: '4.5px',
