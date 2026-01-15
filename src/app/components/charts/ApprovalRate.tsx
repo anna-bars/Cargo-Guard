@@ -129,64 +129,21 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
 
   return (
     <article 
-      className="frame approval-rate-container"
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        gap: '24px',
-        padding: '16px',
-        position: 'relative',
-        backgroundColor: '#fafcfc',
-        borderRadius: '16px',
-        border: '1px solid #e2e8f0',
-        width: '100%',
-        boxSizing: 'border-box'
-      }}
+      className="frame approval-rate-container w-full box-border relative flex flex-col items-start gap-6 p-4 bg-[#fafcfc] rounded-2xl border border-[#e2e8f0]"
     >
       {/* Վերնագիր և ենթավերնագիր */}
       <header 
-        className="approval-rate-header"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          gap: '4px',
-          width: '100%',
-          flex: '0 0 auto',
-          position: 'relative'
-        }}
+        className="approval-rate-header w-full flex flex-col items-start gap-1 flex-none relative"
       >
         <h1 
-          className="approval-rate-title"
-          style={{
-            position: 'relative',
-            alignSelf: 'stretch',
-            marginTop: '-1px',
-            fontFamily: '"Montserrat", Helvetica, Arial, sans-serif',
-            fontWeight: 500,
-            color: colors.textPrimary,
-            fontSize: '18px',
-            letterSpacing: '0.36px',
-            lineHeight: 'normal',
-            margin: 0
-          }}
+          className="approval-rate-title w-full mt-[-1px] font-['Montserrat',_Helvetica,_Arial,_sans-serif] font-medium text-[18px] tracking-[0.36px] leading-normal m-0"
+          style={{ color: colors.textPrimary }}
         >
           {title}
         </h1>
         <p 
-          className="approval-rate-subtitle"
-          style={{
-            position: 'relative',
-            alignSelf: 'stretch',
-            fontFamily: '"Montserrat", Helvetica, Arial, sans-serif',
-            fontWeight: 500,
-            color: colors.textSecondary,
-            fontSize: '14px',
-            letterSpacing: '0.28px',
-            lineHeight: 'normal',
-            margin: 0
-          }}
+          className="approval-rate-subtitle w-full relative font-['Montserrat',_Helvetica,_Arial,_sans-serif] font-medium text-[14px] tracking-[0.28px] leading-normal m-0"
+          style={{ color: colors.textSecondary }}
         >
           {subtitle}
         </p>
@@ -194,58 +151,23 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
 
       {/* Տոկոսի ցուցադրում */}
       <section 
-        className="approval-percentage-section"
+        className="approval-percentage-section relative w-[161px] h-10"
         aria-label="Approval percentage"
-        style={{
-          position: 'relative',
-          width: '161px',
-          height: '40px'
-        }}
       >
         <div 
-          className="percentage-container"
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            display: 'flex',
-            gap: '4px',
-            width: '76px',
-            height: '38px',
-            alignItems: 'flex-start'
-          }}
+          className="percentage-container absolute top-0 left-0 flex gap-1 w-[76px] h-[38px] items-start"
         >
           <span 
-            className="percentage-symbol"
+            className="percentage-symbol w-[9px] h-3 font-['Montserrat',_Helvetica,_Arial,_sans-serif] font-normal text-[10px] tracking-[0.20px] leading-normal whitespace-nowrap pt-1.5"
             aria-hidden="true"
-            style={{
-              width: '9px',
-              height: '12px',
-              fontFamily: '"Montserrat", Helvetica, Arial, sans-serif',
-              fontWeight: 400,
-              color: colors.textPrimary,
-              fontSize: '10px',
-              letterSpacing: '0.20px',
-              lineHeight: 'normal',
-              whiteSpace: 'nowrap',
-              paddingTop: '6px'
-            }}
+            style={{ color: colors.textPrimary }}
           >
             %
           </span>
           <span 
-            className="percentage-value"
-            style={{
-              marginTop: '2px',
-              width: '59px',
-              height: '36px',
-              fontFamily: '"Montserrat", Helvetica, Arial, sans-serif',
-              fontWeight: 400,
+            className="percentage-value mt-0.5 w-[59px] h-9 font-['Montserrat',_Helvetica,_Arial,_sans-serif] font-normal text-[48px] tracking-[0.96px] leading-9 whitespace-nowrap transition-all duration-300 ease-in-out"
+            style={{ 
               color: colors.textPrimary,
-              fontSize: '48px',
-              letterSpacing: '0.96px',
-              lineHeight: '36px',
-              whiteSpace: 'nowrap',
               transition: isAnimating ? 'all 0.3s ease' : 'none',
               transform: isAnimating ? 'scale(1.05)' : 'scale(1)'
             }}
@@ -254,18 +176,8 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
           </span>
         </div>
         <span 
-          className="type-label"
-          style={{
-            position: 'absolute',
-            top: '25px',
-            left: '91px',
-            fontFamily: '"Montserrat", Helvetica, Arial, sans-serif',
-            fontWeight: 500,
-            color: colors.textSecondary,
-            fontSize: '12px',
-            letterSpacing: '0.24px',
-            lineHeight: 'normal'
-          }}
+          className="type-label absolute top-[25px] left-[91px] font-['Montserrat',_Helvetica,_Arial,_sans-serif] font-medium text-[12px] tracking-[0.24px] leading-normal"
+          style={{ color: colors.textSecondary }}
         >
           {typeLabel}
         </span>
@@ -273,69 +185,29 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
 
       {/* Առաջընթացի տող */}
       <section 
-        className="progress-section"
+        className="progress-section relative w-full h-[68px]"
         aria-label="Document approval progress"
-        style={{
-          position: 'relative',
-          width: '100%',
-          height: '68px'
-        }}
       >
         <div 
-          className="progress-wrapper"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            width: '100%'
-          }}
+          className="progress-wrapper flex flex-col w-full"
         >
           {/* Վերնագիր և քանակ */}
           <div 
-            className="progress-header"
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '100%'
-            }}
+            className="progress-header flex flex-col w-full"
           >
             <div 
-              className="count-display"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                width: '100%',
-                height: '17px',
-                position: 'relative'
-              }}
+              className="count-display flex items-center justify-between w-full h-[17px] relative"
             >
               <span 
-                className="progress-title"
-                style={{
-                  position: 'relative',
-                  width: 'fit-content',
-                  fontFamily: '"Montserrat", Helvetica, Arial, sans-serif',
-                  fontWeight: 500,
-                  color: colors.textPrimary,
-                  fontSize: '12px',
-                  letterSpacing: '0.24px',
-                  lineHeight: 'normal'
-                }}
+                className="progress-title relative w-fit font-['Montserrat',_Helvetica,_Arial,_sans-serif] font-medium text-[12px] tracking-[0.24px] leading-normal"
+                style={{ color: colors.textPrimary }}
               >
                 Documents Approved
               </span>
               <span 
-                className="progress-count"
-                style={{
-                  position: 'relative',
-                  width: 'fit-content',
-                  marginTop: '-1px',
-                  fontFamily: '"Montserrat", Helvetica, Arial, sans-serif',
-                  fontWeight: 400,
+                className="progress-count relative w-fit mt-[-1px] font-['Montserrat',_Helvetica,_Arial,_sans-serif] font-normal text-[14px] tracking-[0.28px] leading-normal transition-all duration-300 ease-in-out"
+                style={{ 
                   color: colors.textSecondary,
-                  fontSize: '14px',
-                  letterSpacing: '0.28px',
-                  lineHeight: 'normal',
                   transition: isAnimating ? 'all 0.3s ease' : 'none'
                 }}
               >
@@ -346,82 +218,38 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
 
           {/* Առաջընթացի տող */}
           <div 
-            className="progress-bar-container"
-            style={{
-              marginTop: '6px',
-              width: '100%',
-              height: '24px',
-              borderRadius: '4px',
-              overflow: 'hidden',
-              position: 'relative',
-              display: 'flex'
-            }}
+            className="progress-bar-container mt-1.5 w-full h-6 rounded overflow-hidden relative flex"
           >
             <div 
-              className="progress-bar-fill"
+              className="progress-bar-fill relative top-0 left-0 h-full rounded transition-all duration-500 ease-in-out"
               role="progressbar"
               aria-valuenow={animatedPercentage}
               aria-valuemin={0}
               aria-valuemax={100}
               aria-label="Document approval progress bar"
               style={{
-                position: 'relative',
-                top: 0,
-                left: 0,
                 width: `${animatedPercentage}%`,
-                height: '100%',
                 background: getProgressGradient(),
-                borderRadius: '4px',
                 transition: isAnimating ? 'width 0.5s ease' : 'width 0.3s ease',
                 boxShadow: isAnimating ? '0 0 10px rgba(255, 200, 100, 0.5)' : 'none',
                 zIndex: 2
               }}
             >
               <div 
-                className="progress-indicator"
-                style={{
-                  position: 'absolute',
-                  right: '3px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  width: '3px',
-                  height: '18px',
-                  backgroundColor: '#f6f8fa',
-                  borderRadius: '1px'
-                }}
+                className="progress-indicator absolute right-[3px] top-1/2 transform -translate-y-1/2 w-[3px] h-[18px] bg-[#f6f8fa] rounded-[1px]"
               />
             </div>
             
             {/* Առաջադեմ ցուցիչ (գծիկներ) */}
             {showAdvancedIndicator && (
               <div 
-                className="advanced-indicator-container"
-                style={{
-                  top: 0,
-                  left: 0,
-                  width: `${100 - animatedPercentage}%`,
-                  height: '100%',
-                  display: 'inline-flex',
-                  gap: '4.5px',
-                  justifyContent: 'flex-start',
-                  alignItems: 'flex-end',
-                  overflow: 'hidden',
-                  paddingBottom: '4px',
-                  zIndex: 1,
-                  marginLeft: '-2px'
-                }}
+                className="advanced-indicator-container top-0 left-0 h-full inline-flex gap-[4.5px] ml-[2px] justify-start items-end overflow-hidden pb-1 z-10 -ml-0.5"
+                style={{ width: `${100 - animatedPercentage}%` }}
               >
                 {Array.from({ length: 40 }).map((_, index) => (
                   <div
                     key={index}
-                    className="indicator-line"
-                    style={{
-                      width: '1px',
-                      height: '18px',
-                      backgroundColor: '#E8E8E8',
-                      flexShrink: 0,
-                      transform: 'scaleX(2.7)'
-                    }}
+                    className="indicator-line w-px h-[18px] bg-[#E8E8E8] flex-shrink-0 scale-x-[2.7]"
                   />
                 ))}
               </div>
@@ -430,46 +258,17 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
 
           {/* Սանդղակ */}
           <div 
-            className="progress-scale"
-            style={{
-              marginTop: '4px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              width: '100%',
-              height: '17px',
-              position: 'relative'
-            }}
+            className="progress-scale mt-1 flex items-center justify-between w-full h-[17px] relative"
           >
             <span 
-              className="scale-min"
-              style={{
-                position: 'relative',
-                width: 'fit-content',
-                marginTop: '-1px',
-                fontFamily: '"Montserrat", Helvetica, Arial, sans-serif',
-                fontWeight: 400,
-                color: colors.textSecondary,
-                fontSize: '14px',
-                letterSpacing: '0.28px',
-                lineHeight: 'normal'
-              }}
+              className="scale-min relative w-fit mt-[-1px] font-['Montserrat',_Helvetica,_Arial,_sans-serif] font-normal text-[14px] tracking-[0.28px] leading-normal"
+              style={{ color: colors.textSecondary }}
             >
               0
             </span>
             <span 
-              className="scale-max"
-              style={{
-                position: 'relative',
-                width: 'fit-content',
-                marginTop: '-1px',
-                fontFamily: '"Montserrat", Helvetica, Arial, sans-serif',
-                fontWeight: 400,
-                color: colors.textSecondary,
-                fontSize: '14px',
-                letterSpacing: '0.28px',
-                lineHeight: 'normal'
-              }}
+              className="scale-max relative w-fit mt-[-1px] font-['Montserrat',_Helvetica,_Arial,_sans-serif] font-normal text-[14px] tracking-[0.28px] leading-normal"
+              style={{ color: colors.textSecondary }}
             >
               100
             </span>
@@ -490,10 +289,6 @@ export const ApprovalRate: React.FC<ApprovalRateProps> = ({
         
         .approval-rate-container {
           transition: all 0.3s ease;
-        }
-        
-        .approval-rate-container:hover {
-          
         }
         
         .progress-bar-fill {
