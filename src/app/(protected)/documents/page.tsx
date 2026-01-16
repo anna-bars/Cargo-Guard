@@ -8,6 +8,7 @@ import QuotesExpirationCard from '@/app/components/charts/QuotesExpirationCard'
 import InfoWidget from '@/app/components/widgets/InfoWidget'
 import { ApprovalRate } from '@/app/components/charts/ApprovalRate';
 import DocumentItem from '@/app/components/documents/DocumentItem';
+import { ActivityTableFilter } from '@/app/components/tables/ActivityTableFilter';
 
 // Dashboard-ի տվյալներ - ԼՐԱՑՈՒՄ
 const quotesRows = [
@@ -149,6 +150,93 @@ const quotesColumns = [
 ];
  
 export default function DocumentsPage() {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedFilter, setSelectedFilter] = useState('All Activity')
+  const [selectedTimeframe, setSelectedTimeframe] = useState('Last 30 days')
+  const [selectedSort, setSelectedSort] = useState('Status')
+
+  // Փաստաթղթերի զանգված
+  const documents = [
+    { type: 'Policy:', id: 'P-0812', status: 'Pending Review', cargoType: 'Electronics', summary: '1 Document Pending Review' },
+    { 
+      type: 'Policy:',
+      id: 'P-3401',
+      status: 'Missing',
+      cargoType: 'Machinery',
+      summary: '1 of 3 Documents Missing' 
+    },
+    { 
+      type: 'Policy:',
+      id: 'P-0812',
+      status: 'Rejected',
+      cargoType: 'Textiles',
+      summary: '2 of 3 Documents Approved' 
+    },
+    { 
+      type: 'Quote:',
+      id: 'Q-0072',
+      status: 'Pending Review',
+      cargoType: 'Clothing',
+      summary: '1 Document Pending Review' 
+    },
+    { 
+      type: 'Policy:',
+      id: 'P-4419',
+      status: 'Approved',
+      cargoType: 'Perishables',
+      summary: 'All Documents Approved' 
+    },
+    { 
+      type: 'Quote:',
+      id: 'Q-4102',
+      status: 'Rejected',
+      cargoType: 'Furniture',
+      summary: '2 of 3 Documents Approved' 
+    },
+    { 
+      type: 'Policy:',
+      id: 'P-4419',
+      status: 'Approved',
+      cargoType: 'Perishables',
+      summary: 'All Documents Approved' 
+    },
+    { 
+      type: 'Policy:',
+      id: 'P-4419',
+      status: 'Approved',
+      cargoType: 'Perishables',
+      summary: 'All Documents Approved' 
+    },
+    { 
+      type: 'Policy:',
+      id: 'P-4419',
+      status: 'Approved',
+      cargoType: 'Perishables',
+      summary: 'All Documents Approved' 
+    },
+    { 
+      type: 'Policy:',
+      id: 'P-4419',
+      status: 'Approved',
+      cargoType: 'Perishables',
+      summary: 'All Documents Approved' 
+    },
+    
+  ]
+
+  const filteredDocuments = documents.filter(doc => {
+    // Search filter
+    const matchesSearch = searchQuery === '' || 
+      doc.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doc.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doc.cargoType.toLowerCase().includes(searchQuery.toLowerCase())
+    
+    // Activity filter
+    const matchesActivity = selectedFilter === 'All Activity' || 
+      doc.status === selectedFilter
+    
+    return matchesSearch && matchesActivity
+  })
   const quotesDatas = {
   'This Week': { approved: 17, declined: 2, expired: 18 },
   'This Month': { approved: 35, declined: 5, expired: 42 },
@@ -212,7 +300,7 @@ export default function DocumentsPage() {
   
   return (
     <DashboardLayout>
-      <div className="w-full min-w-[97.5%] max-w-[88%] !sm:min-w-[90.5%] mx-auto">
+      <div className="min-w-[96%] max-w-[95.5%] !sm:min-w-[90.5%] mx-auto">
         {/* Mobile Header for Activity Section */}
        
 
@@ -271,72 +359,44 @@ export default function DocumentsPage() {
               />
             </div>
             </div>
-           <div className='overflow-y-scroll max-h-[82vh] sm:max-h-max-content flex justify-between flex-wrap gap-y-3 sm:gap-y-2'>
-             <DocumentItem 
-        type="Policy:"
-        id="P-0812"
-        status="Approved"
-        cargoType="Textiles"
-        summary="3 Documents Ready"
-        buttonText="Open Documents"
+           <div className="p-6">
+      {/* ActivityTableFilter օգտագործումը */}
+      <ActivityTableFilter
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        selectedFilter={selectedFilter}
+        setSelectedFilter={setSelectedFilter}
+        selectedTimeframe={selectedTimeframe}
+        setSelectedTimeframe={setSelectedTimeframe}
+        selectedSort={selectedSort}
+        setSelectedSort={setSelectedSort}
+        title="Documents" // Փոխում ենք վերնագիրը
+        filterConfig={{
+          showActivityFilter: true,
+          showTimeframeFilter: true,
+          showSortFilter: true,
+          // Կարգավորում ենք ըստ փաստաթղթերի
+          activityOptions: ['All Activity', 'Pending Review', 'Approved', 'Rejected', 'In Progress'],
+          timeframeOptions: ['Last 7 days', 'Last 30 days', 'Last 3 months', 'Last year', 'All time'],
+          sortOptions: ['Date', 'Status', 'Document Type', 'ID']
+        }}
       />
-       <DocumentItem 
-        type="Policy:"
-        id="P-0812"
-        status="Approved"
-        cargoType="Textiles"
-        summary="3 Documents Ready"
-        buttonText="Open Documents"
-      />
-       <DocumentItem 
-        type="Policy:"
-        id="P-0812"
-        status="Approved"
-        cargoType="Textiles"
-        summary="3 Documents Ready"
-        buttonText="Open Documents"
-      />
-      <DocumentItem 
-        type="Policy:"
-        id="P-0812"
-        status="Approved"
-        cargoType="Textiles"
-        summary="3 Documents Ready"
-        buttonText="Open Documents"
-      />
-      <DocumentItem 
-        type="Policy:"
-        id="P-0812"
-        status="Approved"
-        cargoType="Textiles"
-        summary="3 Documents Ready"
-        buttonText="Open Documents"
-      />
-      <DocumentItem 
-        type="Policy:"
-        id="P-0812"
-        status="Approved"
-        cargoType="Textiles"
-        summary="3 Documents Ready"
-        buttonText="Open Documents"
-      />
-      <DocumentItem 
-        type="Policy:"
-        id="P-0812"
-        status="Approved"
-        cargoType="Textiles"
-        summary="3 Documents Ready"
-        buttonText="Open Documents"
-      />
-      <DocumentItem 
-        type="Policy:"
-        id="P-0812"
-        status="Approved"
-        cargoType="Textiles"
-        summary="3 Documents Ready"
-        buttonText="Open Documents"
-      />
-           </div>
+
+      {/* Փաստաթղթերի ցուցադրում */}
+      <div className="overflow-y-scroll max-h-[82vh] sm:max-h-max-content flex justify-between flex-wrap gap-y-3 sm:gap-y-2">
+        {filteredDocuments.map((doc, index) => (
+          <DocumentItem
+            key={index}
+            type={doc.type}
+            id={doc.id}
+            status={doc.status}
+            cargoType={doc.cargoType}
+            summary={doc.summary}
+            buttonText="View Details"
+          />
+        ))}
+      </div>
+    </div>
 
          
           </div>

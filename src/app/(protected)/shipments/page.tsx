@@ -138,7 +138,7 @@ export default function ShipmentsPage() {
   
   return (
     <DashboardLayout>
-      <div className="w-full min-w-[97.5%] max-w-[88%] !sm:min-w-[90.5%] mx-auto">
+      <div className="min-w-[96%] max-w-[95.5%] !sm:min-w-[90.5%] mx-auto">
         {/* Mobile Header for Activity Section */}
        
 
