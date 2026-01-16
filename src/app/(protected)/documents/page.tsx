@@ -271,7 +271,7 @@ export default function DocumentsPage() {
               />
             </div>
             </div>
-           <div className='flex justify-between'>
+           <div className='flex justify-between flex-wrap gap-y-2'>
              <DocumentItem 
         type="Policy:"
         id="P-0812"
@@ -289,6 +289,38 @@ export default function DocumentsPage() {
         buttonText="Open Documents"
       />
        <DocumentItem 
+        type="Policy:"
+        id="P-0812"
+        status="Approved"
+        cargoType="Textiles"
+        summary="3 Documents Ready"
+        buttonText="Open Documents"
+      />
+      <DocumentItem 
+        type="Policy:"
+        id="P-0812"
+        status="Approved"
+        cargoType="Textiles"
+        summary="3 Documents Ready"
+        buttonText="Open Documents"
+      />
+      <DocumentItem 
+        type="Policy:"
+        id="P-0812"
+        status="Approved"
+        cargoType="Textiles"
+        summary="3 Documents Ready"
+        buttonText="Open Documents"
+      />
+      <DocumentItem 
+        type="Policy:"
+        id="P-0812"
+        status="Approved"
+        cargoType="Textiles"
+        summary="3 Documents Ready"
+        buttonText="Open Documents"
+      />
+      <DocumentItem 
         type="Policy:"
         id="P-0812"
         status="Approved"
