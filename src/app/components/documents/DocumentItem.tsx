@@ -28,7 +28,7 @@ const DocumentItem: React.FC<DocumentItemProps> = ({
       textColor: 'text-[#6B6B6B]',
       hoverTextColor: 'text-white',
       borderColor: 'border-[#EAECBA]',
-      hoverBorderColor: 'border-[#d8da94]',
+      hoverBorderColor: 'border-[#F1F0F6]',
       dotColor: '#EAECBA',
       hoverDotColor: '#d8da94',
       buttons: [
@@ -42,7 +42,7 @@ const DocumentItem: React.FC<DocumentItemProps> = ({
       textColor: 'text-[#6B6B6B]',
       hoverTextColor: 'text-white',
       borderColor: 'border-[#FAEDBC]',
-      hoverBorderColor: 'border-[#e8d9a4]',
+      hoverBorderColor: 'border-[#F1F0F6]',
       dotColor: '#FAEDBC',
       hoverDotColor: '#e8d9a4',
       buttons: [
@@ -57,7 +57,7 @@ const DocumentItem: React.FC<DocumentItemProps> = ({
       textColor: 'text-[#6B6B6B]',
       hoverTextColor: 'text-white',
       borderColor: 'border-[#ECB9BA]',
-      hoverBorderColor: 'border-[#daa7a8]',
+      hoverBorderColor: 'border-[#F1F0F6]',
       dotColor: '#ECB9BA',
       hoverDotColor: '#daa7a8',
       buttons: [
@@ -72,7 +72,7 @@ const DocumentItem: React.FC<DocumentItemProps> = ({
       textColor: 'text-[#6B6B6B]',
       hoverTextColor: 'text-white',
       borderColor: 'border-[#B9DAEC]',
-      hoverBorderColor: 'border-[#a7c8da]',
+      hoverBorderColor: 'border-[#F1F0F6]',
       dotColor: '#B9DAEC',
       hoverDotColor: '#a7c8da',
       buttons: [
@@ -86,7 +86,7 @@ const DocumentItem: React.FC<DocumentItemProps> = ({
       textColor: 'text-[#6B6B6B]',
       hoverTextColor: 'text-white',
       borderColor: 'border-[#EAECBA]',
-      hoverBorderColor: 'border-[#d8da94]',
+      hoverBorderColor: 'border-[#F1F0F6]',
       dotColor: '#EAECBA',
       hoverDotColor: '#d8da94',
       buttons: [
@@ -129,7 +129,7 @@ const DocumentItem: React.FC<DocumentItemProps> = ({
                   px-2 py-0.5 
                   rounded-full 
                   border-2 
-                  outline outline-2 outline-[#F3F3F5] hover:border-[#F1F0F6]
+                  outline outline-2 outline-[#F3F3F5] 
                   relative
                   transition-all duration-300 ease-out
                   z-10
