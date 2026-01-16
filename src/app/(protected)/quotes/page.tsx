@@ -205,7 +205,7 @@ export default function QuotesPage() {
   
   return (
     <DashboardLayout>
-      <div className="w-full max-w-[99%] sm:max-w-[99%] mx-auto">
+      <div className="w-full min-w-[97.5%] max-w-[88%] !sm:min-w-[90.5%] mx-auto">
         {/* Mobile Header for Activity Section */}
        
 
