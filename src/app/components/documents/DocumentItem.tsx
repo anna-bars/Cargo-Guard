@@ -132,7 +132,7 @@ const DocumentItem: React.FC<DocumentItemProps> = ({
                   outline outline-2 outline-[#F3F3F5] 
                   relative
                   transition-all duration-300 ease-out
-                  z-10
+                  z-1
                   ${isHovered ? currentStatus.hoverTextColor : currentStatus.textColor}
                   ${isHovered ? currentStatus.hoverBorderColor : currentStatus.borderColor}
                   ${isHovered ? currentStatus.hoverBgColor : 'bg-[#FAFAFB]'}
@@ -152,7 +152,7 @@ const DocumentItem: React.FC<DocumentItemProps> = ({
                     w-2 h-2 
                     rounded-full
                     transition-all duration-300
-                    z-20
+                    z-2
                   `}
                   style={{ 
                     backgroundColor: isHovered ? currentStatus.hoverDotColor : currentStatus.dotColor,
