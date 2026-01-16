@@ -300,7 +300,7 @@ export default function DocumentsPage() {
   
   return (
     <DashboardLayout>
-      <div className="min-w-[96%] max-w-[95.5%] !sm:min-w-[90.5%] mx-auto">
+      <div className="min-w-[96%] max-w-[95.5%] !sm:min-w-[90.5%] mx-auto document">
         {/* Mobile Header for Activity Section */}
        
 
@@ -320,14 +320,14 @@ export default function DocumentsPage() {
             max-[1024px]:min-h-auto max-[1024px]:max-h-none
           ">
              
-             <div className="flex items-center gap-3 mt-4 mb-2 sm:mt-0">
+             <div className="flex items-center gap-3 mt-4 mb-2 sm:mt-0 sm:hidden">
                   <img
                     src="/quotes/header-ic.svg"
                     alt=""
-                    className="w-[22px] h-[22px] sm:w-5 sm:h-5"
+                    className="w-[22px] h-[22px] sm:w-6 sm:h-6"
                   />
                   <h2 className="font-normal text-[18px] sm:text-[26px]">Documents</h2>
-                  
+                   
                 </div> 
 
             <div className="block md:hidden">
@@ -359,9 +359,10 @@ export default function DocumentsPage() {
               />
             </div>
             </div>
-           <div className="p-6">
+           <div className="">
       {/* ActivityTableFilter օգտագործումը */}
-      <ActivityTableFilter
+      <div className='mb-2'>
+        <ActivityTableFilter
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         selectedFilter={selectedFilter}
@@ -370,7 +371,7 @@ export default function DocumentsPage() {
         setSelectedTimeframe={setSelectedTimeframe}
         selectedSort={selectedSort}
         setSelectedSort={setSelectedSort}
-        title="Documents" // Փոխում ենք վերնագիրը
+        title="" // Փոխում ենք վերնագիրը
         filterConfig={{
           showActivityFilter: true,
           showTimeframeFilter: true,
@@ -381,9 +382,10 @@ export default function DocumentsPage() {
           sortOptions: ['Date', 'Status', 'Document Type', 'ID']
         }}
       />
+      </div>
 
       {/* Փաստաթղթերի ցուցադրում */}
-      <div className="overflow-y-scroll max-h-[82vh] sm:max-h-max-content flex justify-between flex-wrap gap-y-3 sm:gap-y-2">
+      <div className="overflow-y-scroll max-h-[82vh]  sm:max-h-[89.5%] rounded sm:max-h-max-content flex justify-start flex-wrap gap-y-3 sm:gap-2.5">
         {filteredDocuments.map((doc, index) => (
           <DocumentItem
             key={index}
@@ -531,6 +533,7 @@ export default function DocumentsPage() {
             </div>
           </div>
         </div>
+        
       </div>
     </DashboardLayout>
   )

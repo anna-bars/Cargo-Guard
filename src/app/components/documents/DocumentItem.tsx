@@ -18,7 +18,7 @@ const DocumentItem: React.FC<DocumentItemProps> = ({
   buttonText = 'View All Docs'
 }) => {
   return (
-    <div className="w-full max-w-[100%] sm:max-w-[24.5%] group">
+    <div className="w-full max-w-[100%] sm:max-w-[24.3%] group">
       <div className="relative">
         {/* Top part with background image */}
         <div 
