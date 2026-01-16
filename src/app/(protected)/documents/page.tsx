@@ -239,6 +239,7 @@ export default function DocumentsPage() {
                     className="w-[22px] h-[22px] sm:w-5 sm:h-5"
                   />
                   <h2 className="font-normal text-[18px] sm:text-[26px]">Documents</h2>
+                  
                 </div> 
 
             <div className="block md:hidden">

@@ -18,7 +18,7 @@ const DocumentItem: React.FC<DocumentItemProps> = ({
   buttonText = 'View All Docs'
 }) => {
   return (
-    <div className="w-full max-w-[24.5%]">
+    <div className="w-full max-w-[24.5%] group">
       <div className="relative">
         {/* Top part with background image */}
         <div 
@@ -35,13 +35,47 @@ const DocumentItem: React.FC<DocumentItemProps> = ({
         
         {/* Bottom part */}
         <div className="bg-[#fdfdf8cf] p-3 rounded-b-2xl rounded-tr-2xl flex flex-col gap-1">
-          {/* Status */}
+          {/* Status with Glow Effect */}
           <div className="flex justify-end">
             <div className="relative">
-              <span className="text-xs text-[#6B6B6B] bg-[#FAFAFB] px-2 py-0.5 rounded-full border-2 border-[#B9DAEC] outline outline-2 outline-[#F3F3F5] relative">
+              <span className="
+                text-xs text-[#6B6B6B] 
+                bg-[#FAFAFB] 
+                px-2 py-0.5 
+                rounded-full 
+                border-2 border-[#B9DAEC] 
+                outline outline-2 outline-[#F3F3F5] 
+                relative
+                group-hover:bg-gradient-to-r group-hover:from-[#8EB1FF] group-hover:to-[#ABC3F7]
+                group-hover:text-white
+                group-hover:border-[#F3F3F6]
+                group-hover:outline-blue-300
+                transition-all duration-300 ease-out
+                z-10
+              ">
                 {status}
-                {/* Dot before status */}
-                <span className="absolute -left-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-[#B9DAEC] rounded-full"></span>
+                {/* Glowing dot - enhanced */}
+                <span className="
+                  absolute -left-3 top-1/2 -translate-y-1/2 
+                  w-1.5 h-1.5 
+                  bg-[#B9DAEC] 
+                  rounded-full
+                  group-hover:scale-70
+                  transition-all duration-300
+                  z-20
+                "></span>
+                
+                {/* Additional glow layer */}
+                <span className="
+                  absolute inset-0 
+                  rounded-full 
+                  opacity-0 
+                  group-hover:opacity-100
+                  bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600
+                  blur-[2px]
+                  -z-10
+                  transition-opacity duration-300
+                "></span>
               </span>
             </div>
           </div>
