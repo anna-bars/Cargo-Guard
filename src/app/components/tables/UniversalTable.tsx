@@ -532,7 +532,7 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
           border border-[#8989893b]
           flex flex-col flex-1 overflow-hidden
           max-[767px]:border-none
-          max-[767px]:bg-[#f3f3f6] max-[767px]:!w-[99.5%]
+          max-[767px]:bg-[#f3f3f6] max-[767px]:!w-[99.5%] pb-2
         ">
           
           {/* Desktop Table Header */}
