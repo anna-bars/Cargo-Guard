@@ -237,7 +237,7 @@ export default function DocumentsPage() {
                     alt=""
                     className="w-[22px] h-[22px] sm:w-5 sm:h-5"
                   />
-                  <h2 className="font-normal text-[18px] sm:text-lg">Quotes</h2>
+                  <h2 className="font-normal text-[18px] sm:text-lg">Documents</h2>
                 </div> 
 
             <div className="block md:hidden">
