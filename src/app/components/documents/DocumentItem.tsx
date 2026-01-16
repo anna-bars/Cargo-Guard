@@ -20,43 +20,68 @@ const DocumentItem: React.FC<DocumentItemProps> = ({
   // Ստատուսների համար գույների և կոճակների կոնֆիգուրացիա
   const statusConfig = {
     'Pending Review': {
-      color: '#EAECBA',
-      textColor: '#6B6B6B',
-      borderColor: '#EAECBA',
+      bgColor: 'bg-[#EAECBA]',
+      hoverBgColor: 'group-hover:bg-[#EAECBA]',
+      textColor: 'text-[#6B6B6B]',
+      hoverTextColor: 'group-hover:text-[#4A4A4A]',
+      borderColor: 'border-[#EAECBA]',
+      hoverBorderColor: 'group-hover:border-[#D8DA94]',
+      dotColor: '#EAECBA',
+      hoverDotColor: '#D8DA94',
       buttons: [
         { text: 'View All Docs', variant: 'default' as const }
       ]
     },
     'Missing': {
-      color: '#FAEDBC',
-      textColor: '#6B6B6B',
-      borderColor: '#FAEDBC',
+      bgColor: 'bg-[#FAEDBC]',
+      hoverBgColor: 'group-hover:bg-[#FAEDBC]',
+      textColor: 'text-[#6B6B6B]',
+      hoverTextColor: 'group-hover:text-[#4A4A4A]',
+      borderColor: 'border-[#FAEDBC]',
+      hoverBorderColor: 'group-hover:border-[#E8D9A4]',
+      dotColor: '#FAEDBC',
+      hoverDotColor: '#E8D9A4',
       buttons: [
         { text: 'View All Docs', variant: 'default' as const },
         { text: 'Upload Missing Docs', variant: 'primary' as const }
       ]
     },
     'Rejected': {
-      color: '#ECB9BA',
-      textColor: '#6B6B6B',
-      borderColor: '#ECB9BA',
+      bgColor: 'bg-[#ECB9BA]',
+      hoverBgColor: 'group-hover:bg-[#ECB9BA]',
+      textColor: 'text-[#6B6B6B]',
+      hoverTextColor: 'group-hover:text-[#4A4A4A]',
+      borderColor: 'border-[#ECB9BA]',
+      hoverBorderColor: 'group-hover:border-[#DAA7A8]',
+      dotColor: '#ECB9BA',
+      hoverDotColor: '#DAA7A8',
       buttons: [
         { text: 'View All Docs', variant: 'default' as const },
         { text: 'Replace Document', variant: 'rejected' as const }
       ]
     },
     'Approved': {
-      color: '#B9DAEC',
-      textColor: '#6B6B6B',
-      borderColor: '#B9DAEC',
+      bgColor: 'bg-[#B9DAEC]',
+      hoverBgColor: 'group-hover:bg-[#B9DAEC]',
+      textColor: 'text-[#6B6B6B]',
+      hoverTextColor: 'group-hover:text-[#4A4A4A]',
+      borderColor: 'border-[#B9DAEC]',
+      hoverBorderColor: 'group-hover:border-[#A7C8DA]',
+      dotColor: '#B9DAEC',
+      hoverDotColor: '#A7C8DA',
       buttons: [
         { text: 'View All Docs', variant: 'default' as const }
       ]
     },
     'In Progress': {
-      color: '#EAECBA',
-      textColor: '#6B6B6B',
-      borderColor: '#EAECBA',
+      bgColor: 'bg-[#EAECBA]',
+      hoverBgColor: 'group-hover:bg-[#EAECBA]',
+      textColor: 'text-[#6B6B6B]',
+      hoverTextColor: 'group-hover:text-[#4A4A4A]',
+      borderColor: 'border-[#EAECBA]',
+      hoverBorderColor: 'group-hover:border-[#D8DA94]',
+      dotColor: '#EAECBA',
+      hoverDotColor: '#D8DA94',
       buttons: [
         { text: 'View All Docs', variant: 'default' as const }
       ]
@@ -84,11 +109,11 @@ const DocumentItem: React.FC<DocumentItemProps> = ({
         
         {/* Bottom part */}
         <div className="bg-[#fdfdf8cf] p-3 rounded-b-2xl rounded-tr-2xl flex flex-col gap-3">
-          {/* Status with Glow Effect */}
+          {/* Status with custom hover colors */}
           <div className="flex justify-end">
             <div className="relative">
               <span 
-                className="
+                className={`
                   text-xs 
                   bg-[#FAFAFB] 
                   px-2 py-0.5 
@@ -96,43 +121,30 @@ const DocumentItem: React.FC<DocumentItemProps> = ({
                   border-2 
                   outline outline-2 outline-[#F3F3F5] 
                   relative
-                  group-hover:bg-gradient-to-r group-hover:from-[#8EB1FF] group-hover:to-[#ABC3F7]
-                  group-hover:text-white
-                  group-hover:border-[#F3F3F6]
-                  group-hover:outline-blue-300
                   transition-all duration-300 ease-out
                   z-10
-                "
-                style={{
-                  color: currentStatus.textColor,
-                  borderColor: currentStatus.color
-                }}
+                  ${currentStatus.textColor}
+                  ${currentStatus.hoverTextColor}
+                  ${currentStatus.borderColor}
+                  ${currentStatus.hoverBorderColor}
+                  ${currentStatus.hoverBgColor}
+                `}
               >
                 {status}
-                {/* Glowing dot - enhanced */}
+                {/* Glowing dot with hover effect */}
                 <span 
-                  className="
+                  className={`
                     absolute -left-3 top-1/2 -translate-y-1/2 
                     w-1.5 h-1.5 
                     rounded-full
-                    group-hover:scale-70
                     transition-all duration-300
                     z-20
-                  "
-                  style={{ backgroundColor: currentStatus.color }}
+                  `}
+                  style={{ 
+                    backgroundColor: currentStatus.dotColor,
+                    '--hover-dot-color': currentStatus.hoverDotColor
+                  } as React.CSSProperties}
                 ></span>
-                
-                {/* Additional glow layer */}
-                <span className="
-                  absolute inset-0 
-                  rounded-full 
-                  opacity-0 
-                  group-hover:opacity-100
-                  bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600
-                  blur-[2px]
-                  -z-10
-                  transition-opacity duration-300
-                "></span>
               </span>
             </div>
           </div>
