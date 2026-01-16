@@ -13,6 +13,7 @@ interface ActivityTableFilterProps {
   showMobileHeader?: boolean;
   title?: string;
   onReset?: () => void;
+  showGetNewQuote?: boolean; // ✅ Նոր prop՝ Get New Quote կոճակը ցույց տալու համար
   filterConfig?: {
     showActivityFilter?: boolean;
     showTimeframeFilter?: boolean;
@@ -35,6 +36,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
   showMobileHeader = true,
   title = 'Recent Insurance Activity',
   onReset,
+  showGetNewQuote = true, // ✅ Default արժեքը true է
   filterConfig = {
     showActivityFilter: true,
     showTimeframeFilter: true,
@@ -44,7 +46,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
     sortOptions: ['Status', 'Date', 'Value', 'Type']
   },
 }) => {
-  // Use filterConfig values - ԿԱՐԵՎՈՐ՝ ջնջեք կրկնվող փոփոխականների հայտարարումները
+  // Use filterConfig values
   const activityOptions = filterConfig.activityOptions || ['All Activity', 'Pending', 'Active', 'Expiring', 'Missing', 'Declined'];
   const timeframeOptions = filterConfig.timeframeOptions || ['Last 7 days', 'Last 30 days', 'Last 3 months', 'All time'];
   const sortOptions = filterConfig.sortOptions || ['Status', 'Date', 'Value', 'Type'];
@@ -60,21 +62,15 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
     if (onReset) onReset();
   };
 
-  // ԿԱՐԵՎՈՐ՝ ջնջեք այս կրկնվող տողերը
-  // const activityOptions = ['All Activity', 'Pending', 'Active', 'Expiring', 'Missing', 'Declined'];
-  // const timeframeOptions = ['Last 7 days', 'Last 30 days', 'Last 3 months', 'All time'];
-  // const sortOptions = ['Status', 'Date', 'Value', 'Type'];
-
   return (
     <>
-      
-
       <div className='block-1'>
-        <div className='mt-3 mb-2 lg:mt-0 lg:mb-0 flex px-0 md:px-4 justify-between items-center relative'>
+        {/* ✅ Padding-ը ավելացված է այստեղ */}
+        <div className='mt-3 mb-2 lg:mt-0 lg:mb-0 flex px-4 md:px-4 justify-between items-center relative'>
           <h2 className="block">{title}</h2>
           <div className='document-header header-btn flex justify-between gap-2'>
             <div className='desktop-filter-cont hidden md:flex items-center gap-4 bg-[#f9f9f6] rounded-lg mx-4'>
-             
+              {/* Desktop filter content can go here */}
             </div>
             
             <button 
@@ -93,17 +89,21 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#2563eb] rounded-full"></span>
               )}
             </button>
-            <button className="max-[768px]:p-2 bg-[#eb8d25] text-white px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#ff8c0c] transition-colors duration-300">
-              Get New Quote
-            </button>
+            
+            {/* ✅ Get New Quote կոճակը ցուցադրվում է միայն եթե showGetNewQuote = true */}
+            {showGetNewQuote && (
+              <button className="max-[768px]:p-2 bg-[#eb8d25] text-white px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#ff8c0c] transition-colors duration-300">
+                Get New Quote
+              </button>
+            )}
           </div>
         </div>
         
-        {/* Desktop Filters Panel - Initially hidden, shows on Filter click */}
+        {/* Desktop Filters Panel */}
         {showDesktopFilters && (
           <div className="hidden md:flex justify-between items-center relative mx-auto w-[97%] bg-white/47 p-[6px] rounded-[12px] mt-[8px] border-2 border-dashed border-[#ececec] animate-fade-in">
             <div className="flex items-center gap-2">
-              {/* Activity Filter - Custom Dropdown */}
+              {/* Activity Filter */}
               <CustomDropdown
                 options={activityOptions}
                 value={selectedFilter}
@@ -111,7 +111,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
                 className="min-w-[140px]"
               />
               
-              {/* Timeframe Filter - Custom Dropdown */}
+              {/* Timeframe Filter */}
               <CustomDropdown
                 options={timeframeOptions}
                 value={selectedTimeframe}
@@ -119,7 +119,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
                 className="min-w-[140px]"
               />
               
-              {/* Sort By Filter - Custom Dropdown */}
+              {/* Sort By Filter */}
               <CustomDropdown
                 options={sortOptions}
                 value={selectedSort}
@@ -162,8 +162,6 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
             </div>
           </div>
         )}
-        
-        
       </div>
 
       {/* Active filters display */}
@@ -216,16 +214,16 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
         </div>
       )}
 
-      {/* Mobile Filter Modal - IMPROVED */}
+      {/* Mobile Filter Modal */}
       {showFilter && (
         <div className="md:hidden fixed inset-0 z-50 flex items-end justify-center">
-          {/* Overlay with animation */}
+          {/* Overlay */}
           <div 
             className="absolute inset-0 bg-black/40 transition-opacity duration-300 animate-fade-in"
             onClick={() => setShowFilter(false)}
           />
           
-          {/* Filter Modal - Improved */}
+          {/* Filter Modal */}
           <div className="relative w-full bg-white rounded-t-2xl shadow-xl max-h-[85vh] overflow-y-auto animate-slide-up">
             {/* Header */}
             <div className="sticky top-0 bg-white border-b border-gray-200 px-5 py-4 rounded-t-2xl z-10">
@@ -249,7 +247,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
               </div>
             </div>
             
-            {/* Filter Content - Improved */}
+            {/* Filter Content */}
             <div className="p-5 space-y-4">
               {/* Search Input for Mobile */}
               <div>
@@ -276,7 +274,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
                 </div>
               </div>
 
-              {/* Activity Type - Improved */}
+              {/* Activity Type */}
               <div>
                 <h4 className="font-poppins font-medium text-sm text-gray-900 mb-3">Activity Type</h4>
                 <div className="grid grid-cols-2 gap-2.5">
@@ -296,7 +294,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
                 </div>
               </div>
               
-              {/* Timeframe - Improved */}
+              {/* Timeframe */}
               <div>
                 <h4 className="font-poppins font-medium text-sm text-gray-900 mb-3">Timeframe</h4>
                 <div className="grid grid-cols-2 gap-2.5">
@@ -316,7 +314,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
                 </div>
               </div>
               
-              {/* Sort By - Improved */}
+              {/* Sort By */}
               <div>
                 <h4 className="font-poppins font-medium text-sm text-gray-900 mb-3">Sort by</h4>
                 <div className="grid grid-cols-2 gap-2.5">
@@ -337,7 +335,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
               </div>
             </div>
             
-            {/* Action Buttons - Improved */}
+            {/* Action Buttons */}
             <div className="sticky bottom-0 bg-white border-t border-gray-200 p-5 pt-4">
               <div className="flex gap-3">
                 <button 

@@ -363,6 +363,7 @@ export default function DocumentsPage() {
       {/* ActivityTableFilter օգտագործումը */}
       <div className='mb-2'>
         <ActivityTableFilter
+        showGetNewQuote={false}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         selectedFilter={selectedFilter}
@@ -371,7 +372,7 @@ export default function DocumentsPage() {
         setSelectedTimeframe={setSelectedTimeframe}
         selectedSort={selectedSort}
         setSelectedSort={setSelectedSort}
-        title="" // Փոխում ենք վերնագիրը
+        title="Documents" // Փոխում ենք վերնագիրը
         filterConfig={{
           showActivityFilter: true,
           showTimeframeFilter: true,
