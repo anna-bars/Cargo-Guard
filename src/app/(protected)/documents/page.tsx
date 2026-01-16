@@ -7,6 +7,7 @@ import { UniversalTable, renderStatus, renderButton } from '@/app/components/tab
 import QuotesExpirationCard from '@/app/components/charts/QuotesExpirationCard'
 import InfoWidget from '@/app/components/widgets/InfoWidget'
 import { ApprovalRate } from '@/app/components/charts/ApprovalRate';
+import DocumentItem from '@/app/components/documents/DocumentItem';
 
 // Dashboard-ի տվյալներ - ԼՐԱՑՈՒՄ
 const quotesRows = [
@@ -231,13 +232,13 @@ export default function DocumentsPage() {
             max-[1024px]:min-h-auto max-[1024px]:max-h-none
           ">
              
-             <div className="flex items-center gap-3 mt-4 mb-2 xl:hidden">
+             <div className="flex items-center gap-3 mt-4 mb-2 sm:mt-0">
                   <img
                     src="/quotes/header-ic.svg"
                     alt=""
                     className="w-[22px] h-[22px] sm:w-5 sm:h-5"
                   />
-                  <h2 className="font-normal text-[18px] sm:text-lg">Documents</h2>
+                  <h2 className="font-normal text-[18px] sm:text-[26px]">Documents</h2>
                 </div> 
 
             <div className="block md:hidden">
@@ -269,25 +270,42 @@ export default function DocumentsPage() {
               />
             </div>
             </div>
+           <div className='flex justify-between'>
+             <DocumentItem 
+        type="Policy:"
+        id="P-0812"
+        status="Approved"
+        cargoType="Textiles"
+        summary="3 Documents Ready"
+        buttonText="Open Documents"
+      />
+       <DocumentItem 
+        type="Policy:"
+        id="P-0812"
+        status="Approved"
+        cargoType="Textiles"
+        summary="3 Documents Ready"
+        buttonText="Open Documents"
+      />
+       <DocumentItem 
+        type="Policy:"
+        id="P-0812"
+        status="Approved"
+        cargoType="Textiles"
+        summary="3 Documents Ready"
+        buttonText="Open Documents"
+      />
+      <DocumentItem 
+        type="Policy:"
+        id="P-0812"
+        status="Approved"
+        cargoType="Textiles"
+        summary="3 Documents Ready"
+        buttonText="Open Documents"
+      />
+           </div>
 
-            {/* Universal Table for Recent Activity */}
-            <div className='max-h-[85%'>
-            <UniversalTable
-              title="Quotes Overview"
-              showMobileHeader={true}
-              rows={quotesRows}
-              columns={quotesColumns}
-              mobileDesign={{
-                showType: false,
-                showCargoIcon: true,
-                showDateIcon: true,
-                dateLabel: 'Expires',
-                buttonWidth: '47%'
-              }}
-              mobileDesignType="quotes" // ավելացնել
-              desktopGridCols="0.6fr 0.8fr  0.8fr 0.7fr 1.1fr 0.9fr 1fr" // ավելացնել
-            />
-            </div>
+         
           </div>
 
           {/* Right Column - 25% - Desktop View */}

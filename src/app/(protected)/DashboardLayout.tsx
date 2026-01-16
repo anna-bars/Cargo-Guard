@@ -43,7 +43,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   
   // Պայմանավորել background class-ը
   const omblockBackgroundClass = isDocumentsPage 
-    ? "bg-[url('/documents/documents-back.png')] bg-cover bg-center"
+    ? "bg-[url('/documents/documents-back.png')] bg-cover bg-center bg-top" // ✅ Ավելացել է bg-top
     : ""
 
   return (
