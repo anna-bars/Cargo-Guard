@@ -271,7 +271,7 @@ export default function DocumentsPage() {
               />
             </div>
             </div>
-           <div className='flex justify-between flex-wrap gap-y-2'>
+           <div className='overflow-y-scroll max-h-[82vh] sm:max-h-max-content flex justify-between flex-wrap gap-y-3 sm:gap-y-2'>
              <DocumentItem 
         type="Policy:"
         id="P-0812"
