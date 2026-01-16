@@ -129,7 +129,7 @@ const DocumentItem: React.FC<DocumentItemProps> = ({
                   px-2 py-0.5 
                   rounded-full 
                   border-2 
-                  outline outline-2 outline-[#F3F3F5] 
+                  outline outline-2 outline-[#F3F3F5] hover:border-[#F1F0F6]
                   relative
                   transition-all duration-300 ease-out
                   z-10
