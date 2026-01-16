@@ -13,7 +13,8 @@ interface ActivityTableFilterProps {
   showMobileHeader?: boolean;
   title?: string;
   onReset?: () => void;
-  showGetNewQuote?: boolean; // ✅ Նոր prop՝ Get New Quote կոճակը ցույց տալու համար
+  showGetNewQuote?: boolean;
+  pxValue?: string; // ✅ Նոր prop՝ padding-ի արժեքի համար
   filterConfig?: {
     showActivityFilter?: boolean;
     showTimeframeFilter?: boolean;
@@ -36,7 +37,8 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
   showMobileHeader = true,
   title = 'Recent Insurance Activity',
   onReset,
-  showGetNewQuote = true, // ✅ Default արժեքը true է
+  showGetNewQuote = true,
+  pxValue = '4', // ✅ Default արժեքը '4'
   filterConfig = {
     showActivityFilter: true,
     showTimeframeFilter: true,
@@ -65,8 +67,8 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
   return (
     <>
       <div className='block-1'>
-        {/* ✅ Padding-ը ավելացված է այստեղ */}
-        <div className='mt-3 mb-2 lg:mt-0 lg:mb-0 flex px-4 md:px-4 justify-between items-center relative'>
+        {/* ✅ pxValue-ն օգտագործվում է այստեղ className-ում */}
+        <div className={`mt-3 mb-2 lg:mt-0 lg:mb-0 flex px-${pxValue} md:px-${pxValue} justify-between items-center relative`}>
           <h2 className="block">{title}</h2>
           <div className='document-header header-btn flex justify-between gap-2'>
             <div className='desktop-filter-cont hidden md:flex items-center gap-4 bg-[#f9f9f6] rounded-lg mx-4'>
@@ -90,7 +92,7 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
               )}
             </button>
             
-            {/* ✅ Get New Quote կոճակը ցուցադրվում է միայն եթե showGetNewQuote = true */}
+            {/* Get New Quote կոճակը */}
             {showGetNewQuote && (
               <button className="max-[768px]:p-2 bg-[#eb8d25] text-white px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#ff8c0c] transition-colors duration-300">
                 Get New Quote
@@ -164,9 +166,9 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
         )}
       </div>
 
-      {/* Active filters display */}
+      {/* Active filters display - նույնպես օգտագործում է pxValue */}
       {(selectedFilter !== 'All Activity' || selectedTimeframe !== 'Last 30 days' || selectedSort !== 'Status' || searchQuery) && (
-        <div className="px-4 mb-0.5 mt-1 flex flex-wrap gap-2 filter-tags mobile-filter-tags">
+        <div className={`px-${pxValue} mb-0.5 mt-1 flex flex-wrap gap-2 filter-tags mobile-filter-tags`}>
           {searchQuery && (
             <span className="inline-flex items-center gap-1 bg-[#fdfeff] border border-[#00000026] text-[#7f7f7f] px-3 py-1.5 rounded-[6px] text-xs font-poppins font-medium mobile-filter-tag">
               Search: "{searchQuery}"

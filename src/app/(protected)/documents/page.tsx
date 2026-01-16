@@ -363,6 +363,7 @@ export default function DocumentsPage() {
       {/* ActivityTableFilter օգտագործումը */}
       <div className='mb-2'>
         <ActivityTableFilter
+         pxValue="0"
         showGetNewQuote={false}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
