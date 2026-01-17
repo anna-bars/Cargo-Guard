@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CustomDropdown } from './CustomDropdown';
+import { useRouter } from 'next/navigation';
 
 interface ActivityTableFilterProps {
   searchQuery: string;
@@ -48,6 +49,12 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
     sortOptions: ['Status', 'Date', 'Value', 'Type']
   },
 }) => {
+  const router = useRouter()
+  
+    const handleGetNewQuote = () => {
+      // Սկսել quote ստեղծման flow
+      router.push('/quotes/new/shipping')
+    }
   // Use filterConfig values
   const activityOptions = filterConfig.activityOptions || ['All Activity', 'Pending', 'Active', 'Expiring', 'Missing', 'Declined'];
   const timeframeOptions = filterConfig.timeframeOptions || ['Last 7 days', 'Last 30 days', 'Last 3 months', 'All time'];
@@ -94,7 +101,9 @@ export const ActivityTableFilter: React.FC<ActivityTableFilterProps> = ({
             
             {/* Get New Quote կոճակը */}
             {showGetNewQuote && (
-              <button className="max-[768px]:p-2 bg-[#eb8d25] text-white px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#ff8c0c] transition-colors duration-300">
+              <button
+              onClick={handleGetNewQuote}
+              className="max-[768px]:p-2 bg-[#eb8d25] text-white px-4 py-2 rounded-lg font-poppins text-sm font-normal hover:bg-[#ff8c0c] transition-colors duration-300">
                 Get New Quote
               </button>
             )}

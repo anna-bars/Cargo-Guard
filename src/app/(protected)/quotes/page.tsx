@@ -6,6 +6,7 @@ import { ConversionChart } from '../../components/charts/ConversionChart'
 import { UniversalTable, renderStatus, renderButton } from '@/app/components/tables/UniversalTable';
 import QuotesExpirationCard from '@/app/components/charts/QuotesExpirationCard'
 import InfoWidget from '@/app/components/widgets/InfoWidget'
+import { useRouter } from 'next/navigation';
 
 // Dashboard-ի տվյալներ - ԼՐԱՑՈՒՄ
 const quotesRows = [
@@ -147,6 +148,12 @@ const quotesColumns = [
 ];
  
 export default function QuotesPage() {
+  const router = useRouter()
+
+  const handleGetNewQuote = () => {
+    // Սկսել quote ստեղծման flow
+    router.push('/quotes/new/shipping')
+  }
   const quotesData = {
     'Upcoming Expirations & Conversions': { 
       approved: 17,  // Pending Approval
@@ -291,7 +298,9 @@ export default function QuotesPage() {
                     />
                     Download
                   </button>
-                  <button className="inline-flex items-center justify-center gap-[10px] px-4 py-2 h-[35.68px] bg-[#0b0b0b] border-0 rounded-[6px] font-poppins text-base font-normal text-white cursor-pointer whitespace-nowrap">
+                  <button 
+                  onClick={handleGetNewQuote}
+                  className="inline-flex items-center justify-center gap-[10px] px-4 py-2 h-[35.68px] bg-[#0b0b0b] border-0 rounded-[6px] font-poppins text-base font-normal text-white cursor-pointer whitespace-nowrap">
                     + Get New Quote
                   </button>
                 </div>

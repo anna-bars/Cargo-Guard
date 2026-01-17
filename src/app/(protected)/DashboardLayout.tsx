@@ -38,22 +38,51 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     )
   }
 
-  // Ստուգել, արդյոք ընթացիկ էջը profile էջն է
+  // Ստուգել, թե որ էջում ենք
   const isProfilePage = pathname?.includes('/profile')
-  
-  // Ստուգել, արդյոք ընթացիկ էջը documents էջն է
   const isDocumentsPage = pathname?.includes('/documents')
-  
-  // Պայմանավորել background class-ը
-  const omblockBackgroundClass = isDocumentsPage 
-    ? "bg-[url('/documents/documents-back.png')] bg-cover bg-center bg-top"
+  const isQuoteFlow = pathname?.includes('/quotes/new/')
+
+  // Quote flow էջերի համար background
+  const quoteBackgroundClass = isQuoteFlow 
+    ? "bg-gradient-to-b from-[#F3F3F6] to-[#FFFFFF] min-h-screen"
     : ""
 
-  // Եթե profile էջն է, վերադարձնել պարզ կառուցվածք
+  // Էջի համար կոնկրետ styling
+  const getPageLayoutClass = () => {
+    if (isProfilePage) return "bg-[#F3F3F6] min-h-screen"
+    if (isQuoteFlow) return quoteBackgroundClass
+    if (isDocumentsPage) return "bg-[url('/documents/documents-back.png')] bg-cover bg-center"
+    
+    return `
+      md:h-[116vh] overflow-hidden
+      bg-[#F3F3F6]
+      md:bg-[url('/background2.png')]
+      md:bg-no-repeat md:bg-cover md:bg-center md:bg-top
+    `
+  }
+
+  // Quote flow էջերի համար պարզ layout
+  if (isQuoteFlow) {
+    return (
+      <div className="font-montserrat">
+        <div className='bg-white shadow-sm'>
+          <DashboardHeader userEmail={user?.email} />
+        </div>
+        <main className={quoteBackgroundClass}>
+          {children}
+        </main>
+      </div>
+    )
+  }
+
+  // Profile էջի համար
   if (isProfilePage) {
     return (
       <div className="font-montserrat">
-        <div className='bg-[#F3F3F6]'><DashboardHeader userEmail={user?.email} /></div>
+        <div className='bg-[#F3F3F6]'>
+          <DashboardHeader userEmail={user?.email} />
+        </div>
         <main className="flex-1 mt-[-12px] bg-[#f3f3f6]">
           {children}
         </main>
@@ -61,18 +90,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     )
   }
 
-  // Սովորական դեպք՝ մյուս էջերի համար
+  // Սովորական էջերի համար
   return (
-    <div className="
-      md:h-[116vh]
-      overflow-hidden
-      bg-[#F3F3F6]
-      md:bg-[url('/background2.png')]
-      md:bg-no-repeat
-      md:bg-cover
-      md:bg-center
-      md:bg-top
-    ">
+    <div className={getPageLayoutClass()}>
       <div className="md:h-[116vh] md:min-h-[116vh] font-montserrat flex flex-col">
         <div className='block-1'>
           <DashboardHeader userEmail={user?.email} />
@@ -87,7 +107,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           mx-auto 
           overflow-hidden 
           max-[767px]:!overflow-hidden
-          ${omblockBackgroundClass}
+          ${isDocumentsPage ? "bg-[url('/documents/documents-back.png')] bg-cover bg-center" : ""}
         `}>
           {children}
         </main>
