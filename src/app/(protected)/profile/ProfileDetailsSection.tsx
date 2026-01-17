@@ -1,11 +1,5 @@
 import { JSX, useState } from "react";
-import group10000030812 from "./group-1000003081-2.png";
-import group1000003081 from "./group-1000003081.png";
-import image from "./image.png";
 import image1 from "../../../../public/profile/image.svg";
-import location11 from "./location-1-1.png";
-import pen1 from "./pen-1.png";
-import trash1 from "./trash-1.png";
 import vector902 from "../../../../public/profile/vector-90.svg";
 import vector903 from "../../../../public/profile/vector-90.svg";
 import vector90 from "../../../../public/profile/vector-90.svg";
@@ -18,24 +12,14 @@ import vector160 from "../../../../public/profile/vector-160.svg";
 import vector161 from "../../../../public/profile/vector-161.svg";
 import paymentMethod from "../../../../public/profile/payment-method.svg"
 
-interface PersonalInfo {
-  fullName: string;
-  phoneNumber: string;
-  emailAddress: string;
-}
-
-interface CompanyInfo {
-  companyName: string;
-  companyAddress: string;
-}
 
 interface PaymentMethod {
   id: string;
   cardImage: string;
-  lastFourDigits: string;
+  lastFour: string;
   expiryDate: string;
   isDefault: boolean;
-  trashIcon: string;
+  deleteIcon: string;
 }
 
 interface BillingHistoryItem {
@@ -48,100 +32,83 @@ interface BillingHistoryItem {
 }
 
 export const ProfileDetailsSection = (): JSX.Element => {
-  const [personalInfo] = useState<PersonalInfo>({
-    fullName: "Lucas Bennet",
-    phoneNumber: "+1 (555) 123-4567",
-    emailAddress: "lucaas.bennet@example.com",
-  });
+  const [fullName, setFullName] = useState("Lucas Bennet");
+  const [phoneNumber, setPhoneNumber] = useState("+1 (555) 123-4567");
+  const [emailAddress, setEmailAddress] = useState("lucaas.bennet@example.com");
+  const [companyName, setCompanyName] = useState("Anderson & Co.");
+  const [companyAddress, setCompanyAddress] = useState(
+    "123 Business Street, New York, NY 100001",
+  );
 
-  const [companyInfo] = useState<CompanyInfo>({
-    companyName: "Anderson & Co.",
-    companyAddress: "123 Business Street, New York, NY 100001",
-  });
-
-  const [paymentMethods] = useState<PaymentMethod[]>([
+  const paymentMethods: PaymentMethod[] = [
     {
       id: "1",
-      cardImage: 'group1000003081',
-      lastFourDigits: "•••• 4242",
+      cardImage: paymentMethod,
+      lastFour: "•••• 4242",
       expiryDate: "Expires 09/25",
       isDefault: true,
-      trashIcon: 'trash1',
+      deleteIcon: paymentMethod,
     },
     {
       id: "2",
-      cardImage: 'group10000030812',
-      lastFourDigits: "•••• 4242",
+      cardImage: paymentMethod,
+      lastFour: "•••• 4242",
       expiryDate: "Expires 09/25",
       isDefault: true,
-      trashIcon: 'image',
+      deleteIcon: paymentMethod,
     },
-  ]);
-
-  const [billingHistory] = useState<BillingHistoryItem[]>([
-    {
-      invoice: "INV-001",
-      date: "Nov 1, 2025",
-      policy: "P-0124",
-      amount: "$1,245.00",
-      status: "Paid",
-      statusColor: "#cbd03c",
-    },
-    {
-      invoice: "INV-001",
-      date: "Nov 1, 2025",
-      policy: "P-0124",
-      amount: "$1,245.00",
-      status: "Paid",
-      statusColor: "#cbd03c",
-    },
-    {
-      invoice: "INV-001",
-      date: "Nov 1, 2025",
-      policy: "P-0124",
-      amount: "$1,245.00",
-      status: "Paid",
-      statusColor: "#cbd03c",
-    },
-  ]);
-
-  const tableHeaders = [
-    { label: "Invoice", icon: null },
-    { label: "Date", icon: vector90 },
-    { label: "Policy", icon: image1 },
-    { label: "Amount", icon: vector902 },
-    { label: "Status", icon: vector903 },
-    { label: "Action", icon: vector95 },
   ];
 
-  const tableHeaderPositions = [0, 209, 436, 641, 855, 1133];
+  const billingHistory: BillingHistoryItem[] = [
+    {
+      invoice: "INV-001",
+      date: "Nov 1, 2025",
+      policy: "P-0124",
+      amount: "$1,245.00",
+      status: "Paid",
+      statusColor: "#cbd03c",
+    },
+    {
+      invoice: "INV-001",
+      date: "Nov 1, 2025",
+      policy: "P-0124",
+      amount: "$1,245.00",
+      status: "Paid",
+      statusColor: "#cbd03c",
+    },
+    {
+      invoice: "INV-001",
+      date: "Nov 1, 2025",
+      policy: "P-0124",
+      amount: "$1,245.00",
+      status: "Paid",
+      statusColor: "#cbd03c",
+    },
+  ];
+
+  const handleAddPaymentMethod = () => {
+    console.log("Add payment method clicked");
+  };
+
+  const handleDeletePaymentMethod = (id: string) => {
+    console.log("Delete payment method:", id);
+  };
+
+  const handleDownloadInvoice = (invoice: string) => {
+    console.log("Download invoice:", invoice);
+  };
 
   return (
-    <section
-      className="flex flex-col w-[1250px] h-[879px] items-start gap-6 p-6 absolute top-[136px] left-[438px] bg-[#fafcffcc] rounded-2xl"
-      aria-labelledby="profile-heading"
-    >
+    <section className="flex flex-col w-[1250px] h-[879px] items-start gap-6 p-6 absolute top-[136px] left-[438px] bg-[#fafcffcc] rounded-2xl">
       <header className="flex items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">
-        <div className="relative w-[81px] h-[81px] bg-[url(/898887d89ce7b428ae8824c896050271-2.png)] bg-[100%_100%]">
-          <button
-            className="relative top-[54px] left-[54px] w-6 flex"
-            aria-label="Edit profile picture"
-          >
-            {/* <div className="w-6 h-6 flex bg-[#f8fafd] rounded-md border-[0.7px] border-solid border-[#2563eb0a]">
-              <img
-                className="mt-1.5 w-3 h-3 ml-1.5 aspect-[1]"
-                alt=""
-                src={pen1}
-              />
-            </div> */}
-          </button>
-        </div>
+        <img
+          className="relative w-[81px] h-[81px]"
+          alt="Profile picture of Lucas Bennett"
+          src={paymentMethod}
+        />
 
         <div className="flex flex-col items-start justify-between px-0 py-[5px] relative flex-1 self-stretch grow">
-          <h1
-            id="profile-heading"
-            className="relative self-stretch mt-[-1.00px] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#2a2a2a] text-2xl tracking-[0.48px] leading-[normal]"
-          >
+          <h1 className="relative self-stretch mt-[-1.00px] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#2a2a2a] text-2xl tracking-[0.48px] leading-[normal]">
             Lucas Bennett
           </h1>
 
@@ -150,11 +117,11 @@ export const ProfileDetailsSection = (): JSX.Element => {
           </p>
 
           <div className="inline-flex items-center gap-1 relative flex-[0_0_auto]">
-            {/* <img
+            <img
               className="relative w-3 h-3 aspect-[1] object-cover"
-              alt=""
-              src={location11}
-            /> */}
+              alt="Location icon"
+              src={paymentMethod}
+            />
 
             <p className="relative w-[359px] mt-[-1.00px] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#c7c7c7] text-sm tracking-[0.28px] leading-[normal]">
               Utrecht, Netherlands – 8:29 PM local time
@@ -166,53 +133,62 @@ export const ProfileDetailsSection = (): JSX.Element => {
       <div className="flex items-start justify-between relative self-stretch w-full flex-[0_0_auto]">
         <div className="flex flex-col w-[385px] items-start gap-2 relative">
           <label
-            htmlFor="full-name"
+            htmlFor="fullName"
             className="relative w-fit mt-[-1.00px] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#4f4f4f] text-sm tracking-[0] leading-[18px] whitespace-nowrap"
           >
             Full Name
           </label>
 
-          <input
-            type="text"
-            id="full-name"
-            value={personalInfo.fullName}
-            readOnly
-            className="flex flex-col h-[38px] items-start justify-center gap-2.5 px-3 py-2 relative self-stretch w-full rounded-[7px] border border-solid border-[#c7c7c782] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#7b7b7b] text-base tracking-[0] leading-[18px]"
-          />
+          <div className="flex flex-col h-[38px] items-start justify-center gap-2.5 px-3 py-2 relative self-stretch w-full rounded-[7px] border border-solid border-[#c7c7c782]">
+            <input
+              id="fullName"
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              className="w-full bg-transparent border-none outline-none [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#7b7b7b] text-base tracking-[0] leading-[18px]"
+              aria-label="Full Name"
+            />
+          </div>
         </div>
 
         <div className="flex flex-col w-[385px] items-start gap-2 relative">
           <label
-            htmlFor="phone-number"
+            htmlFor="phoneNumber"
             className="relative w-fit mt-[-1.00px] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#4f4f4f] text-sm tracking-[0] leading-[18px] whitespace-nowrap"
           >
             Phone Number
           </label>
 
-          <input
-            type="tel"
-            id="phone-number"
-            value={personalInfo.phoneNumber}
-            readOnly
-            className="flex flex-col h-[38px] items-start justify-center gap-2.5 px-3 py-2 relative self-stretch w-full rounded-[7px] border border-solid border-[#c7c7c782] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#7b7b7b] text-base tracking-[0] leading-[18px]"
-          />
+          <div className="flex flex-col h-[38px] items-start justify-center gap-2.5 px-3 py-2 relative self-stretch w-full rounded-[7px] border border-solid border-[#c7c7c782]">
+            <input
+              id="phoneNumber"
+              type="tel"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              className="w-full bg-transparent border-none outline-none [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#7b7b7b] text-base tracking-[0] leading-[18px]"
+              aria-label="Phone Number"
+            />
+          </div>
         </div>
 
         <div className="flex flex-col w-[385px] items-start gap-2 relative">
           <label
-            htmlFor="email-address"
+            htmlFor="emailAddress"
             className="relative w-fit mt-[-1.00px] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#4f4f4f] text-sm tracking-[0] leading-[18px] whitespace-nowrap"
           >
             Email Address
           </label>
 
-          <input
-            type="email"
-            id="email-address"
-            value={personalInfo.emailAddress}
-            readOnly
-            className="flex flex-col h-[38px] items-start justify-center gap-2.5 px-3 py-2 relative self-stretch w-full rounded-[7px] border border-solid border-[#c7c7c782] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#7b7b7b] text-base tracking-[0] leading-[18px]"
-          />
+          <div className="flex flex-col h-[38px] items-start justify-center gap-2.5 px-3 py-2 relative self-stretch w-full rounded-[7px] border border-solid border-[#c7c7c782]">
+            <input
+              id="emailAddress"
+              type="email"
+              value={emailAddress}
+              onChange={(e) => setEmailAddress(e.target.value)}
+              className="w-full bg-transparent border-none outline-none [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#7b7b7b] text-base tracking-[0] leading-[18px]"
+              aria-label="Email Address"
+            />
+          </div>
         </div>
       </div>
 
@@ -237,36 +213,42 @@ export const ProfileDetailsSection = (): JSX.Element => {
         <div className="inline-flex items-start gap-6 relative flex-[0_0_auto]">
           <div className="flex flex-col w-[385px] items-start gap-2 relative">
             <label
-              htmlFor="company-name"
+              htmlFor="companyName"
               className="relative w-fit mt-[-1.00px] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#4f4f4f] text-sm tracking-[0] leading-[18px] whitespace-nowrap"
             >
               Company Name
             </label>
 
-            <input
-              type="text"
-              id="company-name"
-              value={companyInfo.companyName}
-              readOnly
-              className="flex flex-col h-[38px] items-start justify-center gap-2.5 px-3 py-2 relative self-stretch w-full rounded-[7px] border border-solid border-[#c7c7c782] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#7b7b7b] text-base tracking-[0] leading-[18px]"
-            />
+            <div className="flex flex-col h-[38px] items-start justify-center gap-2.5 px-3 py-2 relative self-stretch w-full rounded-[7px] border border-solid border-[#c7c7c782]">
+              <input
+                id="companyName"
+                type="text"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                className="w-full bg-transparent border-none outline-none [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#7b7b7b] text-base tracking-[0] leading-[18px]"
+                aria-label="Company Name"
+              />
+            </div>
           </div>
 
           <div className="flex flex-col w-[385px] items-start gap-2 relative">
             <label
-              htmlFor="company-address"
+              htmlFor="companyAddress"
               className="relative w-fit mt-[-1.00px] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#4f4f4f] text-sm tracking-[0] leading-[18px] whitespace-nowrap"
             >
               Company Address
             </label>
 
-            <input
-              type="text"
-              id="company-address"
-              value={companyInfo.companyAddress}
-              readOnly
-              className="flex flex-col h-[38px] items-start justify-center gap-2.5 px-3 py-2 relative self-stretch w-full rounded-[7px] border border-solid border-[#c7c7c782] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#7b7b7b] text-base tracking-[0] leading-[18px]"
-            />
+            <div className="flex flex-col h-[38px] items-start justify-center gap-2.5 px-3 py-2 relative self-stretch w-full rounded-[7px] border border-solid border-[#c7c7c782]">
+              <input
+                id="companyAddress"
+                type="text"
+                value={companyAddress}
+                onChange={(e) => setCompanyAddress(e.target.value)}
+                className="w-full bg-transparent border-none outline-none [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#7b7b7b] text-base tracking-[0] leading-[18px]"
+                aria-label="Company Address"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -290,7 +272,11 @@ export const ProfileDetailsSection = (): JSX.Element => {
             </p>
           </div>
 
-          <button className="inline-flex h-[35.68px] items-center justify-center gap-2.5 px-3 py-1.5 relative flex-[0_0_auto] bg-blue-600 rounded-md">
+          <button
+            onClick={handleAddPaymentMethod}
+            className="inline-flex h-[35.68px] items-center justify-center gap-2.5 px-3 py-1.5 relative flex-[0_0_auto] bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+            aria-label="Add Payment Method"
+          >
             <span className="relative w-fit [font-family:'Poppins-Regular',Helvetica] font-normal text-white text-sm tracking-[0] leading-[18px] whitespace-nowrap">
               Add Payment Method
             </span>
@@ -309,15 +295,15 @@ export const ProfileDetailsSection = (): JSX.Element => {
                     <div className="flex flex-col w-[58px] h-[39px] items-start gap-2.5 relative">
                       <img
                         className="relative flex-1 self-stretch w-full grow"
-                        alt="Card brand"
-                        src={paymentMethod}
+                        alt="Payment card logo"
+                        src={method.cardImage}
                       />
                     </div>
 
                     <div className="flex flex-col w-[102px] items-start justify-center relative">
                       <div className="relative w-[99px] h-[17px]">
                         <div className="absolute top-0 left-0 w-[211px] [font-family:'Urbanist-Medium',Helvetica] font-medium text-[#5e5e5e] text-sm tracking-[0] leading-[normal]">
-                          {method.lastFourDigits}
+                          {method.lastFour}
                         </div>
 
                         {method.isDefault && (
@@ -337,11 +323,15 @@ export const ProfileDetailsSection = (): JSX.Element => {
                 </div>
               </div>
 
-              <button aria-label="Remove payment method">
+              <button
+                onClick={() => handleDeletePaymentMethod(method.id)}
+                className="relative w-5 h-5 aspect-[1] hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded transition-opacity"
+                aria-label="Delete payment method"
+              >
                 <img
-                  className="relative w-5 h-5 aspect-[1] object-cover"
+                  className="w-full h-full object-cover"
                   alt=""
-                  src={method.trashIcon}
+                  src={method.deleteIcon}
                 />
               </button>
             </article>
@@ -367,31 +357,84 @@ export const ProfileDetailsSection = (): JSX.Element => {
       </div>
 
       <div className="relative w-[1186px] h-[18px]" role="row">
-        {tableHeaders.map((header, index) => (
-          <div
-            key={header.label}
-            className="inline-flex items-center gap-2 absolute top-0"
-            style={{ left: `${tableHeaderPositions[index]}px` }}
-          >
-            {header.icon && (
-              <img
-                className="relative w-px h-[10.5px] ml-[-0.50px]"
-                alt=""
-                src={header.icon}
-              />
-            )}
+        <div className="inline-flex items-center gap-1.5 absolute top-0 left-0">
+          <div className="relative w-fit mt-[-1.00px] [font-family:'Poppins-Regular',Helvetica] font-normal text-[#606068] text-sm tracking-[0] leading-[18px] whitespace-nowrap">
+            Invoice
+          </div>
+        </div>
 
-            <div
-              className={`inline-flex items-center ${
-                header.label === "Invoice" ? "gap-1.5" : "gap-[7px]"
-              } relative flex-[0_0_auto]`}
-            >
-              <span className="relative w-fit mt-[-1.00px] [font-family:'Poppins-Regular',Helvetica] font-normal text-[#606068] text-sm tracking-[0] leading-[18px] whitespace-nowrap">
-                {header.label}
-              </span>
+        <div className="inline-flex items-center gap-2 absolute top-0 left-[209px]">
+          <img
+            className="relative w-px h-[10.5px] ml-[-0.50px]"
+            alt=""
+            src={vector90}
+            role="presentation"
+          />
+
+          <div className="inline-flex items-center gap-[7px] relative flex-[0_0_auto]">
+            <div className="relative w-fit mt-[-1.00px] [font-family:'Poppins-Regular',Helvetica] font-normal text-[#606068] text-sm tracking-[0] leading-[18px] whitespace-nowrap">
+              Date
             </div>
           </div>
-        ))}
+        </div>
+
+        <div className="inline-flex items-center gap-2 absolute top-0 left-[436px]">
+          <img
+            className="relative w-px h-[10.5px] ml-[-0.50px]"
+            alt=""
+            src={image1}
+            role="presentation"
+          />
+
+          <div className="inline-flex items-center gap-[7px] relative flex-[0_0_auto]">
+            <div className="relative w-fit mt-[-1.00px] [font-family:'Poppins-Regular',Helvetica] font-normal text-[#606068] text-sm tracking-[0] leading-[18px] whitespace-nowrap">
+              Policy
+            </div>
+          </div>
+        </div>
+
+        <div className="inline-flex items-center gap-2 absolute top-0 left-[641px]">
+          <img
+            className="relative w-px h-[10.5px] ml-[-0.50px]"
+            alt=""
+            src={vector902}
+            role="presentation"
+          />
+
+          <div className="inline-flex items-center gap-[7px] relative flex-[0_0_auto]">
+            <div className="relative w-fit mt-[-1.00px] [font-family:'Poppins-Regular',Helvetica] font-normal text-[#606068] text-sm tracking-[0] leading-[18px] whitespace-nowrap">
+              Amount
+            </div>
+          </div>
+        </div>
+
+        <div className="inline-flex items-center gap-2 absolute top-0 left-[855px]">
+          <img
+            className="relative w-px h-[10.5px] ml-[-0.50px]"
+            alt=""
+            src={vector903}
+            role="presentation"
+          />
+
+          <div className="inline-flex items-center gap-[7px] relative flex-[0_0_auto]">
+            <div className="relative w-fit mt-[-1.00px] [font-family:'Poppins-Regular',Helvetica] font-normal text-[#606068] text-sm tracking-[0] leading-[18px] whitespace-nowrap">
+              Status
+            </div>
+          </div>
+        </div>
+
+        <div className="inline-flex items-center gap-2 absolute top-0 left-[1133px]">
+          <img
+            className="relative w-px h-[10.5px] ml-[-0.50px]"
+            alt=""
+            src={vector95}
+            role="presentation"
+          />
+
+          <div className="relative w-fit mt-[-1.00px] [font-family:'Poppins-Regular',Helvetica] font-normal text-[#606068] text-sm tracking-[0] leading-[18px] whitespace-nowrap">
+            Action
+          </div>
+        </div>
       </div>
 
       <div className="flex flex-col w-[1193px] items-start gap-2 relative flex-[0_0_auto] mb-[-16.00px]">
@@ -416,7 +459,7 @@ export const ProfileDetailsSection = (): JSX.Element => {
 
                 <a
                   href={`#${item.policy}`}
-                  className="relative w-[53px] h-[21px] [font-family:'Poppins-Regular',Helvetica] font-normal text-blue-600 text-sm tracking-[0] leading-[18px] underline whitespace-nowrap"
+                  className="relative w-[53px] h-[21px] [font-family:'Poppins-Regular',Helvetica] font-normal text-blue-600 text-sm tracking-[0] leading-[18px] underline whitespace-nowrap hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
                 >
                   {item.policy}
                 </a>
@@ -431,16 +474,20 @@ export const ProfileDetailsSection = (): JSX.Element => {
                     style={{ backgroundColor: item.statusColor }}
                   />
 
-                  <span
+                  <div
                     className="relative w-fit mt-[-1.00px] [font-family:'Poppins-Regular',Helvetica] font-normal text-xs tracking-[0] leading-[18px] whitespace-nowrap"
                     style={{ color: item.statusColor }}
                   >
                     {item.status}
-                  </span>
+                  </div>
                 </div>
 
                 <div className="inline-flex items-center gap-4 relative flex-[0_0_auto]">
-                  <button className="flex w-[130px] h-[35.68px] items-center justify-center gap-2.5 px-3 py-1.5 relative rounded-md border border-solid border-[#e3e6ea]">
+                  <button
+                    onClick={() => handleDownloadInvoice(item.invoice)}
+                    className="flex w-[130px] h-[35.68px] items-center justify-center gap-2.5 px-3 py-1.5 relative rounded-md border border-solid border-[#e3e6ea] hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+                    aria-label={`Download invoice ${item.invoice}`}
+                  >
                     <span className="relative w-fit [font-family:'Poppins-Regular',Helvetica] font-normal text-gray-700 text-sm tracking-[0] leading-[18px] whitespace-nowrap">
                       Download
                     </span>

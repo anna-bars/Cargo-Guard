@@ -207,12 +207,12 @@ export default function ProfilePage() {
 
   return (
     <DashboardLayout>
-      <div className=''>
-        <div className=''>
-          <div className="bg-[#f3f3f6] w-full min-w-[100%] relative">
-            <ProfileNavigationSection />
-            <ProfileDetailsSection />
-          </div>
+      <div className='insult'>
+        <div className='infarkt'>
+              <div className="bg-[#f3f3f6] w-full min-w-[1728px] min-h-[1117px] relative">
+                <ProfileNavigationSection />
+                <ProfileDetailsSection />
+              </div>
         </div>
       </div>
     </DashboardLayout>
