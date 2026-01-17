@@ -55,20 +55,20 @@ export const ProfileBillingContent = () => {
   ];
 
   return (
-    <div className="flex flex-col w-full items-start gap-6 p-6 relative bg-[#fbfbf6] rounded-2xl">
+    <div className="flex flex-col w-full items-start gap-6 p-4 sm:p-6 relative bg-[#fbfbf6] rounded-2xl">
       {/* User Profile Section */}
-      <div className="flex items-start gap-4 relative self-stretch w-full">
+      <div className="flex flex-col sm:flex-row items-start gap-4 relative self-stretch w-full">
         {/* Profile image with edit button */}
-        <div className="relative">
+        <div className="relative mb-4 sm:mb-0">
           <img
-            className="relative w-[81px] h-[81px] rounded-[8px] rounded border border-[#f3f3f6]"
+            className="relative w-16 h-16 sm:w-[81px] sm:h-[81px] rounded-[8px] border border-[#f3f3f6]"
             alt="Lucas Bennett profile picture"
             src="/profile/user.png"
           />
           {/* Edit button - positioned at bottom right */}
-          <button className="absolute bottom-1 right-1 flex justify-center items-center w-7 h-7 bg-[#f8fafd] px-1.5 py-[0px] rounded-md border-[0.7px] border-solid border-[#EFF4FC] hover:bg-blue-50 transition-colors">
+          <button className="absolute bottom-0 right-0 flex justify-center items-center w-6 h-6 sm:w-7 sm:h-7 bg-[#f8fafd] px-1 sm:px-1.5 py-[0px] rounded-md border-[0.7px] border-solid border-[#EFF4FC] hover:bg-blue-50 transition-colors">
             <img 
-              className="w-6 h-6" 
+              className="w-4 h-4 sm:w-6 sm:h-6" 
               alt="Edit profile"
               src="/profile/pen-01-stroke-rounded.svg"
             />
@@ -76,19 +76,19 @@ export const ProfileBillingContent = () => {
         </div>
         
         <div className="flex flex-col items-start justify-between px-0 py-[5px] relative flex-1 self-stretch grow">
-          <h1 className="relative self-stretch mt-[-1.00px] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#2a2a2a] text-2xl tracking-[0.48px] leading-[normal]">
+          <h1 className="relative self-stretch mt-[-1.00px] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#2a2a2a] text-xl sm:text-2xl tracking-[0.48px] leading-[normal]">
             Lucas Bennett
           </h1>
-          <p className="relative self-stretch [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#949494] text-base tracking-[0.32px] leading-[normal]">
+          <p className="relative self-stretch [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#949494] text-sm sm:text-base tracking-[0.32px] leading-[normal]">
             Logistics Manager
           </p>
-          <div className="inline-flex items-center gap-1 relative flex-[0_0_auto]">
+          <div className="inline-flex items-center gap-1 relative flex-[0_0_auto] mt-2">
             <img
               className="relative w-3 h-3 aspect-[1] object-cover"
               alt="Location icon"
               src="/profile/location-01-stroke-rounded.svg"
             />
-            <p className="relative w-[359px] mt-[-1.00px] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#c7c7c7] text-sm tracking-[0.28px] leading-[normal]">
+            <p className="relative w-full sm:w-[359px] mt-[-1.00px] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#c7c7c7] text-xs sm:text-sm tracking-[0.28px] leading-[normal]">
               Utrecht, Netherlands – 8:29 PM local time
             </p>
           </div>
@@ -96,13 +96,13 @@ export const ProfileBillingContent = () => {
       </div>
 
       {/* Personal Information Fields */}
-      <div className="flex items-start justify-between relative self-stretch w-full">
+      <div className="flex flex-col lg:flex-row items-start justify-between gap-6 relative self-stretch w-full">
         {[
           { id: "fullName", label: "Full Name", value: "Lucas Bennett" },
           { id: "phoneNumber", label: "Phone Number", value: "+1 (555) 123-4567" },
           { id: "emailAddress", label: "Email Address", value: "lucas.bennett@example.com" },
         ].map((field) => (
-          <div key={field.id} className="flex flex-col w-[385px] items-start gap-2 relative">
+          <div key={field.id} className="flex flex-col w-full lg:w-[385px] items-start gap-2 relative">
             <label className="relative w-fit mt-[-1.00px] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#4f4f4f] text-sm tracking-[0] leading-[18px] whitespace-nowrap">
               {field.label}
             </label>
@@ -118,8 +118,8 @@ export const ProfileBillingContent = () => {
       <div className="relative self-stretch w-full h-px bg-gray-200" />
 
       {/* Company Information */}
-      <div className="inline-flex flex-col items-start gap-5 relative">
-        <div className="relative w-[272px] h-[43px]">
+      <div className="inline-flex flex-col items-start gap-5 relative w-full">
+        <div className="relative w-full sm:w-[272px] h-[43px]">
           <h2 className="absolute top-0 left-0 [font-family:'Montserrat-Medium',Helvetica] font-medium text-black text-lg tracking-[0.36px] leading-[normal]">
             Company Information
           </h2>
@@ -127,12 +127,12 @@ export const ProfileBillingContent = () => {
             Details used for policy and billing purposes
           </p>
         </div>
-        <div className="inline-flex items-start gap-6 relative">
+        <div className="flex flex-col lg:flex-row items-start gap-6 relative w-full">
           {[
             { id: "companyName", label: "Company Name", value: "Anderson & Co." },
             { id: "companyAddress", label: "Company Address", value: "123 Business Street, New York, NY 100001" },
           ].map((field) => (
-            <div key={field.id} className="flex flex-col w-[385px] items-start gap-2 relative">
+            <div key={field.id} className="flex flex-col w-full lg:w-[385px] items-start gap-2 relative">
               <label className="relative w-fit mt-[-1.00px] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#4f4f4f] text-sm tracking-[0] leading-[18px] whitespace-nowrap">
                 {field.label}
               </label>
@@ -149,9 +149,9 @@ export const ProfileBillingContent = () => {
       <div className="relative self-stretch w-full h-px bg-gray-200" />
 
       {/* Payment Methods */}
-      <div className="inline-flex flex-col items-start gap-5 relative">
-        <div className="flex items-start justify-between relative self-stretch w-full">
-          <div className="w-[278px] relative h-[43px]">
+      <div className="inline-flex flex-col items-start gap-5 relative w-full">
+        <div className="flex flex-col sm:flex-row items-start justify-between relative self-stretch w-full gap-4 sm:gap-0">
+          <div className="w-full sm:w-[278px] relative h-[43px]">
             <h2 className="absolute top-0 left-0 [font-family:'Montserrat-Medium',Helvetica] font-medium text-black text-lg tracking-[0.36px] leading-[normal]">
               Payment Methods
             </h2>
@@ -159,35 +159,35 @@ export const ProfileBillingContent = () => {
               Add or remove payment methods for billing
             </p>
           </div>
-          <button className="inline-flex h-[35.68px] items-center justify-center gap-2.5 px-3 py-1.5 relative bg-blue-600 rounded-md hover:bg-blue-700 transition-colors">
+          <button className="inline-flex h-[35.68px] items-center justify-center gap-2.5 px-3 py-1.5 relative bg-blue-600 rounded-md hover:bg-blue-700 transition-colors w-full sm:w-auto">
             <span className="relative w-fit [font-family:'Poppins-Regular',Helvetica] font-normal text-white text-sm tracking-[0] leading-[18px] whitespace-nowrap">
               Add Payment Method
             </span>
           </button>
         </div>
-        <div className="inline-flex items-start gap-6 relative">
+        <div className="flex flex-col lg:flex-row items-start gap-6 relative w-full">
           {paymentMethods.map((method) => (
-            <div key={method.id} className="flex w-[385px] items-center justify-between p-3 relative rounded-[9px] border border-dashed border-[#e7e7eb]">
+            <div key={method.id} className="flex w-full lg:w-[385px] items-center justify-between p-3 relative rounded-[9px] border border-dashed border-[#e7e7eb]">
               <div className="flex flex-col items-start gap-4 relative flex-1 grow">
-                <div className="flex flex-col w-[172px] items-start gap-1.5 relative">
+                <div className="flex flex-col w-full sm:w-[172px] items-start gap-1.5 relative">
                   <div className="inline-flex items-center gap-3 relative">
                     <div className="flex flex-col w-[58px] h-[39px] items-start gap-2.5 relative">
-                      <img src="/profile/payment-method.svg" alt="" />
+                      <img src="/profile/payment-method.svg" alt="" className="w-full h-full" />
                     </div>
-                    <div className="flex flex-col w-[102px] items-start justify-center relative">
-                      <div className="relative w-[99px] h-[17px]">
+                    <div className="flex flex-col items-start justify-center relative">
+                      <div className="relative w-full h-[17px]">
                         <div className="absolute top-0 left-0 [font-family:'Urbanist-Medium',Helvetica] font-medium text-[#5e5e5e] text-sm tracking-[0]">
                           •••• {method.lastFourDigits}
                         </div>
                         {method.isDefault && (
-                          <span className="inline-flex items-center justify-center gap-2.5 px-1 py-px absolute left-[58px] bg-[#edecf7] rounded-[3px]">
+                          <span className="inline-flex items-center justify-center gap-2.5 px-1 py-px absolute left-[58px] top-[-2px] bg-[#edecf7] rounded-[3px]">
                             <span className="relative w-fit mt-[-1.00px] [font-family:'Urbanist-Medium',Helvetica] font-medium text-[#7b7b7b] text-[8px] tracking-[0]">
                               Default
                             </span>
                           </span>
                         )}
                       </div>
-                      <div className="relative [font-family:'Urbanist-Medium',Helvetica] font-medium text-[#7b7b7b] text-[10px] tracking-[0]">
+                      <div className="relative [font-family:'Urbanist-Medium',Helvetica] font-medium text-[#7b7b7b] text-[10px] tracking-[0] mt-1">
                         Expires {method.expiryDate}
                       </div>
                     </div>
@@ -196,9 +196,9 @@ export const ProfileBillingContent = () => {
               </div>
               <button
                 onClick={() => handleDeletePaymentMethod(method.id)}
-                className="relative w-5 h-5 aspect-[1] hover:opacity-70 transition-opacity"
+                className="relative w-5 h-5 aspect-[1] hover:opacity-70 transition-opacity ml-4"
               >
-                <img src="/profile/delete-02-stroke-rounded.svg" alt="" />
+                <img src="/profile/delete-02-stroke-rounded.svg" alt="" className="w-full h-full" />
               </button>
             </div>
           ))}
@@ -208,7 +208,7 @@ export const ProfileBillingContent = () => {
       <div className="relative self-stretch w-full h-px bg-gray-200" />
 
       {/* Billing History Header */}
-      <div className="w-[354px] relative h-[43px]">
+      <div className="w-full sm:w-[354px] relative h-[43px]">
         <h1 className="absolute top-0 left-0 [font-family:'Montserrat-Medium',Helvetica] font-medium text-black text-lg tracking-[0.36px] leading-[normal]">
           Billing History
         </h1>
@@ -217,8 +217,8 @@ export const ProfileBillingContent = () => {
         </p>
       </div>
 
-      {/* Billing History Table Header */}
-      <div className="relative w-[1186px] h-[18px]">
+      {/* Billing History Table Header (դեսքթոփի համար) */}
+      <div className="hidden lg:block relative w-full h-[18px]">
         {[
           { label: "Invoice", left: 0 },
           { label: "Date", left: 209 },
@@ -235,11 +235,11 @@ export const ProfileBillingContent = () => {
         ))}
       </div>
 
-      {/* Billing History Items */}
-      <div className="flex flex-col w-[1193px] items-start gap-2 relative">
+      {/* Billing History Items - դեսքթոփ տեսք */}
+      <div className="hidden lg:flex flex-col w-full items-start gap-2 relative">
         {billingHistoryData.map((item) => (
-          <div key={item.id} className="border-t border-[#EFF1F3] pt-1 relative w-[1193px] h-11 bg-[#f8fafd] rounded-md">
-            <div className="flex w-[1173px] items-center justify-between relative top-1 left-3">
+          <div key={item.id} className="border-t border-[#EFF1F3] pt-1 relative w-full h-11 bg-[#f8fafd] rounded-md">
+            <div className="flex w-full items-center justify-between relative top-1 left-3">
               <div className="relative w-fit [font-family:'Poppins-Regular',Helvetica] font-normal text-black text-sm tracking-[0] leading-[18px] whitespace-nowrap">
                 {item.invoiceNumber}
               </div>
@@ -264,6 +264,49 @@ export const ProfileBillingContent = () => {
                 </span>
               </button>
             </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Billing History Items - մոբայլ տեսք */}
+      <div className="lg:hidden flex flex-col w-full items-start gap-4 relative">
+        {billingHistoryData.map((item) => (
+          <div key={item.id} className="flex flex-col w-full p-4 relative bg-[#F3F3F6] rounded-2xl gap-3">
+            {/* Վերին մաս - INV-001 | P-0124 և ստատուսը */}
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center gap-2">
+                <div className="relative [font-family:'Poppins-Regular',Helvetica] font-normal text-black text-sm tracking-[0] leading-[18px]">
+                  {item.invoiceNumber}
+                </div>
+                <div className="text-gray-400">|</div>
+                <div className="relative [font-family:'Poppins-Regular',Helvetica] font-normal text-blue-600 text-sm tracking-[0] leading-[18px]">
+                  {item.projectId}
+                </div>
+              </div>
+              <div className="inline-flex items-center justify-center gap-1.5 px-2 py-1 relative rounded-[37px] bg-white">
+                <div className="relative w-1.5 h-1.5 rounded-[3px]" style={{ backgroundColor: item.statusColor }} />
+                <div className="relative w-fit [font-family:'Poppins-Regular',Helvetica] font-normal text-xs tracking-[0] leading-[18px] whitespace-nowrap" style={{ color: item.statusColor }}>
+                  {item.status}
+                </div>
+              </div>
+            </div>
+
+            {/* Ներքևի մաս - ամսաթիվ և գումար */}
+            <div className="flex items-center justify-between w-full">
+              <div className="relative [font-family:'Poppins-Regular',Helvetica] font-normal text-gray-600 text-sm tracking-[0] leading-[18px]">
+                {item.date}
+              </div>
+              <div className="relative [font-family:'Poppins-Regular',Helvetica] font-medium text-black text-sm tracking-[0] leading-[18px]">
+                {item.amount}
+              </div>
+            </div>
+
+            {/* Download button */}
+            <button className="flex w-full h-[35.68px] items-center justify-center gap-2.5 px-3 py-1.5 relative rounded-md border border-solid border-[#e3e6ea] bg-white hover:bg-gray-50 transition-colors mt-2">
+              <span className="relative w-fit [font-family:'Poppins-Regular',Helvetica] font-normal text-gray-700 text-sm tracking-[0] leading-[18px] whitespace-nowrap">
+                Download
+              </span>
+            </button>
           </div>
         ))}
       </div>

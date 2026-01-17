@@ -42,11 +42,11 @@ export const SecurityContent = () => {
   };
 
   return (
-    <div className="flex flex-col w-[1250px] items-start gap-6 p-6 relative bg-[#fbfbf6] rounded-2xl">
+    <div className="flex flex-col w-full items-start gap-6 p-4 sm:p-6 relative bg-[#fbfbf6] rounded-2xl">
       {/* Change Password Section */}
-      <div className="inline-flex flex-col items-start gap-5 relative">
-        <div className="flex items-start justify-between relative self-stretch w-full">
-          <div className="w-[278px] relative h-[43px]">
+      <div className="inline-flex flex-col items-start gap-5 relative w-full">
+        <div className="flex flex-col sm:flex-row items-start justify-between relative self-stretch w-full gap-4">
+          <div className="w-full sm:w-[278px] relative h-[43px]">
             <h2 className="absolute top-0 left-0 [font-family:'Montserrat-Medium',Helvetica] font-medium text-black text-lg tracking-[0.36px] leading-[normal]">
               Change Password
             </h2>
@@ -56,7 +56,7 @@ export const SecurityContent = () => {
           </div>
           <button
             onClick={handleChangePassword}
-            className="inline-flex h-[35.68px] items-center justify-center gap-2.5 px-3 py-1.5 relative bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+            className="inline-flex h-[35.68px] items-center justify-center gap-2.5 px-3 py-1.5 relative bg-blue-600 rounded-md hover:bg-blue-700 transition-colors w-full sm:w-auto"
           >
             <span className="relative w-fit [font-family:'Poppins-Regular',Helvetica] font-normal text-white text-sm tracking-[0] leading-[18px] whitespace-nowrap">
               Change Password
@@ -64,7 +64,7 @@ export const SecurityContent = () => {
           </button>
         </div>
 
-        <div className="inline-flex items-start gap-6 relative mt-4">
+        <div className="flex flex-col lg:flex-row items-start gap-6 relative w-full mt-4">
           {[
             {
               id: "currentPassword",
@@ -88,7 +88,7 @@ export const SecurityContent = () => {
               placeholder: "Confirm new password",
             },
           ].map((field) => (
-            <div key={field.id} className="flex flex-col w-[385px] items-start gap-2 relative">
+            <div key={field.id} className="flex flex-col w-full lg:w-[385px] items-start gap-2 relative">
               <label className="relative w-fit mt-[-1.00px] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#4f4f4f] text-sm tracking-[0] leading-[18px] whitespace-nowrap">
                 {field.label}
               </label>
@@ -110,9 +110,9 @@ export const SecurityContent = () => {
       <div className="relative self-stretch w-full h-px bg-gray-200" />
 
       {/* Two-Factor Authentication */}
-      <div className="inline-flex flex-col items-start gap-5 relative">
-        <div className="flex items-start justify-between relative self-stretch w-full">
-          <div className="w-[278px] relative h-[43px]">
+      <div className="inline-flex flex-col items-start gap-5 relative w-full">
+        <div className="flex flex-col sm:flex-row items-start justify-between relative self-stretch w-full gap-4">
+          <div className="w-full sm:w-[278px] relative h-[43px]">
             <h2 className="absolute top-0 left-0 [font-family:'Montserrat-Medium',Helvetica] font-medium text-black text-lg tracking-[0.36px] leading-[normal]">
               Two-Factor Authentication
             </h2>
@@ -120,7 +120,7 @@ export const SecurityContent = () => {
               Add an extra layer of security to your account
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 self-start">
             <span className="relative w-fit [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#606068] text-sm tracking-[0] leading-[18px] whitespace-nowrap">
               {is2FAEnabled ? "Enabled" : "Disabled"}
             </span>
@@ -148,9 +148,9 @@ export const SecurityContent = () => {
       <div className="relative self-stretch w-full h-px bg-gray-200" />
 
       {/* Active Sessions */}
-      <div className="inline-flex flex-col items-start gap-5 relative">
-        <div className="flex items-start justify-between relative self-stretch w-full">
-          <div className="w-[278px] relative h-[43px]">
+      <div className="inline-flex flex-col items-start gap-5 relative w-full">
+        <div className="flex flex-col sm:flex-row items-start justify-between relative self-stretch w-full gap-4">
+          <div className="w-full sm:w-[278px] relative h-[43px]">
             <h2 className="absolute top-0 left-0 [font-family:'Montserrat-Medium',Helvetica] font-medium text-black text-lg tracking-[0.36px] leading-[normal]">
               Active Sessions
             </h2>
@@ -160,7 +160,7 @@ export const SecurityContent = () => {
           </div>
           <button
             onClick={handleSignOutAll}
-            className="inline-flex h-[35.68px] items-center justify-center gap-2.5 px-3 py-1.5 relative rounded-md border border-solid border-gray-300 hover:bg-gray-50 transition-colors"
+            className="inline-flex h-[35.68px] items-center justify-center gap-2.5 px-3 py-1.5 relative rounded-md border border-solid border-gray-300 hover:bg-gray-50 transition-colors w-full sm:w-auto"
           >
             <span className="relative w-fit [font-family:'Poppins-Regular',Helvetica] font-normal text-gray-700 text-sm tracking-[0] leading-[18px] whitespace-nowrap">
               Sign Out All Devices
@@ -168,13 +168,13 @@ export const SecurityContent = () => {
           </button>
         </div>
 
-        <div className="inline-flex items-start gap-4 relative self-stretch w-full">
+        <div className="flex flex-col lg:flex-row items-start gap-4 relative self-stretch w-full">
           {sessions.map((session) => (
             <div
               key={session.id}
-              className={`flex flex-col w-[582px] items-start justify-center p-6 relative rounded-lg border border-solid ${session.isCurrent ? "border-blue-200 bg-blue-50" : "border-gray-200 bg-gray-50 opacity-70"}`}
+              className={`flex flex-col w-full lg:w-[582px] items-start justify-center p-4 sm:p-6 relative rounded-lg border border-solid ${session.isCurrent ? "border-blue-200 bg-blue-50" : "border-gray-200 bg-gray-50 opacity-70"}`}
             >
-              <div className="flex items-center justify-between relative self-stretch w-full">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between relative self-stretch w-full gap-4">
                 <div className="inline-flex items-center gap-4 relative flex-[0_0_auto]">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${session.isCurrent ? "bg-blue-100" : "bg-gray-100"}`}>
                     <span className={`${session.isCurrent ? "text-blue-600" : "text-gray-400"}`}>
@@ -201,7 +201,7 @@ export const SecurityContent = () => {
                   )}
                   <button
                     onClick={() => handleSignOut(session.id)}
-                    className={`inline-flex h-[35.68px] items-center justify-center gap-2.5 px-3 py-1.5 relative rounded-md border border-solid ${session.isCurrent ? "border-red-300 text-red-600 hover:bg-red-50" : "border-gray-300 text-gray-600 hover:bg-gray-50"} transition-colors`}
+                    className={`inline-flex h-[35.68px] items-center justify-center gap-2.5 px-3 py-1.5 relative rounded-md border border-solid ${session.isCurrent ? "border-red-300 text-red-600 hover:bg-red-50" : "border-gray-300 text-gray-600 hover:bg-gray-50"} transition-colors w-full sm:w-auto`}
                   >
                     <span className="relative w-fit [font-family:'Poppins-Regular',Helvetica] font-normal text-sm tracking-[0] leading-[18px] whitespace-nowrap">
                       Sign Out
@@ -217,9 +217,9 @@ export const SecurityContent = () => {
       <div className="relative self-stretch w-full h-px bg-gray-200" />
 
       {/* Delete Account */}
-      <div className="inline-flex flex-col items-start gap-5 relative self-stretch w-full p-6 rounded-lg border border-solid border-red-200 bg-red-50">
-        <div className="flex items-start justify-between relative self-stretch w-full">
-          <div className="w-[278px] relative h-[43px]">
+      <div className="inline-flex flex-col items-start gap-5 relative self-stretch w-full p-4 sm:p-6 rounded-lg border border-solid border-red-200 bg-red-50">
+        <div className="flex flex-col sm:flex-row items-start justify-between relative self-stretch w-full gap-4">
+          <div className="w-full sm:w-[278px] relative h-[43px]">
             <h2 className="absolute top-0 left-0 [font-family:'Montserrat-Medium',Helvetica] font-medium text-red-900 text-lg tracking-[0.36px] leading-[normal]">
               Delete Account
             </h2>
@@ -229,7 +229,7 @@ export const SecurityContent = () => {
           </div>
           <button
             onClick={handleDeleteAccount}
-            className="inline-flex h-[35.68px] items-center justify-center gap-2.5 px-3 py-1.5 relative bg-red-600 rounded-md hover:bg-red-700 transition-colors"
+            className="inline-flex h-[35.68px] items-center justify-center gap-2.5 px-3 py-1.5 relative bg-red-600 rounded-md hover:bg-red-700 transition-colors w-full sm:w-auto"
           >
             <span className="relative w-fit [font-family:'Poppins-Regular',Helvetica] font-normal text-white text-sm tracking-[0] leading-[18px] whitespace-nowrap">
               Delete Account

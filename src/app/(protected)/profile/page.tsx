@@ -13,13 +13,12 @@ export default function ProfilePage() {
   return (
     <DashboardLayout>
       <div className="bg-[#f3f3f6] w-full min-h-screen">
-        
-        <div className="px-10 py-8">
-          {/* Վերին բաժինը - ոչ absolute */}
+        <div className="px-4 sm:px-6 lg:px-10 py-6 sm:py-8">
+          {/* Վերին բաժինը */}
           <ProfileNavigationSection />
           
           {/* Հիմնական բաժինը */}
-          <div className="mt-12">
+          <div className="mt-6 sm:mt-8 lg:mt-12">
             <ProfileContentSection activeTab={activeTab} onTabChange={setActiveTab} />
           </div>
         </div>

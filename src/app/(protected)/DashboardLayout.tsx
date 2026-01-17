@@ -54,7 +54,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     return (
       <div className="font-montserrat">
         <div className='bg-[#F3F3F6]'><DashboardHeader userEmail={user?.email} /></div>
-        <main className="flex-1 mt-[-12px]">
+        <main className="flex-1 mt-[-12px] bg-[#f3f3f6]">
           {children}
         </main>
       </div>
