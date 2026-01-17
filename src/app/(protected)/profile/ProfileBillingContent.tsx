@@ -226,7 +226,7 @@ export const ProfileBillingContent = () => {
       {/* Billing History Items */}
       <div className="flex flex-col w-[1193px] items-start gap-2 relative">
         {billingHistoryData.map((item) => (
-          <div key={item.id} className="relative w-[1193px] h-11 bg-[#f8fafd] rounded-md">
+          <div key={item.id} className="border-t border-[#EFF1F3] pt-1 relative w-[1193px] h-11 bg-[#f8fafd] rounded-md">
             <div className="flex w-[1173px] items-center justify-between relative top-1 left-3">
               <div className="relative w-fit [font-family:'Poppins-Regular',Helvetica] font-normal text-black text-sm tracking-[0] leading-[18px] whitespace-nowrap">
                 {item.invoiceNumber}
