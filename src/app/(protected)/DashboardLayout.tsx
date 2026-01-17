@@ -38,14 +38,30 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     )
   }
 
+  // Ստուգել, արդյոք ընթացիկ էջը profile էջն է
+  const isProfilePage = pathname?.includes('/profile')
+  
   // Ստուգել, արդյոք ընթացիկ էջը documents էջն է
   const isDocumentsPage = pathname?.includes('/documents')
   
   // Պայմանավորել background class-ը
   const omblockBackgroundClass = isDocumentsPage 
-    ? "bg-[url('/documents/documents-back.png')] bg-cover bg-center bg-top" // ✅ Ավելացել է bg-top
+    ? "bg-[url('/documents/documents-back.png')] bg-cover bg-center bg-top"
     : ""
 
+  // Եթե profile էջն է, վերադարձնել պարզ կառուցվածք
+  if (isProfilePage) {
+    return (
+      <div className="font-montserrat">
+        <div className='bg-[#F3F3F6]'><DashboardHeader userEmail={user?.email} /></div>
+        <main className="flex-1 mt-[-12px]">
+          {children}
+        </main>
+      </div>
+    )
+  }
+
+  // Սովորական դեպք՝ մյուս էջերի համար
   return (
     <div className="
       md:h-[116vh]
