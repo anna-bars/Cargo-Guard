@@ -425,10 +425,7 @@ export default function DocumentsPage() {
                       alt=""
                       className="w-3 h-3 object-cover"
                     />
-                    Download
-                  </button>
-                  <button className="inline-flex items-center justify-center gap-[10px] px-4 py-2 h-[35.68px] bg-[#0b0b0b] border-0 rounded-[6px] font-poppins text-base font-normal text-white cursor-pointer whitespace-nowrap">
-                    + Get New Quote
+                    Download All Certificates
                   </button>
                 </div>
 

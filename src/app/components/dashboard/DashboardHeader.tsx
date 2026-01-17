@@ -91,8 +91,7 @@ export default function DashboardHeader({ userEmail }: DashboardHeaderProps) {
     { id: 'dashboard', label: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
     { id: 'quotes', label: 'Quotes', href: '/quotes', icon: 'quotes' },
     { id: 'shipments', label: 'Shipments', href: '/shipments', icon: 'shipments' },
-    { id: 'documents', label: 'Documents', href: '/documents', icon: 'documents' },
-    { id: 'profile', label: 'Profile', href: '/profile', icon: 'settings' }
+    { id: 'documents', label: 'Documents', href: '/documents', icon: 'documents' }
   ]
   
   const handleNavClick = (itemLabel: string) => {
