@@ -55,14 +55,26 @@ export const ProfileBillingContent = () => {
   ];
 
   return (
-    <div className="flex flex-col w-[1250px] items-start gap-6 p-6 relative bg-[#fafcffcc] rounded-2xl">
+    <div className="flex flex-col w-full items-start gap-6 p-6 relative bg-[#fbfbf6] rounded-2xl">
       {/* User Profile Section */}
       <div className="flex items-start gap-4 relative self-stretch w-full">
-        <img
-          className="relative w-[81px] h-[81px]"
-          alt="Lucas Bennett profile picture"
-          src="/profile/user.png"
-        />
+        {/* Profile image with edit button */}
+        <div className="relative">
+          <img
+            className="relative w-[81px] h-[81px] rounded-[8px] rounded border border-[#f3f3f6]"
+            alt="Lucas Bennett profile picture"
+            src="/profile/user.png"
+          />
+          {/* Edit button - positioned at bottom right */}
+          <button className="absolute bottom-1 right-1 flex justify-center items-center w-7 h-7 bg-[#f8fafd] px-1.5 py-[0px] rounded-md border-[0.7px] border-solid border-[#EFF4FC] hover:bg-blue-50 transition-colors">
+            <img 
+              className="w-6 h-6" 
+              alt="Edit profile"
+              src="/profile/pen-01-stroke-rounded.svg"
+            />
+          </button>
+        </div>
+        
         <div className="flex flex-col items-start justify-between px-0 py-[5px] relative flex-1 self-stretch grow">
           <h1 className="relative self-stretch mt-[-1.00px] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#2a2a2a] text-2xl tracking-[0.48px] leading-[normal]">
             Lucas Bennett

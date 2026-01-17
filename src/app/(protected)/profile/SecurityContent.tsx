@@ -42,7 +42,7 @@ export const SecurityContent = () => {
   };
 
   return (
-    <div className="flex flex-col w-[1250px] items-start gap-6 p-6 relative bg-[#fafcffcc] rounded-2xl">
+    <div className="flex flex-col w-[1250px] items-start gap-6 p-6 relative bg-[#fbfbf6] rounded-2xl">
       {/* Change Password Section */}
       <div className="inline-flex flex-col items-start gap-5 relative">
         <div className="flex items-start justify-between relative self-stretch w-full">
@@ -50,7 +50,7 @@ export const SecurityContent = () => {
             <h2 className="absolute top-0 left-0 [font-family:'Montserrat-Medium',Helvetica] font-medium text-black text-lg tracking-[0.36px] leading-[normal]">
               Change Password
             </h2>
-            <p className="absolute top-7 left-0 [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#c7c7c7] text-xs tracking-[0.24px] leading-[normal]">
+            <p className="absolute top-7 mb-3 left-0 [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#c7c7c7] text-xs tracking-[0.24px] leading-[normal]">
               Update your password regularly to keep your account secure
             </p>
           </div>
@@ -64,7 +64,7 @@ export const SecurityContent = () => {
           </button>
         </div>
 
-        <div className="inline-flex items-start gap-6 relative">
+        <div className="inline-flex items-start gap-6 relative mt-4">
           {[
             {
               id: "currentPassword",
