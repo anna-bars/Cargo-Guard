@@ -69,8 +69,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <div className='bg-white shadow-sm'>
           <DashboardHeader userEmail={user?.email} />
         </div>
+        <h1>dd</h1>
         <main className={quoteBackgroundClass}>
-          {children}
+         
         </main>
       </div>
     )
