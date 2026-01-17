@@ -13,6 +13,7 @@ export default function ProfilePage() {
   return (
     <DashboardLayout>
       <div className="bg-[#f3f3f6] w-full min-h-screen">
+        
         <div className="px-10 py-8">
           {/* Վերին բաժինը - ոչ absolute */}
           <ProfileNavigationSection />
