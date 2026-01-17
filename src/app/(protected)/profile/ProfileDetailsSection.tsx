@@ -16,6 +16,7 @@ import vector145 from "../../../../public/profile/vector-145.svg";
 import vector159 from "../../../../public/profile/vector-161.svg";
 import vector160 from "../../../../public/profile/vector-160.svg";
 import vector161 from "../../../../public/profile/vector-161.svg";
+import paymentMethod from "../../../../public/profile/payment-method.svg"
 
 interface PersonalInfo {
   fullName: string;
@@ -309,7 +310,7 @@ export const ProfileDetailsSection = (): JSX.Element => {
                       <img
                         className="relative flex-1 self-stretch w-full grow"
                         alt="Card brand"
-                        src={method.cardImage}
+                        src={paymentMethod}
                       />
                     </div>
 
