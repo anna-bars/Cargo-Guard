@@ -61,7 +61,7 @@ export const ProfileBillingContent = () => {
         <img
           className="relative w-[81px] h-[81px]"
           alt="Lucas Bennett profile picture"
-          src="group-211.svg"
+          src="/profile/user.png"
         />
         <div className="flex flex-col items-start justify-between px-0 py-[5px] relative flex-1 self-stretch grow">
           <h1 className="relative self-stretch mt-[-1.00px] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#2a2a2a] text-2xl tracking-[0.48px] leading-[normal]">
@@ -74,7 +74,7 @@ export const ProfileBillingContent = () => {
             <img
               className="relative w-3 h-3 aspect-[1] object-cover"
               alt="Location icon"
-              src="location-1-1.png"
+              src="/profile/location-01-stroke-rounded.svg"
             />
             <p className="relative w-[359px] mt-[-1.00px] [font-family:'Montserrat-Regular',Helvetica] font-normal text-[#c7c7c7] text-sm tracking-[0.28px] leading-[normal]">
               Utrecht, Netherlands – 8:29 PM local time
@@ -160,7 +160,7 @@ export const ProfileBillingContent = () => {
                 <div className="flex flex-col w-[172px] items-start gap-1.5 relative">
                   <div className="inline-flex items-center gap-3 relative">
                     <div className="flex flex-col w-[58px] h-[39px] items-start gap-2.5 relative">
-                      <div className="relative flex-1 self-stretch w-full bg-gradient-to-r from-gray-200 to-gray-300 rounded" />
+                      <img src="/profile/payment-method.svg" alt="" />
                     </div>
                     <div className="flex flex-col w-[102px] items-start justify-center relative">
                       <div className="relative w-[99px] h-[17px]">
@@ -186,7 +186,7 @@ export const ProfileBillingContent = () => {
                 onClick={() => handleDeletePaymentMethod(method.id)}
                 className="relative w-5 h-5 aspect-[1] hover:opacity-70 transition-opacity"
               >
-                <div className="w-full h-full bg-red-500 rounded-sm" />
+                <img src="/profile/delete-02-stroke-rounded.svg" alt="" />
               </button>
             </div>
           ))}
