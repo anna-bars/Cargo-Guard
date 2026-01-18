@@ -81,7 +81,6 @@ const CustomDatePicker = ({
       day
     );
     
-    // Check if date is within range
     if (min && selected < min) return;
     if (max && selected > max) return;
     
@@ -124,7 +123,6 @@ const CustomDatePicker = ({
     return false;
   };
 
-  // Close date picker when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (isOpen && !(e.target as Element).closest('.date-picker-container')) {
@@ -153,7 +151,6 @@ const CustomDatePicker = ({
 
       {isOpen && (
         <div className="absolute z-50 mt-1 bg-white rounded-xl shadow-lg border border-gray-200 p-4 w-80">
-          {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <button
               type="button"
@@ -174,7 +171,6 @@ const CustomDatePicker = ({
             </button>
           </div>
 
-          {/* Days of week */}
           <div className="grid grid-cols-7 gap-1 mb-2">
             {days.map(day => (
               <div key={day} className="text-center text-sm font-medium text-gray-500 py-1">
@@ -183,7 +179,6 @@ const CustomDatePicker = ({
             ))}
           </div>
 
-          {/* Calendar grid */}
           <div className="grid grid-cols-7 gap-1">
             {Array.from({ length: firstDayOfMonth }).map((_, index) => (
               <div key={`empty-${index}`} />
@@ -218,7 +213,6 @@ const CustomDatePicker = ({
             })}
           </div>
 
-          {/* Today button */}
           <div className="mt-4 pt-4 border-t border-gray-100">
             <button
               type="button"
@@ -300,68 +294,38 @@ const LocationIQAutocomplete = ({
   const [suggestions, setSuggestions] = useState<LocationIQFeature[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [apiStatus, setApiStatus] = useState<'idle' | 'loading' | 'error' | 'success'>('idle');
+  const [apiStatus, setApiStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const debounceTimeout = useRef<NodeJS.Timeout>();
 
-  // Your LocationIQ API Key
-  const LOCATIONIQ_API_KEY = process.env.NEXT_PUBLIC_LOCATIONIQ_API_KEY || '434f3e21-0c41-4c64-8ffb-6429092efb66';
+  // ✅ CORRECT LocationIQ API Key
+  const LOCATIONIQ_API_KEY = process.env.NEXT_PUBLIC_LOCATIONIQ_API_KEY || 'pk.f15b5391da0772168ecba607d5fe3136';
 
-  // Shipping-specific keywords for better results
+  // Shipping-specific keywords
   const SHIPPING_KEYWORDS = [
     'port', 'harbor', 'dock', 'terminal', 'seaport', 'marina',
     'airport', 'airfield', 'airstrip', 'airbase',
     'logistics', 'freight', 'cargo', 'shipping', 'container'
   ];
 
-  // Local shipping port database as fallback
+  // Local fallback database
   const LOCAL_PORTS_DB = [
-    // Major Sea Ports
-    { name: 'Port of Shanghai', city: 'Shanghai', country: 'China', type: 'port' as const, code: 'CNSHA', lat: 31.23, lon: 121.47 },
-    { name: 'Port of Singapore', city: 'Singapore', country: 'Singapore', type: 'port' as const, code: 'SGSIN', lat: 1.26, lon: 103.82 },
-    { name: 'Port of Rotterdam', city: 'Rotterdam', country: 'Netherlands', type: 'port' as const, code: 'NLRTM', lat: 51.92, lon: 4.48 },
-    { name: 'Port of Antwerp', city: 'Antwerp', country: 'Belgium', type: 'port' as const, code: 'BEANR', lat: 51.23, lon: 4.40 },
-    { name: 'Port of Hamburg', city: 'Hamburg', country: 'Germany', type: 'port' as const, code: 'DEHAM', lat: 53.54, lon: 9.99 },
-    { name: 'Port of Los Angeles', city: 'Los Angeles', country: 'USA', type: 'port' as const, code: 'USLAX', lat: 33.72, lon: -118.27 },
-    { name: 'Port of Long Beach', city: 'Long Beach', country: 'USA', type: 'port' as const, code: 'USLGB', lat: 33.76, lon: -118.21 },
-    { name: 'Port of New York', city: 'New York', country: 'USA', type: 'port' as const, code: 'USNYC', lat: 40.70, lon: -74.01 },
-    { name: 'Jebel Ali Port', city: 'Dubai', country: 'UAE', type: 'port' as const, code: 'AEJEA', lat: 25.00, lon: 55.07 },
-    { name: 'Port of Busan', city: 'Busan', country: 'South Korea', type: 'port' as const, code: 'KRKAN', lat: 35.11, lon: 129.04 },
-    
-    // Major Airports
-    { name: 'Dubai International Airport', city: 'Dubai', country: 'UAE', type: 'airport' as const, code: 'DXB', lat: 25.25, lon: 55.36 },
-    { name: 'Heathrow Airport', city: 'London', country: 'UK', type: 'airport' as const, code: 'LHR', lat: 51.47, lon: -0.46 },
-    { name: 'Hong Kong International Airport', city: 'Hong Kong', country: 'China', type: 'airport' as const, code: 'HKG', lat: 22.31, lon: 113.92 },
-    { name: 'Singapore Changi Airport', city: 'Singapore', country: 'Singapore', type: 'airport' as const, code: 'SIN', lat: 1.36, lon: 103.99 },
-    { name: 'Incheon International Airport', city: 'Seoul', country: 'South Korea', type: 'airport' as const, code: 'ICN', lat: 37.46, lon: 126.44 },
-    { name: 'Charles de Gaulle Airport', city: 'Paris', country: 'France', type: 'airport' as const, code: 'CDG', lat: 49.01, lon: 2.55 },
-    { name: 'Frankfurt Airport', city: 'Frankfurt', country: 'Germany', type: 'airport' as const, code: 'FRA', lat: 50.03, lon: 8.57 },
-    
-    // Major Cities
-    { name: 'New York City', city: 'New York', country: 'USA', type: 'city' as const, lat: 40.71, lon: -74.01 },
-    { name: 'London City', city: 'London', country: 'UK', type: 'city' as const, lat: 51.51, lon: -0.13 },
-    { name: 'Tokyo City', city: 'Tokyo', country: 'Japan', type: 'city' as const, lat: 35.68, lon: 139.76 },
-    { name: 'Shanghai City', city: 'Shanghai', country: 'China', type: 'city' as const, lat: 31.23, lon: 121.47 },
-    { name: 'Singapore City', city: 'Singapore', country: 'Singapore', type: 'city' as const, lat: 1.35, lon: 103.82 },
-    { name: 'Dubai City', city: 'Dubai', country: 'UAE', type: 'city' as const, lat: 25.20, lon: 55.27 },
-    { name: 'Rotterdam City', city: 'Rotterdam', country: 'Netherlands', type: 'city' as const, lat: 51.92, lon: 4.48 },
-    { name: 'Hamburg City', city: 'Hamburg', country: 'Germany', type: 'city' as const, lat: 53.55, lon: 10.00 },
+      { name: 'Tokyo City', city: 'Tokyo', country: 'Japan', type: 'city' as const, lat: 35.68, lon: 139.76 },
   ];
 
-  // Handle click outside to close suggestions
+  // Handle click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setShowSuggestions(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Debounced search for locations
+  // Debounced search
   useEffect(() => {
     if (debounceTimeout.current) {
       clearTimeout(debounceTimeout.current);
@@ -374,7 +338,7 @@ const LocationIQAutocomplete = ({
 
     debounceTimeout.current = setTimeout(async () => {
       await searchLocations(inputValue);
-    }, 400); // Slightly longer debounce for API conservation
+    }, 350);
 
     return () => {
       if (debounceTimeout.current) {
@@ -383,78 +347,102 @@ const LocationIQAutocomplete = ({
     };
   }, [inputValue]);
 
-  const searchLocations = async (query: string) => {
-    if (query.length < 2) return;
+ const searchLocations = async (query: string) => {
+  if (query.length < 2) return;
 
-    setIsLoading(true);
-    setApiStatus('loading');
+  setIsLoading(true);
+  setApiStatus('loading');
+  
+  try {
+    // 1. Local results (instant)
+    const localResults = searchLocalDatabase(query);
     
-    try {
-      // First, check local database for exact matches
-      const localResults = searchLocalDatabase(query);
-      
-      if (localResults.length >= 3) {
-        setSuggestions(localResults);
-        setApiStatus('success');
-        setIsLoading(false);
-        return;
-      }
-
-      // Use LocationIQ API for broader search
-      const response = await fetch(
-        `https://api.locationiq.com/v1/autocomplete.php?` +
-        `key=${LOCATIONIQ_API_KEY}&` +
-        `q=${encodeURIComponent(query)}&` +
-        `limit=8&` +
-        `tag=place:city,place:town,place:village,transport:port,transport:airport&` +
-        `countrycodes=us,gb,de,fr,nl,be,es,it,cn,jp,kr,sg,au,ae,sa,qa,ca,mx,br,ru,in&` +
-        `dedupe=1&` +
-        `normalizeaddress=1`
-      );
-
-      if (!response.ok) {
-        throw new Error(`LocationIQ API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      
-      // Filter and prioritize shipping-relevant locations
-      const filteredResults = data
-        .filter((feature: LocationIQFeature) => {
-          const isShippingRelated = SHIPPING_KEYWORDS.some(keyword => 
-            feature.display_name.toLowerCase().includes(keyword) ||
-            feature.type?.toLowerCase().includes(keyword) ||
-            feature.class?.toLowerCase().includes(keyword)
-          );
-          
-          const isMajorCity = feature.type === 'city' && feature.importance > 0.4;
-          const isPortOrAirport = feature.class === 'transport' && 
-            (feature.type === 'port' || feature.type === 'airport' || feature.type === 'harbor');
-          
-          return isShippingRelated || isMajorCity || isPortOrAirport;
-        })
-        .slice(0, 6); // Limit results
-
-      // Combine local and API results
-      const allResults = [...localResults, ...filteredResults]
-        .filter((v, i, a) => a.findIndex(t => t.place_id === v.place_id) === i)
-        .slice(0, 6);
-
-      setSuggestions(allResults);
+    // Show local results immediately
+    if (localResults.length > 0) {
+      setSuggestions(localResults);
       setApiStatus('success');
       setShowSuggestions(true);
-    } catch (error) {
-      console.error('LocationIQ search error:', error);
-      setApiStatus('error');
-      
-      // Fallback to local database only
-      const localResults = searchLocalDatabase(query);
-      setSuggestions(localResults);
-    } finally {
-      setIsLoading(false);
     }
-  };
 
+    // 2. Try LocationIQ
+    let locationIQResults: LocationIQFeature[] = [];
+    try {
+      const apiKey = 'pk.f15b5391da0772168ecba607d5fe3136';
+      const response = await fetch(
+        `https://api.locationiq.com/v1/autocomplete.php?` +
+        `key=${apiKey}&` +
+        `q=${encodeURIComponent(query)}&` +
+        `limit=5&` +
+        `format=json`
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        locationIQResults = data || [];
+      }
+    } catch (locationIQError) {
+      console.log('LocationIQ failed, trying OpenStreetMap...');
+    }
+
+    // 3. Try OpenStreetMap as fallback
+    let osmResults: LocationIQFeature[] = [];
+    if (locationIQResults.length === 0) {
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?` +
+          `format=json&` +
+          `q=${encodeURIComponent(query)}&` +
+          `addressdetails=1&` +
+          `limit=5&` +
+          `email=contact@shippingapp.com`
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          osmResults = data.map((place: any) => ({
+            place_id: place.place_id,
+            licence: place.licence,
+            osm_type: place.osm_type,
+            osm_id: place.osm_id,
+            boundingbox: place.boundingbox,
+            lat: place.lat,
+            lon: place.lon,
+            display_name: place.display_name,
+            class: place.class,
+            type: place.type,
+            importance: place.importance,
+            address: place.address
+          }));
+        }
+      } catch (osmError) {
+        console.log('OpenStreetMap also failed');
+      }
+    }
+
+    // Combine all results
+    const allResults = [...localResults, ...locationIQResults, ...osmResults]
+      .filter((v, i, a) => 
+        a.findIndex(t => t.place_id === v.place_id) === i
+      )
+      .slice(0, 8);
+
+    setSuggestions(allResults);
+    setApiStatus(allResults.length > 0 ? 'success' : 'error');
+    setShowSuggestions(true);
+    
+  } catch (error) {
+    console.error('Final search error:', error);
+    setApiStatus('error');
+    
+    // Final fallback: just local
+    const localResults = searchLocalDatabase(query);
+    setSuggestions(localResults);
+    setShowSuggestions(localResults.length > 0);
+    
+  } finally {
+    setIsLoading(false);
+  }
+};
   const searchLocalDatabase = (query: string): LocationIQFeature[] => {
     const normalizedQuery = query.toLowerCase();
     
@@ -462,8 +450,7 @@ const LocationIQAutocomplete = ({
       .filter(location =>
         location.name.toLowerCase().includes(normalizedQuery) ||
         location.city.toLowerCase().includes(normalizedQuery) ||
-        location.country.toLowerCase().includes(normalizedQuery) ||
-        (location.code && location.code.toLowerCase().includes(normalizedQuery))
+        location.country.toLowerCase().includes(normalizedQuery)
       )
       .map(location => ({
         place_id: `local-${location.code || location.name}`,
@@ -498,27 +485,29 @@ const LocationIQAutocomplete = ({
     
     let type: LocationData['type'] = 'place';
     if (feature.class === 'transport') {
-      if (feature.type === 'airport') type = 'airport';
-      else if (['port', 'harbor', 'dock'].includes(feature.type || '')) type = 'port';
-      else type = 'place';
+      if (feature.type === 'airport' || feature.display_name.toLowerCase().includes('airport')) {
+        type = 'airport';
+      } else if (['port', 'harbor', 'dock'].includes(feature.type || '') || 
+                 feature.display_name.toLowerCase().includes('port')) {
+        type = 'port';
+      } else {
+        type = 'place';
+      }
     } else if (['city', 'town', 'village'].includes(feature.type || '')) {
       type = 'city';
     }
 
-    // Determine city and country
     const city = feature.address?.city || feature.address?.town || feature.address?.village || '';
     const country = feature.address?.country || '';
     const countryCode = feature.address?.country_code?.toUpperCase() || '';
 
-    // Generate port code if applicable
+    // Generate port code
     let portCode: string | undefined;
     if (type === 'port' || type === 'airport') {
-      if (isLocal && feature.display_name.includes('Port of')) {
-        // Extract from local database code
+      if (isLocal) {
         const localPort = LOCAL_PORTS_DB.find(p => p.name === feature.display_name);
         portCode = localPort?.code;
       } else {
-        // Generate simple code: first 3 letters of name + country code
         const baseCode = feature.display_name
           .replace(/port|airport|international|seaport|harbor|terminal/gi, '')
           .trim()
@@ -529,7 +518,7 @@ const LocationIQAutocomplete = ({
     }
 
     return {
-      name: feature.display_name.split(',')[0], // Take first part for cleaner name
+      name: feature.display_name.split(',')[0],
       city: city || feature.display_name.split(',')[0],
       country,
       countryCode,
@@ -561,8 +550,6 @@ const LocationIQAutocomplete = ({
       case 'airport':
         return <Plane className="h-4 w-4" />;
       case 'city':
-      case 'town':
-      case 'village':
         return <Building className="h-4 w-4" />;
       default:
         return <MapPin className="h-4 w-4" />;
@@ -572,12 +559,8 @@ const LocationIQAutocomplete = ({
   const getTypeLabel = (type: string): string => {
     switch (type) {
       case 'port': return 'Sea Port';
-      case 'harbor': return 'Harbor';
-      case 'dock': return 'Dock';
       case 'airport': return 'Airport';
       case 'city': return 'City';
-      case 'town': return 'Town';
-      case 'village': return 'Village';
       default: return 'Location';
     }
   };
@@ -651,9 +634,10 @@ const LocationIQAutocomplete = ({
                   Port Code: <code className="bg-white px-1.5 py-0.5 rounded border">{value.portCode}</code>
                 </div>
               )}
-              {apiStatus === 'success' && value.osmId && (
-                <div className="mt-1 text-xs text-gray-500">
-                  ✓ Powered by OpenStreetMap
+              {apiStatus === 'success' && (
+                <div className="mt-1 text-xs text-gray-500 flex items-center gap-1">
+                  <Globe className="h-3 w-3" />
+                  Powered by LocationIQ
                 </div>
               )}
             </div>
@@ -668,7 +652,7 @@ const LocationIQAutocomplete = ({
           <div className="py-2">
             {suggestions.map((feature) => {
               const type = feature.class === 'transport' 
-                ? (feature.type === 'airport' ? 'airport' : 'port')
+                ? (feature.display_name.toLowerCase().includes('airport') ? 'airport' : 'port')
                 : feature.type || 'place';
               
               const isLocal = feature.osm_type === 'local';
@@ -706,12 +690,10 @@ const LocationIQAutocomplete = ({
                         {getTypeLabel(type)}
                       </span>
                       {isLocal && (
-                        <span className="text-xs text-gray-500">📋 Local Database</span>
+                        <span className="text-xs text-gray-500">📋 Local</span>
                       )}
-                      {!isLocal && (
-                        <span className="text-xs text-gray-500">
-                          {feature.importance > 0.7 ? '🌟 High match' : '✓ Good match'}
-                        </span>
+                      {!isLocal && feature.importance > 0.6 && (
+                        <span className="text-xs text-gray-500">✓ Good match</span>
                       )}
                     </div>
                   </div>
@@ -723,41 +705,11 @@ const LocationIQAutocomplete = ({
           <div className="px-4 py-2 border-t border-gray-100 bg-gray-50 rounded-b-xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-xs text-gray-500">
-                <Globe className="h-3 w-3" />
-                <span>Powered by LocationIQ + OpenStreetMap</span>
+                <Navigation className="h-3 w-3" />
+                <span>Powered by LocationIQ</span>
               </div>
               <div className="text-xs text-gray-400">
-                {apiStatus === 'error' ? 'Using local database' : '10K requests/day free'}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* No results message */}
-      {showSuggestions && !isLoading && inputValue.length >= 2 && suggestions.length === 0 && (
-        <div className="absolute z-50 mt-1 w-full bg-white rounded-xl shadow-lg border border-gray-200 p-4">
-          <div className="text-center py-4">
-            <Search className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-            <p className="text-gray-500 text-sm">
-              No shipping locations found for "{inputValue}"
-            </p>
-            <p className="text-xs text-gray-400 mt-1">
-              Try searching for specific ports, airports, or major cities
-            </p>
-            <div className="mt-3">
-              <div className="text-xs text-gray-500 mb-1">Popular searches:</div>
-              <div className="flex flex-wrap gap-2 justify-center">
-                {['Shanghai Port', 'Rotterdam Port', 'Dubai Airport', 'New York', 'Singapore'].map(term => (
-                  <button
-                    key={term}
-                    type="button"
-                    onClick={() => setInputValue(term)}
-                    className="text-xs px-3 py-1 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100"
-                  >
-                    {term}
-                  </button>
-                ))}
+                10,000 free requests/day
               </div>
             </div>
           </div>
@@ -778,13 +730,13 @@ export default function ShippingValuePage() {
   const [transportationMode, setTransportationMode] = useState('');
   const [step, setStep] = useState(1);
 
-  // Get today's date in YYYY-MM-DD format
+  // Get dates
   const today = new Date().toISOString().split('T')[0];
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
 
-  // Cargo options with Lucide icons
+  // Cargo options
   const cargoOptions = [
     { value: 'electronics', label: 'Electronics', icon: Cpu },
     { value: 'clothing', label: 'Clothing', icon: Shirt },
@@ -812,7 +764,6 @@ export default function ShippingValuePage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Format data for submission
     const formData = {
       cargoType,
       shipmentValue: parseFloat(shipmentValue),
@@ -848,11 +799,7 @@ export default function ShippingValuePage() {
     };
     
     console.log('Shipping Quote Form Submitted:', formData);
-    // Next step logic
     setStep(2);
-    
-    // Show success message (in real app, would redirect to next step)
-    alert('✅ Form submitted successfully! Moving to coverage options...');
   };
 
   const handleCancel = () => {
@@ -868,7 +815,7 @@ export default function ShippingValuePage() {
     }
   };
 
-  // Calculate completion percentage
+  // Calculate completion
   const completedFields = [
     !!cargoType,
     !!shipmentValue,
@@ -881,17 +828,13 @@ export default function ShippingValuePage() {
 
   const totalFields = 7;
   const completionPercentage = Math.round((completedFields / totalFields) * 100);
-
-  // Check if form is complete
   const isFormComplete = completedFields === totalFields;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <DashboardHeader userEmail="client@example.com" />
       
-      {/* Main Content */}
       <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Breadcrumb & Progress */}
         <div className="mb-8">
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
             <button 
@@ -905,7 +848,6 @@ export default function ShippingValuePage() {
             <span className="text-gray-900 font-medium">New Quote</span>
           </div>
           
-          {/* Progress Steps */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-2xl font-bold text-gray-900">Create Shipping Insurance Quote</h1>
@@ -947,9 +889,7 @@ export default function ShippingValuePage() {
           </div>
         </div>
 
-        {/* Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_0.02fr_0.7fr]">
-          {/* Left Column - Form */}
           <div className="lg:col-span-2 w-[99%]">
             <div className="bg-[#FFFFFE] rounded-2xl shadow-lg border border-gray-200 p-8">
               <form onSubmit={handleSubmit} className="space-y-8">
@@ -960,7 +900,6 @@ export default function ShippingValuePage() {
                   </div>
                   
                   <div className="space-y-6">
-                    {/* Cargo Type */}
                     <div>
                       <label className="block text-sm font-medium text-[#868686] mb-2">
                         Cargo Type *
@@ -1001,7 +940,6 @@ export default function ShippingValuePage() {
                       </div>
                     </div>
 
-                    {/* Shipment Value */}
                     <div>
                       <label className="block text-sm font-medium text-[#868686] mb-2">
                         Shipment Value (USD) *
@@ -1024,9 +962,6 @@ export default function ShippingValuePage() {
                           <span className="text-gray-500 text-sm">USD</span>
                         </div>
                       </div>
-                      <p className="mt-2 text-xs text-gray-500">
-                        Enter the total value including goods, freight, and insurance
-                      </p>
                     </div>
                   </div>
                 </div>
@@ -1038,7 +973,6 @@ export default function ShippingValuePage() {
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Origin */}
                     <div>
                       <LocationIQAutocomplete
                         value={origin}
@@ -1049,7 +983,6 @@ export default function ShippingValuePage() {
                       />
                     </div>
 
-                    {/* Destination */}
                     <div>
                       <LocationIQAutocomplete
                         value={destination}
@@ -1060,80 +993,10 @@ export default function ShippingValuePage() {
                       />
                     </div>
                   </div>
-                  
-                  {/* Route summary */}
-                  {(origin || destination) && (
-                    <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-4">
-                            <div className="text-center">
-                              <div className={`h-10 w-10 rounded-full flex items-center justify-center ${
-                                origin?.type === 'port' ? 'bg-blue-500' :
-                                origin?.type === 'airport' ? 'bg-purple-500' :
-                                'bg-green-500'
-                              }`}>
-                                {origin?.type === 'port' ? <Anchor className="h-5 w-5 text-white" /> :
-                                 origin?.type === 'airport' ? <Plane className="h-5 w-5 text-white" /> :
-                                 <Building className="h-5 w-5 text-white" />}
-                              </div>
-                              <span className="text-xs font-medium text-gray-600 mt-1">Origin</span>
-                            </div>
-                            
-                            <div className="flex-1 h-0.5 bg-gradient-to-r from-blue-300 via-purple-300 to-green-300"></div>
-                            
-                            <div className="text-center">
-                              <div className={`h-10 w-10 rounded-full flex items-center justify-center ${
-                                destination?.type === 'port' ? 'bg-blue-500' :
-                                destination?.type === 'airport' ? 'bg-purple-500' :
-                                'bg-green-500'
-                              }`}>
-                                {destination?.type === 'port' ? <Anchor className="h-5 w-5 text-white" /> :
-                                 destination?.type === 'airport' ? <Plane className="h-5 w-5 text-white" /> :
-                                 <Building className="h-5 w-5 text-white" />}
-                              </div>
-                              <span className="text-xs font-medium text-gray-600 mt-1">Destination</span>
-                            </div>
-                          </div>
-                          
-                          <div className="mt-4 grid grid-cols-2 gap-4">
-                            <div>
-                              <div className="text-sm font-medium text-gray-900">
-                                {origin?.name || 'Not selected'}
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                {origin?.city}, {origin?.country}
-                              </div>
-                              {origin?.portCode && (
-                                <div className="text-xs font-medium text-blue-600 mt-1">
-                                  Code: {origin.portCode}
-                                </div>
-                              )}
-                            </div>
-                            
-                            <div className="text-right">
-                              <div className="text-sm font-medium text-gray-900">
-                                {destination?.name || 'Not selected'}
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                {destination?.city}, {destination?.country}
-                              </div>
-                              {destination?.portCode && (
-                                <div className="text-xs font-medium text-purple-600 mt-1">
-                                  Code: {destination.portCode}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 {/* Dates & Transport */}
                 <div className="">
-                  {/* Dates */}
                   <div>
                     <div className="flex items-center gap-2 mb-4">
                       <h2 className="text-lg font-semibold text-gray-900">Coverage Period</h2>
@@ -1166,7 +1029,6 @@ export default function ShippingValuePage() {
                     </div>
                   </div>
 
-                  {/* Transport Mode */}
                   <div>
                     <div className="flex items-center gap-2 mb-4">
                       <h2 className="text-lg font-semibold text-gray-900">Transport Mode *</h2>
@@ -1251,7 +1113,6 @@ export default function ShippingValuePage() {
 
           {/* Right Column - Tips & Help */}
           <div className="space-y-6">
-            {/* Tips Card */}
             <div className="bg-[url('/quotes/new/shipping-wd-back.png')] bg-cover flex flex-col gap-8 rounded-2xl shadow-lg p-6 text-white">
               <div className="flex items-center gap-2 mb-4">
                 <h3 className="text-lg font-semibold">Smart Quote Tips</h3>
@@ -1290,20 +1151,11 @@ export default function ShippingValuePage() {
                         style={{ width: `${completionPercentage}%` }}
                       />
                     </div>
-                    <div className="mt-2 text-center">
-                      <span className="text-xs text-blue-200">
-                        {isFormComplete 
-                          ? '✅ All fields completed!' 
-                          : `${totalFields - completedFields} more to go`
-                        }
-                      </span>
-                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Help Card */}
             <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
               <div className="flex items-center gap-2 mb-3">
                 <AlertCircle className="w-5 h-5 text-amber-500" />
@@ -1315,17 +1167,6 @@ export default function ShippingValuePage() {
               <button className="w-full py-3 rounded-xl border-2 border-blue-600 text-blue-600 font-medium hover:bg-blue-50 transition-colors">
                 Contact Support
               </button>
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <div className="text-xs text-gray-500">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Globe className="h-3 w-3" />
-                    <span>Location search powered by LocationIQ</span>
-                  </div>
-                  <div className="text-xs text-gray-400">
-                    10,000 free requests per day • No credit card required
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
