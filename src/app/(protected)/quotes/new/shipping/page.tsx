@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 import DashboardHeader from '@/app/components/dashboard/DashboardHeader';
 
-// Custom Date Picker Component (Նախորդից)
+// Custom Date Picker Component
 const CustomDatePicker = ({ 
   value, 
   onChange, 
@@ -297,36 +297,147 @@ const LocationIQAutocomplete = ({
   const [apiStatus, setApiStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const debounceTimeout = useRef<NodeJS.Timeout>();
+  const debounceTimeout = useRef<ReturnType<typeof setTimeout>>();
 
-  // ✅ CORRECT LocationIQ API Key
+  // LocationIQ API Key
   const LOCATIONIQ_API_KEY = process.env.NEXT_PUBLIC_LOCATIONIQ_API_KEY || 'pk.f15b5391da0772168ecba607d5fe3136';
 
-  // Shipping-specific keywords
-  const SHIPPING_KEYWORDS = [
-    'port', 'harbor', 'dock', 'terminal', 'seaport', 'marina',
-    'airport', 'airfield', 'airstrip', 'airbase',
-    'logistics', 'freight', 'cargo', 'shipping', 'container'
-  ];
-
   // Local fallback database
-  const LOCAL_PORTS_DB = [
-      { name: 'Tokyo City', city: 'Tokyo', country: 'Japan', type: 'city' as const, lat: 35.68, lon: 139.76 },
+  const LOCAL_PORTS_DB: Array<{
+    name: string;
+    city: string;
+    country: string;
+    type: 'city' | 'port' | 'airport';
+    lat: number;
+    lon: number;
+    code?: string;
+  }> = [
+    { name: 'Tokyo City', city: 'Tokyo', country: 'Japan', type: 'city', lat: 35.68, lon: 139.76 },
   ];
 
   // Handle click outside
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+    const handleDocumentClick = (e: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node) &&
+        !(e.target as Element).closest('.location-suggestion-button')
+      ) {
         setShowSuggestions(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+
+    document.addEventListener('click', handleDocumentClick);
+    return () => document.removeEventListener('click', handleDocumentClick);
   }, []);
+
+  // Update input when value changes
+  useEffect(() => {
+    if (value) {
+      setInputValue(value.name);
+      setShowSuggestions(false);
+    }
+  }, [value]);
 
   // Debounced search
   useEffect(() => {
+    const searchLocations = async (query: string) => {
+      if (query.length < 2) return;
+
+      setIsLoading(true);
+      setApiStatus('loading');
+      
+      try {
+        // 1. Local results (instant)
+        const localResults = searchLocalDatabase(query);
+        
+        // Show local results immediately
+        if (localResults.length > 0) {
+          setSuggestions(localResults);
+          setApiStatus('success');
+          setShowSuggestions(true);
+        }
+
+        // 2. Try LocationIQ
+        let locationIQResults: LocationIQFeature[] = [];
+        try {
+          const apiKey = 'pk.f15b5391da0772168ecba607d5fe3136';
+          const response = await fetch(
+            `https://api.locationiq.com/v1/autocomplete.php?` +
+            `key=${apiKey}&` +
+            `q=${encodeURIComponent(query)}&` +
+            `limit=5&` +
+            `format=json`
+          );
+          
+          if (response.ok) {
+            const data = await response.json();
+            locationIQResults = data || [];
+          }
+        } catch (locationIQError) {
+          console.log('LocationIQ failed, trying OpenStreetMap...');
+        }
+
+        // 3. Try OpenStreetMap as fallback
+        let osmResults: LocationIQFeature[] = [];
+        if (locationIQResults.length === 0) {
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/search?` +
+              `format=json&` +
+              `q=${encodeURIComponent(query)}&` +
+              `addressdetails=1&` +
+              `limit=5&` +
+              `email=contact@shippingapp.com`
+            );
+            
+            if (response.ok) {
+              const data = await response.json();
+              osmResults = data.map((place: any) => ({
+                place_id: place.place_id,
+                licence: place.licence,
+                osm_type: place.osm_type,
+                osm_id: place.osm_id,
+                boundingbox: place.boundingbox,
+                lat: place.lat,
+                lon: place.lon,
+                display_name: place.display_name,
+                class: place.class,
+                type: place.type,
+                importance: place.importance,
+                address: place.address
+              }));
+            }
+          } catch (osmError) {
+            console.log('OpenStreetMap also failed');
+          }
+        }
+
+        // Combine all results
+        const allResults = [...localResults, ...locationIQResults, ...osmResults]
+          .filter((v, i, a) => 
+            a.findIndex(t => t.place_id === v.place_id) === i
+          )
+          .slice(0, 8);
+
+        setSuggestions(allResults);
+        setApiStatus(allResults.length > 0 ? 'success' : 'error');
+        setShowSuggestions(true);
+        
+      } catch (error) {
+        console.error('Final search error:', error);
+        setApiStatus('error');
+        
+        // Final fallback: just local
+        const localResults = searchLocalDatabase(query);
+        setSuggestions(localResults);
+        setShowSuggestions(localResults.length > 0);
+        
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     if (debounceTimeout.current) {
       clearTimeout(debounceTimeout.current);
     }
@@ -347,109 +458,6 @@ const LocationIQAutocomplete = ({
     };
   }, [inputValue]);
 
-  useEffect(() => {
-  if (value) {
-    setInputValue(value.name);
-    setShowSuggestions(false);
-  }
-}, [value]);
-
- const searchLocations = async (query: string) => {
-  if (query.length < 2) return;
-
-  setIsLoading(true);
-  setApiStatus('loading');
-  
-  try {
-    // 1. Local results (instant)
-    const localResults = searchLocalDatabase(query);
-    
-    // Show local results immediately
-    if (localResults.length > 0) {
-      setSuggestions(localResults);
-      setApiStatus('success');
-      setShowSuggestions(true);
-    }
-
-    // 2. Try LocationIQ
-    let locationIQResults: LocationIQFeature[] = [];
-    try {
-      const apiKey = 'pk.f15b5391da0772168ecba607d5fe3136';
-      const response = await fetch(
-        `https://api.locationiq.com/v1/autocomplete.php?` +
-        `key=${apiKey}&` +
-        `q=${encodeURIComponent(query)}&` +
-        `limit=5&` +
-        `format=json`
-      );
-      
-      if (response.ok) {
-        const data = await response.json();
-        locationIQResults = data || [];
-      }
-    } catch (locationIQError) {
-      console.log('LocationIQ failed, trying OpenStreetMap...');
-    }
-
-    // 3. Try OpenStreetMap as fallback
-    let osmResults: LocationIQFeature[] = [];
-    if (locationIQResults.length === 0) {
-      try {
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?` +
-          `format=json&` +
-          `q=${encodeURIComponent(query)}&` +
-          `addressdetails=1&` +
-          `limit=5&` +
-          `email=contact@shippingapp.com`
-        );
-        
-        if (response.ok) {
-          const data = await response.json();
-          osmResults = data.map((place: any) => ({
-            place_id: place.place_id,
-            licence: place.licence,
-            osm_type: place.osm_type,
-            osm_id: place.osm_id,
-            boundingbox: place.boundingbox,
-            lat: place.lat,
-            lon: place.lon,
-            display_name: place.display_name,
-            class: place.class,
-            type: place.type,
-            importance: place.importance,
-            address: place.address
-          }));
-        }
-      } catch (osmError) {
-        console.log('OpenStreetMap also failed');
-      }
-    }
-
-    // Combine all results
-    const allResults = [...localResults, ...locationIQResults, ...osmResults]
-      .filter((v, i, a) => 
-        a.findIndex(t => t.place_id === v.place_id) === i
-      )
-      .slice(0, 8);
-
-    setSuggestions(allResults);
-    setApiStatus(allResults.length > 0 ? 'success' : 'error');
-    setShowSuggestions(true);
-    
-  } catch (error) {
-    console.error('Final search error:', error);
-    setApiStatus('error');
-    
-    // Final fallback: just local
-    const localResults = searchLocalDatabase(query);
-    setSuggestions(localResults);
-    setShowSuggestions(localResults.length > 0);
-    
-  } finally {
-    setIsLoading(false);
-  }
-};
   const searchLocalDatabase = (query: string): LocationIQFeature[] => {
     const normalizedQuery = query.toLowerCase();
     
@@ -459,48 +467,71 @@ const LocationIQAutocomplete = ({
         location.city.toLowerCase().includes(normalizedQuery) ||
         location.country.toLowerCase().includes(normalizedQuery)
       )
-      .map(location => ({
-        place_id: `local-${location.code || location.name}`,
-        licence: 'Local Database',
-        osm_type: 'local',
-        osm_id: 0,
-        boundingbox: ['0', '0', '0', '0'],
-        lat: location.lat.toString(),
-        lon: location.lon.toString(),
-        display_name: location.name,
-        class: location.type === 'port' ? 'transport' : location.type === 'airport' ? 'transport' : 'place',
-        type: location.type,
-        importance: 0.9,
-        address: {
-          city: location.city,
-          country: location.country,
-          country_code: location.code?.substring(0, 2) || ''
-        }
-      }))
+      .map(location => {
+        const boundingbox: [string, string, string, string] = [
+          (location.lat - 0.1).toString(),
+          (location.lat + 0.1).toString(),
+          (location.lon - 0.1).toString(),
+          (location.lon + 0.1).toString()
+        ];
+        
+        return {
+          place_id: `local-${location.code || location.name}`,
+          licence: 'Local Database',
+          osm_type: 'local',
+          osm_id: 0,
+          boundingbox,
+          lat: location.lat.toString(),
+          lon: location.lon.toString(),
+          display_name: location.name,
+          class: location.type === 'port' || location.type === 'airport' ? 'transport' : 'place',
+          type: location.type,
+          importance: 0.9,
+          address: {
+            city: location.city,
+            country: location.country,
+            country_code: location.country.substring(0, 2).toUpperCase() || ''
+          }
+        };
+      })
       .slice(0, 4);
   };
 
   const handleSelect = (feature: LocationIQFeature) => {
+    console.log('🟢 handleSelect called');
+    
     const locationData = extractLocationData(feature);
-    onChange(locationData);
+    console.log('📍 Location data:', locationData);
+    
+    // Սկզբում թարմացնել state-ները
     setInputValue(locationData.name);
-    // setShowSuggestions(false);
+    onChange(locationData);
+    
+    // Այնուհետև փակել սուգեստները
+    setTimeout(() => {
+      setShowSuggestions(false);
+    }, 100);
   };
 
   const extractLocationData = (feature: LocationIQFeature): LocationData => {
     const isLocal = feature.osm_type === 'local';
     
     let type: LocationData['type'] = 'place';
+    
+    // Check if it's a transport type
     if (feature.class === 'transport') {
-      if (feature.type === 'airport' || feature.display_name.toLowerCase().includes('airport')) {
+      // Use string includes for type detection
+      const lowerDisplayName = feature.display_name.toLowerCase();
+      
+      if (lowerDisplayName.includes('airport') || feature.type?.includes('airport')) {
         type = 'airport';
-      } else if (['port', 'harbor', 'dock'].includes(feature.type || '') || 
-                 feature.display_name.toLowerCase().includes('port')) {
+      } else if (lowerDisplayName.includes('port') || lowerDisplayName.includes('harbor') || 
+                lowerDisplayName.includes('dock') || feature.type?.includes('port')) {
         type = 'port';
       } else {
         type = 'place';
       }
-    } else if (['city', 'town', 'village'].includes(feature.type || '')) {
+    } else if (feature.type && ['city', 'town', 'village'].includes(feature.type)) {
       type = 'city';
     }
 
@@ -589,14 +620,6 @@ const LocationIQAutocomplete = ({
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onFocus={() => setShowSuggestions(true)}
-          onBlur={() => {
-            // Add a small delay to allow click event to register
-            setTimeout(() => {
-              if (!inputRef.current?.matches(':focus')) {
-                setShowSuggestions(false);
-              }
-            }, 200);
-          }}
           placeholder={placeholder}
           className="pl-10 pr-10 w-full h-12 px-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-colors"
           required={required && !value}
@@ -676,8 +699,17 @@ const LocationIQAutocomplete = ({
                 <button
                   key={`${feature.place_id}-${feature.osm_id}`}
                   type="button"
-                  onClick={() => handleSelect(feature)}
-                  className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-start gap-3"
+                  onMouseDown={(e) => {
+                    // Կանխել input-ի blur-ը մինչև click-ը
+                    e.preventDefault();
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🟡 Button clicked');
+                    handleSelect(feature);
+                  }}
+                  className="location-suggestion-button w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-start gap-3"
                 >
                   <div className="flex-shrink-0 mt-0.5">
                     <div className={`h-6 w-6 rounded-full flex items-center justify-center ${
@@ -694,7 +726,7 @@ const LocationIQAutocomplete = ({
                     </div>
                     <div className="text-sm text-gray-500 truncate">
                       {feature.display_name.split(',').slice(1).join(',').trim() || 
-                       `${feature.address?.city || ''}, ${feature.address?.country || ''}`}
+                      `${feature.address?.city || ''}, ${feature.address?.country || ''}`}
                     </div>
                     <div className="mt-1 flex items-center gap-2">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
