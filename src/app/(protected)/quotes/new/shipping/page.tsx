@@ -1,10 +1,23 @@
 "use client";
 
 import { useState } from 'react';
-import DashboardHeader from '@/app/components/dashboard/DashboardHeader'
+import { 
+  ArrowLeft, 
+  Calendar, 
+  DollarSign, 
+  MapPin, 
+  Package, 
+  Plane, 
+  Ship, 
+  Truck,
+  AlertCircle,
+  CheckCircle,
+  Info
+} from 'lucide-react';
+import DashboardHeader from '@/app/components/dashboard/DashboardHeader';
 
 export default function ShippingValuePage() {
-  // State-ներ բոլոր input-ների համար
+  // State-ներ
   const [cargoType, setCargoType] = useState('');
   const [shipmentValue, setShipmentValue] = useState('');
   const [origin, setOrigin] = useState('');
@@ -12,26 +25,34 @@ export default function ShippingValuePage() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [transportationMode, setTransportationMode] = useState('');
+  const [step, setStep] = useState(1);
 
-  // Cargo type options
+  // Cargo options
   const cargoOptions = [
-    'Electronics',
-    'Clothing',
-    'Machinery',
-    'Food Products',
-    'Chemicals',
-    'Pharmaceuticals',
-    'Other'
+    { value: 'electronics', label: 'Electronics', icon: '💻' },
+    { value: 'clothing', label: 'Clothing', icon: '👕' },
+    { value: 'machinery', label: 'Machinery', icon: '⚙️' },
+    { value: 'food', label: 'Food Products', icon: '🍎' },
+    { value: 'chemicals', label: 'Chemicals', icon: '🧪' },
+    { value: 'pharma', label: 'Pharmaceuticals', icon: '💊' },
+    { value: 'other', label: 'Other', icon: '📦' },
   ];
 
-  // Transportation modes
+  // Transport modes
   const transportModes = [
-    { id: 'sea', name: 'Sea', icon: '/icons/sea.svg' },
-    { id: 'air', name: 'Air', icon: '/icons/air.svg' },
-    { id: 'road', name: 'Road', icon: '/icons/road.svg' }
+    { id: 'sea', name: 'Sea Freight', icon: Ship, color: 'blue' },
+    { id: 'air', name: 'Air Freight', icon: Plane, color: 'emerald' },
+    { id: 'road', name: 'Road Freight', icon: Truck, color: 'amber' },
   ];
 
-  const handleSubmit = (e) => {
+  // Progress steps
+  const steps = [
+    { id: 1, name: 'Shipment Details', status: 'current' },
+    { id: 2, name: 'Coverage Options', status: 'upcoming' },
+    { id: 3, name: 'Quote Review', status: 'upcoming' },
+  ];
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log({
       cargoType,
@@ -42,11 +63,11 @@ export default function ShippingValuePage() {
       endDate,
       transportationMode
     });
-    // Այստեղ կարող եք ավելացնել quote հաշվարկման լոգիկա
+    // Next step logic
+    setStep(2);
   };
 
   const handleCancel = () => {
-    // Reset բոլոր input-ները
     setCargoType('');
     setShipmentValue('');
     setOrigin('');
@@ -54,311 +75,449 @@ export default function ShippingValuePage() {
     setStartDate('');
     setEndDate('');
     setTransportationMode('');
+    setStep(1);
   };
-
-  // Ձևավորել date-ը input-ի համար
-  const formatDateForInput = () => {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 30); // 30 օր հետո
-    
-    return {
-      today: today.toISOString().split('T')[0],
-      tomorrow: tomorrow.toISOString().split('T')[0]
-    };
-  };
-
-  const defaultDates = formatDateForInput();
 
   return (
-    <div className="min-h-screen bg-[#F3F3F6]">
-      <DashboardHeader userEmail={"c"} />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <DashboardHeader userEmail="client@example.com" />
       
-      {/* Page Header */}
-      <div className="px-6">
-        <div className="flex items-center gap-3 mt-4 mb-2 sm:mt-0">
-          <img
-            src="/quotes/header-ic.svg"
-            alt="Quote Icon"
-            className="w-[22px] h-[22px] sm:w-6 sm:h-6"
-          />
-          <h2 className="font-normal text-[18px] sm:text-[26px]">
-            Shipment Insurance Quote
-          </h2>
-        </div>
-      </div>
-
       {/* Main Content */}
-      <form onSubmit={handleSubmit} className="px-6 py-4">
-        <div className="flex gap-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Breadcrumb & Progress */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+            <button className="flex items-center gap-2 hover:text-gray-700 transition-colors">
+              <ArrowLeft className="w-4 h-4" />
+              <span>Back to Quotes</span>
+            </button>
+            <span>/</span>
+            <span className="text-gray-900 font-medium">New Quote</span>
+          </div>
+          
+          {/* Progress Steps */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-2xl font-bold text-gray-900">Create Shipping Insurance Quote</h1>
+              <span className="text-sm text-gray-500">Step {step} of 3</span>
+            </div>
+            
+            <div className="flex items-center">
+              {steps.map((stepItem, index) => (
+                <div key={stepItem.id} className="flex items-center">
+                  <div className={`
+                    flex items-center justify-center w-8 h-8 rounded-full border-2
+                    ${stepItem.id === step 
+                      ? 'border-blue-600 bg-blue-600 text-white' 
+                      : stepItem.id < step
+                      ? 'border-green-500 bg-green-500 text-white'
+                      : 'border-gray-300 bg-white text-gray-400'
+                    }
+                  `}>
+                    {stepItem.id < step ? (
+                      <CheckCircle className="w-4 h-4" />
+                    ) : (
+                      stepItem.id
+                    )}
+                  </div>
+                  <span className={`ml-2 text-sm font-medium ${
+                    stepItem.id === step ? 'text-blue-600' : 
+                    stepItem.id < step ? 'text-green-600' : 'text-gray-500'
+                  }`}>
+                    {stepItem.name}
+                  </span>
+                  {index < steps.length - 1 && (
+                    <div className={`h-0.5 w-16 mx-4 ${
+                      stepItem.id < step ? 'bg-green-500' : 'bg-gray-300'
+                    }`} />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Form */}
-          <div className="w-[1241px] flex flex-col gap-[44px] bg-[#fafcff] p-6 rounded-2xl">
-            <div className="flex flex-col gap-[44px]">
-              {/* Cargo Type Dropdown */}
-              <div className="w-[585px] flex flex-col gap-2">
-                <label htmlFor="cargoType" className="font-normal text-[14px] leading-[18px] text-[#505050]">
-                  Cargo Type *
-                </label>
-                <div className="relative">
-                  <select
-                    id="cargoType"
-                    value={cargoType}
-                    onChange={(e) => setCargoType(e.target.value)}
-                    className="w-full h-[42px] px-4 py-3 rounded-[7px] border border-solid border-[#c8c8c8] bg-white appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                  >
-                    <option value="">Select cargo type</option>
-                    {cargoOptions.map((option) => (
-                      <option key={option} value={option.toLowerCase()}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                    <svg 
-                      className="w-4 h-4 text-[#7b7b7b]" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+              <form onSubmit={handleSubmit} className="space-y-8">
+                {/* Cargo Type Section */}
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Package className="w-5 h-5 text-blue-600" />
+                    <h2 className="text-lg font-semibold text-gray-900">Cargo Information</h2>
                   </div>
-                </div>
-              </div>
-
-              {/* Shipment Value Input */}
-              <div className="w-[585px] flex flex-col gap-2">
-                <label htmlFor="shipmentValue" className="font-normal text-[14px] leading-[18px] text-[#505050]">
-                  Shipment Value (USD) *
-                </label>
-                <div className="relative">
-                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#7b7b7b]">
-                    $
-                  </div>
-                  <input
-                    type="number"
-                    id="shipmentValue"
-                    value={shipmentValue}
-                    onChange={(e) => setShipmentValue(e.target.value)}
-                    placeholder="Enter total shipment value"
-                    className="w-full h-[42px] pl-10 pr-4 py-3 rounded-[7px] border border-solid border-[#c8c8c8] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    min="0"
-                    step="0.01"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Origin and Destination */}
-              <div className="flex justify-between items-center self-stretch">
-                {/* Origin Input */}
-                <div className="w-[585px] flex flex-col gap-2">
-                  <label htmlFor="origin" className="font-normal text-[14px] leading-[18px] text-[#505050]">
-                    From (Origin City / Port) *
-                  </label>
-                  <div className="relative">
-                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                      <svg className="w-3 h-4 text-[#505050]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    </div>
-                    <input
-                      type="text"
-                      id="origin"
-                      value={origin}
-                      onChange={(e) => setOrigin(e.target.value)}
-                      placeholder="e.g., New York, USA"
-                      className="w-full h-[42px] pl-10 pr-4 py-3 rounded-[7px] border border-solid border-[#c8c8c8] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Destination Input */}
-                <div className="w-[585px] flex flex-col gap-2">
-                  <label htmlFor="destination" className="font-normal text-[14px] leading-[18px] text-[#505050]">
-                    To (Destination City / Port) *
-                  </label>
-                  <div className="relative">
-                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                      <svg className="w-3 h-4 text-[#505050]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    </div>
-                    <input
-                      type="text"
-                      id="destination"
-                      value={destination}
-                      onChange={(e) => setDestination(e.target.value)}
-                      placeholder="e.g., London, UK"
-                      className="w-full h-[42px] pl-10 pr-4 py-3 rounded-[7px] border border-solid border-[#c8c8c8] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Coverage Period */}
-              <div className="flex justify-between items-end self-stretch">
-                {/* Start Date Input */}
-                <div className="w-[585px] flex flex-col gap-2">
-                  <label htmlFor="startDate" className="font-normal text-[14px] leading-[18px] text-[#505050]">
-                    Coverage Start Date *
-                  </label>
-                  <div className="relative">
-                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                      <svg className="w-4 h-4 text-[#505050]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <input
-                      type="date"
-                      id="startDate"
-                      value={startDate || defaultDates.today}
-                      onChange={(e) => setStartDate(e.target.value)}
-                      className="w-full h-[42px] pl-10 pr-4 py-3 rounded-[7px] border border-solid border-[#c8c8c8] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      min={defaultDates.today}
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* End Date Input */}
-                <div className="w-[585px] flex flex-col gap-2">
-                  <label htmlFor="endDate" className="font-normal text-[14px] leading-[18px] text-[#505050]">
-                    Coverage End Date *
-                  </label>
-                  <div className="relative">
-                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                      <svg className="w-4 h-4 text-[#505050]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <input
-                      type="date"
-                      id="endDate"
-                      value={endDate || defaultDates.tomorrow}
-                      onChange={(e) => setEndDate(e.target.value)}
-                      className="w-full h-[42px] pl-10 pr-4 py-3 rounded-[7px] border border-solid border-[#c8c8c8] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      min={startDate || defaultDates.today}
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Transportation Mode Selection */}
-              <div className="flex flex-col gap-4">
-                <label className="font-normal text-[14px] leading-[18px] text-[#505050]">
-                  Transportation Mode *
-                </label>
-                <div className="flex justify-between items-center self-stretch">
-                  {transportModes.map((mode) => (
-                    <button
-                      key={mode.id}
-                      type="button"
-                      onClick={() => setTransportationMode(mode.id)}
-                      className={`w-[383px] flex flex-col justify-center items-center gap-[3px] px-4 py-3 rounded-[7px] border border-solid transition-all duration-200 ${
-                        transportationMode === mode.id 
-                          ? 'border-blue-600 bg-blue-50 shadow-sm' 
-                          : 'border-[#c8c8c8] hover:border-blue-400 hover:bg-blue-25'
-                      }`}
-                    >
-                      <div className={`w-12 h-12 flex items-center justify-center ${
-                        transportationMode === mode.id ? 'text-blue-600' : 'text-gray-500'
-                      }`}>
-                        <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          {mode.id === 'sea' && (
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 12H4m16 0l-4-4m4 4l-4 4M4 12l4-4m-4 4l4 4" />
-                          )}
-                          {mode.id === 'air' && (
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4 4 0 003 15z" />
-                          )}
-                          {mode.id === 'road' && (
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                          )}
-                        </svg>
+                  
+                  <div className="space-y-6">
+                    {/* Cargo Type */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Cargo Type *
+                      </label>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {cargoOptions.map((option) => (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => setCargoType(option.value)}
+                            className={`
+                              p-4 rounded-xl border-2 transition-all duration-200
+                              ${cargoType === option.value
+                                ? 'border-blue-500 bg-blue-50'
+                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                              }
+                            `}
+                          >
+                            <div className="flex flex-col items-center gap-2">
+                              <span className="text-2xl">{option.icon}</span>
+                              <span className="text-sm font-medium text-gray-700">
+                                {option.label}
+                              </span>
+                            </div>
+                          </button>
+                        ))}
                       </div>
-                      <span className={`font-normal text-[14px] leading-[18px] text-center ${
-                        transportationMode === mode.id ? 'text-blue-600 font-medium' : 'text-[#505050]'
-                      }`}>
-                        {mode.name}
-                      </span>
+                    </div>
+
+                    {/* Shipment Value */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Shipment Value (USD) *
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <DollarSign className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <input
+                          type="number"
+                          value={shipmentValue}
+                          onChange={(e) => setShipmentValue(e.target.value)}
+                          placeholder="Enter total value"
+                          className="pl-10 w-full h-12 px-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-colors"
+                          required
+                        />
+                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                          <span className="text-gray-500 text-sm">USD</span>
+                        </div>
+                      </div>
+                      <p className="mt-2 text-sm text-gray-500">
+                        Include all freight charges and duties for full coverage
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Route Information */}
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <MapPin className="w-5 h-5 text-blue-600" />
+                    <h2 className="text-lg font-semibold text-gray-900">Route Information</h2>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Origin */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Origin *
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <MapPin className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <input
+                          type="text"
+                          value={origin}
+                          onChange={(e) => setOrigin(e.target.value)}
+                          placeholder="e.g., New York Port, USA"
+                          className="pl-10 w-full h-12 px-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-colors"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {/* Destination */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Destination *
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <MapPin className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <input
+                          type="text"
+                          value={destination}
+                          onChange={(e) => setDestination(e.target.value)}
+                          placeholder="e.g., Shanghai Port, China"
+                          className="pl-10 w-full h-12 px-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-colors"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Dates & Transport */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {/* Dates */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <Calendar className="w-5 h-5 text-blue-600" />
+                      <h2 className="text-lg font-semibold text-gray-900">Coverage Period</h2>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Start Date *
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Calendar className="h-5 w-5 text-gray-400" />
+                          </div>
+                          <input
+                            type="date"
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            className="pl-10 w-full h-12 px-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-colors"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          End Date *
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Calendar className="h-5 w-5 text-gray-400" />
+                          </div>
+                          <input
+                            type="date"
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            className="pl-10 w-full h-12 px-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-colors"
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Transport Mode */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <Truck className="w-5 h-5 text-blue-600" />
+                      <h2 className="text-lg font-semibold text-gray-900">Transport Mode *</h2>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      {transportModes.map((mode) => {
+                        const Icon = mode.icon;
+                        return (
+                          <button
+                            key={mode.id}
+                            type="button"
+                            onClick={() => setTransportationMode(mode.id)}
+                            className={`
+                              w-full p-4 rounded-xl border-2 transition-all duration-200
+                              flex items-center gap-4
+                              ${transportationMode === mode.id
+                                ? 'border-blue-500 bg-blue-50'
+                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                              }
+                            `}
+                          >
+                            <div className={`
+                              p-2 rounded-lg
+                              ${transportationMode === mode.id
+                                ? `bg-blue-100 text-blue-600`
+                                : 'bg-gray-100 text-gray-500'
+                              }
+                            `}>
+                              <Icon className="w-6 h-6" />
+                            </div>
+                            <div className="flex-1 text-left">
+                              <div className="font-medium text-gray-900">{mode.name}</div>
+                              <div className="text-sm text-gray-500">
+                                {mode.id === 'sea' && 'Most economical, 20-40 days'}
+                                {mode.id === 'air' && 'Fastest option, 2-7 days'}
+                                {mode.id === 'road' && 'Regional delivery, 3-10 days'}
+                              </div>
+                            </div>
+                            {transportationMode === mode.id && (
+                              <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+                                <CheckCircle className="w-3 h-3 text-white" />
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    className="px-6 py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                  >
+                    Cancel
+                  </button>
+                  
+                  <div className="flex items-center gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setStep(step - 1)}
+                      className="px-6 py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                    >
+                      Previous
                     </button>
+                    <button
+                      type="submit"
+                      disabled={!cargoType || !shipmentValue || !origin || !destination || !startDate || !endDate || !transportationMode}
+                      className="px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
+                    >
+                      Continue to Coverage Options
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          {/* Right Column - Tips & Help */}
+          <div className="space-y-6">
+            {/* Tips Card */}
+            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl shadow-lg p-6 text-white">
+              <div className="flex items-center gap-2 mb-4">
+                <Info className="w-5 h-5" />
+                <h3 className="text-lg font-semibold">Smart Quote Tips</h3>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-3 h-3" />
+                  </div>
+                  <p className="text-sm leading-relaxed">
+                    <span className="font-semibold">Full Coverage:</span> Include all freight charges and duties in shipment value for complete protection.
+                  </p>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-3 h-3" />
+                  </div>
+                  <p className="text-sm leading-relaxed">
+                    <span className="font-semibold">Lower Premiums:</span> Accurate cargo classification can reduce premiums by up to 30%.
+                  </p>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-3 h-3" />
+                  </div>
+                  <p className="text-sm leading-relaxed">
+                    <span className="font-semibold">Transit Time:</span> Longer transit periods may increase risk factors and premium costs.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Progress Card */}
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Quote Progress
+              </h3>
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700">Step 1: Shipment Details</span>
+                  <span className="text-sm font-semibold text-green-600">Complete</span>
+                </div>
+                
+                <div className="space-y-2">
+                  {[
+                    { label: 'Cargo Type', completed: !!cargoType },
+                    { label: 'Shipment Value', completed: !!shipmentValue },
+                    { label: 'Route Details', completed: !!origin && !!destination },
+                    { label: 'Dates', completed: !!startDate && !!endDate },
+                    { label: 'Transport Mode', completed: !!transportationMode },
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      <div className={`
+                        w-5 h-5 rounded-full flex items-center justify-center
+                        ${item.completed 
+                          ? 'bg-green-500' 
+                          : 'bg-gray-200'
+                        }
+                      `}>
+                        {item.completed && (
+                          <CheckCircle className="w-3 h-3 text-white" />
+                        )}
+                      </div>
+                      <span className={`text-sm ${item.completed ? 'text-gray-900' : 'text-gray-500'}`}>
+                        {item.label}
+                      </span>
+                    </div>
                   ))}
                 </div>
-                {!transportationMode && (
-                  <p className="text-red-500 text-sm mt-1">Please select a transportation mode</p>
-                )}
+                
+                <div className="pt-4 border-t border-gray-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-gray-600">Progress</span>
+                    <span className="text-sm font-semibold text-gray-900">
+                      {[
+                        !!cargoType,
+                        !!shipmentValue,
+                        !!origin && !!destination,
+                        !!startDate && !!endDate,
+                        !!transportationMode
+                      ].filter(Boolean).length} of 5
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      style={{ 
+                        width: `${(
+                          [
+                            !!cargoType,
+                            !!shipmentValue,
+                            !!origin && !!destination,
+                            !!startDate && !!endDate,
+                            !!transportationMode
+                          ].filter(Boolean).length / 5
+                        ) * 100}%` 
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex items-center gap-4">
-              <button 
-                type="button"
-                onClick={handleCancel}
-                className="flex justify-center items-center gap-2.5 px-4 py-3 rounded-md border border-solid border-[#c6c8cb] hover:bg-gray-50 transition-colors"
-              >
-                <span className="font-normal text-[16px] leading-[18px] text-gray-700">
-                  Cancel
-                </span>
-              </button>
-              <button 
-                type="submit"
-                disabled={!cargoType || !shipmentValue || !origin || !destination || !startDate || !endDate || !transportationMode}
-                className="flex justify-center items-center gap-2.5 bg-blue-600 px-4 py-3 rounded-md hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-              >
-                <span className="font-normal text-[16px] leading-[18px] text-white">
-                  Calculate Quote
-                </span>
-              </button>
-            </div>
-          </div>
-
-          {/* Right Column - Tips */}
-          <div className="flex flex-col gap-[76px] p-6 rounded-2xl bg-gradient-to-b from-blue-600 to-blue-800">
-            <span className="font-normal text-[20px] text-white">
-              Smart Quote Tips
-            </span>
-            
-            <div className="flex flex-col gap-6 self-stretch">
-              <div className="flex items-start gap-2">
-                <div className="w-3 h-3 flex-shrink-0 mt-1">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <span className="text-[14px] text-white">
-                  Full Coverage: Ensure your Shipment Value includes all freight and duties to guarantee full coverage.
-                </span>
+            {/* Help Card */}
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <AlertCircle className="w-5 h-5 text-amber-500" />
+                <h3 className="text-lg font-semibold text-gray-900">Need Help?</h3>
               </div>
-              <div className="flex items-start gap-2">
-                <div className="w-3 h-3 flex-shrink-0 mt-1">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <span className="text-[14px] text-white">
-                  Lower Premiums: Selecting the correct Cargo Type can significantly reduce your premium.
-                </span>
-              </div>
-            </div>
-            
-            <div className="flex flex-col gap-[13px] self-stretch">
-              <span className="font-bold text-[12px] leading-3 text-right text-white">
-                1 of 6
-              </span>
-              <span className="font-normal text-[10px] leading-3 text-white">
-                Complete 6 more fields to continue.
-              </span>
+              <p className="text-sm text-gray-600 mb-4">
+                Our team is here to assist you with any questions about your shipment insurance.
+              </p>
+              <button className="w-full py-3 rounded-xl border-2 border-blue-600 text-blue-600 font-medium hover:bg-blue-50 transition-colors">
+                Contact Support
+              </button>
             </div>
           </div>
         </div>
-      </form>
+      </div>
     </div>
-  )
+  );
 }
