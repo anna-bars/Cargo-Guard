@@ -347,6 +347,13 @@ const LocationIQAutocomplete = ({
     };
   }, [inputValue]);
 
+  useEffect(() => {
+  if (value) {
+    setInputValue(value.name);
+    setShowSuggestions(false);
+  }
+}, [value]);
+
  const searchLocations = async (query: string) => {
   if (query.length < 2) return;
 
@@ -477,7 +484,7 @@ const LocationIQAutocomplete = ({
     const locationData = extractLocationData(feature);
     onChange(locationData);
     setInputValue(locationData.name);
-    setShowSuggestions(false);
+    // setShowSuggestions(false);
   };
 
   const extractLocationData = (feature: LocationIQFeature): LocationData => {
@@ -582,6 +589,14 @@ const LocationIQAutocomplete = ({
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onFocus={() => setShowSuggestions(true)}
+          onBlur={() => {
+            // Add a small delay to allow click event to register
+            setTimeout(() => {
+              if (!inputRef.current?.matches(':focus')) {
+                setShowSuggestions(false);
+              }
+            }, 200);
+          }}
           placeholder={placeholder}
           className="pl-10 pr-10 w-full h-12 px-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-colors"
           required={required && !value}
