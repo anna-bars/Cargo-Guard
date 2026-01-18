@@ -83,7 +83,7 @@ export default function ShippingValuePage() {
       <DashboardHeader userEmail="client@example.com" />
       
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb & Progress */}
         <div className="mb-8">
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
@@ -138,9 +138,9 @@ export default function ShippingValuePage() {
         </div>
 
         {/* Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_0.02fr_0.7fr]">
           {/* Left Column - Form */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 w-[99%]">
             <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
               <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Cargo Type Section */}
@@ -394,9 +394,8 @@ export default function ShippingValuePage() {
           {/* Right Column - Tips & Help */}
           <div className="space-y-6">
             {/* Tips Card */}
-            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl shadow-lg p-6 text-white">
+            <div className="bg-[url('/quotes/new/shipping-wd-back.png')] bg-cover flex flex-col gap-8 rounded-2xl shadow-lg p-6 text-white">
               <div className="flex items-center gap-2 mb-4">
-                <Info className="w-5 h-5" />
                 <h3 className="text-lg font-semibold">Smart Quote Tips</h3>
               </div>
               
@@ -418,61 +417,13 @@ export default function ShippingValuePage() {
                     <span className="font-semibold">Lower Premiums:</span> Accurate cargo classification can reduce premiums by up to 30%.
                   </p>
                 </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="w-3 h-3" />
-                  </div>
-                  <p className="text-sm leading-relaxed">
-                    <span className="font-semibold">Transit Time:</span> Longer transit periods may increase risk factors and premium costs.
-                  </p>
-                </div>
-              </div>
-            </div>
 
-            {/* Progress Card */}
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Quote Progress
-              </h3>
-              
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-700">Step 1: Shipment Details</span>
-                  <span className="text-sm font-semibold text-green-600">Complete</span>
-                </div>
-                
-                <div className="space-y-2">
-                  {[
-                    { label: 'Cargo Type', completed: !!cargoType },
-                    { label: 'Shipment Value', completed: !!shipmentValue },
-                    { label: 'Route Details', completed: !!origin && !!destination },
-                    { label: 'Dates', completed: !!startDate && !!endDate },
-                    { label: 'Transport Mode', completed: !!transportationMode },
-                  ].map((item, index) => (
-                    <div key={index} className="flex items-center gap-3">
-                      <div className={`
-                        w-5 h-5 rounded-full flex items-center justify-center
-                        ${item.completed 
-                          ? 'bg-green-500' 
-                          : 'bg-gray-200'
-                        }
-                      `}>
-                        {item.completed && (
-                          <CheckCircle className="w-3 h-3 text-white" />
-                        )}
-                      </div>
-                      <span className={`text-sm ${item.completed ? 'text-gray-900' : 'text-gray-500'}`}>
-                        {item.label}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                
-                <div className="pt-4 border-t border-gray-200">
+                <div>
+                 
+                <div className="pt-4 ">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-600">Progress</span>
-                    <span className="text-sm font-semibold text-gray-900">
+                    <span className="text-sm text-gray-600 text-white">Progress</span>
+                    <span className="text-sm font-semibold text-white">
                       {[
                         !!cargoType,
                         !!shipmentValue,
@@ -482,9 +433,9 @@ export default function ShippingValuePage() {
                       ].filter(Boolean).length} of 5
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-200 rounded-full h-3">
                     <div 
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      className="bg-white h-3 rounded-full transition-all duration-300"
                       style={{ 
                         width: `${(
                           [
@@ -499,8 +450,11 @@ export default function ShippingValuePage() {
                     />
                   </div>
                 </div>
+                </div>
+               
               </div>
             </div>
+
 
             {/* Help Card */}
             <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
