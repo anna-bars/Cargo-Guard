@@ -24,6 +24,7 @@ import {
 import DashboardHeader from '@/app/components/dashboard/DashboardHeader';
 
 interface QuoteData {
+  quoteId: string;
   cargoType: string;
   shipmentValue: number;
   origin: {
@@ -63,26 +64,74 @@ export default function InsuranceQuotePage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'coverage' | 'documents'>('overview');
 
   useEffect(() => {
-    const mockData: QuoteData = {
-      cargoType: 'Electronics & Consumer Goods',
-      shipmentValue: 45000,
-      origin: {
-        name: 'New York Port',
-        city: 'New York',
-        country: 'USA'
-      },
-      destination: {
-        name: 'Tokyo Port',
-        city: 'Tokyo',
-        country: 'Japan'
-      },
-      startDate: '2025-12-10',
-      endDate: '2025-12-25',
-      transportationMode: 'Air Freight'
+    // Get data from localStorage instead of mock data
+    const loadQuoteData = () => {
+      try {
+        // Try to get from quote_submission first
+        const submissionData = localStorage.getItem('quote_submission');
+        if (submissionData) {
+          const parsedData = JSON.parse(submissionData);
+          setQuoteData({
+            quoteId: parsedData.quoteId || `q-${Date.now()}`,
+            cargoType: parsedData.cargoType || 'Unknown Cargo',
+            shipmentValue: parsedData.shipmentValue || 0,
+            origin: parsedData.origin || { name: 'Unknown', city: 'Unknown', country: 'Unknown' },
+            destination: parsedData.destination || { name: 'Unknown', city: 'Unknown', country: 'Unknown' },
+            startDate: parsedData.startDate || new Date().toISOString().split('T')[0],
+            endDate: parsedData.endDate || new Date().toISOString().split('T')[0],
+            transportationMode: parsedData.transportationMode || 'Unknown'
+          });
+        } else {
+          // Fallback to quote_draft if submission not found
+          const draftData = localStorage.getItem('quote_draft');
+          if (draftData) {
+            const parsedData = JSON.parse(draftData);
+            setQuoteData({
+              quoteId: parsedData.quoteId || `q-${Date.now()}`,
+              cargoType: parsedData.cargoType === 'other' ? parsedData.otherCargoType : parsedData.cargoType || 'Unknown Cargo',
+              shipmentValue: parseFloat(parsedData.shipmentValue) || 0,
+              origin: parsedData.origin || { name: 'Unknown', city: 'Unknown', country: 'Unknown' },
+              destination: parsedData.destination || { name: 'Unknown', city: 'Unknown', country: 'Unknown' },
+              startDate: parsedData.startDate || new Date().toISOString().split('T')[0],
+              endDate: parsedData.endDate || new Date().toISOString().split('T')[0],
+              transportationMode: parsedData.transportationMode || 'Unknown'
+            });
+          } else {
+            // No data found
+            console.warn('No quote data found in localStorage');
+            // Set default data to prevent errors
+            setQuoteData({
+              quoteId: `q-${Date.now()}`,
+              cargoType: 'No data found',
+              shipmentValue: 0,
+              origin: { name: 'Unknown', city: 'Unknown', country: 'Unknown' },
+              destination: { name: 'Unknown', city: 'Unknown', country: 'Unknown' },
+              startDate: new Date().toISOString().split('T')[0],
+              endDate: new Date().toISOString().split('T')[0],
+              transportationMode: 'Unknown'
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error loading quote data:', error);
+        // Set default data on error
+        setQuoteData({
+          quoteId: `q-${Date.now()}`,
+          cargoType: 'Error loading data',
+          shipmentValue: 0,
+          origin: { name: 'Error', city: 'Error', country: 'Error' },
+          destination: { name: 'Error', city: 'Error', country: 'Error' },
+          startDate: new Date().toISOString().split('T')[0],
+          endDate: new Date().toISOString().split('T')[0],
+          transportationMode: 'Error'
+        });
+      } finally {
+        setLoading(false);
+      }
     };
 
-    setQuoteData(mockData);
-    setLoading(false);
+    // Add slight delay to ensure localStorage is available
+    setTimeout(loadQuoteData, 100);
   }, []);
 
   const coverageOptions: CoverageOption[] = [
@@ -140,15 +189,25 @@ export default function InsuranceQuotePage() {
     if (!quoteData) return 0;
     
     const baseRate = quoteData.shipmentValue * 0.015;
-    const modeMultiplier = quoteData.transportationMode.includes('Air') ? 1.2 : 1.0;
     
+    // Transportation mode multipliers
+    const modeMultipliers: Record<string, number> = {
+      'air': 1.2,
+      'sea': 1.0,
+      'road': 1.1
+    };
+    const mode = quoteData.transportationMode.toLowerCase();
+    const modeMultiplier = modeMultipliers[mode] || 1.0;
+    
+    // Coverage type multipliers
     const typeMultipliers = {
       'standard': 1.0,
       'premium': 1.5,
       'enterprise': 2.0
     };
-    
     const typeMultiplier = typeMultipliers[type as keyof typeof typeMultipliers] || 1.0;
+    
+    // Duration multiplier
     const durationDays = Math.ceil(
       (new Date(quoteData.endDate).getTime() - new Date(quoteData.startDate).getTime()) / (1000 * 60 * 60 * 24)
     );
@@ -175,8 +234,27 @@ export default function InsuranceQuotePage() {
     });
   };
 
+  const getTransportationModeDisplay = (mode: string) => {
+    const modeMap: Record<string, string> = {
+      'air': 'Air Freight',
+      'sea': 'Sea Freight',
+      'road': 'Road Freight'
+    };
+    return modeMap[mode.toLowerCase()] || mode;
+  };
+
   const handleApproveQuote = () => {
-    router.push('/quotes/review?coverage=' + selectedCoverage);
+    if (!quoteData) return;
+    
+    // Save selected coverage to localStorage
+    const quoteDataToSave = {
+      ...quoteData,
+      selectedCoverage,
+      coverageDetails: coverageOptions.find(coverage => coverage.id === selectedCoverage)
+    };
+    localStorage.setItem('quote_coverage_selection', JSON.stringify(quoteDataToSave));
+    
+    router.push('/quotes/review?coverage=' + selectedCoverage + '&quote_id=' + (quoteData?.quoteId || ''));
   };
 
   const handleModifyInputs = () => {
@@ -193,6 +271,27 @@ export default function InsuranceQuotePage() {
               <div className="animate-spin rounded-full h-12 w-12 border-2 border-blue-600 border-t-transparent mx-auto mb-4"></div>
               <p className="text-gray-600">Generating your quote...</p>
             </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!quoteData) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <DashboardHeader userEmail="client@example.com" />
+        <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
+            <AlertCircle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">No Quote Data Found</h2>
+            <p className="text-gray-600 mb-6">Please go back and fill out the shipment details form.</p>
+            <button
+              onClick={() => router.push('/shipping')}
+              className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Go to Shipment Details
+            </button>
           </div>
         </div>
       </div>
@@ -232,7 +331,9 @@ export default function InsuranceQuotePage() {
             <div className="hidden lg:flex items-center gap-4">
               <div className="text-right">
                 <p className="text-sm text-gray-500">Quote ID</p>
-                <p className="font-mono font-medium">#INS-2024-7890</p>
+                <p className="font-mono font-medium">
+                  #{quoteData?.quoteId ? quoteData.quoteId.replace('temp-', 'Q-') : 'Loading...'}
+                </p>
               </div>
               <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
                 <Shield className="w-5 h-5 text-blue-600" />
@@ -301,7 +402,7 @@ export default function InsuranceQuotePage() {
                     <Package className="w-4 h-4" />
                     <span className="text-sm">Cargo Type</span>
                   </div>
-                  <p className="font-medium">{quoteData?.cargoType}</p>
+                  <p className="font-medium">{quoteData?.cargoType || 'N/A'}</p>
                 </div>
                 
                 <div className="space-y-2">
@@ -317,7 +418,10 @@ export default function InsuranceQuotePage() {
                     <MapPin className="w-4 h-4" />
                     <span className="text-sm">Route</span>
                   </div>
-                  <p className="font-medium">{quoteData?.origin.city} → {quoteData?.destination.city}</p>
+                  <p className="font-medium">
+                    {quoteData?.origin?.city || quoteData?.origin?.name || 'Unknown'} → 
+                    {quoteData?.destination?.city || quoteData?.destination?.name || 'Unknown'}
+                  </p>
                 </div>
                 
                 <div className="space-y-2">
@@ -325,7 +429,7 @@ export default function InsuranceQuotePage() {
                     <Truck className="w-4 h-4" />
                     <span className="text-sm">Transport Mode</span>
                   </div>
-                  <p className="font-medium">{quoteData?.transportationMode}</p>
+                  <p className="font-medium">{getTransportationModeDisplay(quoteData?.transportationMode || '')}</p>
                 </div>
               </div>
             </div>
