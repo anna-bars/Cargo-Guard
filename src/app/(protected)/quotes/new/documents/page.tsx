@@ -26,6 +26,7 @@ import {
   Truck
 } from 'lucide-react';
 import DashboardHeader from '@/app/components/dashboard/DashboardHeader';
+import toast from 'react-hot-toast';
 
 interface QuoteData {
   id: string;
@@ -334,8 +335,10 @@ useEffect(() => {
       localStorage.removeItem('quote_submission');
       localStorage.removeItem('quote_draft');
       
-      alert('Quote submitted successfully! Our team will review your documents and get back to you within 24 hours.');
+      // alert('Quote submitted successfully! Our team will review your documents and get back to you within 24 hours.');
       // router.push('/quotes/pending');
+      toast.success('Quote submitted successfully! Our team will review your documents and get back to you within 24 hours.')
+      router.push('/dashboard')
     } else {
       throw new Error('Failed to submit quote');
     }
