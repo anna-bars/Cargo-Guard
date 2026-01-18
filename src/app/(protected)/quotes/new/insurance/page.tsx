@@ -186,35 +186,76 @@ export default function InsuranceQuotePage() {
   ];
 
   function calculatePremium(type: string): number {
-    if (!quoteData) return 0;
-    
-    const baseRate = quoteData.shipmentValue * 0.015;
-    
-    // Transportation mode multipliers
-    const modeMultipliers: Record<string, number> = {
-      'air': 1.2,
-      'sea': 1.0,
-      'road': 1.1
-    };
-    const mode = quoteData.transportationMode.toLowerCase();
-    const modeMultiplier = modeMultipliers[mode] || 1.0;
-    
-    // Coverage type multipliers
-    const typeMultipliers = {
-      'standard': 1.0,
-      'premium': 1.5,
-      'enterprise': 2.0
-    };
-    const typeMultiplier = typeMultipliers[type as keyof typeof typeMultipliers] || 1.0;
-    
-    // Duration multiplier
-    const durationDays = Math.ceil(
-      (new Date(quoteData.endDate).getTime() - new Date(quoteData.startDate).getTime()) / (1000 * 60 * 60 * 24)
-    );
-    const durationMultiplier = Math.max(1, durationDays / 30);
-    
-    return Math.round(baseRate * modeMultiplier * typeMultiplier * durationMultiplier);
+  if (!quoteData) return 0;
+  
+  // Base rate: 2.7% of shipment value
+  const baseRate = quoteData.shipmentValue * 0.027;
+  
+  // Cargo type risk multipliers
+  const cargoRiskMultipliers: Record<string, number> = {
+    'electronics': 1.2,    // Medium risk
+    'apparel': 1.0,        // Low risk
+    'machinery': 1.5,      // High risk
+    'food products': 1.3,  // Medium risk
+    'chemicals': 2.0,      // High risk
+    'pharmaceuticals': 1.1, // Low risk
+    'other cargo': 1.0      // Varies
+  };
+  
+  const cargoType = quoteData.cargoType.toLowerCase();
+  const cargoMultiplier = cargoRiskMultipliers[cargoType] || 1.0;
+  
+  // Transportation mode multipliers
+  const modeMultipliers: Record<string, number> = {
+    'air': 1.5,    // Highest risk for air
+    'sea': 1.2,    // Medium risk for sea
+    'road': 1.3,   // High risk for road
+    'air freight': 1.5,
+    'sea freight': 1.2,
+    'road freight': 1.3
+  };
+  
+  const mode = quoteData.transportationMode.toLowerCase();
+  const modeMultiplier = modeMultipliers[mode] || 1.0;
+  
+  // Coverage type multipliers
+  const typeMultipliers = {
+    'standard': 1.0,     // Base coverage
+    'premium': 1.5,      // Premium coverage (50% more)
+    'enterprise': 2.0    // Enterprise coverage (100% more)
+  };
+  
+  const typeMultiplier = typeMultipliers[type as keyof typeof typeMultipliers] || 1.0;
+  
+  // Duration multiplier (per day)
+  const durationDays = Math.ceil(
+    (new Date(quoteData.endDate).getTime() - new Date(quoteData.startDate).getTime()) / (1000 * 60 * 60 * 24)
+  );
+  
+  // Base duration is 7 days, each additional day adds 1.5%
+  const durationMultiplier = 1 + ((durationDays - 7) * 0.015);
+  const safeDurationMultiplier = Math.max(1, durationMultiplier);
+  
+  // Calculate final premium
+  let calculatedPremium = baseRate * cargoMultiplier * modeMultiplier * typeMultiplier * safeDurationMultiplier;
+  
+  // Apply minimum premium ($450 for standard, $675 for premium, $900 for enterprise)
+  const minimumPremiums = {
+    'standard': 450,
+    'premium': 675,
+    'enterprise': 900
+  };
+  
+  const minimum = minimumPremiums[type as keyof typeof minimumPremiums] || 0;
+  
+  // Ensure premium is at least the minimum
+  if (calculatedPremium < minimum) {
+    calculatedPremium = minimum;
   }
+  
+  // Round to nearest dollar
+  return Math.round(calculatedPremium);
+}
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
