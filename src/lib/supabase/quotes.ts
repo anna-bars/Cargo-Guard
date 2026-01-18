@@ -43,27 +43,32 @@ export async function submitQuoteToSupabase(quoteData: SubmitQuoteData) {
     }
     
     // Ստեղծում ենք quote_requests գրառումը
-    const quoteId = uuidv4();
+    const quoteRequestId = uuidv4();
+    
+    const insertData: any = {
+      id: quoteRequestId,
+      quote_id: quoteData.quoteId,
+      user_id: user.id,
+      cargo_type: quoteData.cargoType,
+      shipment_value: quoteData.shipmentValue,
+      origin: quoteData.origin,
+      destination: quoteData.destination,
+      start_date: quoteData.startDate,
+      end_date: quoteData.endDate,
+      transportation_mode: quoteData.transportationMode,
+      selected_coverage: quoteData.selectedCoverage,
+      calculated_premium: quoteData.premium,
+      deductible: quoteData.deductible,
+      status: 'submitted',
+      is_active: true,
+    };
+    
+    // Ավելացնենք admin_notes դաշտում shipper name-ը
+    insertData.admin_notes = `Shipper: ${quoteData.shipperName}${quoteData.referenceNumber ? `, Reference: ${quoteData.referenceNumber}` : ''}`;
     
     const { data: quoteRequest, error: quoteError } = await supabase
       .from('quote_requests')
-      .insert({
-        id: quoteId,
-        quote_id: quoteData.quoteId,
-        user_id: user.id,
-        cargo_type: quoteData.cargoType,
-        shipment_value: quoteData.shipmentValue,
-        origin: quoteData.origin,
-        destination: quoteData.destination,
-        start_date: quoteData.startDate,
-        end_date: quoteData.endDate,
-        transportation_mode: quoteData.transportationMode,
-        selected_coverage: quoteData.selectedCoverage,
-        calculated_premium: quoteData.premium,
-        deductible: quoteData.deductible,
-        status: 'submitted',
-        is_active: true
-      })
+      .insert(insertData)
       .select()
       .single();
     
@@ -104,7 +109,8 @@ export async function submitQuoteToSupabase(quoteData: SubmitQuoteData) {
           .from('documents')
           .insert({
             user_id: user.id,
-            quote_id: quoteId,
+            quote_request_id: quoteRequestId,
+            quote_id: null,
             document_type: doc.type,
             file_name: doc.file.name,
             file_url: publicUrl,
@@ -130,15 +136,15 @@ export async function submitQuoteToSupabase(quoteData: SubmitQuoteData) {
         user_id: user.id,
         type: 'quote_submitted',
         title: 'Quote Submitted Successfully',
-        message: `Your quote ${quoteData.quoteId} has been submitted and is under review.`,
-        related_id: quoteId,
+        message: `Your quote ${quoteData.quoteId} has been submitted and is under review. Shipper: ${quoteData.shipperName}`,
+        related_id: quoteRequestId,
         related_type: 'quote_requests',
         is_read: false
       });
     
     return {
       success: true,
-      quoteRequestId: quoteId,
+      quoteRequestId: quoteRequestId,
       documents: uploadedDocuments
     };
     
