@@ -260,7 +260,7 @@ export default function ShippingValuePage() {
                 </div>
 
                 {/* Dates & Transport */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="">
                   {/* Dates */}
                   <div>
                     <div className="flex items-center gap-2 mb-4">
@@ -268,8 +268,8 @@ export default function ShippingValuePage() {
                       <h2 className="text-lg font-semibold text-gray-900">Coverage Period</h2>
                     </div>
                     
-                    <div className="space-y-4">
-                      <div>
+                    <div className="space-y-4 flex justify-between">
+                      <div className='w-[49%]'>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Start Date *
                         </label>
@@ -287,7 +287,7 @@ export default function ShippingValuePage() {
                         </div>
                       </div>
 
-                      <div>
+                      <div className='w-[48.8%]'>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           End Date *
                         </label>
@@ -314,7 +314,7 @@ export default function ShippingValuePage() {
                       <h2 className="text-lg font-semibold text-gray-900">Transport Mode *</h2>
                     </div>
                     
-                    <div className="space-y-3">
+                    <div className="space-y-3 flex justify-between">
                       {transportModes.map((mode) => {
                         const Icon = mode.icon;
                         return (
@@ -323,8 +323,8 @@ export default function ShippingValuePage() {
                             type="button"
                             onClick={() => setTransportationMode(mode.id)}
                             className={`
-                              w-full p-4 rounded-xl border-2 transition-all duration-200
-                              flex items-center gap-4
+                              w-[32.7%] relative p-4 rounded-xl border-2 transition-all duration-200
+                              flex flex-col items-center gap-4 mb-0
                               ${transportationMode === mode.id
                                 ? 'border-blue-500 bg-blue-50'
                                 : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
@@ -340,7 +340,7 @@ export default function ShippingValuePage() {
                             `}>
                               <Icon className="w-6 h-6" />
                             </div>
-                            <div className="flex-1 text-left">
+                            <div className="flex-1 text-center">
                               <div className="font-medium text-gray-900">{mode.name}</div>
                               <div className="text-sm text-gray-500">
                                 {mode.id === 'sea' && 'Most economical, 20-40 days'}
@@ -349,7 +349,7 @@ export default function ShippingValuePage() {
                               </div>
                             </div>
                             {transportationMode === mode.id && (
-                              <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+                              <div className="w-5 h-5 absolute top-2 right-2 rounded-full bg-blue-500 flex items-center justify-center">
                                 <CheckCircle className="w-3 h-3 text-white" />
                               </div>
                             )}
