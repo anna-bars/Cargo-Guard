@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, AlertCircle, CheckCircle, Ship, Plane, Truck } from 'lucide-react';
 import DashboardHeader from '@/app/components/dashboard/DashboardHeader';
 import CustomDatePicker from './components/CustomDatePicker';
@@ -9,8 +10,14 @@ import MobileTipsCard from './components/MobileTipsCard';
 import MobileStepIndicator from './components/MobileStepIndicator';
 import CargoTypeSelector from './components/CargoTypeSelector';
 import { LocationData } from './components/LocationIQAutocomplete';
+import { createClient } from '@/lib/supabase/client';
+import { useUser } from '@/app/context/UserContext';
 
 export default function ShippingValuePage() {
+  const router = useRouter();
+  const supabase = createClient();
+  const { user } = useUser();
+  
   const [cargoType, setCargoType] = useState('');
   const [shipmentValue, setShipmentValue] = useState('');
   const [origin, setOrigin] = useState<LocationData | null>(null);
@@ -20,6 +27,9 @@ export default function ShippingValuePage() {
   const [transportationMode, setTransportationMode] = useState('');
   const [step, setStep] = useState(1);
   const [otherCargoType, setOtherCargoType] = useState('');
+  const [quoteId, setQuoteId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const today = new Date().toISOString().split('T')[0];
   const tomorrow = new Date();
@@ -38,33 +48,179 @@ export default function ShippingValuePage() {
     { id: 3, name: 'Quote Review', status: 'upcoming' },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Load or create draft on component mount
+  useEffect(() => {
+    if (!user) return;
+
+    const initializeQuote = async () => {
+      setIsLoading(true);
+      try {
+        // Check if there's an existing draft
+        const { data: existingQuote, error: fetchError } = await supabase
+          .from('quotes')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('status', 'draft')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (fetchError && fetchError.code !== 'PGRST116') {
+          console.error('Error fetching draft:', fetchError);
+        }
+
+        if (existingQuote) {
+          // Load existing draft
+          setQuoteId(existingQuote.id);
+          setCargoType(existingQuote.cargo_type || '');
+          setShipmentValue(existingQuote.shipment_value?.toString() || '');
+          setStartDate(existingQuote.coverage_start || today);
+          setEndDate(existingQuote.coverage_end || tomorrowFormatted);
+          setTransportationMode(existingQuote.transportation_mode || '');
+          
+          if (existingQuote.origin_city) {
+  setOrigin({
+    name: existingQuote.origin_city,
+    city: existingQuote.origin_city,
+    country: '',
+    countryCode: '',
+    type: 'city',
+    fullAddress: existingQuote.origin_city
+  });
+}
+
+if (existingQuote.destination_city) {
+  setDestination({
+    name: existingQuote.destination_city,
+    city: existingQuote.destination_city,
+    country: '',
+    countryCode: '',
+    type: 'city',
+    fullAddress: existingQuote.destination_city
+  });
+}
+        } else {
+          // Create new draft
+          const quoteNumber = `Q-${Date.now()}`;
+          const { data: newQuote, error: createError } = await supabase
+            .from('quotes')
+            .insert({
+              user_id: user.id,
+              quote_number: quoteNumber,
+              status: 'draft',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            })
+            .select()
+            .single();
+
+          if (createError) throw createError;
+          setQuoteId(newQuote.id);
+        }
+      } catch (error) {
+        console.error('Error initializing quote:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeQuote();
+  }, [user]);
+
+  // Auto-save function with debounce
+  const saveDraft = useCallback(async () => {
+    if (!user || !quoteId || isSaving) return;
+
+    setIsSaving(true);
+    
+    try {
+      const finalCargoType = cargoType === 'other' ? otherCargoType : cargoType;
+      
+      await supabase
+        .from('quotes')
+        .update({
+          cargo_type: finalCargoType || null,
+          shipment_value: shipmentValue ? parseFloat(shipmentValue) : null,
+          origin_city: origin?.city || null,
+          destination_city: destination?.city || null,
+          coverage_start: startDate || today,
+          coverage_end: endDate || tomorrowFormatted,
+          transportation_mode: transportationMode || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', quoteId)
+        .eq('user_id', user.id);
+    } catch (error) {
+      console.error('Error saving draft:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [user, quoteId, cargoType, otherCargoType, shipmentValue, origin, destination, startDate, endDate, transportationMode]);
+
+  // Auto-save on changes with debounce
+  useEffect(() => {
+    if (!quoteId) return;
+    
+    const timeoutId = setTimeout(() => {
+      saveDraft();
+    }, 1000); // Debounce 1 second
+
+    return () => clearTimeout(timeoutId);
+  }, [saveDraft, quoteId]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const finalCargoType = cargoType === 'other' ? otherCargoType : cargoType;
-    
-    const formData = {
-      cargoType: finalCargoType,
-      shipmentValue: parseFloat(shipmentValue),
-      origin,
-      destination,
-      coveragePeriod: {
-        startDate,
-        endDate,
-        durationDays: Math.ceil(
-          (new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)
-        )
-      },
-      transportationMode,
-      timestamp: new Date().toISOString()
-    };
-    
-    console.log('Shipping Quote Form Submitted:', formData);
-    setStep(2);
+    if (!quoteId || !user) return;
+
+    try {
+      const finalCargoType = cargoType === 'other' ? otherCargoType : cargoType;
+      
+      // Update quote with status for next step
+      const { error } = await supabase
+        .from('quotes')
+        .update({
+          cargo_type: finalCargoType,
+          shipment_value: parseFloat(shipmentValue),
+          origin_city: origin?.city || '',
+          destination_city: destination?.city || '',
+          coverage_start: startDate,
+          coverage_end: endDate,
+          transportation_mode: transportationMode,
+          status: 'awaiting_coverage',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', quoteId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      // Navigate to coverage page with quote ID
+      router.push(`/quotes/new/coverage?quote_id=${quoteId}`);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Error saving quote. Please try again.');
+    }
   };
 
-  const handleCancel = () => {
+  const handleCancel = async () => {
     if (window.confirm('Are you sure you want to cancel? All entered data will be lost.')) {
+      if (quoteId && user) {
+        try {
+          await supabase
+            .from('quotes')
+            .update({
+              status: 'cancelled',
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', quoteId)
+            .eq('user_id', user.id);
+        } catch (error) {
+          console.error('Error cancelling quote:', error);
+        }
+      }
+      
+      // Reset form
       setCargoType('');
       setOtherCargoType('');
       setShipmentValue('');
@@ -73,7 +229,11 @@ export default function ShippingValuePage() {
       setStartDate('');
       setEndDate('');
       setTransportationMode('');
+      setQuoteId(null);
       setStep(1);
+      
+      // Navigate back
+      router.push('/quotes');
     }
   };
 
@@ -91,16 +251,29 @@ export default function ShippingValuePage() {
   const completionPercentage = Math.round((completedFields / totalFields) * 100);
   const isFormComplete = completedFields === totalFields;
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <DashboardHeader userEmail={user?.email} />
+        <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <DashboardHeader userEmail="client@example.com" />
+      <DashboardHeader userEmail={user?.email} />
       
       <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         {/* Desktop Breadcrumb */}
         <div className="hidden md:block mb-8">
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
             <button 
-              onClick={() => window.history.back()}
+              onClick={() => router.push('/quotes')}
               className="flex items-center gap-2 hover:text-gray-700 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -158,6 +331,11 @@ export default function ShippingValuePage() {
             className="w-[22px] h-[22px] sm:w-6 sm:h-6"
           />
           <h2 className="font-normal text-[18px] sm:text-[26px]">Shipment Insurance Quote</h2>
+          {isSaving && (
+            <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+              Saving...
+            </span>
+          )}
         </div> 
 
         {/* Mobile Header */}
@@ -329,7 +507,7 @@ export default function ShippingValuePage() {
                   <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
                     <button
                       type="button"
-                      onClick={() => setStep(step - 1)}
+                      onClick={() => router.push('/quotes')}
                       className="w-full sm:w-auto px-6 py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors font-medium text-sm md:text-base order-2 sm:order-1"
                     >
                       Previous

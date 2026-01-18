@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Montserrat } from 'next/font/google'
-
+import { UserProvider } from '@/app/context/UserContext';
 import { Toaster } from 'react-hot-toast'
 import './globals.css'
 
@@ -20,8 +20,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={montserrat.className}>
-        {children}
+         <UserProvider >
+          {children}
         <Toaster position="top-right" />
+         </UserProvider>
+        
       </body>
     </html>
   )

@@ -103,26 +103,26 @@ export default function SubmitDocumentsPage() {
     setLoading(false);
   }, [searchParams]);
 
-  const handleFileUpload = (documentId: string, file: File) => {
-    const updatedDocuments = documents.map(doc => {
-      if (doc.id === documentId) {
-        const previewUrl = URL.createObjectURL(file);
-        return {
-          ...doc,
-          file,
-          previewUrl,
-          uploadedAt: new Date(),
-          status: 'uploaded'
-        };
-      }
-      return doc;
-    });
+ const handleFileUpload = (documentId: string, file: File) => {
+  const updatedDocuments = documents.map(doc => {
+    if (doc.id === documentId) {
+      const previewUrl = URL.createObjectURL(file);
+      return {
+        ...doc,
+        file,
+        previewUrl,
+        uploadedAt: new Date(),
+        status: 'uploaded' as const // Cast to the specific type
+      };
+    }
+    return doc;
+  });
 
-    setDocuments(updatedDocuments);
+  setDocuments(updatedDocuments);
 
-    // Simulate upload progress
-    simulateUploadProgress(documentId);
-  };
+  // Simulate upload progress
+  simulateUploadProgress(documentId);
+};
 
   const simulateUploadProgress = (documentId: string) => {
     let progress = 0;
@@ -140,24 +140,23 @@ export default function SubmitDocumentsPage() {
   };
 
   const handleRemoveDocument = (documentId: string) => {
-    const updatedDocuments = documents.map(doc => {
-      if (doc.id === documentId) {
-        if (doc.previewUrl) {
-          URL.revokeObjectURL(doc.previewUrl);
-        }
-        return {
-          ...doc,
-          file: null,
-          previewUrl: undefined,
-          status: 'pending'
-        };
+  const updatedDocuments = documents.map(doc => {
+    if (doc.id === documentId) {
+      if (doc.previewUrl) {
+        URL.revokeObjectURL(doc.previewUrl);
       }
-      return doc;
-    });
+      return {
+        ...doc,
+        file: null,
+        previewUrl: undefined,
+        status: 'pending' as const // Cast to the specific type
+      };
+    }
+    return doc;
+  });
 
-    setDocuments(updatedDocuments);
-  };
-
+  setDocuments(updatedDocuments);
+};
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
   };
