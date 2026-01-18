@@ -792,43 +792,43 @@ const LocationIQAutocomplete = ({
   );
 };
 
-// Մոբայլի համար հատուկ Components
-const MobileProgressBar = ({ 
-  currentStep, 
-  totalSteps,
-  completionPercentage 
-}: { 
-  currentStep: number; 
-  totalSteps: number;
-  completionPercentage: number;
-}) => {
+const MobileTipsCard = ({ completionPercentage }: { completionPercentage: number }) => {
   return (
-    <div className="md:hidden bg-white rounded-xl p-4 mb-4 shadow-sm border border-gray-200">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-700">Step {currentStep} of {totalSteps}</span>
-          <div className="w-12 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-blue-500 rounded-full transition-all duration-300"
-              style={{ width: `${(currentStep - 1) / (totalSteps - 1) * 100}%` }}
-            />
-          </div>
-        </div>
-        <div className="text-sm font-semibold text-blue-600">
-          {completionPercentage}%
-        </div>
+    <div className="md:hidden bg-[url('/quotes/new/shipping-wd-back.png')] bg-cover bg-center flex flex-col gap-6 rounded-2xl shadow-lg border border-gray-200 p-5 mb-6 text-white">
+      <div className="flex items-center gap-2 mb-2">
+        <h3 className="text-lg font-semibold">Smart Quote Tips</h3>
       </div>
       
-      <div className="space-y-1">
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-600">Progress</span>
-          <span className="text-xs font-medium text-gray-900">
+      <div className="space-y-4">
+        <div className="flex items-start gap-3">
+          <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+            <CheckCircle className="w-3 h-3" />
+          </div>
+          <p className="text-sm leading-relaxed">
+            <span className="font-semibold">Full Coverage:</span> Include all freight charges and duties in shipment value for complete protection.
+          </p>
+        </div>
+        
+        <div className="flex items-start gap-3">
+          <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+            <CheckCircle className="w-3 h-3" />
+          </div>
+          <p className="text-sm leading-relaxed">
+            <span className="font-semibold">Lower Premiums:</span> Accurate cargo classification can reduce premiums by up to 30%.
+          </p>
+        </div>
+      </div>
+
+      <div className="pt-4 border-t border-white/20">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm text-white/90">Progress</span>
+          <span className="text-sm font-semibold text-white">
             {Math.round(completionPercentage/100*7)} of 7 fields
           </span>
         </div>
-        <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div className="w-full bg-white/20 rounded-full h-2">
           <div 
-            className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-300"
+            className="bg-white h-2 rounded-full transition-all duration-300"
             style={{ width: `${completionPercentage}%` }}
           />
         </div>
@@ -836,41 +836,6 @@ const MobileProgressBar = ({
     </div>
   );
 };
-
-const MobileTipsCard = ({ completionPercentage }: { completionPercentage: number }) => {
-  return (
-    <div className="md:hidden bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-5 mb-6 text-white">
-      <h3 className="text-lg font-semibold mb-4">Smart Quote Tips</h3>
-      
-      <div className="space-y-4 mb-6">
-        <div className="flex items-start gap-3">
-          <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <CheckCircle className="w-3 h-3" />
-          </div>
-          <div>
-            <p className="text-sm font-medium mb-1">Full Coverage</p>
-            <p className="text-xs opacity-90 leading-relaxed">
-              Include all freight charges and duties in shipment value for complete protection.
-            </p>
-          </div>
-        </div>
-        
-        <div className="flex items-start gap-3">
-          <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <CheckCircle className="w-3 h-3" />
-          </div>
-          <div>
-            <p className="text-sm font-medium mb-1">Lower Premiums</p>
-            <p className="text-xs opacity-90 leading-relaxed">
-              Accurate cargo classification can reduce premiums by up to 30%.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const MobileStepIndicator = ({ currentStep }: { currentStep: number }) => {
   const steps = [
     { id: 1, name: 'Shipment Details' },
@@ -879,49 +844,7 @@ const MobileStepIndicator = ({ currentStep }: { currentStep: number }) => {
   ];
 
   return (
-    <div className="md:hidden mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-bold text-gray-900">New Quote</h1>
-        <span className="text-sm text-gray-500">Step {currentStep}/3</span>
-      </div>
-      
-      <div className="flex justify-between relative">
-        {steps.map((step, index) => (
-          <div key={step.id} className="relative z-10 flex flex-col items-center">
-            <div className={`
-              w-10 h-10 rounded-full border-2 flex items-center justify-center mb-2
-              ${step.id === currentStep 
-                ? 'border-blue-600 bg-blue-600 text-white' 
-                : step.id < currentStep
-                ? 'border-green-500 bg-green-500 text-white'
-                : 'border-gray-300 bg-white text-gray-400'
-              }
-            `}>
-              {step.id < currentStep ? (
-                <CheckCircle className="w-5 h-5" />
-              ) : (
-                <span className="text-sm font-medium">{step.id}</span>
-              )}
-            </div>
-            <span className={`
-              text-xs font-medium text-center max-w-[80px] truncate
-              ${step.id === currentStep ? 'text-blue-600' : 
-                step.id < currentStep ? 'text-green-600' : 'text-gray-500'
-              }
-            `}>
-              {step.name}
-            </span>
-            
-            {index < steps.length - 1 && (
-              <div className={`
-                absolute top-5 left-[70%] w-[calc(100%-80px)] h-0.5 -translate-y-1/2
-                ${step.id < currentStep ? 'bg-green-500' : 'bg-gray-300'}
-              `} />
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
+    <div></div>
   );
 };
 
@@ -1090,15 +1013,19 @@ export default function ShippingValuePage() {
             </div>
           </div>
         </div>
-
+<div className="flex items-center gap-3 mt-0 mb-2 sm:mt-0">
+                  <img
+                    src="/quotes/header-ic.svg"
+                    alt=""
+                    className="w-[22px] h-[22px] sm:w-6 sm:h-6"
+                  />
+                  <h2 className="font-normal text-[18px] sm:text-[26px]">Shipment Insurance Quote</h2>
+                   
+                </div> 
         {/* Mobile Header */}
         <MobileStepIndicator currentStep={step} />
         <MobileTipsCard completionPercentage={completionPercentage} />
-        <MobileProgressBar 
-          currentStep={step} 
-          totalSteps={3}
-          completionPercentage={completionPercentage}
-        />
+        
 
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_0.02fr_0.7fr]">
           <div className="lg:col-span-2 w-full lg:w-[99%]">
