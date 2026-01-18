@@ -12,7 +12,14 @@ import {
   Truck,
   AlertCircle,
   CheckCircle,
-  Info
+  Info,
+  Cpu,
+  Shirt,
+  Cog,
+  Apple,
+  FlaskConical,
+  Pill,
+  Box
 } from 'lucide-react';
 import DashboardHeader from '@/app/components/dashboard/DashboardHeader';
 
@@ -27,15 +34,15 @@ export default function ShippingValuePage() {
   const [transportationMode, setTransportationMode] = useState('');
   const [step, setStep] = useState(1);
 
-  // Cargo options
+  // Cargo options with Lucide icons
   const cargoOptions = [
-    { value: 'electronics', label: 'Electronics', icon: '💻' },
-    { value: 'clothing', label: 'Clothing', icon: '👕' },
-    { value: 'machinery', label: 'Machinery', icon: '⚙️' },
-    { value: 'food', label: 'Food Products', icon: '🍎' },
-    { value: 'chemicals', label: 'Chemicals', icon: '🧪' },
-    { value: 'pharma', label: 'Pharmaceuticals', icon: '💊' },
-    { value: 'other', label: 'Other', icon: '📦' },
+    { value: 'electronics', label: 'Electronics', icon: Cpu },
+    { value: 'clothing', label: 'Clothing', icon: Shirt },
+    { value: 'machinery', label: 'Machinery', icon: Cog },
+    { value: 'food', label: 'Food Products', icon: Apple },
+    { value: 'chemicals', label: 'Chemicals', icon: FlaskConical },
+    { value: 'pharma', label: 'Pharmaceuticals', icon: Pill },
+    { value: 'other', label: 'Other', icon: Box },
   ];
 
   // Transport modes
@@ -156,27 +163,38 @@ export default function ShippingValuePage() {
                         Cargo Type *
                       </label>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        {cargoOptions.map((option) => (
-                          <button
-                            key={option.value}
-                            type="button"
-                            onClick={() => setCargoType(option.value)}
-                            className={`
-                              p-4 rounded-xl border-2 transition-all duration-200
-                              ${cargoType === option.value
-                                ? 'border-blue-500 bg-blue-50'
-                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                              }
-                            `}
-                          >
-                            <div className="flex flex-col items-center gap-2">
-                              <span className="text-2xl">{option.icon}</span>
-                              <span className="text-sm font-medium text-[#868686]">
-                                {option.label}
-                              </span>
-                            </div>
-                          </button>
-                        ))}
+                        {cargoOptions.map((option) => {
+                          const Icon = option.icon;
+                          return (
+                            <button
+                              key={option.value}
+                              type="button"
+                              onClick={() => setCargoType(option.value)}
+                              className={`
+                                p-4 rounded-xl border-2 transition-all duration-200
+                                ${cargoType === option.value
+                                  ? 'border-blue-500 bg-blue-50'
+                                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                                }
+                              `}
+                            >
+                              <div className="flex flex-col items-center gap-2">
+                                <div className={`
+                                  p-3 rounded-lg
+                                  ${cargoType === option.value
+                                    ? 'bg-blue-100 text-blue-600'
+                                    : 'bg-gray-100 text-gray-600'
+                                  }
+                                `}>
+                                  <Icon className="w-4 h-4" />
+                                </div>
+                                <span className="text-sm font-medium text-[#868686]">
+                                  {option.label}
+                                </span>
+                              </div>
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
 
@@ -325,13 +343,13 @@ export default function ShippingValuePage() {
                             `}
                           >
                             <div className={`
-                              p-2 rounded-lg
+                              p-3 rounded-lg
                               ${transportationMode === mode.id
                                 ? `bg-blue-100 text-blue-600`
                                 : 'bg-gray-100 text-gray-500'
                               }
                             `}>
-                              <Icon className="w-6 h-6" />
+                              <Icon className="w-4 h-4" />
                             </div>
                             <div className="flex-1 text-center">
                               <div className="font-medium text-gray-900">{mode.name}</div>
