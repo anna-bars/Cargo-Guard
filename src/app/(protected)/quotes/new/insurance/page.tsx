@@ -7,6 +7,7 @@ import {
   CheckCircle, 
   ChevronRight, 
   CreditCard,
+  Download,
   HelpCircle,
   Shield,
   AlertCircle,
@@ -61,13 +62,10 @@ export default function InsuranceQuotePage() {
   const [quoteData, setQuoteData] = useState<QuoteData | null>(null);
   const [selectedCoverage, setSelectedCoverage] = useState<string>('premium');
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'coverage' | 'documents'>('overview');
 
   useEffect(() => {
-    // Get data from localStorage instead of mock data
     const loadQuoteData = () => {
       try {
-        // Try to get from quote_submission first
         const submissionData = localStorage.getItem('quote_submission');
         if (submissionData) {
           const parsedData = JSON.parse(submissionData);
@@ -82,7 +80,6 @@ export default function InsuranceQuotePage() {
             transportationMode: parsedData.transportationMode || 'Unknown'
           });
         } else {
-          // Fallback to quote_draft if submission not found
           const draftData = localStorage.getItem('quote_draft');
           if (draftData) {
             const parsedData = JSON.parse(draftData);
@@ -97,9 +94,7 @@ export default function InsuranceQuotePage() {
               transportationMode: parsedData.transportationMode || 'Unknown'
             });
           } else {
-            // No data found
             console.warn('No quote data found in localStorage');
-            // Set default data to prevent errors
             setQuoteData({
               quoteId: `q-${Date.now()}`,
               cargoType: 'No data found',
@@ -114,7 +109,6 @@ export default function InsuranceQuotePage() {
         }
       } catch (error) {
         console.error('Error loading quote data:', error);
-        // Set default data on error
         setQuoteData({
           quoteId: `q-${Date.now()}`,
           cargoType: 'Error loading data',
@@ -130,7 +124,6 @@ export default function InsuranceQuotePage() {
       }
     };
 
-    // Add slight delay to ensure localStorage is available
     setTimeout(loadQuoteData, 100);
   }, []);
 
@@ -186,76 +179,71 @@ export default function InsuranceQuotePage() {
   ];
 
   function calculatePremium(type: string): number {
-  if (!quoteData) return 0;
-  
-  // Base rate: 2.7% of shipment value
-  const baseRate = quoteData.shipmentValue * 0.027;
-  
-  // Cargo type risk multipliers
-  const cargoRiskMultipliers: Record<string, number> = {
-    'electronics': 1.2,    // Medium risk
-    'apparel': 1.0,        // Low risk
-    'machinery': 1.5,      // High risk
-    'food products': 1.3,  // Medium risk
-    'chemicals': 2.0,      // High risk
-    'pharmaceuticals': 1.1, // Low risk
-    'other cargo': 1.0      // Varies
-  };
-  
-  const cargoType = quoteData.cargoType.toLowerCase();
-  const cargoMultiplier = cargoRiskMultipliers[cargoType] || 1.0;
-  
-  // Transportation mode multipliers
-  const modeMultipliers: Record<string, number> = {
-    'air': 1.5,    // Highest risk for air
-    'sea': 1.2,    // Medium risk for sea
-    'road': 1.3,   // High risk for road
-    'air freight': 1.5,
-    'sea freight': 1.2,
-    'road freight': 1.3
-  };
-  
-  const mode = quoteData.transportationMode.toLowerCase();
-  const modeMultiplier = modeMultipliers[mode] || 1.0;
-  
-  // Coverage type multipliers
-  const typeMultipliers = {
-    'standard': 1.0,     // Base coverage
-    'premium': 1.5,      // Premium coverage (50% more)
-    'enterprise': 2.0    // Enterprise coverage (100% more)
-  };
-  
-  const typeMultiplier = typeMultipliers[type as keyof typeof typeMultipliers] || 1.0;
-  
-  // Duration multiplier (per day)
-  const durationDays = Math.ceil(
-    (new Date(quoteData.endDate).getTime() - new Date(quoteData.startDate).getTime()) / (1000 * 60 * 60 * 24)
-  );
-  
-  // Base duration is 7 days, each additional day adds 1.5%
-  const durationMultiplier = 1 + ((durationDays - 7) * 0.015);
-  const safeDurationMultiplier = Math.max(1, durationMultiplier);
-  
-  // Calculate final premium
-  let calculatedPremium = baseRate * cargoMultiplier * modeMultiplier * typeMultiplier * safeDurationMultiplier;
-  
-  // Apply minimum premium ($450 for standard, $675 for premium, $900 for enterprise)
-  const minimumPremiums = {
-    'standard': 450,
-    'premium': 675,
-    'enterprise': 900
-  };
-  
-  const minimum = minimumPremiums[type as keyof typeof minimumPremiums] || 0;
-  
-  // Ensure premium is at least the minimum
-  if (calculatedPremium < minimum) {
-    calculatedPremium = minimum;
+    if (!quoteData) return 0;
+    
+    // Base rate: 2.3% of shipment value for standard coverage
+    const baseRate = quoteData.shipmentValue * 0.023;
+    
+    // Cargo type risk multipliers
+    const cargoRiskMultipliers: Record<string, number> = {
+      'electronics': 1.0,
+      'apparel': 0.9,
+      'machinery': 1.0,
+      'food products': 1.2,
+      'chemicals': 1.5,
+      'pharmaceuticals': 1.0,
+      'other cargo': 1.0
+    };
+    
+    const cargoType = quoteData.cargoType.toLowerCase();
+    const cargoMultiplier = cargoRiskMultipliers[cargoType] || 1.0;
+    
+    // Transportation mode multipliers
+    const modeMultipliers: Record<string, number> = {
+      'air': 1.0,
+      'sea': 1.0,
+      'road': 1.1,
+      'air freight': 1.0,
+      'sea freight': 1.0,
+      'road freight': 1.1
+    };
+    
+    const mode = quoteData.transportationMode.toLowerCase();
+    const modeMultiplier = modeMultipliers[mode] || 1.0;
+    
+    // Coverage type multipliers
+    const typeMultipliers = {
+      'standard': 1.0,
+      'premium': 1.5,
+      'enterprise': 2.0
+    };
+    
+    const typeMultiplier = typeMultipliers[type as keyof typeof typeMultipliers] || 1.0;
+    
+    // Duration multiplier
+    const durationDays = Math.ceil(
+      (new Date(quoteData.endDate).getTime() - new Date(quoteData.startDate).getTime()) / (1000 * 60 * 60 * 24)
+    );
+    const durationMultiplier = Math.max(1, durationDays / 30);
+    
+    // Calculate final premium
+    let calculatedPremium = baseRate * cargoMultiplier * modeMultiplier * typeMultiplier * durationMultiplier;
+    
+    // Apply minimum premium ($450 for standard, $675 for premium, $900 for enterprise)
+    const minimumPremiums = {
+      'standard': 450,
+      'premium': 675,
+      'enterprise': 900
+    };
+    
+    const minimum = minimumPremiums[type as keyof typeof minimumPremiums] || 0;
+    
+    if (calculatedPremium < minimum) {
+      calculatedPremium = minimum;
+    }
+    
+    return Math.round(calculatedPremium);
   }
-  
-  // Round to nearest dollar
-  return Math.round(calculatedPremium);
-}
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -284,19 +272,43 @@ export default function InsuranceQuotePage() {
     return modeMap[mode.toLowerCase()] || mode;
   };
 
-  const handleApproveQuote = () => {
-    if (!quoteData) return;
-    
-    // Save selected coverage to localStorage
-    const quoteDataToSave = {
-      ...quoteData,
-      selectedCoverage,
-      coverageDetails: coverageOptions.find(coverage => coverage.id === selectedCoverage)
-    };
-    localStorage.setItem('quote_coverage_selection', JSON.stringify(quoteDataToSave));
-    
-    router.push('/quotes/review?coverage=' + selectedCoverage + '&quote_id=' + (quoteData?.quoteId || ''));
+  const handleDownloadDocuments = () => {
+  if (!quoteData) return;
+  
+  // Get the selected coverage data without React components
+  const selectedCoverageData = coverageOptions.find(coverage => coverage.id === selectedCoverage);
+  
+  // Create a simplified version without React components
+  const simplifiedCoverageDetails = selectedCoverageData ? {
+    id: selectedCoverageData.id,
+    name: selectedCoverageData.name,
+    description: selectedCoverageData.description,
+    premium: selectedCoverageData.premium,
+    deductible: selectedCoverageData.deductible,
+    coverage: selectedCoverageData.coverage,
+    features: selectedCoverageData.features,
+    badge: selectedCoverageData.badge
+  } : null;
+  
+  const quoteDataToSave = {
+    ...quoteData,
+    selectedCoverage,
+    coverageDetails: simplifiedCoverageDetails,
+    orderSummary: {
+      basePremium: simplifiedCoverageDetails?.premium || 0,
+      deductible: simplifiedCoverageDetails?.deductible || 0,
+      serviceFee: 99,
+      taxes: Math.round((simplifiedCoverageDetails?.premium || 0) * 0.08),
+      totalAmount: (simplifiedCoverageDetails?.premium || 0) + 99 + Math.round((simplifiedCoverageDetails?.premium || 0) * 0.08)
+    },
+    timestamp: new Date().toISOString()
   };
+  
+  localStorage.setItem('quote_coverage_selection', JSON.stringify(quoteDataToSave));
+  
+  // Navigate to documents page
+  router.push('/quotes/new/documents');
+};
 
   const handleModifyInputs = () => {
     router.back();
@@ -339,12 +351,18 @@ export default function InsuranceQuotePage() {
     );
   }
 
+  const selectedCoverageData = coverageOptions.find(coverage => coverage.id === selectedCoverage);
+  const basePremium = selectedCoverageData?.premium || 0;
+  const deductible = selectedCoverageData?.deductible || 0;
+  const serviceFee = 99;
+  const taxes = Math.round(basePremium * 0.08);
+  const totalAmount = basePremium + serviceFee + taxes;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <DashboardHeader userEmail="client@example.com" />
       
       <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header with Breadcrumb */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -382,7 +400,6 @@ export default function InsuranceQuotePage() {
             </div>
           </div>
 
-          {/* Progress Steps */}
           <div className="mb-8">
             <div className="flex items-center justify-between max-w-2xl">
               <div className="flex items-center">
@@ -415,7 +432,7 @@ export default function InsuranceQuotePage() {
                     3
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm font-medium text-gray-500">Review & Payment</p>
+                    <p className="text-sm font-medium text-gray-500">Document Download</p>
                     <p className="text-xs text-gray-500">Up next</p>
                   </div>
                 </div>
@@ -424,11 +441,8 @@ export default function InsuranceQuotePage() {
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Quote Details */}
           <div className="lg:col-span-2 space-y-6 w-[102%]">
-            {/* Quote Summary Card */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold text-gray-900">Shipment Summary</h2>
@@ -475,7 +489,6 @@ export default function InsuranceQuotePage() {
               </div>
             </div>
 
-            {/* Coverage Options */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
@@ -485,9 +498,7 @@ export default function InsuranceQuotePage() {
                 <div className="text-right">
                   <p className="text-sm text-gray-500">Estimated Premium</p>
                   <p className="text-2xl font-bold text-blue-600">
-                    {formatCurrency(
-                      coverageOptions.find(coverage => coverage.id === selectedCoverage)?.premium || 0
-                    )}
+                    {formatCurrency(basePremium)}
                   </p>
                 </div>
               </div>
@@ -572,7 +583,6 @@ export default function InsuranceQuotePage() {
               </div>
             </div>
 
-            {/* Coverage Details */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Coverage Details</h3>
               <div className="space-y-4">
@@ -613,9 +623,7 @@ export default function InsuranceQuotePage() {
             </div>
           </div>
 
-          {/* Right Column - Summary & Actions */}
           <div className="space-y-6">
-            {/* Order Summary */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
               
@@ -623,32 +631,26 @@ export default function InsuranceQuotePage() {
                 <div className="flex justify-between items-center pb-3 border-b border-gray-200">
                   <span className="text-gray-600">Base Premium</span>
                   <span className="font-medium text-gray-900">
-                    {formatCurrency(
-                      coverageOptions.find(coverage => coverage.id === selectedCoverage)?.premium || 0
-                    )}
+                    {formatCurrency(basePremium)}
                   </span>
                 </div>
                 
                 <div className="flex justify-between items-center pb-3 border-b border-gray-200">
                   <span className="text-gray-600">Deductible</span>
                   <span className="font-medium text-gray-900">
-                    {formatCurrency(
-                      coverageOptions.find(coverage => coverage.id === selectedCoverage)?.deductible || 0
-                    )}
+                    {formatCurrency(deductible)}
                   </span>
                 </div>
                 
                 <div className="flex justify-between items-center pb-3 border-b border-gray-200">
                   <span className="text-gray-600">Service Fee</span>
-                  <span className="font-medium text-gray-900">$99</span>
+                  <span className="font-medium text-gray-900">{formatCurrency(serviceFee)}</span>
                 </div>
                 
                 <div className="flex justify-between items-center pb-3 border-b border-gray-200">
                   <span className="text-gray-600">Taxes</span>
                   <span className="font-medium text-gray-900">
-                    {formatCurrency(
-                      (coverageOptions.find(coverage => coverage.id === selectedCoverage)?.premium || 0) * 0.08
-                    )}
+                    {formatCurrency(taxes)}
                   </span>
                 </div>
                 
@@ -656,11 +658,7 @@ export default function InsuranceQuotePage() {
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-semibold text-gray-900">Total Amount</span>
                     <span className="text-xl font-bold text-blue-600">
-                      {formatCurrency(
-                        (coverageOptions.find(coverage => coverage.id === selectedCoverage)?.premium || 0) + 
-                        99 + 
-                        ((coverageOptions.find(coverage => coverage.id === selectedCoverage)?.premium || 0) * 0.08)
-                      )}
+                      {formatCurrency(totalAmount)}
                     </span>
                   </div>
                   <p className="text-xs text-gray-500 text-right mt-1">Due upon approval</p>
@@ -669,11 +667,11 @@ export default function InsuranceQuotePage() {
               
               <div className="mt-6 space-y-3">
                 <button
-                  onClick={handleApproveQuote}
+                  onClick={handleDownloadDocuments}
                   className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
                 >
-                  <CreditCard className="w-4 h-4" />
-                  Continue to Payment
+                  <Download className="w-4 h-4" />
+                  Download Documents
                 </button>
                 
                 <button
@@ -694,7 +692,6 @@ export default function InsuranceQuotePage() {
               </div>
             </div>
 
-            {/* Support Card */}
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100 p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
@@ -733,7 +730,6 @@ export default function InsuranceQuotePage() {
               </button>
             </div>
 
-            {/* Timeline */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h4 className="font-semibold text-gray-900 mb-4">Next Steps</h4>
               <div className="space-y-4">
@@ -742,8 +738,8 @@ export default function InsuranceQuotePage() {
                     <div className="w-2 h-2 rounded-full bg-blue-600"></div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">Review & Payment</p>
-                    <p className="text-xs text-gray-500">Complete payment to activate coverage</p>
+                    <p className="text-sm font-medium text-gray-900">Document Download</p>
+                    <p className="text-xs text-gray-500">Download quote and insurance documents</p>
                   </div>
                 </div>
                 
@@ -752,8 +748,8 @@ export default function InsuranceQuotePage() {
                     <div className="w-2 h-2 rounded-full bg-gray-400"></div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Policy Issuance</p>
-                    <p className="text-xs text-gray-500">Receive documents within 1 hour</p>
+                    <p className="text-sm font-medium text-gray-500">Review Documents</p>
+                    <p className="text-xs text-gray-500">Review terms and conditions</p>
                   </div>
                 </div>
                 
@@ -762,8 +758,8 @@ export default function InsuranceQuotePage() {
                     <div className="w-2 h-2 rounded-full bg-gray-400"></div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Coverage Active</p>
-                    <p className="text-xs text-gray-500">From shipment start date</p>
+                    <p className="text-sm font-medium text-gray-500">Finalize Quote</p>
+                    <p className="text-xs text-gray-500">Accept and finalize your insurance quote</p>
                   </div>
                 </div>
               </div>
