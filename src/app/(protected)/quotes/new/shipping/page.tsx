@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { ArrowLeft, AlertCircle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, AlertCircle, CheckCircle, Ship, Plane, Truck } from 'lucide-react';
 import DashboardHeader from '@/app/components/dashboard/DashboardHeader';
 import CustomDatePicker from './components/CustomDatePicker';
 import LocationIQAutocomplete from './components/LocationIQAutocomplete';
@@ -27,9 +27,9 @@ export default function ShippingValuePage() {
   const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
 
   const transportModes = [
-    { id: 'sea', name: 'Sea Freight', icon: 'Ship', color: 'blue' },
-    { id: 'air', name: 'Air Freight', icon: 'Plane', color: 'emerald' },
-    { id: 'road', name: 'Road Freight', icon: 'Truck', color: 'amber' },
+    { id: 'sea', name: 'Sea Freight', icon: Ship, color: 'blue' },
+    { id: 'air', name: 'Air Freight', icon: Plane, color: 'emerald' },
+    { id: 'road', name: 'Road Freight', icon: Truck, color: 'amber' },
   ];
 
   const steps = [
@@ -268,49 +268,50 @@ export default function ShippingValuePage() {
                     
                     <div className="flex flex-col sm:flex-row sm:justify-between gap-3">
                       {transportModes.map((mode) => {
-                        const transportDescriptions = {
-                          'sea': '20-40 days',
-                          'air': '2-7 days', 
-                          'road': '3-10 days'
-                        };
-                        
-                        return (
-                          <button
-                            key={mode.id}
-                            type="button"
-                            onClick={() => setTransportationMode(mode.id)}
-                            className={`
-                              w-full sm:w-[32.7%] relative p-4 rounded-xl border-2 transition-all duration-200
-                              flex flex-col sm:flex-col items-center gap-3 md:gap-4 mb-0
-                              ${transportationMode === mode.id
-                                ? 'border-blue-500 bg-blue-50'
-                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                              }
-                            `}
-                          >
-                            <div className={`
-                              p-3 rounded-lg
-                              ${transportationMode === mode.id
-                                ? `bg-blue-100 text-blue-600`
-                                : 'bg-gray-100 text-gray-500'
-                              }
-                            `}>
-                              {mode.id === 'sea' ? '🚢' : mode.id === 'air' ? '✈️' : '🚚'}
-                            </div>
-                            <div className="flex-1 text-center">
-                              <div className="font-medium text-gray-900 text-sm md:text-base">{mode.name}</div>
-                              <div className="text-xs md:text-sm text-gray-500">
-                                {transportDescriptions[mode.id as keyof typeof transportDescriptions]}
-                              </div>
-                            </div>
-                            {transportationMode === mode.id && (
-                              <div className="w-5 h-5 absolute top-2 right-2 rounded-full bg-blue-500 flex items-center justify-center">
-                                <CheckCircle className="w-3 h-3 text-white" />
-                              </div>
-                            )}
-                          </button>
-                        );
-                      })}
+          const Icon = mode.icon;
+          const transportDescriptions = {
+            'sea': '20-40 days',
+            'air': '2-7 days', 
+            'road': '3-10 days'
+          };
+          
+          return (
+            <button
+              key={mode.id}
+              type="button"
+              onClick={() => setTransportationMode(mode.id)}
+              className={`
+                w-full sm:w-[32.7%] relative p-4 rounded-xl border-2 transition-all duration-200
+                flex flex-col sm:flex-col items-center gap-3 md:gap-4 mb-0
+                ${transportationMode === mode.id
+                  ? 'border-blue-500 bg-blue-50'
+                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                }
+              `}
+            >
+              <div className={`
+                p-3 rounded-lg flex items-center justify-center
+                ${transportationMode === mode.id
+                  ? `bg-blue-100 text-blue-600`
+                  : 'bg-gray-100 text-gray-500'
+                }
+              `}>
+                <Icon className="w-5 h-5" />
+              </div>
+              <div className="flex-1 text-center">
+                <div className="font-medium text-gray-900 text-sm md:text-base">{mode.name}</div>
+                <div className="text-xs md:text-sm text-gray-500">
+                  {transportDescriptions[mode.id as keyof typeof transportDescriptions]}
+                </div>
+              </div>
+              {transportationMode === mode.id && (
+                <div className="w-5 h-5 absolute top-2 right-2 rounded-full bg-blue-500 flex items-center justify-center">
+                  <CheckCircle className="w-3 h-3 text-white" />
+                </div>
+              )}
+            </button>
+          );
+        })}
                     </div>
                   </div>
                 </div>
