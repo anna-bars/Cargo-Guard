@@ -144,7 +144,7 @@ const CustomDatePicker = ({
       >
         <div className="flex items-center gap-3">
           <Calendar className="h-5 w-5 text-gray-400" />
-          <span className={value ? "text-gray-900" : "text-gray-500"}>
+          <span className={`${value ? "text-gray-900" : "text-gray-500"} text-sm md:text-base truncate max-w-[160px] md:max-w-none`}>
             {value ? formatDate(new Date(value)) : placeholder}
           </span>
         </div>
@@ -152,7 +152,7 @@ const CustomDatePicker = ({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 bg-white rounded-xl shadow-lg border border-gray-200 p-4 w-80">
+        <div className="absolute z-50 mt-1 bg-white rounded-xl shadow-lg border border-gray-200 p-4 w-full md:w-80">
           <div className="flex items-center justify-between mb-4">
             <button
               type="button"
@@ -161,7 +161,7 @@ const CustomDatePicker = ({
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <div className="font-semibold text-gray-900">
+            <div className="font-semibold text-gray-900 text-sm md:text-base">
               {months[currentMonth.getMonth()]} {currentMonth.getFullYear()}
             </div>
             <button
@@ -175,7 +175,7 @@ const CustomDatePicker = ({
 
           <div className="grid grid-cols-7 gap-1 mb-2">
             {days.map(day => (
-              <div key={day} className="text-center text-sm font-medium text-gray-500 py-1">
+              <div key={day} className="text-center text-xs md:text-sm font-medium text-gray-500 py-1">
                 {day}
               </div>
             ))}
@@ -199,7 +199,7 @@ const CustomDatePicker = ({
                   onClick={() => handleDateSelect(day)}
                   disabled={disabled}
                   className={`
-                    h-8 rounded-lg text-sm transition-all duration-200
+                    h-8 rounded-lg text-xs md:text-sm transition-all duration-200
                     ${selected
                       ? 'bg-blue-500 text-white hover:bg-blue-600'
                       : today
@@ -656,7 +656,7 @@ const LocationIQAutocomplete = ({
             console.log('👁️ Input blurred');
           }}
           placeholder={placeholder}
-          className="pl-10 pr-10 w-full h-12 px-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-colors"
+          className="pl-10 pr-10 w-full h-12 px-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-colors text-sm md:text-base placeholder:text-sm md:placeholder:text-base placeholder:text-gray-400"
           required={required && !value}
         />
         
@@ -680,15 +680,15 @@ const LocationIQAutocomplete = ({
       {value && (
         <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-100">
           <div className="flex items-start justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <div className="flex items-center gap-1">
                   {getIcon(value.type)}
-                  <span className="text-sm font-medium text-blue-900 ml-1">
+                  <span className="text-sm font-medium text-blue-900 ml-1 truncate">
                     {value.name}
                   </span>
                 </div>
-                <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                <span className={`px-2 py-0.5 text-xs font-medium rounded-full flex-shrink-0 ${
                   value.type === 'port' 
                     ? 'bg-blue-100 text-blue-800'
                     : value.type === 'airport'
@@ -698,7 +698,7 @@ const LocationIQAutocomplete = ({
                   {getTypeLabel(value.type)}
                 </span>
               </div>
-              <div className="text-xs text-gray-600">
+              <div className="text-xs text-gray-600 truncate">
                 {value.city}, {value.country}
               </div>
               {value.portCode && (
@@ -707,7 +707,7 @@ const LocationIQAutocomplete = ({
                 </div>
               )}
             </div>
-            <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+            <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 ml-2" />
           </div>
         </div>
       )}
@@ -747,14 +747,14 @@ const LocationIQAutocomplete = ({
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium text-gray-900 truncate">
+                    <div className="font-medium text-gray-900 truncate text-sm md:text-base">
                       {feature.display_name.split(',')[0]}
                     </div>
-                    <div className="text-sm text-gray-500 truncate">
+                    <div className="text-xs md:text-sm text-gray-500 truncate">
                       {feature.display_name.split(',').slice(1).join(',').trim() || 
                       `${feature.address?.city || ''}, ${feature.address?.country || ''}`}
                     </div>
-                    <div className="mt-1 flex items-center gap-2">
+                    <div className="mt-1 flex items-center gap-2 flex-wrap">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
                         type === 'port' ? 'bg-blue-100 text-blue-800' :
                         type === 'airport' ? 'bg-purple-100 text-purple-800' :
@@ -836,6 +836,7 @@ const MobileTipsCard = ({ completionPercentage }: { completionPercentage: number
     </div>
   );
 };
+
 const MobileStepIndicator = ({ currentStep }: { currentStep: number }) => {
   const steps = [
     { id: 1, name: 'Shipment Details' },
@@ -858,6 +859,7 @@ export default function ShippingValuePage() {
   const [transportationMode, setTransportationMode] = useState('');
   const [step, setStep] = useState(1);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [otherCargoType, setOtherCargoType] = useState(''); // Նոր state other-ի համար
 
   const today = new Date().toISOString().split('T')[0];
   const tomorrow = new Date();
@@ -886,11 +888,23 @@ export default function ShippingValuePage() {
     { id: 3, name: 'Quote Review', status: 'upcoming' },
   ];
 
+  // Ֆունկցիա cargo type ընտրելու համար
+  const handleCargoTypeSelect = (type: string) => {
+    setCargoType(type);
+    // Եթե ընտրված է այլ տարբերակ, ապա մաքրում ենք otherCargoType դաշտը
+    if (type !== 'other') {
+      setOtherCargoType('');
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Ստեղծում ենք վերջնական cargo type-ը
+    const finalCargoType = cargoType === 'other' ? otherCargoType : cargoType;
+    
     const formData = {
-      cargoType,
+      cargoType: finalCargoType,
       shipmentValue: parseFloat(shipmentValue),
       origin: origin ? {
         name: origin.name,
@@ -930,6 +944,7 @@ export default function ShippingValuePage() {
   const handleCancel = () => {
     if (window.confirm('Are you sure you want to cancel? All entered data will be lost.')) {
       setCargoType('');
+      setOtherCargoType('');
       setShipmentValue('');
       setOrigin(null);
       setDestination(null);
@@ -940,8 +955,9 @@ export default function ShippingValuePage() {
     }
   };
 
+  // Update completed fields to include otherCargoType
   const completedFields = [
-    !!cargoType,
+    cargoType === 'other' ? !!otherCargoType : !!cargoType, // Կա եթե other է, պետք է լինի otherCargoType
     !!shipmentValue,
     !!origin,
     !!destination,
@@ -1013,15 +1029,16 @@ export default function ShippingValuePage() {
             </div>
           </div>
         </div>
-<div className="flex items-center gap-3 mt-0 mb-2 sm:mt-0">
-                  <img
-                    src="/quotes/header-ic.svg"
-                    alt=""
-                    className="w-[22px] h-[22px] sm:w-6 sm:h-6"
-                  />
-                  <h2 className="font-normal text-[18px] sm:text-[26px]">Shipment Insurance Quote</h2>
-                   
-                </div> 
+        
+        <div className="flex items-center gap-3 mt-0 mb-2 sm:mt-0">
+          <img
+            src="/quotes/header-ic.svg"
+            alt=""
+            className="w-[22px] h-[22px] sm:w-6 sm:h-6"
+          />
+          <h2 className="font-normal text-[18px] sm:text-[26px]">Shipment Insurance Quote</h2>
+        </div> 
+
         {/* Mobile Header */}
         <MobileStepIndicator currentStep={step} />
         <MobileTipsCard completionPercentage={completionPercentage} />
@@ -1049,7 +1066,7 @@ export default function ShippingValuePage() {
                             <button
                               key={option.value}
                               type="button"
-                              onClick={() => setCargoType(option.value)}
+                              onClick={() => handleCargoTypeSelect(option.value)}
                               className={`
                                 p-3 md:p-4 rounded-xl border-2 transition-all duration-200
                                 ${cargoType === option.value
@@ -1076,6 +1093,32 @@ export default function ShippingValuePage() {
                           );
                         })}
                       </div>
+                      
+                      {/* Other Cargo Type Input Field - ցուցադրվում է միայն երբ ընտրված է Other */}
+                      {cargoType === 'other' && (
+                        <div className="mt-4 animate-fadeIn">
+                          <label className="block text-sm font-medium text-[#868686] mb-2">
+                            Please specify cargo type *
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              value={otherCargoType}
+                              onChange={(e) => setOtherCargoType(e.target.value)}
+                              placeholder="Enter cargo type"
+                              className="w-full h-12 px-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-colors text-sm md:text-base placeholder:text-sm md:placeholder:text-base"
+                              required
+                              maxLength={50}
+                            />
+                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                              <Box className="h-5 w-5 text-gray-400" />
+                            </div>
+                          </div>
+                          <p className="mt-1 text-xs text-gray-500">
+                            Please provide a detailed description of your cargo
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     <div>
@@ -1091,7 +1134,7 @@ export default function ShippingValuePage() {
                           value={shipmentValue}
                           onChange={(e) => setShipmentValue(e.target.value)}
                           placeholder="Enter total value"
-                          className="pl-10 w-full h-12 px-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-colors"
+                          className="pl-10 w-full h-12 px-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-colors text-sm md:text-base placeholder:text-sm md:placeholder:text-base"
                           required
                           min="0"
                           step="0.01"
@@ -1115,7 +1158,7 @@ export default function ShippingValuePage() {
                       <LocationIQAutocomplete
                         value={origin}
                         onChange={setOrigin}
-                        placeholder="Search port, airport, or city..."
+                        placeholder="Search location..."
                         label="Origin *"
                         required
                       />
@@ -1125,7 +1168,7 @@ export default function ShippingValuePage() {
                       <LocationIQAutocomplete
                         value={destination}
                         onChange={setDestination}
-                        placeholder="Search port, airport, or city..."
+                        placeholder="Search location..."
                         label="Destination *"
                         required
                       />
@@ -1148,7 +1191,7 @@ export default function ShippingValuePage() {
                         <CustomDatePicker
                           value={startDate || today}
                           onChange={setStartDate}
-                          placeholder="Select start date"
+                          placeholder="Start date"
                           minDate={today}
                         />
                       </div>
@@ -1160,7 +1203,7 @@ export default function ShippingValuePage() {
                         <CustomDatePicker
                           value={endDate || tomorrowFormatted}
                           onChange={setEndDate}
-                          placeholder="Select end date"
+                          placeholder="End date"
                           minDate={startDate || today}
                         />
                       </div>
@@ -1175,6 +1218,12 @@ export default function ShippingValuePage() {
                     <div className="flex flex-col sm:flex-row sm:justify-between gap-3">
                       {transportModes.map((mode) => {
                         const Icon = mode.icon;
+                        const transportDescriptions = {
+                          'sea': '20-40 days',
+                          'air': '2-7 days', 
+                          'road': '3-10 days'
+                        };
+                        
                         return (
                           <button
                             key={mode.id}
@@ -1201,9 +1250,7 @@ export default function ShippingValuePage() {
                             <div className="flex-1 text-center">
                               <div className="font-medium text-gray-900 text-sm md:text-base">{mode.name}</div>
                               <div className="text-xs md:text-sm text-gray-500">
-                                {mode.id === 'sea' && 'Most economical, 20-40 days'}
-                                {mode.id === 'air' && 'Fastest option, 2-7 days'}
-                                {mode.id === 'road' && 'Regional delivery, 3-10 days'}
+                                {transportDescriptions[mode.id as keyof typeof transportDescriptions]}
                               </div>
                             </div>
                             {transportationMode === mode.id && (
@@ -1223,7 +1270,7 @@ export default function ShippingValuePage() {
                   <button
                     type="button"
                     onClick={handleCancel}
-                    className="w-full sm:w-auto px-6 py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                    className="w-full sm:w-auto px-6 py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors font-medium text-sm md:text-base"
                   >
                     Cancel
                   </button>
@@ -1232,14 +1279,14 @@ export default function ShippingValuePage() {
                     <button
                       type="button"
                       onClick={() => setStep(step - 1)}
-                      className="w-full sm:w-auto px-6 py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors font-medium order-2 sm:order-1"
+                      className="w-full sm:w-auto px-6 py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors font-medium text-sm md:text-base order-2 sm:order-1"
                     >
                       Previous
                     </button>
                     <button
                       type="submit"
                       disabled={!isFormComplete}
-                      className="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl order-1 sm:order-2"
+                      className="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl text-sm md:text-base order-1 sm:order-2"
                     >
                       Continue to Coverage Options
                     </button>
@@ -1323,6 +1370,37 @@ export default function ShippingValuePage() {
           </button>
         </div>
       </div>
+      
+      {/* CSS for fadeIn animation */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+        
+        /* Mobile-specific input text scaling */
+        @media (max-width: 640px) {
+          input::placeholder {
+            font-size: 14px;
+          }
+          input {
+            font-size: 14px;
+          }
+          .text-sm-mobile {
+            font-size: 14px;
+          }
+        }
+      `}</style>
     </div>
   );
 }
