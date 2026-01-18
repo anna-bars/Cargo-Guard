@@ -2,7 +2,25 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, CheckCircle, ChevronRight, Info } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  CheckCircle, 
+  ChevronRight, 
+  CreditCard,
+  HelpCircle,
+  Shield,
+  AlertCircle,
+  Zap,
+  Clock,
+  MapPin,
+  Package,
+  DollarSign,
+  Calendar,
+  Truck,
+  BadgeCheck,
+  Users,
+  Phone
+} from 'lucide-react';
 import DashboardHeader from '@/app/components/dashboard/DashboardHeader';
 
 interface QuoteData {
@@ -32,20 +50,21 @@ interface CoverageOption {
   deductible: number;
   features: string[];
   color: string;
+  badge: string;
+  icon: React.ReactNode;
 }
 
 export default function InsuranceQuotePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [quoteData, setQuoteData] = useState<QuoteData | null>(null);
-  const [selectedCoverage, setSelectedCoverage] = useState<string>('standard');
+  const [selectedCoverage, setSelectedCoverage] = useState<string>('premium');
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'overview' | 'coverage' | 'documents'>('overview');
 
-  // Demo data - իրականում պետք է ստանաք URL-ից կամ API-ից
   useEffect(() => {
-    // Սիմուլյացիա՝ տվյալների ստացում
     const mockData: QuoteData = {
-      cargoType: 'Electronics',
+      cargoType: 'Electronics & Consumer Goods',
       shipmentValue: 45000,
       origin: {
         name: 'New York Port',
@@ -59,7 +78,7 @@ export default function InsuranceQuotePage() {
       },
       startDate: '2025-12-10',
       endDate: '2025-12-25',
-      transportationMode: 'Air'
+      transportationMode: 'Air Freight'
     };
 
     setQuoteData(mockData);
@@ -70,40 +89,70 @@ export default function InsuranceQuotePage() {
     {
       id: 'standard',
       name: 'Standard Coverage',
-      description: 'Base protection for loss or damage.',
+      description: 'Essential protection for common risks during transit.',
       premium: calculatePremium('standard'),
-      coverage: ['All Risks', 'Theft', 'Accidental Damage'],
+      coverage: ['All Risks', 'Theft Protection', 'Accidental Damage', 'Basic Liability'],
       deductible: 1000,
-      features: ['Basic coverage', 'Standard response time', 'Email support'],
-      color: 'border-[#7dabf1]'
+      features: ['Standard claims processing', 'Email support', 'Basic tracking'],
+      color: 'from-gray-100 to-gray-50',
+      badge: 'Popular',
+      icon: <Shield className="w-5 h-5 text-gray-600" />
     },
     {
       id: 'premium',
       name: 'Premium Coverage',
-      description: 'Includes war, strike, and special risk coverage.',
+      description: 'Comprehensive protection including special risks and priority service.',
       premium: calculatePremium('premium'),
-      coverage: ['All Risks', 'War Risks', 'Strike Coverage', 'Special Perils'],
+      coverage: ['All Risks +', 'War & Political Risks', 'Strike Coverage', 'Cyber Protection', 'Delay Compensation'],
       deductible: 500,
       features: [
-        'Extended coverage',
-        '24/7 emergency support',
-        'Priority claims processing',
-        'Dedicated account manager'
+        '24/7 Priority Support',
+        'Dedicated Risk Manager',
+        'Expedited Claims (<24h)',
+        'Real-time Tracking',
+        'Monthly Risk Reports'
       ],
-      color: 'border-transparent'
+      color: 'from-blue-50 to-indigo-50',
+      badge: 'Recommended',
+      icon: <Zap className="w-5 h-5 text-blue-600" />
+    },
+    {
+      id: 'enterprise',
+      name: 'Enterprise Plan',
+      description: 'Maximum protection with white-glove service for high-value shipments.',
+      premium: calculatePremium('enterprise'),
+      coverage: ['All Inclusive', 'War & Terrorism', 'Customs Delay', 'Inventory Protection', 'Revenue Loss'],
+      deductible: 250,
+      features: [
+        '24/7 Dedicated Team',
+        'Same-day Claims',
+        'Custom Coverage',
+        'API Integration',
+        'Quarterly Reviews'
+      ],
+      color: 'from-purple-50 to-pink-50',
+      badge: 'Enterprise',
+      icon: <BadgeCheck className="w-5 h-5 text-purple-600" />
     }
   ];
 
   function calculatePremium(type: string): number {
     if (!quoteData) return 0;
     
-    const baseRate = quoteData.shipmentValue * 0.015; // 1.5% base rate
-    const modeMultiplier = quoteData.transportationMode === 'Air' ? 1.2 : 1.0;
-    const typeMultiplier = type === 'premium' ? 1.5 : 1.0;
+    const baseRate = quoteData.shipmentValue * 0.015;
+    const modeMultiplier = quoteData.transportationMode.includes('Air') ? 1.2 : 1.0;
+    
+    const typeMultipliers = {
+      'standard': 1.0,
+      'premium': 1.5,
+      'enterprise': 2.0
+    };
+    
+    const typeMultiplier = typeMultipliers[type as keyof typeof typeMultipliers] || 1.0;
     const durationDays = Math.ceil(
       (new Date(quoteData.endDate).getTime() - new Date(quoteData.startDate).getTime()) / (1000 * 60 * 60 * 24)
     );
-    const durationMultiplier = durationDays / 30; // Monthly rate
+    const durationMultiplier = Math.max(1, durationDays / 30);
     
     return Math.round(baseRate * modeMultiplier * typeMultiplier * durationMultiplier);
   }
@@ -126,14 +175,8 @@ export default function InsuranceQuotePage() {
     });
   };
 
-  const formatDateRange = () => {
-    if (!quoteData) return '';
-    return `${formatDate(quoteData.startDate)} – ${formatDate(quoteData.endDate)}`;
-  };
-
   const handleApproveQuote = () => {
-    // Այստեղ ավելացրեք API call կամ navigation դեպի վճարման էջ
-    alert('Quote approved! Proceeding to payment...');
+    router.push('/quotes/review?coverage=' + selectedCoverage);
   };
 
   const handleModifyInputs = () => {
@@ -142,11 +185,14 @@ export default function InsuranceQuotePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="min-h-screen bg-gray-50">
         <DashboardHeader userEmail="client@example.com" />
-        <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-center h-96">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-2 border-blue-600 border-t-transparent mx-auto mb-4"></div>
+              <p className="text-gray-600">Generating your quote...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -154,245 +200,266 @@ export default function InsuranceQuotePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gray-50">
       <DashboardHeader userEmail="client@example.com" />
       
-      <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Breadcrumb */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header with Breadcrumb */}
         <div className="mb-8">
-          <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-            <button 
-              onClick={() => router.push('/quotes/new/shipping')}
-              className="flex items-center gap-2 hover:text-gray-700 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to Shipment Details</span>
-            </button>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-gray-900 font-medium">Insurance Quote</span>
-          </div>
-          
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-2xl font-bold text-gray-900">Your Insurance Quote</h1>
-              <span className="text-sm text-gray-500">Step 2 of 3</span>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                <button 
+                  onClick={() => router.push('/dashboard')}
+                  className="flex items-center gap-2 hover:text-gray-700 transition-colors"
+                >
+                  Dashboard
+                </button>
+                <ChevronRight className="w-3 h-3" />
+                <button 
+                  onClick={() => router.push('/quotes')}
+                  className="hover:text-gray-700 transition-colors"
+                >
+                  Quotes
+                </button>
+                <ChevronRight className="w-3 h-3" />
+                <span className="text-gray-900 font-medium">New Quote</span>
+              </div>
+              <h1 className="text-3xl font-bold text-gray-900">Insurance Quote</h1>
+              <p className="text-gray-600 mt-2">Review and customize your coverage options</p>
             </div>
             
-            <div className="flex items-center">
-              <div className="flex items-center">
-                <div className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-green-500 bg-green-500 text-white">
-                  <CheckCircle className="w-4 h-4" />
-                </div>
-                <span className="ml-2 text-sm font-medium text-green-600">Shipment Details</span>
+            <div className="hidden lg:flex items-center gap-4">
+              <div className="text-right">
+                <p className="text-sm text-gray-500">Quote ID</p>
+                <p className="font-mono font-medium">#INS-2024-7890</p>
               </div>
-              
-              <div className="h-0.5 w-16 mx-4 bg-green-500" />
-              
-              <div className="flex items-center">
-                <div className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-blue-600 bg-blue-600 text-white">
-                  2
-                </div>
-                <span className="ml-2 text-sm font-medium text-blue-600">Coverage Options</span>
+              <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                <Shield className="w-5 h-5 text-blue-600" />
               </div>
-              
-              <div className="h-0.5 w-16 mx-4 bg-gray-300" />
-              
+            </div>
+          </div>
+
+          {/* Progress Steps */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between max-w-2xl">
               <div className="flex items-center">
-                <div className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-gray-300 bg-white text-gray-400">
-                  3
+                <div className="flex items-center">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white">
+                    <CheckCircle className="w-5 h-5" />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-gray-900">Shipment Details</p>
+                    <p className="text-xs text-gray-500">Completed</p>
+                  </div>
                 </div>
-                <span className="ml-2 text-sm font-medium text-gray-500">Quote Review</span>
+                
+                <div className="h-0.5 w-20 mx-4 bg-blue-600" />
+                
+                <div className="flex items-center">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white">
+                    2
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-gray-900">Coverage Options</p>
+                    <p className="text-xs text-gray-500">Current Step</p>
+                  </div>
+                </div>
+                
+                <div className="h-0.5 w-20 mx-4 bg-gray-300" />
+                
+                <div className="flex items-center">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full border-2 border-gray-300 bg-white text-gray-400">
+                    3
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-gray-500">Review & Payment</p>
+                    <p className="text-xs text-gray-500">Up next</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Quote Details */}
-          <div className="space-y-8">
+          <div className="lg:col-span-2 space-y-6">
+            {/* Quote Summary Card */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-gray-900">Shipment Summary</h2>
+                <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                  Active Quote
+                </span>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-gray-500">
+                    <Package className="w-4 h-4" />
+                    <span className="text-sm">Cargo Type</span>
+                  </div>
+                  <p className="font-medium">{quoteData?.cargoType}</p>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-gray-500">
+                    <DollarSign className="w-4 h-4" />
+                    <span className="text-sm">Shipment Value</span>
+                  </div>
+                  <p className="font-medium">{formatCurrency(quoteData?.shipmentValue || 0)}</p>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-gray-500">
+                    <MapPin className="w-4 h-4" />
+                    <span className="text-sm">Route</span>
+                  </div>
+                  <p className="font-medium">{quoteData?.origin.city} → {quoteData?.destination.city}</p>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-gray-500">
+                    <Truck className="w-4 h-4" />
+                    <span className="text-sm">Transport Mode</span>
+                  </div>
+                  <p className="font-medium">{quoteData?.transportationMode}</p>
+                </div>
+              </div>
+            </div>
+
             {/* Coverage Options */}
-            <div className="bg-[#fafcff] p-6 rounded-2xl">
-              <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-6">
-                <div className="mb-4 md:mb-0">
-                  <h2 className="font-medium text-[18px] md:text-xl text-black mb-1">
-                    Your Insurance Quote
-                  </h2>
-                  <p className="font-normal text-[12px] md:text-sm text-[#afafaf]">
-                    Total Premium Amount
-                  </p>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900 mb-2">Select Coverage Plan</h2>
+                  <p className="text-gray-600 text-sm">Choose the protection level that fits your needs</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl md:text-3xl font-bold text-blue-600">
+                  <p className="text-sm text-gray-500">Estimated Premium</p>
+                  <p className="text-2xl font-bold text-blue-600">
                     {formatCurrency(
                       coverageOptions.find(coverage => coverage.id === selectedCoverage)?.premium || 0
                     )}
-                  </div>
-                  <p className="text-xs md:text-sm text-gray-500 mt-1">
-                    per shipment
                   </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {coverageOptions.map((coverage) => (
                   <div
                     key={coverage.id}
                     className={`
-                      h-auto md:h-[148px] flex flex-col justify-between bg-[#eeeeff] p-4 rounded-2xl border border-solid 
-                      ${coverage.color}
-                      ${selectedCoverage === coverage.id ? 'ring-2 ring-blue-500' : ''}
-                      cursor-pointer transition-all duration-200 hover:shadow-md
+                      relative p-5 rounded-xl border-2 cursor-pointer transition-all duration-200
+                      ${selectedCoverage === coverage.id 
+                        ? 'border-blue-500 bg-gradient-to-br ' + coverage.color + ' shadow-lg' 
+                        : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                      }
                     `}
                     onClick={() => setSelectedCoverage(coverage.id)}
                   >
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="font-medium text-[16px] text-black mb-1">
-                          {coverage.name}
-                        </h3>
-                        <p className="font-normal text-[11px] text-[#afafaf]">
-                          {coverage.description}
-                        </p>
-                      </div>
-                      {selectedCoverage === coverage.id && (
-                        <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
-                          <CheckCircle className="w-3 h-3 text-white" />
+                    {selectedCoverage === coverage.id && (
+                      <div className="absolute -top-2 -right-2">
+                        <div className="bg-blue-500 text-white text-xs font-medium px-3 py-1 rounded-full">
+                          Selected
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
                     
-                    <div className="mt-4">
-                      <div className="text-xl md:text-2xl font-bold text-gray-900">
-                        {formatCurrency(coverage.premium)}
+                    {coverage.badge && (
+                      <div className="absolute -top-2 left-4">
+                        <div className={`px-3 py-1 rounded-full text-xs font-medium
+                          ${coverage.id === 'standard' ? 'bg-gray-100 text-gray-800' : ''}
+                          ${coverage.id === 'premium' ? 'bg-blue-100 text-blue-800' : ''}
+                          ${coverage.id === 'enterprise' ? 'bg-purple-100 text-purple-800' : ''}
+                        `}>
+                          {coverage.badge}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="text-xs text-gray-600">Deductible:</span>
-                        <span className="text-sm font-medium text-gray-900">
-                          {formatCurrency(coverage.deductible)}
-                        </span>
+                    )}
+
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-lg ${
+                            coverage.id === 'standard' ? 'bg-gray-100' :
+                            coverage.id === 'premium' ? 'bg-blue-100' : 'bg-purple-100'
+                          }`}>
+                            {coverage.icon}
+                          </div>
+                          <h3 className="font-semibold text-gray-900">{coverage.name}</h3>
+                        </div>
                       </div>
+                      
+                      <p className="text-sm text-gray-600 mb-4">{coverage.description}</p>
+                      
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-xs text-gray-500 mb-1">Premium</p>
+                          <p className="text-xl font-bold text-gray-900">
+                            {formatCurrency(coverage.premium)}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500 mb-1">Deductible</p>
+                          <p className="font-medium text-gray-900">
+                            {formatCurrency(coverage.deductible)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border-t border-gray-200 pt-4">
+                      <p className="text-xs font-medium text-gray-900 mb-2">Key Features:</p>
+                      <ul className="space-y-1">
+                        {coverage.features.slice(0, 3).map((feature, index) => (
+                          <li key={index} className="flex items-center gap-2">
+                            <CheckCircle className="w-3 h-3 text-green-500 flex-shrink-0" />
+                            <span className="text-xs text-gray-600">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Quote Summary */}
-            <div className="bg-[#fafcff] p-6 rounded-2xl">
-              <h2 className="font-medium text-[18px] md:text-xl text-black mb-6">
-                Quote Summary
-              </h2>
-
-              <div className="space-y-8">
-                {/* Row 1 */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-3">
-                    <span className="font-normal text-[16px] text-[#505050]">Cargo Type</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                        <span className="text-blue-600 text-lg">📦</span>
-                      </div>
-                      <span className="font-normal text-[24px] text-black">
-                        {quoteData?.cargoType || 'Electronics'}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <span className="font-normal text-[16px] text-[#505050]">Shipment Value</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
-                        <span className="text-green-600 text-lg">$</span>
-                      </div>
-                      <span className="font-normal text-[24px] text-black">
-                        {formatCurrency(quoteData?.shipmentValue || 45000)}
-                      </span>
-                    </div>
+            {/* Coverage Details */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Coverage Details</h3>
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-2">What's Covered:</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {coverageOptions
+                      .find(coverage => coverage.id === selectedCoverage)
+                      ?.coverage.map((item, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                          <span className="text-sm text-gray-700">{item}</span>
+                        </div>
+                      ))}
                   </div>
                 </div>
-
-                {/* Row 2 */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-3">
-                    <span className="font-normal text-[16px] text-[#505050]">Policy Coverage</span>
+                
+                <div className="pt-4 border-t border-gray-200">
+                  <h4 className="font-medium text-gray-900 mb-2">Claims Process:</h4>
+                  <div className="flex items-center gap-6">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
-                        <span className="text-purple-600 text-lg">🛡️</span>
-                      </div>
-                      <span className="font-normal text-[24px] text-black">
-                        {selectedCoverage === 'standard' ? 'Standard' : 'Premium'}
+                      <Clock className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm text-gray-600">
+                        {selectedCoverage === 'standard' ? '3-5 business days' : 
+                         selectedCoverage === 'premium' ? '<24 hours' : 'Same day'}
                       </span>
                     </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <span className="font-normal text-[16px] text-[#505050]">Transportation Mode</span>
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center">
-                        <span className="text-orange-600 text-lg">
-                          {quoteData?.transportationMode === 'Air' ? '✈️' : 
-                           quoteData?.transportationMode === 'Sea' ? '🚢' : '🚚'}
-                        </span>
-                      </div>
-                      <span className="font-normal text-[24px] text-black">
-                        {quoteData?.transportationMode || 'Air'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Row 3 */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-3">
-                    <span className="font-normal text-[16px] text-[#505050]">Coverage Period</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
-                        <span className="text-indigo-600 text-lg">📅</span>
-                      </div>
-                      <span className="font-normal text-[20px] md:text-[24px] text-black">
-                        {formatDateRange()}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <span className="font-normal text-[16px] text-[#505050]">Deductible</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
-                        <span className="text-red-600 text-lg">💰</span>
-                      </div>
-                      <span className="font-normal text-[24px] text-black">
-                        {formatCurrency(
-                          coverageOptions.find(coverage => coverage.id === selectedCoverage)?.deductible || 0
-                        )}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Row 4 */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-3">
-                    <span className="font-normal text-[16px] text-[#505050]">Route</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center">
-                        <span className="text-teal-600 text-lg">📍</span>
-                      </div>
-                      <span className="font-normal text-[20px] md:text-[24px] text-black">
-                        {quoteData?.origin.city || 'New York'} → {quoteData?.destination.city || 'Tokyo'}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <span className="font-normal text-[16px] text-[#505050]">Additional Fees</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
-                        <Info className="w-4 h-4 text-gray-600" />
-                      </div>
-                      <span className="font-normal text-[20px] text-black">
-                        $25 (Taxes/Fees)
+                      <Users className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm text-gray-600">
+                        {selectedCoverage === 'standard' ? 'Email Support' : 
+                         selectedCoverage === 'premium' ? '24/7 Priority Support' : 'Dedicated Team'}
                       </span>
                     </div>
                   </div>
@@ -401,76 +468,160 @@ export default function InsuranceQuotePage() {
             </div>
           </div>
 
-          {/* Right Column - Action Buttons */}
+          {/* Right Column - Summary & Actions */}
           <div className="space-y-6">
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Premium</span>
-                    <span className="font-medium text-gray-900">
-                      {formatCurrency(
-                        coverageOptions.find(coverage => coverage.id === selectedCoverage)?.premium || 0
-                      )}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Deductible</span>
-                    <span className="font-medium text-gray-900">
-                      {formatCurrency(
-                        coverageOptions.find(coverage => coverage.id === selectedCoverage)?.deductible || 0
-                      )}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Taxes & Fees</span>
-                    <span className="font-medium text-gray-900">$25</span>
-                  </div>
+            {/* Order Summary */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
+              
+              <div className="space-y-3">
+                <div className="flex justify-between items-center pb-3 border-b border-gray-200">
+                  <span className="text-gray-600">Base Premium</span>
+                  <span className="font-medium text-gray-900">
+                    {formatCurrency(
+                      coverageOptions.find(coverage => coverage.id === selectedCoverage)?.premium || 0
+                    )}
+                  </span>
                 </div>
                 
-                <div className="border-t border-gray-200 pt-4">
+                <div className="flex justify-between items-center pb-3 border-b border-gray-200">
+                  <span className="text-gray-600">Deductible</span>
+                  <span className="font-medium text-gray-900">
+                    {formatCurrency(
+                      coverageOptions.find(coverage => coverage.id === selectedCoverage)?.deductible || 0
+                    )}
+                  </span>
+                </div>
+                
+                <div className="flex justify-between items-center pb-3 border-b border-gray-200">
+                  <span className="text-gray-600">Service Fee</span>
+                  <span className="font-medium text-gray-900">$99</span>
+                </div>
+                
+                <div className="flex justify-between items-center pb-3 border-b border-gray-200">
+                  <span className="text-gray-600">Taxes</span>
+                  <span className="font-medium text-gray-900">
+                    {formatCurrency(
+                      (coverageOptions.find(coverage => coverage.id === selectedCoverage)?.premium || 0) * 0.08
+                    )}
+                  </span>
+                </div>
+                
+                <div className="pt-3">
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-semibold text-gray-900">Total Amount</span>
                     <span className="text-xl font-bold text-blue-600">
                       {formatCurrency(
-                        (coverageOptions.find(coverage => coverage.id === selectedCoverage)?.premium || 0) + 25
+                        (coverageOptions.find(coverage => coverage.id === selectedCoverage)?.premium || 0) + 
+                        99 + 
+                        ((coverageOptions.find(coverage => coverage.id === selectedCoverage)?.premium || 0) * 0.08)
                       )}
                     </span>
                   </div>
+                  <p className="text-xs text-gray-500 text-right mt-1">Due upon approval</p>
                 </div>
               </div>
-            </div>
-
-            <div className="space-y-4">
-              <button
-                onClick={handleApproveQuote}
-                className="w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl text-lg"
-              >
-                Approve Quote & Proceed
-              </button>
               
-              <button
-                onClick={handleModifyInputs}
-                className="w-full py-4 rounded-xl border-2 border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors text-lg"
-              >
-                Modify Inputs
+              <div className="mt-6 space-y-3">
+                <button
+                  onClick={handleApproveQuote}
+                  className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                >
+                  <CreditCard className="w-4 h-4" />
+                  Continue to Payment
+                </button>
+                
+                <button
+                  onClick={handleModifyInputs}
+                  className="w-full py-3 px-4 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Modify Shipment Details
+                </button>
+              </div>
+              
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <p className="text-xs text-gray-500 text-center">
+                  By continuing, you agree to our{' '}
+                  <a href="#" className="text-blue-600 hover:text-blue-700">Terms of Service</a>
+                  {' '}and{' '}
+                  <a href="#" className="text-blue-600 hover:text-blue-700">Privacy Policy</a>
+                </p>
+              </div>
+            </div>
+
+            {/* Support Card */}
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100 p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
+                  <Users className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900">Need Assistance?</h4>
+                  <p className="text-sm text-gray-600">Our team is here to help</p>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 p-3 bg-white/50 rounded-lg">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                    <Phone className="w-3 h-3 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">Call Us</p>
+                    <p className="text-xs text-gray-600">1-800-INS-CARGO</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3 p-3 bg-white/50 rounded-lg">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                    <AlertCircle className="w-3 h-3 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">Live Chat</p>
+                    <p className="text-xs text-gray-600">Available 24/7</p>
+                  </div>
+                </div>
+              </div>
+              
+              <button className="w-full mt-4 py-2 px-4 bg-white text-blue-600 font-medium rounded-lg border border-blue-200 hover:bg-blue-50 transition-colors">
+                Schedule a Call
               </button>
             </div>
 
-            {/* Help Card */}
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                  <Info className="w-4 h-4 text-blue-600" />
+            {/* Timeline */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h4 className="font-semibold text-gray-900 mb-4">Next Steps</h4>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-blue-600"></div>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">Review & Payment</p>
+                    <p className="text-xs text-gray-500">Complete payment to activate coverage</p>
+                  </div>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">Need Help?</h3>
+                
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Policy Issuance</p>
+                    <p className="text-xs text-gray-500">Receive documents within 1 hour</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Coverage Active</p>
+                    <p className="text-xs text-gray-500">From shipment start date</p>
+                  </div>
+                </div>
               </div>
-              <p className="text-sm text-gray-600 mb-4">
-                Our insurance specialists are available 24/7 to answer any questions about your coverage.
-              </p>
-              <button className="w-full py-3 rounded-xl border-2 border-blue-600 text-blue-600 font-medium hover:bg-blue-50 transition-colors">
-                Contact Support
-              </button>
             </div>
           </div>
         </div>
