@@ -152,7 +152,7 @@ export default function ShippingValuePage() {
                   <div className="space-y-6">
                     {/* Cargo Type */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-[#868686] mb-2">
                         Cargo Type *
                       </label>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -171,7 +171,7 @@ export default function ShippingValuePage() {
                           >
                             <div className="flex flex-col items-center gap-2">
                               <span className="text-2xl">{option.icon}</span>
-                              <span className="text-sm font-medium text-gray-700">
+                              <span className="text-sm font-medium text-[#868686]">
                                 {option.label}
                               </span>
                             </div>
@@ -182,7 +182,7 @@ export default function ShippingValuePage() {
 
                     {/* Shipment Value */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-[#868686] mb-2">
                         Shipment Value (USD) *
                       </label>
                       <div className="relative">
@@ -201,9 +201,6 @@ export default function ShippingValuePage() {
                           <span className="text-gray-500 text-sm">USD</span>
                         </div>
                       </div>
-                      <p className="mt-2 text-sm text-gray-500">
-                        Include all freight charges and duties for full coverage
-                      </p>
                     </div>
                   </div>
                 </div>
@@ -217,7 +214,7 @@ export default function ShippingValuePage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Origin */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-[#868686] mb-2">
                         Origin *
                       </label>
                       <div className="relative">
@@ -237,7 +234,7 @@ export default function ShippingValuePage() {
 
                     {/* Destination */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-[#868686] mb-2">
                         Destination *
                       </label>
                       <div className="relative">
@@ -285,7 +282,7 @@ export default function ShippingValuePage() {
                       </div>
 
                       <div className='w-[48.8%]'>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-[#868686] mb-2">
                           End Date *
                         </label>
                         <div className="relative">
