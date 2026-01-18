@@ -1,4 +1,4 @@
-// lib/supabase/quotes.ts
+// lib/supabase/quotes.ts - թարմացված տարբերակ
 import { createClient } from './client';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -35,16 +35,15 @@ export async function submitQuoteToSupabase(quoteData: SubmitQuoteData) {
   const supabase = createClient();
   
   try {
-    // Ստանում ենք ընթացիկ օգտատիրոջը
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     
     if (userError || !user) {
       throw new Error('User not authenticated');
     }
     
-    // Ստեղծում ենք quote_requests գրառումը
     const quoteRequestId = uuidv4();
     
+    // Սկզբում պահպանում ենք quote request առանց փաստաթղթերի
     const insertData: any = {
       id: quoteRequestId,
       quote_id: quoteData.quoteId,
@@ -59,12 +58,12 @@ export async function submitQuoteToSupabase(quoteData: SubmitQuoteData) {
       selected_coverage: quoteData.selectedCoverage,
       calculated_premium: quoteData.premium,
       deductible: quoteData.deductible,
+      shipper_name: quoteData.shipperName,
+      reference_number: quoteData.referenceNumber,
       status: 'submitted',
       is_active: true,
+      documents: [] // Սկզբում դատարկ array
     };
-    
-    // Ավելացնենք admin_notes դաշտում shipper name-ը
-    insertData.admin_notes = `Shipper: ${quoteData.shipperName}${quoteData.referenceNumber ? `, Reference: ${quoteData.referenceNumber}` : ''}`;
     
     const { data: quoteRequest, error: quoteError } = await supabase
       .from('quote_requests')
@@ -77,14 +76,14 @@ export async function submitQuoteToSupabase(quoteData: SubmitQuoteData) {
     }
     
     // Վերբեռնում ենք փաստաթղթերը
-    const uploadedDocuments = [];
+    const uploadedDocuments: any[] = [];
     
     for (const doc of quoteData.documents) {
       if (doc.file) {
         // Ստեղծում ենք ֆայլի անունը
         const fileName = `${quoteData.quoteId}_${doc.type}_${Date.now()}_${doc.file.name}`;
         
-        // Վերբեռնում ենք ֆայլը Supabase Storage-ում
+        // Վերբեռնում ենք ֆայլը
         const { data: uploadData, error: uploadError } = await supabase
           .storage
           .from('documents')
@@ -104,7 +103,7 @@ export async function submitQuoteToSupabase(quoteData: SubmitQuoteData) {
           .from('documents')
           .getPublicUrl(fileName);
         
-        // Ստեղծում ենք documents աղյուսակում գրառում
+        // Ստեղծում ենք փաստաթղթի գրառում documents աղյուսակում
         const { data: documentRecord, error: docError } = await supabase
           .from('documents')
           .insert({
@@ -115,7 +114,8 @@ export async function submitQuoteToSupabase(quoteData: SubmitQuoteData) {
             file_name: doc.file.name,
             file_url: publicUrl,
             file_size: doc.file.size,
-            status: 'pending'
+            status: 'pending',
+            uploaded_at: new Date().toISOString()
           })
           .select()
           .single();
@@ -125,8 +125,28 @@ export async function submitQuoteToSupabase(quoteData: SubmitQuoteData) {
           continue;
         }
         
-        uploadedDocuments.push(documentRecord);
+        // Հավաքում ենք փաստաթղթերի տեղեկությունները
+        uploadedDocuments.push({
+          id: documentRecord.id,
+          type: doc.type,
+          name: doc.name,
+          file_name: doc.file.name,
+          file_url: publicUrl,
+          file_size: doc.file.size,
+          uploaded_at: new Date().toISOString()
+        });
       }
+    }
+    
+    // Update quote request-ը փաստաթղթերի տվյալներով
+    if (uploadedDocuments.length > 0) {
+      await supabase
+        .from('quote_requests')
+        .update({
+          documents: uploadedDocuments,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', quoteRequestId);
     }
     
     // Ստեղծում ենք notification
@@ -136,7 +156,7 @@ export async function submitQuoteToSupabase(quoteData: SubmitQuoteData) {
         user_id: user.id,
         type: 'quote_submitted',
         title: 'Quote Submitted Successfully',
-        message: `Your quote ${quoteData.quoteId} has been submitted and is under review. Shipper: ${quoteData.shipperName}`,
+        message: `Your quote ${quoteData.quoteId} has been submitted with ${uploadedDocuments.length} documents.`,
         related_id: quoteRequestId,
         related_type: 'quote_requests',
         is_read: false
