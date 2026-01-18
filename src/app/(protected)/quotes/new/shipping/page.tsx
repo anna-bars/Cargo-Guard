@@ -1,853 +1,14 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { 
-  ArrowLeft, 
-  Calendar, 
-  DollarSign, 
-  MapPin, 
-  Cpu,
-  Shirt,
-  Cog,
-  Apple,
-  FlaskConical,
-  Pill,
-  Box,
-  Plane, 
-  Ship, 
-  Truck,
-  AlertCircle,
-  CheckCircle,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  Search,
-  Loader2,
-  X,
-  Building,
-  Anchor,
-  Navigation,
-  Globe,
-  Menu,
-  X as XIcon
-} from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeft, AlertCircle, CheckCircle } from 'lucide-react';
 import DashboardHeader from '@/app/components/dashboard/DashboardHeader';
-
-// Custom Date Picker Component (նույնը)
-const CustomDatePicker = ({ 
-  value, 
-  onChange, 
-  placeholder = "Select date",
-  minDate,
-  maxDate 
-}: {
-  value: string;
-  onChange: (date: string) => void;
-  placeholder?: string;
-  minDate?: string;
-  maxDate?: string;
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState<Date | null>(
-    value ? new Date(value) : null
-  );
-
-  const today = new Date();
-  const min = minDate ? new Date(minDate) : null;
-  const max = maxDate ? new Date(maxDate) : null;
-
-  const daysInMonth = new Date(
-    currentMonth.getFullYear(),
-    currentMonth.getMonth() + 1,
-    0
-  ).getDate();
-
-  const firstDayOfMonth = new Date(
-    currentMonth.getFullYear(),
-    currentMonth.getMonth(),
-    1
-  ).getDay();
-
-  const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
-
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-  const handleDateSelect = (day: number) => {
-    const selected = new Date(
-      currentMonth.getFullYear(),
-      currentMonth.getMonth(),
-      day
-    );
-    
-    if (min && selected < min) return;
-    if (max && selected > max) return;
-    
-    setSelectedDate(selected);
-    onChange(selected.toISOString().split('T')[0]);
-    setIsOpen(false);
-  };
-
-  const prevMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
-  };
-
-  const nextMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
-  };
-
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
-
-  const isToday = (day: number) => {
-    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    return date.toDateString() === today.toDateString();
-  };
-
-  const isSelected = (day: number) => {
-    if (!selectedDate) return false;
-    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    return date.toDateString() === selectedDate.toDateString();
-  };
-
-  const isDisabled = (day: number) => {
-    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    if (min && date < min) return true;
-    if (max && date > max) return true;
-    return false;
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (isOpen && !(e.target as Element).closest('.date-picker-container')) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen]);
-
-  return (
-    <div className="relative date-picker-container">
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full h-12 px-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-colors flex items-center justify-between bg-white"
-      >
-        <div className="flex items-center gap-3">
-          <Calendar className="h-5 w-5 text-gray-400" />
-          <span className={`${value ? "text-gray-900" : "text-gray-500"} text-sm md:text-base truncate max-w-[160px] md:max-w-none`}>
-            {value ? formatDate(new Date(value)) : placeholder}
-          </span>
-        </div>
-        <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
-
-      {isOpen && (
-        <div className="absolute z-50 mt-1 bg-white rounded-xl shadow-lg border border-gray-200 p-4 w-full md:w-80">
-          <div className="flex items-center justify-between mb-4">
-            <button
-              type="button"
-              onClick={prevMonth}
-              className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <div className="font-semibold text-gray-900 text-sm md:text-base">
-              {months[currentMonth.getMonth()]} {currentMonth.getFullYear()}
-            </div>
-            <button
-              type="button"
-              onClick={nextMonth}
-              className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-7 gap-1 mb-2">
-            {days.map(day => (
-              <div key={day} className="text-center text-xs md:text-sm font-medium text-gray-500 py-1">
-                {day}
-              </div>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-7 gap-1">
-            {Array.from({ length: firstDayOfMonth }).map((_, index) => (
-              <div key={`empty-${index}`} />
-            ))}
-            
-            {Array.from({ length: daysInMonth }).map((_, index) => {
-              const day = index + 1;
-              const disabled = isDisabled(day);
-              const today = isToday(day);
-              const selected = isSelected(day);
-              
-              return (
-                <button
-                  key={day}
-                  type="button"
-                  onClick={() => handleDateSelect(day)}
-                  disabled={disabled}
-                  className={`
-                    h-8 rounded-lg text-xs md:text-sm transition-all duration-200
-                    ${selected
-                      ? 'bg-blue-500 text-white hover:bg-blue-600'
-                      : today
-                      ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                      : 'hover:bg-gray-100 text-gray-900'
-                    }
-                    ${disabled ? 'opacity-30 cursor-not-allowed hover:bg-transparent' : ''}
-                  `}
-                >
-                  {day}
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="mt-4 pt-4 border-t border-gray-100">
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedDate(today);
-                onChange(today.toISOString().split('T')[0]);
-                setIsOpen(false);
-              }}
-              className="w-full py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-            >
-              Select Today
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// LocationIQ Autocomplete Component (նույնը)
-interface LocationIQFeature {
-  place_id: string;
-  licence: string;
-  osm_type: string;
-  osm_id: number;
-  boundingbox: [string, string, string, string];
-  lat: string;
-  lon: string;
-  display_name: string;
-  class: string;
-  type: string;
-  importance: number;
-  icon?: string;
-  address?: {
-    city?: string;
-    town?: string;
-    village?: string;
-    state?: string;
-    country?: string;
-    country_code?: string;
-    postcode?: string;
-    road?: string;
-    suburb?: string;
-    county?: string;
-    neighbourhood?: string;
-    house_number?: string;
-  };
-}
-
-interface LocationData {
-  name: string;
-  city: string;
-  country: string;
-  countryCode: string;
-  type: 'port' | 'airport' | 'city' | 'place' | 'harbor' | 'dock';
-  portCode?: string;
-  coordinates?: {
-    lat: number;
-    lng: number;
-  };
-  fullAddress: string;
-  osmId?: string;
-}
-
-const LocationIQAutocomplete = ({
-  value,
-  onChange,
-  placeholder,
-  label,
-  required = false
-}: {
-  value: LocationData | null;
-  onChange: (location: LocationData | null) => void;
-  placeholder: string;
-  label: string;
-  required?: boolean;
-}) => {
-  const [inputValue, setInputValue] = useState(value?.name || '');
-  const [suggestions, setSuggestions] = useState<LocationIQFeature[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [apiStatus, setApiStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const inputRef = useRef<HTMLInputElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const debounceTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-
-  useEffect(() => {
-    console.log('📊 LocationIQAutocomplete State:', {
-      inputValue,
-      showSuggestions,
-      suggestionsCount: suggestions.length,
-      value: value?.name,
-      apiStatus
-    });
-  }, [inputValue, showSuggestions, suggestions, value, apiStatus]);
-
-  const LOCAL_PORTS_DB: Array<{
-    name: string;
-    city: string;
-    country: string;
-    type: 'city' | 'port' | 'airport';
-    lat: number;
-    lon: number;
-    code?: string;
-  }> = [
-    { name: 'Tokyo City', city: 'Tokyo', country: 'Japan', type: 'city', lat: 35.68, lon: 139.76 },
-  ];
-
-  const getIcon = (type: string) => {
-    switch (type) {
-      case 'port':
-      case 'harbor':
-      case 'dock':
-        return <Anchor className="h-4 w-4" />;
-      case 'airport':
-        return <Plane className="h-4 w-4" />;
-      case 'city':
-        return <Building className="h-4 w-4" />;
-      default:
-        return <MapPin className="h-4 w-4" />;
-    }
-  };
-
-  const getTypeLabel = (type: string): string => {
-    switch (type) {
-      case 'port': return 'Sea Port';
-      case 'airport': return 'Airport';
-      case 'city': return 'City';
-      default: return 'Location';
-    }
-  };
-
-  useEffect(() => {
-    if (value && showSuggestions) {
-      console.log('🔽 Value exists and showSuggestions is true, closing...');
-      setShowSuggestions(false);
-    }
-  }, [value, showSuggestions]);
-
-  useEffect(() => {
-    const handleDocumentClick = (e: MouseEvent) => {
-      const target = e.target as Element;
-      const isInsideContainer = containerRef.current?.contains(target);
-      const isSuggestionButton = target.closest('.location-suggestion-button');
-      
-      console.log('🖱️ Document click:', {
-        target: target?.tagName,
-        isInsideContainer,
-        isSuggestionButton: !!isSuggestionButton,
-        showSuggestions
-      });
-      
-      if (
-        containerRef.current &&
-        !isInsideContainer &&
-        !isSuggestionButton
-      ) {
-        console.log('❌ Click outside, closing suggestions');
-        setShowSuggestions(false);
-      }
-    };
-
-    document.addEventListener('click', handleDocumentClick);
-    return () => document.removeEventListener('click', handleDocumentClick);
-  }, []);
-
-  useEffect(() => {
-    if (value) {
-      console.log('✅ Value changed, updating input:', value.name);
-      setInputValue(value.name);
-      setShowSuggestions(false);
-    }
-  }, [value]);
-
-  const searchLocalDatabase = (query: string): LocationIQFeature[] => {
-    const normalizedQuery = query.toLowerCase();
-    
-    return LOCAL_PORTS_DB
-      .filter(location =>
-        location.name.toLowerCase().includes(normalizedQuery) ||
-        location.city.toLowerCase().includes(normalizedQuery) ||
-        location.country.toLowerCase().includes(normalizedQuery)
-      )
-      .map(location => {
-        const boundingbox: [string, string, string, string] = [
-          (location.lat - 0.1).toString(),
-          (location.lat + 0.1).toString(),
-          (location.lon - 0.1).toString(),
-          (location.lon + 0.1).toString()
-        ];
-        
-        return {
-          place_id: `local-${location.code || location.name}`,
-          licence: 'Local Database',
-          osm_type: 'local',
-          osm_id: 0,
-          boundingbox,
-          lat: location.lat.toString(),
-          lon: location.lon.toString(),
-          display_name: location.name,
-          class: location.type === 'port' || location.type === 'airport' ? 'transport' : 'place',
-          type: location.type,
-          importance: 0.9,
-          address: {
-            city: location.city,
-            country: location.country,
-            country_code: location.country.substring(0, 2).toUpperCase() || ''
-          }
-        };
-      })
-      .slice(0, 4);
-  };
-
-  useEffect(() => {
-    const searchLocations = async (query: string) => {
-      if (query.length < 2) return;
-
-      setIsLoading(true);
-      setApiStatus('loading');
-      
-      try {
-        const localResults = searchLocalDatabase(query);
-        
-        if (localResults.length > 0) {
-          setSuggestions(localResults);
-          setApiStatus('success');
-          setShowSuggestions(true);
-        }
-
-        let locationIQResults: LocationIQFeature[] = [];
-        try {
-          const apiKey = 'pk.f15b5391da0772168ecba607d5fe3136';
-          const response = await fetch(
-            `https://api.locationiq.com/v1/autocomplete.php?` +
-            `key=${apiKey}&` +
-            `q=${encodeURIComponent(query)}&` +
-            `limit=5&` +
-            `format=json`
-          );
-          
-          if (response.ok) {
-            const data = await response.json();
-            locationIQResults = data || [];
-          }
-        } catch (locationIQError) {
-          console.log('LocationIQ failed, trying OpenStreetMap...');
-        }
-
-        let osmResults: LocationIQFeature[] = [];
-        if (locationIQResults.length === 0) {
-          try {
-            const response = await fetch(
-              `https://nominatim.openstreetmap.org/search?` +
-              `format=json&` +
-              `q=${encodeURIComponent(query)}&` +
-              `addressdetails=1&` +
-              `limit=5&` +
-              `email=contact@shippingapp.com`
-            );
-            
-            if (response.ok) {
-              const data = await response.json();
-              osmResults = data.map((place: any) => ({
-                place_id: place.place_id,
-                licence: place.licence,
-                osm_type: place.osm_type,
-                osm_id: place.osm_id,
-                boundingbox: place.boundingbox,
-                lat: place.lat,
-                lon: place.lon,
-                display_name: place.display_name,
-                class: place.class,
-                type: place.type,
-                importance: place.importance,
-                address: place.address
-              }));
-            }
-          } catch (osmError) {
-            console.log('OpenStreetMap also failed');
-          }
-        }
-
-        const allResults = [...localResults, ...locationIQResults, ...osmResults]
-          .filter((v, i, a) => 
-            a.findIndex(t => t.place_id === v.place_id) === i
-          )
-          .slice(0, 8);
-
-        setSuggestions(allResults);
-        setApiStatus(allResults.length > 0 ? 'success' : 'error');
-        setShowSuggestions(true);
-        
-      } catch (error) {
-        console.error('Final search error:', error);
-        setApiStatus('error');
-        
-        const localResults = searchLocalDatabase(query);
-        setSuggestions(localResults);
-        setShowSuggestions(localResults.length > 0);
-        
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (debounceTimeout.current) {
-      clearTimeout(debounceTimeout.current);
-    }
-
-    if (inputValue.length < 2) {
-      setSuggestions([]);
-      return;
-    }
-
-    debounceTimeout.current = setTimeout(async () => {
-      await searchLocations(inputValue);
-    }, 350);
-
-    return () => {
-      if (debounceTimeout.current) {
-        clearTimeout(debounceTimeout.current);
-      }
-    };
-  }, [inputValue]);
-
-  const extractLocationData = (feature: LocationIQFeature): LocationData => {
-    console.log('🧮 Extracting location data from feature:', feature.display_name);
-    
-    const isLocal = feature.osm_type === 'local';
-    
-    let type: LocationData['type'] = 'place';
-    
-    if (feature.class === 'transport') {
-      const lowerDisplayName = feature.display_name.toLowerCase();
-      
-      if (lowerDisplayName.includes('airport') || feature.type?.includes('airport')) {
-        type = 'airport';
-      } else if (lowerDisplayName.includes('port') || lowerDisplayName.includes('harbor') || 
-                lowerDisplayName.includes('dock') || feature.type?.includes('port')) {
-        type = 'port';
-      } else {
-        type = 'place';
-      }
-    } else if (feature.type && ['city', 'town', 'village'].includes(feature.type)) {
-      type = 'city';
-    }
-
-    const city = feature.address?.city || feature.address?.town || feature.address?.village || '';
-    const country = feature.address?.country || '';
-    const countryCode = feature.address?.country_code?.toUpperCase() || '';
-
-    let portCode: string | undefined;
-    if (type === 'port' || type === 'airport') {
-      if (isLocal) {
-        const localPort = LOCAL_PORTS_DB.find(p => p.name === feature.display_name);
-        portCode = localPort?.code;
-      } else {
-        const baseCode = feature.display_name
-          .replace(/port|airport|international|seaport|harbor|terminal/gi, '')
-          .trim()
-          .substring(0, 3)
-          .toUpperCase();
-        portCode = countryCode ? `${baseCode}-${countryCode}` : baseCode;
-      }
-    }
-
-    console.log('📦 Extracted data:', {
-      type,
-      city,
-      country,
-      countryCode,
-      portCode
-    });
-
-    return {
-      name: feature.display_name.split(',')[0],
-      city: city || feature.display_name.split(',')[0],
-      country,
-      countryCode,
-      type,
-      portCode,
-      coordinates: {
-        lat: parseFloat(feature.lat),
-        lng: parseFloat(feature.lon)
-      },
-      fullAddress: feature.display_name,
-      osmId: isLocal ? undefined : feature.place_id
-    };
-  };
-
-  const handleSelect = (feature: LocationIQFeature) => {
-    console.log('🟢 handleSelect called with feature:', {
-      display_name: feature.display_name,
-      osm_type: feature.osm_type,
-      place_id: feature.place_id
-    });
-    
-    const locationData = extractLocationData(feature);
-    console.log('📍 Extracted location data:', locationData);
-    
-    console.log('🔄 Setting new value and closing suggestions');
-    setInputValue(locationData.name);
-    onChange(locationData);
-  };
-
-  const clearSelection = () => {
-    console.log('🗑️ Clearing selection');
-    setInputValue('');
-    onChange(null);
-    setSuggestions([]);
-    setShowSuggestions(false);
-    inputRef.current?.focus();
-  };
-
-  return (
-    <div className="relative" ref={containerRef}>
-      <label className="block text-sm font-medium text-[#868686] mb-2">
-        {label} {required && '*'}
-      </label>
-      
-      <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <MapPin className="h-5 w-5 text-gray-400" />
-        </div>
-        
-        <input
-          ref={inputRef}
-          type="text"
-          value={inputValue}
-          onChange={(e) => {
-            console.log('⌨️ Input changed:', e.target.value);
-            setInputValue(e.target.value);
-          }}
-          onFocus={() => {
-            console.log('🔍 Input focused, showing suggestions');
-            setShowSuggestions(true);
-          }}
-          onBlur={() => {
-            console.log('👁️ Input blurred');
-          }}
-          placeholder={placeholder}
-          className="pl-10 pr-10 w-full h-12 px-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-colors text-sm md:text-base placeholder:text-sm md:placeholder:text-base placeholder:text-gray-400"
-          required={required && !value}
-        />
-        
-        <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-          {isLoading ? (
-            <Loader2 className="h-4 w-4 text-gray-400 animate-spin" />
-          ) : inputValue ? (
-            <button
-              type="button"
-              onClick={clearSelection}
-              className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <X className="h-4 w-4 text-gray-400" />
-            </button>
-          ) : (
-            <Search className="h-4 w-4 text-gray-400" />
-          )}
-        </div>
-      </div>
-
-      {value && (
-        <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-100">
-          <div className="flex items-start justify-between">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <div className="flex items-center gap-1">
-                  {getIcon(value.type)}
-                  <span className="text-sm font-medium text-blue-900 ml-1 truncate">
-                    {value.name}
-                  </span>
-                </div>
-                <span className={`px-2 py-0.5 text-xs font-medium rounded-full flex-shrink-0 ${
-                  value.type === 'port' 
-                    ? 'bg-blue-100 text-blue-800'
-                    : value.type === 'airport'
-                    ? 'bg-purple-100 text-purple-800'
-                    : 'bg-green-100 text-green-800'
-                }`}>
-                  {getTypeLabel(value.type)}
-                </span>
-              </div>
-              <div className="text-xs text-gray-600 truncate">
-                {value.city}, {value.country}
-              </div>
-              {value.portCode && (
-                <div className="mt-1 text-xs font-medium text-gray-700">
-                  Port Code: <code className="bg-white px-1.5 py-0.5 rounded border">{value.portCode}</code>
-                </div>
-              )}
-            </div>
-            <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 ml-2" />
-          </div>
-        </div>
-      )}
-
-      {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute z-50 mt-1 w-full bg-white rounded-xl shadow-lg border border-gray-200 max-h-64 overflow-y-auto">
-          <div className="py-2">
-            {suggestions.map((feature) => {
-              const type = feature.class === 'transport' 
-                ? (feature.display_name.toLowerCase().includes('airport') ? 'airport' : 'port')
-                : feature.type || 'place';
-              
-              const isLocal = feature.osm_type === 'local';
-              
-              return (
-                <button
-                  key={`${feature.place_id}-${feature.osm_id}`}
-                  type="button"
-                  onMouseDown={(e) => {
-                    console.log('🖱️ Suggestion button mouse down');
-                  }}
-                  onClick={(e) => {
-                    console.log('🖱️ Suggestion button clicked');
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleSelect(feature);
-                  }}
-                  className="location-suggestion-button w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-start gap-3"
-                >
-                  <div className="flex-shrink-0 mt-0.5">
-                    <div className={`h-6 w-6 rounded-full flex items-center justify-center ${
-                      type === 'port' ? 'bg-blue-100' :
-                      type === 'airport' ? 'bg-purple-100' :
-                      'bg-gray-100'
-                    }`}>
-                      {getIcon(type)}
-                    </div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-gray-900 truncate text-sm md:text-base">
-                      {feature.display_name.split(',')[0]}
-                    </div>
-                    <div className="text-xs md:text-sm text-gray-500 truncate">
-                      {feature.display_name.split(',').slice(1).join(',').trim() || 
-                      `${feature.address?.city || ''}, ${feature.address?.country || ''}`}
-                    </div>
-                    <div className="mt-1 flex items-center gap-2 flex-wrap">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                        type === 'port' ? 'bg-blue-100 text-blue-800' :
-                        type === 'airport' ? 'bg-purple-100 text-purple-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {getTypeLabel(type)}
-                      </span>
-                      {isLocal && (
-                        <span className="text-xs text-gray-500">📋 Local</span>
-                      )}
-                      {!isLocal && feature.importance > 0.6 && (
-                        <span className="text-xs text-gray-500">✓ Good match</span>
-                      )}
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-          
-          <div className="px-4 py-2 border-t border-gray-100 bg-gray-50 rounded-b-xl">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <Navigation className="h-3 w-3" />
-                <span>Powered by LocationIQ</span>
-              </div>
-              <div className="text-xs text-gray-400">
-                10,000 free requests/day
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-const MobileTipsCard = ({ completionPercentage }: { completionPercentage: number }) => {
-  return (
-    <div className="md:hidden bg-[url('/quotes/new/shipping-wd-back.png')] bg-cover bg-center flex flex-col gap-6 rounded-2xl shadow-lg border border-gray-200 p-5 mb-6 text-white">
-      <div className="flex items-center gap-2 mb-2">
-        <h3 className="text-lg font-semibold">Smart Quote Tips</h3>
-      </div>
-      
-      <div className="space-y-4">
-        <div className="flex items-start gap-3">
-          <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-            <CheckCircle className="w-3 h-3" />
-          </div>
-          <p className="text-sm leading-relaxed">
-            <span className="font-semibold">Full Coverage:</span> Include all freight charges and duties in shipment value for complete protection.
-          </p>
-        </div>
-        
-        <div className="flex items-start gap-3">
-          <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-            <CheckCircle className="w-3 h-3" />
-          </div>
-          <p className="text-sm leading-relaxed">
-            <span className="font-semibold">Lower Premiums:</span> Accurate cargo classification can reduce premiums by up to 30%.
-          </p>
-        </div>
-      </div>
-
-      <div className="pt-4 border-t border-white/20">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-white/90">Progress</span>
-          <span className="text-sm font-semibold text-white">
-            {Math.round(completionPercentage/100*7)} of 7 fields
-          </span>
-        </div>
-        <div className="w-full bg-white/20 rounded-full h-2">
-          <div 
-            className="bg-white h-2 rounded-full transition-all duration-300"
-            style={{ width: `${completionPercentage}%` }}
-          />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const MobileStepIndicator = ({ currentStep }: { currentStep: number }) => {
-  const steps = [
-    { id: 1, name: 'Shipment Details' },
-    { id: 2, name: 'Coverage Options' },
-    { id: 3, name: 'Quote Review' },
-  ];
-
-  return (
-    <div></div>
-  );
-};
+import CustomDatePicker from './components/CustomDatePicker';
+import LocationIQAutocomplete from './components/LocationIQAutocomplete';
+import MobileTipsCard from './components/MobileTipsCard';
+import MobileStepIndicator from './components/MobileStepIndicator';
+import CargoTypeSelector from './components/CargoTypeSelector';
+import { LocationData } from './components/LocationIQAutocomplete';
 
 export default function ShippingValuePage() {
   const [cargoType, setCargoType] = useState('');
@@ -858,28 +19,17 @@ export default function ShippingValuePage() {
   const [endDate, setEndDate] = useState('');
   const [transportationMode, setTransportationMode] = useState('');
   const [step, setStep] = useState(1);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [otherCargoType, setOtherCargoType] = useState(''); // Նոր state other-ի համար
+  const [otherCargoType, setOtherCargoType] = useState('');
 
   const today = new Date().toISOString().split('T')[0];
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
 
-  const cargoOptions = [
-    { value: 'electronics', label: 'Electronics', icon: Cpu },
-    { value: 'clothing', label: 'Clothing', icon: Shirt },
-    { value: 'machinery', label: 'Machinery', icon: Cog },
-    { value: 'food', label: 'Food Products', icon: Apple },
-    { value: 'chemicals', label: 'Chemicals', icon: FlaskConical },
-    { value: 'pharma', label: 'Pharmaceuticals', icon: Pill },
-    { value: 'other', label: 'Other', icon: Box },
-  ];
-
   const transportModes = [
-    { id: 'sea', name: 'Sea Freight', icon: Ship, color: 'blue' },
-    { id: 'air', name: 'Air Freight', icon: Plane, color: 'emerald' },
-    { id: 'road', name: 'Road Freight', icon: Truck, color: 'amber' },
+    { id: 'sea', name: 'Sea Freight', icon: 'Ship', color: 'blue' },
+    { id: 'air', name: 'Air Freight', icon: 'Plane', color: 'emerald' },
+    { id: 'road', name: 'Road Freight', icon: 'Truck', color: 'amber' },
   ];
 
   const steps = [
@@ -888,44 +38,16 @@ export default function ShippingValuePage() {
     { id: 3, name: 'Quote Review', status: 'upcoming' },
   ];
 
-  // Ֆունկցիա cargo type ընտրելու համար
-  const handleCargoTypeSelect = (type: string) => {
-    setCargoType(type);
-    // Եթե ընտրված է այլ տարբերակ, ապա մաքրում ենք otherCargoType դաշտը
-    if (type !== 'other') {
-      setOtherCargoType('');
-    }
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Ստեղծում ենք վերջնական cargo type-ը
     const finalCargoType = cargoType === 'other' ? otherCargoType : cargoType;
     
     const formData = {
       cargoType: finalCargoType,
       shipmentValue: parseFloat(shipmentValue),
-      origin: origin ? {
-        name: origin.name,
-        city: origin.city,
-        country: origin.country,
-        countryCode: origin.countryCode,
-        portCode: origin.portCode,
-        type: origin.type,
-        coordinates: origin.coordinates,
-        fullAddress: origin.fullAddress,
-      } : null,
-      destination: destination ? {
-        name: destination.name,
-        city: destination.city,
-        country: destination.country,
-        countryCode: destination.countryCode,
-        portCode: destination.portCode,
-        type: destination.type,
-        coordinates: destination.coordinates,
-        fullAddress: destination.fullAddress,
-      } : null,
+      origin,
+      destination,
       coveragePeriod: {
         startDate,
         endDate,
@@ -955,9 +77,8 @@ export default function ShippingValuePage() {
     }
   };
 
-  // Update completed fields to include otherCargoType
   const completedFields = [
-    cargoType === 'other' ? !!otherCargoType : !!cargoType, // Կա եթե other է, պետք է լինի otherCargoType
+    cargoType === 'other' ? !!otherCargoType : !!cargoType,
     !!shipmentValue,
     !!origin,
     !!destination,
@@ -1049,100 +170,34 @@ export default function ShippingValuePage() {
             <div className="bg-[#FFFFFE] rounded-2xl shadow-lg border border-gray-200 p-4 md:p-8">
               <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
                 {/* Cargo Type Section */}
-                <div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <h2 className="text-lg font-semibold text-gray-900">Cargo Information</h2>
-                  </div>
-                  
-                  <div className="space-y-6">
-                    <div>
-                      <label className="block text-sm font-medium text-[#868686] mb-2">
-                        Cargo Type *
-                      </label>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 md:gap-3">
-                        {cargoOptions.map((option) => {
-                          const Icon = option.icon;
-                          return (
-                            <button
-                              key={option.value}
-                              type="button"
-                              onClick={() => handleCargoTypeSelect(option.value)}
-                              className={`
-                                p-3 md:p-4 rounded-xl border-2 transition-all duration-200
-                                ${cargoType === option.value
-                                  ? 'border-blue-500 bg-blue-50'
-                                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                                }
-                              `}
-                            >
-                              <div className="flex flex-col items-center gap-2">
-                                <div className={`
-                                  p-2 md:p-3 rounded-lg
-                                  ${cargoType === option.value
-                                    ? 'bg-blue-100 text-blue-600'
-                                    : 'bg-gray-100 text-gray-600'
-                                  }
-                                `}>
-                                  <Icon className="w-4 h-4" />
-                                </div>
-                                <span className="text-xs md:text-sm font-medium text-[#868686] text-center leading-tight">
-                                  {option.label}
-                                </span>
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                      
-                      {/* Other Cargo Type Input Field - ցուցադրվում է միայն երբ ընտրված է Other */}
-                      {cargoType === 'other' && (
-                        <div className="mt-4 animate-fadeIn">
-                          <label className="block text-sm font-medium text-[#868686] mb-2">
-                            Please specify cargo type *
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="text"
-                              value={otherCargoType}
-                              onChange={(e) => setOtherCargoType(e.target.value)}
-                              placeholder="Enter cargo type"
-                              className="w-full h-12 px-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-colors text-sm md:text-base placeholder:text-sm md:placeholder:text-base"
-                              required
-                              maxLength={50}
-                            />
-                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                              <Box className="h-5 w-5 text-gray-400" />
-                            </div>
-                          </div>
-                          <p className="mt-1 text-xs text-gray-500">
-                            Please provide a detailed description of your cargo
-                          </p>
-                        </div>
-                      )}
-                    </div>
+                <CargoTypeSelector 
+                  cargoType={cargoType}
+                  otherCargoType={otherCargoType}
+                  onCargoTypeSelect={setCargoType}
+                  onOtherCargoTypeChange={setOtherCargoType}
+                />
 
-                    <div>
-                      <label className="block text-sm font-medium text-[#868686] mb-2">
-                        Shipment Value (USD) *
-                      </label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <DollarSign className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input
-                          type="number"
-                          value={shipmentValue}
-                          onChange={(e) => setShipmentValue(e.target.value)}
-                          placeholder="Enter total value"
-                          className="pl-10 w-full h-12 px-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-colors text-sm md:text-base placeholder:text-sm md:placeholder:text-base"
-                          required
-                          min="0"
-                          step="0.01"
-                        />
-                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                          <span className="text-gray-500 text-sm">USD</span>
-                        </div>
-                      </div>
+                {/* Shipment Value */}
+                <div>
+                  <label className="block text-sm font-medium text-[#868686] mb-2">
+                    Shipment Value (USD) *
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span className="text-gray-400">$</span>
+                    </div>
+                    <input
+                      type="number"
+                      value={shipmentValue}
+                      onChange={(e) => setShipmentValue(e.target.value)}
+                      placeholder="Enter total value"
+                      className="pl-10 w-full h-12 px-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-colors text-sm md:text-base placeholder:text-sm md:placeholder:text-base"
+                      required
+                      min="0"
+                      step="0.01"
+                    />
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                      <span className="text-gray-500 text-sm">USD</span>
                     </div>
                   </div>
                 </div>
@@ -1154,25 +209,21 @@ export default function ShippingValuePage() {
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                    <div>
-                      <LocationIQAutocomplete
-                        value={origin}
-                        onChange={setOrigin}
-                        placeholder="Search location..."
-                        label="Origin *"
-                        required
-                      />
-                    </div>
+                    <LocationIQAutocomplete
+                      value={origin}
+                      onChange={setOrigin}
+                      placeholder="Search location..."
+                      label="Origin *"
+                      required
+                    />
 
-                    <div>
-                      <LocationIQAutocomplete
-                        value={destination}
-                        onChange={setDestination}
-                        placeholder="Search location..."
-                        label="Destination *"
-                        required
-                      />
-                    </div>
+                    <LocationIQAutocomplete
+                      value={destination}
+                      onChange={setDestination}
+                      placeholder="Search location..."
+                      label="Destination *"
+                      required
+                    />
                   </div>
                 </div>
 
@@ -1217,7 +268,6 @@ export default function ShippingValuePage() {
                     
                     <div className="flex flex-col sm:flex-row sm:justify-between gap-3">
                       {transportModes.map((mode) => {
-                        const Icon = mode.icon;
                         const transportDescriptions = {
                           'sea': '20-40 days',
                           'air': '2-7 days', 
@@ -1245,7 +295,7 @@ export default function ShippingValuePage() {
                                 : 'bg-gray-100 text-gray-500'
                               }
                             `}>
-                              <Icon className="w-4 h-4" />
+                              {mode.id === 'sea' ? '🚢' : mode.id === 'air' ? '✈️' : '🚚'}
                             </div>
                             <div className="flex-1 text-center">
                               <div className="font-medium text-gray-900 text-sm md:text-base">{mode.name}</div>
@@ -1370,37 +420,6 @@ export default function ShippingValuePage() {
           </button>
         </div>
       </div>
-      
-      {/* CSS for fadeIn animation */}
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
-        }
-        
-        /* Mobile-specific input text scaling */
-        @media (max-width: 640px) {
-          input::placeholder {
-            font-size: 14px;
-          }
-          input {
-            font-size: 14px;
-          }
-          .text-sm-mobile {
-            font-size: 14px;
-          }
-        }
-      `}</style>
     </div>
   );
 }
