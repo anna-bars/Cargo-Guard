@@ -299,7 +299,7 @@ const LocationIQAutocomplete = ({
   const [apiStatus, setApiStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const debounceTimeout = useRef<ReturnType<typeof setTimeout>>();
+  const debounceTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     console.log('📊 LocationIQAutocomplete State:', {
