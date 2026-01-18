@@ -27,11 +27,13 @@ import {
   Building,
   Anchor,
   Navigation,
-  Globe
+  Globe,
+  Menu,
+  X as XIcon
 } from 'lucide-react';
 import DashboardHeader from '@/app/components/dashboard/DashboardHeader';
 
-// Custom Date Picker Component
+// Custom Date Picker Component (նույնը)
 const CustomDatePicker = ({ 
   value, 
   onChange, 
@@ -232,7 +234,7 @@ const CustomDatePicker = ({
   );
 };
 
-// LocationIQ Autocomplete Component
+// LocationIQ Autocomplete Component (նույնը)
 interface LocationIQFeature {
   place_id: string;
   licence: string;
@@ -299,7 +301,6 @@ const LocationIQAutocomplete = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const debounceTimeout = useRef<ReturnType<typeof setTimeout>>();
 
-  // Console log ցուցադրելու համար
   useEffect(() => {
     console.log('📊 LocationIQAutocomplete State:', {
       inputValue,
@@ -310,10 +311,6 @@ const LocationIQAutocomplete = ({
     });
   }, [inputValue, showSuggestions, suggestions, value, apiStatus]);
 
-  // LocationIQ API Key
-  const LOCATIONIQ_API_KEY = process.env.NEXT_PUBLIC_LOCATIONIQ_API_KEY || 'pk.f15b5391da0772168ecba607d5fe3136';
-
-  // Local fallback database
   const LOCAL_PORTS_DB: Array<{
     name: string;
     city: string;
@@ -357,7 +354,6 @@ const LocationIQAutocomplete = ({
     }
   }, [value, showSuggestions]);
 
-  // Handle click outside
   useEffect(() => {
     const handleDocumentClick = (e: MouseEvent) => {
       const target = e.target as Element;
@@ -385,7 +381,6 @@ const LocationIQAutocomplete = ({
     return () => document.removeEventListener('click', handleDocumentClick);
   }, []);
 
-  // Update input when value changes
   useEffect(() => {
     if (value) {
       console.log('✅ Value changed, updating input:', value.name);
@@ -433,7 +428,6 @@ const LocationIQAutocomplete = ({
       .slice(0, 4);
   };
 
-  // Debounced search
   useEffect(() => {
     const searchLocations = async (query: string) => {
       if (query.length < 2) return;
@@ -442,17 +436,14 @@ const LocationIQAutocomplete = ({
       setApiStatus('loading');
       
       try {
-        // 1. Local results (instant)
         const localResults = searchLocalDatabase(query);
         
-        // Show local results immediately
         if (localResults.length > 0) {
           setSuggestions(localResults);
           setApiStatus('success');
           setShowSuggestions(true);
         }
 
-        // 2. Try LocationIQ
         let locationIQResults: LocationIQFeature[] = [];
         try {
           const apiKey = 'pk.f15b5391da0772168ecba607d5fe3136';
@@ -472,7 +463,6 @@ const LocationIQAutocomplete = ({
           console.log('LocationIQ failed, trying OpenStreetMap...');
         }
 
-        // 3. Try OpenStreetMap as fallback
         let osmResults: LocationIQFeature[] = [];
         if (locationIQResults.length === 0) {
           try {
@@ -507,7 +497,6 @@ const LocationIQAutocomplete = ({
           }
         }
 
-        // Combine all results
         const allResults = [...localResults, ...locationIQResults, ...osmResults]
           .filter((v, i, a) => 
             a.findIndex(t => t.place_id === v.place_id) === i
@@ -522,7 +511,6 @@ const LocationIQAutocomplete = ({
         console.error('Final search error:', error);
         setApiStatus('error');
         
-        // Final fallback: just local
         const localResults = searchLocalDatabase(query);
         setSuggestions(localResults);
         setShowSuggestions(localResults.length > 0);
@@ -559,7 +547,6 @@ const LocationIQAutocomplete = ({
     
     let type: LocationData['type'] = 'place';
     
-    // Check if it's a transport type
     if (feature.class === 'transport') {
       const lowerDisplayName = feature.display_name.toLowerCase();
       
@@ -579,7 +566,6 @@ const LocationIQAutocomplete = ({
     const country = feature.address?.country || '';
     const countryCode = feature.address?.country_code?.toUpperCase() || '';
 
-    // Generate port code
     let portCode: string | undefined;
     if (type === 'port' || type === 'airport') {
       if (isLocal) {
@@ -632,7 +618,6 @@ const LocationIQAutocomplete = ({
     console.log('🔄 Setting new value and closing suggestions');
     setInputValue(locationData.name);
     onChange(locationData);
-    // showSuggestions-ը կփակվի useEffect-ի միջոցով
   };
 
   const clearSelection = () => {
@@ -692,7 +677,6 @@ const LocationIQAutocomplete = ({
         </div>
       </div>
 
-      {/* Selected location details */}
       {value && (
         <div className="mt-2 p-3 bg-blue-50 rounded-lg border border-blue-100">
           <div className="flex items-start justify-between">
@@ -722,14 +706,12 @@ const LocationIQAutocomplete = ({
                   Port Code: <code className="bg-white px-1.5 py-0.5 rounded border">{value.portCode}</code>
                 </div>
               )}
-            
             </div>
             <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
           </div>
         </div>
       )}
 
-      {/* Suggestions dropdown */}
       {showSuggestions && suggestions.length > 0 && (
         <div className="absolute z-50 mt-1 w-full bg-white rounded-xl shadow-lg border border-gray-200 max-h-64 overflow-y-auto">
           <div className="py-2">
@@ -746,7 +728,6 @@ const LocationIQAutocomplete = ({
                   type="button"
                   onMouseDown={(e) => {
                     console.log('🖱️ Suggestion button mouse down');
-                    // e.preventDefault();
                   }}
                   onClick={(e) => {
                     console.log('🖱️ Suggestion button clicked');
@@ -807,18 +788,144 @@ const LocationIQAutocomplete = ({
           </div>
         </div>
       )}
-      
-      {/* Debug info */}
-      {/* {process.env.NODE_ENV === 'development' && (
-        <div className="mt-2 text-xs text-gray-500">
-          Debug: showSuggestions={showSuggestions.toString()}, suggestions={suggestions.length}
-        </div>
-      )} */}
     </div>
   );
 };
+
+// Մոբայլի համար հատուկ Components
+const MobileProgressBar = ({ 
+  currentStep, 
+  totalSteps,
+  completionPercentage 
+}: { 
+  currentStep: number; 
+  totalSteps: number;
+  completionPercentage: number;
+}) => {
+  return (
+    <div className="md:hidden bg-white rounded-xl p-4 mb-4 shadow-sm border border-gray-200">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-700">Step {currentStep} of {totalSteps}</span>
+          <div className="w-12 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-blue-500 rounded-full transition-all duration-300"
+              style={{ width: `${(currentStep - 1) / (totalSteps - 1) * 100}%` }}
+            />
+          </div>
+        </div>
+        <div className="text-sm font-semibold text-blue-600">
+          {completionPercentage}%
+        </div>
+      </div>
+      
+      <div className="space-y-1">
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-gray-600">Progress</span>
+          <span className="text-xs font-medium text-gray-900">
+            {Math.round(completionPercentage/100*7)} of 7 fields
+          </span>
+        </div>
+        <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-300"
+            style={{ width: `${completionPercentage}%` }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const MobileTipsCard = ({ completionPercentage }: { completionPercentage: number }) => {
+  return (
+    <div className="md:hidden bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-5 mb-6 text-white">
+      <h3 className="text-lg font-semibold mb-4">Smart Quote Tips</h3>
+      
+      <div className="space-y-4 mb-6">
+        <div className="flex items-start gap-3">
+          <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <CheckCircle className="w-3 h-3" />
+          </div>
+          <div>
+            <p className="text-sm font-medium mb-1">Full Coverage</p>
+            <p className="text-xs opacity-90 leading-relaxed">
+              Include all freight charges and duties in shipment value for complete protection.
+            </p>
+          </div>
+        </div>
+        
+        <div className="flex items-start gap-3">
+          <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <CheckCircle className="w-3 h-3" />
+          </div>
+          <div>
+            <p className="text-sm font-medium mb-1">Lower Premiums</p>
+            <p className="text-xs opacity-90 leading-relaxed">
+              Accurate cargo classification can reduce premiums by up to 30%.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const MobileStepIndicator = ({ currentStep }: { currentStep: number }) => {
+  const steps = [
+    { id: 1, name: 'Shipment Details' },
+    { id: 2, name: 'Coverage Options' },
+    { id: 3, name: 'Quote Review' },
+  ];
+
+  return (
+    <div className="md:hidden mb-6">
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-xl font-bold text-gray-900">New Quote</h1>
+        <span className="text-sm text-gray-500">Step {currentStep}/3</span>
+      </div>
+      
+      <div className="flex justify-between relative">
+        {steps.map((step, index) => (
+          <div key={step.id} className="relative z-10 flex flex-col items-center">
+            <div className={`
+              w-10 h-10 rounded-full border-2 flex items-center justify-center mb-2
+              ${step.id === currentStep 
+                ? 'border-blue-600 bg-blue-600 text-white' 
+                : step.id < currentStep
+                ? 'border-green-500 bg-green-500 text-white'
+                : 'border-gray-300 bg-white text-gray-400'
+              }
+            `}>
+              {step.id < currentStep ? (
+                <CheckCircle className="w-5 h-5" />
+              ) : (
+                <span className="text-sm font-medium">{step.id}</span>
+              )}
+            </div>
+            <span className={`
+              text-xs font-medium text-center max-w-[80px] truncate
+              ${step.id === currentStep ? 'text-blue-600' : 
+                step.id < currentStep ? 'text-green-600' : 'text-gray-500'
+              }
+            `}>
+              {step.name}
+            </span>
+            
+            {index < steps.length - 1 && (
+              <div className={`
+                absolute top-5 left-[70%] w-[calc(100%-80px)] h-0.5 -translate-y-1/2
+                ${step.id < currentStep ? 'bg-green-500' : 'bg-gray-300'}
+              `} />
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 export default function ShippingValuePage() {
-  // State-ներ
   const [cargoType, setCargoType] = useState('');
   const [shipmentValue, setShipmentValue] = useState('');
   const [origin, setOrigin] = useState<LocationData | null>(null);
@@ -827,14 +934,13 @@ export default function ShippingValuePage() {
   const [endDate, setEndDate] = useState('');
   const [transportationMode, setTransportationMode] = useState('');
   const [step, setStep] = useState(1);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Get dates
   const today = new Date().toISOString().split('T')[0];
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
 
-  // Cargo options
   const cargoOptions = [
     { value: 'electronics', label: 'Electronics', icon: Cpu },
     { value: 'clothing', label: 'Clothing', icon: Shirt },
@@ -845,14 +951,12 @@ export default function ShippingValuePage() {
     { value: 'other', label: 'Other', icon: Box },
   ];
 
-  // Transport modes
   const transportModes = [
     { id: 'sea', name: 'Sea Freight', icon: Ship, color: 'blue' },
     { id: 'air', name: 'Air Freight', icon: Plane, color: 'emerald' },
     { id: 'road', name: 'Road Freight', icon: Truck, color: 'amber' },
   ];
 
-  // Progress steps
   const steps = [
     { id: 1, name: 'Shipment Details', status: 'current' },
     { id: 2, name: 'Coverage Options', status: 'upcoming' },
@@ -913,7 +1017,6 @@ export default function ShippingValuePage() {
     }
   };
 
-  // Calculate completion
   const completedFields = [
     !!cargoType,
     !!shipmentValue,
@@ -932,8 +1035,9 @@ export default function ShippingValuePage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <DashboardHeader userEmail="client@example.com" />
       
-      <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
+      <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+        {/* Desktop Breadcrumb */}
+        <div className="hidden md:block mb-8">
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
             <button 
               onClick={() => window.history.back()}
@@ -987,10 +1091,19 @@ export default function ShippingValuePage() {
           </div>
         </div>
 
+        {/* Mobile Header */}
+        <MobileStepIndicator currentStep={step} />
+        <MobileTipsCard completionPercentage={completionPercentage} />
+        <MobileProgressBar 
+          currentStep={step} 
+          totalSteps={3}
+          completionPercentage={completionPercentage}
+        />
+
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_0.02fr_0.7fr]">
-          <div className="lg:col-span-2 w-[99%]">
-            <div className="bg-[#FFFFFE] rounded-2xl shadow-lg border border-gray-200 p-8">
-              <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="lg:col-span-2 w-full lg:w-[99%]">
+            <div className="bg-[#FFFFFE] rounded-2xl shadow-lg border border-gray-200 p-4 md:p-8">
+              <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
                 {/* Cargo Type Section */}
                 <div>
                   <div className="flex items-center gap-2 mb-4">
@@ -1002,7 +1115,7 @@ export default function ShippingValuePage() {
                       <label className="block text-sm font-medium text-[#868686] mb-2">
                         Cargo Type *
                       </label>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 md:gap-3">
                         {cargoOptions.map((option) => {
                           const Icon = option.icon;
                           return (
@@ -1011,7 +1124,7 @@ export default function ShippingValuePage() {
                               type="button"
                               onClick={() => setCargoType(option.value)}
                               className={`
-                                p-4 rounded-xl border-2 transition-all duration-200
+                                p-3 md:p-4 rounded-xl border-2 transition-all duration-200
                                 ${cargoType === option.value
                                   ? 'border-blue-500 bg-blue-50'
                                   : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
@@ -1020,7 +1133,7 @@ export default function ShippingValuePage() {
                             >
                               <div className="flex flex-col items-center gap-2">
                                 <div className={`
-                                  p-3 rounded-lg
+                                  p-2 md:p-3 rounded-lg
                                   ${cargoType === option.value
                                     ? 'bg-blue-100 text-blue-600'
                                     : 'bg-gray-100 text-gray-600'
@@ -1028,7 +1141,7 @@ export default function ShippingValuePage() {
                                 `}>
                                   <Icon className="w-4 h-4" />
                                 </div>
-                                <span className="text-sm font-medium text-[#868686]">
+                                <span className="text-xs md:text-sm font-medium text-[#868686] text-center leading-tight">
                                   {option.label}
                                 </span>
                               </div>
@@ -1070,7 +1183,7 @@ export default function ShippingValuePage() {
                     <h2 className="text-lg font-semibold text-gray-900">Route Information</h2>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                     <div>
                       <LocationIQAutocomplete
                         value={origin}
@@ -1094,14 +1207,14 @@ export default function ShippingValuePage() {
                 </div>
 
                 {/* Dates & Transport */}
-                <div className="">
+                <div className="space-y-6 md:space-y-8">
                   <div>
                     <div className="flex items-center gap-2 mb-4">
                       <h2 className="text-lg font-semibold text-gray-900">Coverage Period</h2>
                     </div>
                     
-                    <div className="space-y-4 flex justify-between">
-                      <div className='w-[49%]'>
+                    <div className="flex flex-col sm:flex-row sm:justify-between gap-4">
+                      <div className='w-full sm:w-[49%]'>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Start Date *
                         </label>
@@ -1113,7 +1226,7 @@ export default function ShippingValuePage() {
                         />
                       </div>
 
-                      <div className='w-[48.8%]'>
+                      <div className='w-full sm:w-[49%]'>
                         <label className="block text-sm font-medium text-[#868686] mb-2">
                           End Date *
                         </label>
@@ -1132,7 +1245,7 @@ export default function ShippingValuePage() {
                       <h2 className="text-lg font-semibold text-gray-900">Transport Mode *</h2>
                     </div>
                     
-                    <div className="space-y-3 flex justify-between">
+                    <div className="flex flex-col sm:flex-row sm:justify-between gap-3">
                       {transportModes.map((mode) => {
                         const Icon = mode.icon;
                         return (
@@ -1141,8 +1254,8 @@ export default function ShippingValuePage() {
                             type="button"
                             onClick={() => setTransportationMode(mode.id)}
                             className={`
-                              w-[32.7%] relative p-4 rounded-xl border-2 transition-all duration-200
-                              flex flex-col items-center gap-4 mb-0
+                              w-full sm:w-[32.7%] relative p-4 rounded-xl border-2 transition-all duration-200
+                              flex flex-col sm:flex-col items-center gap-3 md:gap-4 mb-0
                               ${transportationMode === mode.id
                                 ? 'border-blue-500 bg-blue-50'
                                 : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
@@ -1159,8 +1272,8 @@ export default function ShippingValuePage() {
                               <Icon className="w-4 h-4" />
                             </div>
                             <div className="flex-1 text-center">
-                              <div className="font-medium text-gray-900">{mode.name}</div>
-                              <div className="text-sm text-gray-500">
+                              <div className="font-medium text-gray-900 text-sm md:text-base">{mode.name}</div>
+                              <div className="text-xs md:text-sm text-gray-500">
                                 {mode.id === 'sea' && 'Most economical, 20-40 days'}
                                 {mode.id === 'air' && 'Fastest option, 2-7 days'}
                                 {mode.id === 'road' && 'Regional delivery, 3-10 days'}
@@ -1179,27 +1292,27 @@ export default function ShippingValuePage() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+                <div className="flex flex-col-reverse sm:flex-row items-center justify-between pt-6 border-t border-gray-200 gap-4">
                   <button
                     type="button"
                     onClick={handleCancel}
-                    className="px-6 py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                    className="w-full sm:w-auto px-6 py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors font-medium"
                   >
                     Cancel
                   </button>
                   
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
                     <button
                       type="button"
                       onClick={() => setStep(step - 1)}
-                      className="px-6 py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                      className="w-full sm:w-auto px-6 py-3 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors font-medium order-2 sm:order-1"
                     >
                       Previous
                     </button>
                     <button
                       type="submit"
                       disabled={!isFormComplete}
-                      className="px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
+                      className="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl order-1 sm:order-2"
                     >
                       Continue to Coverage Options
                     </button>
@@ -1209,8 +1322,8 @@ export default function ShippingValuePage() {
             </div>
           </div>
 
-          {/* Right Column - Tips & Help */}
-          <div className="space-y-6">
+          {/* Right Column - Tips & Help (Desktop only) */}
+          <div className="hidden lg:block space-y-6">
             <div className="bg-[url('/quotes/new/shipping-wd-back.png')] bg-cover flex flex-col gap-8 rounded-2xl shadow-lg p-6 text-white">
               <div className="flex items-center gap-2 mb-4">
                 <h3 className="text-lg font-semibold">Smart Quote Tips</h3>
@@ -1267,6 +1380,20 @@ export default function ShippingValuePage() {
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Mobile Help Card (Fixed at bottom) */}
+        <div className="lg:hidden mt-6 bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+          <div className="flex items-center gap-2 mb-3">
+            <AlertCircle className="w-5 h-5 text-amber-500" />
+            <h3 className="text-lg font-semibold text-gray-900">Need Help?</h3>
+          </div>
+          <p className="text-sm text-gray-600 mb-4">
+            Our team is here to assist you with any questions about your shipment insurance.
+          </p>
+          <button className="w-full py-3 rounded-xl border-2 border-blue-600 text-blue-600 font-medium hover:bg-blue-50 transition-colors">
+            Contact Support
+          </button>
         </div>
       </div>
     </div>
