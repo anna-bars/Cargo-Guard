@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, AlertCircle, CheckCircle, Ship, Plane, Truck } from 'lucide-react';
 import DashboardHeader from '@/app/components/dashboard/DashboardHeader';
@@ -10,12 +10,10 @@ import MobileTipsCard from './components/MobileTipsCard';
 import MobileStepIndicator from './components/MobileStepIndicator';
 import CargoTypeSelector from './components/CargoTypeSelector';
 import { LocationData } from './components/LocationIQAutocomplete';
-import { createClient } from '@/lib/supabase/client';
 import { useUser } from '@/app/context/UserContext';
 
 export default function ShippingValuePage() {
   const router = useRouter();
-  const supabase = createClient();
   const { user } = useUser();
   
   const [cargoType, setCargoType] = useState('');
@@ -29,7 +27,7 @@ export default function ShippingValuePage() {
   const [otherCargoType, setOtherCargoType] = useState('');
   const [quoteId, setQuoteId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false); // Փոխել true-ից false
 
   const today = new Date().toISOString().split('T')[0];
   const tomorrow = new Date();
@@ -48,177 +46,100 @@ export default function ShippingValuePage() {
     { id: 3, name: 'Quote Review', status: 'upcoming' },
   ];
 
-  // Load or create draft on component mount
+  // Load draft from localStorage on component mount
   useEffect(() => {
-    if (!user) return;
+    if (typeof window === 'undefined') return;
 
-    const initializeQuote = async () => {
-      setIsLoading(true);
+    const loadDraftFromLocalStorage = () => {
       try {
-        // Check if there's an existing draft
-        const { data: existingQuote, error: fetchError } = await supabase
-          .from('quotes')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('status', 'draft')
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
-
-        if (fetchError && fetchError.code !== 'PGRST116') {
-          console.error('Error fetching draft:', fetchError);
-        }
-
-        if (existingQuote) {
-          // Load existing draft
-          setQuoteId(existingQuote.id);
-          setCargoType(existingQuote.cargo_type || '');
-          setShipmentValue(existingQuote.shipment_value?.toString() || '');
-          setStartDate(existingQuote.coverage_start || today);
-          setEndDate(existingQuote.coverage_end || tomorrowFormatted);
-          setTransportationMode(existingQuote.transportation_mode || '');
-          
-          if (existingQuote.origin_city) {
-  setOrigin({
-    name: existingQuote.origin_city,
-    city: existingQuote.origin_city,
-    country: '',
-    countryCode: '',
-    type: 'city',
-    fullAddress: existingQuote.origin_city
-  });
-}
-
-if (existingQuote.destination_city) {
-  setDestination({
-    name: existingQuote.destination_city,
-    city: existingQuote.destination_city,
-    country: '',
-    countryCode: '',
-    type: 'city',
-    fullAddress: existingQuote.destination_city
-  });
-}
+        const draftData = localStorage.getItem('quote_draft');
+        if (draftData) {
+          const draft = JSON.parse(draftData);
+          setCargoType(draft.cargoType || '');
+          setOtherCargoType(draft.otherCargoType || '');
+          setShipmentValue(draft.shipmentValue || '');
+          setStartDate(draft.startDate || today);
+          setEndDate(draft.endDate || tomorrowFormatted);
+          setTransportationMode(draft.transportationMode || '');
+          setOrigin(draft.origin || null);
+          setDestination(draft.destination || null);
+          setQuoteId(draft.quoteId || `temp-${Date.now()}`);
         } else {
-          // Create new draft
-          const quoteNumber = `Q-${Date.now()}`;
-          const { data: newQuote, error: createError } = await supabase
-            .from('quotes')
-            .insert({
-              user_id: user.id,
-              quote_number: quoteNumber,
-              status: 'draft',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            })
-            .select()
-            .single();
-
-          if (createError) throw createError;
-          setQuoteId(newQuote.id);
+          // Create new draft ID
+          setQuoteId(`temp-${Date.now()}`);
+          setStartDate(today);
+          setEndDate(tomorrowFormatted);
         }
       } catch (error) {
-        console.error('Error initializing quote:', error);
-      } finally {
-        setIsLoading(false);
+        console.error('Error loading draft from localStorage:', error);
+        // Create new draft ID as fallback
+        setQuoteId(`temp-${Date.now()}`);
+        setStartDate(today);
+        setEndDate(tomorrowFormatted);
       }
     };
 
-    initializeQuote();
-  }, [user]);
+    loadDraftFromLocalStorage();
+  }, []);
 
-  // Auto-save function with debounce
-  const saveDraft = useCallback(async () => {
-    if (!user || !quoteId || isSaving) return;
-
-    setIsSaving(true);
-    
-    try {
-      const finalCargoType = cargoType === 'other' ? otherCargoType : cargoType;
-      
-      await supabase
-        .from('quotes')
-        .update({
-          cargo_type: finalCargoType || null,
-          shipment_value: shipmentValue ? parseFloat(shipmentValue) : null,
-          origin_city: origin?.city || null,
-          destination_city: destination?.city || null,
-          coverage_start: startDate || today,
-          coverage_end: endDate || tomorrowFormatted,
-          transportation_mode: transportationMode || null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', quoteId)
-        .eq('user_id', user.id);
-    } catch (error) {
-      console.error('Error saving draft:', error);
-    } finally {
-      setIsSaving(false);
-    }
-  }, [user, quoteId, cargoType, otherCargoType, shipmentValue, origin, destination, startDate, endDate, transportationMode]);
-
-  // Auto-save on changes with debounce
+  // Auto-save to localStorage with debounce
   useEffect(() => {
-    if (!quoteId) return;
-    
+    if (typeof window === 'undefined' || !quoteId) return;
+
     const timeoutId = setTimeout(() => {
-      saveDraft();
+      const draftData = {
+        quoteId,
+        cargoType,
+        otherCargoType,
+        shipmentValue,
+        startDate,
+        endDate,
+        transportationMode,
+        origin,
+        destination,
+        lastSaved: new Date().toISOString()
+      };
+      
+      localStorage.setItem('quote_draft', JSON.stringify(draftData));
+      setIsSaving(false);
     }, 1000); // Debounce 1 second
 
-    return () => clearTimeout(timeoutId);
-  }, [saveDraft, quoteId]);
+    setIsSaving(true);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+    return () => clearTimeout(timeoutId);
+  }, [cargoType, otherCargoType, shipmentValue, startDate, endDate, transportationMode, origin, destination, quoteId]);
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!quoteId || !user) return;
-
-    try {
-      const finalCargoType = cargoType === 'other' ? otherCargoType : cargoType;
-      
-      // Update quote with status for next step
-      const { error } = await supabase
-        .from('quotes')
-        .update({
-          cargo_type: finalCargoType,
-          shipment_value: parseFloat(shipmentValue),
-          origin_city: origin?.city || '',
-          destination_city: destination?.city || '',
-          coverage_start: startDate,
-          coverage_end: endDate,
-          transportation_mode: transportationMode,
-          status: 'awaiting_coverage',
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', quoteId)
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-
-      // Navigate to coverage page with quote ID
-      router.push(`/quotes/new/coverage?quote_id=${quoteId}`);
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Error saving quote. Please try again.');
+    if (!isFormComplete) {
+      alert('Խնդրում ենք լրացնել բոլոր պարտադիր դաշտերը');
+      return;
     }
+
+    // Prepare the data to pass to next page
+    const quoteData = {
+      quoteId: quoteId || `q-${Date.now()}`,
+      cargoType: cargoType === 'other' ? otherCargoType : cargoType,
+      shipmentValue: parseFloat(shipmentValue),
+      origin,
+      destination,
+      startDate,
+      endDate,
+      transportationMode
+    };
+
+    // Save to localStorage for the next page
+    localStorage.setItem('quote_submission', JSON.stringify(quoteData));
+    
+    // Navigate to coverage page
+    router.push(`/quotes/new/coverage?quote_id=${quoteData.quoteId}`);
   };
 
-  const handleCancel = async () => {
-    if (window.confirm('Are you sure you want to cancel? All entered data will be lost.')) {
-      if (quoteId && user) {
-        try {
-          await supabase
-            .from('quotes')
-            .update({
-              status: 'cancelled',
-              updated_at: new Date().toISOString(),
-            })
-            .eq('id', quoteId)
-            .eq('user_id', user.id);
-        } catch (error) {
-          console.error('Error cancelling quote:', error);
-        }
-      }
+  const handleCancel = () => {
+    if (window.confirm('Համոզված ե՞ք, որ ցանկանում եք չեղարկել: Բոլոր մուտքագրված տվյալները կկորչեն։')) {
+      // Clear localStorage
+      localStorage.removeItem('quote_draft');
       
       // Reset form
       setCargoType('');
@@ -251,6 +172,7 @@ if (existingQuote.destination_city) {
   const completionPercentage = Math.round((completedFields / totalFields) * 100);
   const isFormComplete = completedFields === totalFields;
 
+  // Remove loading state since we're not waiting for API
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -446,50 +368,50 @@ if (existingQuote.destination_city) {
                     
                     <div className="flex flex-col sm:flex-row sm:justify-between gap-3">
                       {transportModes.map((mode) => {
-          const Icon = mode.icon;
-          const transportDescriptions = {
-            'sea': '20-40 days',
-            'air': '2-7 days', 
-            'road': '3-10 days'
-          };
-          
-          return (
-            <button
-              key={mode.id}
-              type="button"
-              onClick={() => setTransportationMode(mode.id)}
-              className={`
-                w-full sm:w-[32.7%] relative p-4 rounded-xl border-2 transition-all duration-200
-                flex flex-col sm:flex-col items-center gap-3 md:gap-4 mb-0
-                ${transportationMode === mode.id
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                }
-              `}
-            >
-              <div className={`
-                p-3 rounded-lg flex items-center justify-center
-                ${transportationMode === mode.id
-                  ? `bg-blue-100 text-blue-600`
-                  : 'bg-gray-100 text-gray-500'
-                }
-              `}>
-                <Icon className="w-5 h-5" />
-              </div>
-              <div className="flex-1 text-center">
-                <div className="font-medium text-gray-900 text-sm md:text-base">{mode.name}</div>
-                <div className="text-xs md:text-sm text-gray-500">
-                  {transportDescriptions[mode.id as keyof typeof transportDescriptions]}
-                </div>
-              </div>
-              {transportationMode === mode.id && (
-                <div className="w-5 h-5 absolute top-2 right-2 rounded-full bg-blue-500 flex items-center justify-center">
-                  <CheckCircle className="w-3 h-3 text-white" />
-                </div>
-              )}
-            </button>
-          );
-        })}
+                        const Icon = mode.icon;
+                        const transportDescriptions = {
+                          'sea': '20-40 days',
+                          'air': '2-7 days', 
+                          'road': '3-10 days'
+                        };
+                        
+                        return (
+                          <button
+                            key={mode.id}
+                            type="button"
+                            onClick={() => setTransportationMode(mode.id)}
+                            className={`
+                              w-full sm:w-[32.7%] relative p-4 rounded-xl border-2 transition-all duration-200
+                              flex flex-col sm:flex-col items-center gap-3 md:gap-4 mb-0
+                              ${transportationMode === mode.id
+                                ? 'border-blue-500 bg-blue-50'
+                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                              }
+                            `}
+                          >
+                            <div className={`
+                              p-3 rounded-lg flex items-center justify-center
+                              ${transportationMode === mode.id
+                                ? `bg-blue-100 text-blue-600`
+                                : 'bg-gray-100 text-gray-500'
+                              }
+                            `}>
+                              <Icon className="w-5 h-5" />
+                            </div>
+                            <div className="flex-1 text-center">
+                              <div className="font-medium text-gray-900 text-sm md:text-base">{mode.name}</div>
+                              <div className="text-xs md:text-sm text-gray-500">
+                                {transportDescriptions[mode.id as keyof typeof transportDescriptions]}
+                              </div>
+                            </div>
+                            {transportationMode === mode.id && (
+                              <div className="w-5 h-5 absolute top-2 right-2 rounded-full bg-blue-500 flex items-center justify-center">
+                                <CheckCircle className="w-3 h-3 text-white" />
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
