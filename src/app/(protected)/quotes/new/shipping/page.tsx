@@ -299,6 +299,17 @@ const LocationIQAutocomplete = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const debounceTimeout = useRef<ReturnType<typeof setTimeout>>();
 
+  // Console log ցուցադրելու համար
+  useEffect(() => {
+    console.log('📊 LocationIQAutocomplete State:', {
+      inputValue,
+      showSuggestions,
+      suggestionsCount: suggestions.length,
+      value: value?.name,
+      apiStatus
+    });
+  }, [inputValue, showSuggestions, suggestions, value, apiStatus]);
+
   // LocationIQ API Key
   const LOCATIONIQ_API_KEY = process.env.NEXT_PUBLIC_LOCATIONIQ_API_KEY || 'pk.f15b5391da0772168ecba607d5fe3136';
 
@@ -315,14 +326,57 @@ const LocationIQAutocomplete = ({
     { name: 'Tokyo City', city: 'Tokyo', country: 'Japan', type: 'city', lat: 35.68, lon: 139.76 },
   ];
 
+  const getIcon = (type: string) => {
+    switch (type) {
+      case 'port':
+      case 'harbor':
+      case 'dock':
+        return <Anchor className="h-4 w-4" />;
+      case 'airport':
+        return <Plane className="h-4 w-4" />;
+      case 'city':
+        return <Building className="h-4 w-4" />;
+      default:
+        return <MapPin className="h-4 w-4" />;
+    }
+  };
+
+  const getTypeLabel = (type: string): string => {
+    switch (type) {
+      case 'port': return 'Sea Port';
+      case 'airport': return 'Airport';
+      case 'city': return 'City';
+      default: return 'Location';
+    }
+  };
+
+  useEffect(() => {
+    if (value && showSuggestions) {
+      console.log('🔽 Value exists and showSuggestions is true, closing...');
+      setShowSuggestions(false);
+    }
+  }, [value, showSuggestions]);
+
   // Handle click outside
   useEffect(() => {
     const handleDocumentClick = (e: MouseEvent) => {
+      const target = e.target as Element;
+      const isInsideContainer = containerRef.current?.contains(target);
+      const isSuggestionButton = target.closest('.location-suggestion-button');
+      
+      console.log('🖱️ Document click:', {
+        target: target?.tagName,
+        isInsideContainer,
+        isSuggestionButton: !!isSuggestionButton,
+        showSuggestions
+      });
+      
       if (
         containerRef.current &&
-        !containerRef.current.contains(e.target as Node) &&
-        !(e.target as Element).closest('.location-suggestion-button')
+        !isInsideContainer &&
+        !isSuggestionButton
       ) {
+        console.log('❌ Click outside, closing suggestions');
         setShowSuggestions(false);
       }
     };
@@ -334,10 +388,50 @@ const LocationIQAutocomplete = ({
   // Update input when value changes
   useEffect(() => {
     if (value) {
+      console.log('✅ Value changed, updating input:', value.name);
       setInputValue(value.name);
       setShowSuggestions(false);
     }
   }, [value]);
+
+  const searchLocalDatabase = (query: string): LocationIQFeature[] => {
+    const normalizedQuery = query.toLowerCase();
+    
+    return LOCAL_PORTS_DB
+      .filter(location =>
+        location.name.toLowerCase().includes(normalizedQuery) ||
+        location.city.toLowerCase().includes(normalizedQuery) ||
+        location.country.toLowerCase().includes(normalizedQuery)
+      )
+      .map(location => {
+        const boundingbox: [string, string, string, string] = [
+          (location.lat - 0.1).toString(),
+          (location.lat + 0.1).toString(),
+          (location.lon - 0.1).toString(),
+          (location.lon + 0.1).toString()
+        ];
+        
+        return {
+          place_id: `local-${location.code || location.name}`,
+          licence: 'Local Database',
+          osm_type: 'local',
+          osm_id: 0,
+          boundingbox,
+          lat: location.lat.toString(),
+          lon: location.lon.toString(),
+          display_name: location.name,
+          class: location.type === 'port' || location.type === 'airport' ? 'transport' : 'place',
+          type: location.type,
+          importance: 0.9,
+          address: {
+            city: location.city,
+            country: location.country,
+            country_code: location.country.substring(0, 2).toUpperCase() || ''
+          }
+        };
+      })
+      .slice(0, 4);
+  };
 
   // Debounced search
   useEffect(() => {
@@ -458,69 +552,15 @@ const LocationIQAutocomplete = ({
     };
   }, [inputValue]);
 
-  const searchLocalDatabase = (query: string): LocationIQFeature[] => {
-    const normalizedQuery = query.toLowerCase();
-    
-    return LOCAL_PORTS_DB
-      .filter(location =>
-        location.name.toLowerCase().includes(normalizedQuery) ||
-        location.city.toLowerCase().includes(normalizedQuery) ||
-        location.country.toLowerCase().includes(normalizedQuery)
-      )
-      .map(location => {
-        const boundingbox: [string, string, string, string] = [
-          (location.lat - 0.1).toString(),
-          (location.lat + 0.1).toString(),
-          (location.lon - 0.1).toString(),
-          (location.lon + 0.1).toString()
-        ];
-        
-        return {
-          place_id: `local-${location.code || location.name}`,
-          licence: 'Local Database',
-          osm_type: 'local',
-          osm_id: 0,
-          boundingbox,
-          lat: location.lat.toString(),
-          lon: location.lon.toString(),
-          display_name: location.name,
-          class: location.type === 'port' || location.type === 'airport' ? 'transport' : 'place',
-          type: location.type,
-          importance: 0.9,
-          address: {
-            city: location.city,
-            country: location.country,
-            country_code: location.country.substring(0, 2).toUpperCase() || ''
-          }
-        };
-      })
-      .slice(0, 4);
-  };
-
-  const handleSelect = (feature: LocationIQFeature) => {
-    console.log('🟢 handleSelect called');
-    
-    const locationData = extractLocationData(feature);
-    console.log('📍 Location data:', locationData);
-    
-    // Սկզբում թարմացնել state-ները
-    setInputValue(locationData.name);
-    onChange(locationData);
-    
-    // Այնուհետև փակել սուգեստները
-    setTimeout(() => {
-      setShowSuggestions(false);
-    }, 100);
-  };
-
   const extractLocationData = (feature: LocationIQFeature): LocationData => {
+    console.log('🧮 Extracting location data from feature:', feature.display_name);
+    
     const isLocal = feature.osm_type === 'local';
     
     let type: LocationData['type'] = 'place';
     
     // Check if it's a transport type
     if (feature.class === 'transport') {
-      // Use string includes for type detection
       const lowerDisplayName = feature.display_name.toLowerCase();
       
       if (lowerDisplayName.includes('airport') || feature.type?.includes('airport')) {
@@ -555,6 +595,14 @@ const LocationIQAutocomplete = ({
       }
     }
 
+    console.log('📦 Extracted data:', {
+      type,
+      city,
+      country,
+      countryCode,
+      portCode
+    });
+
     return {
       name: feature.display_name.split(',')[0],
       city: city || feature.display_name.split(',')[0],
@@ -571,36 +619,29 @@ const LocationIQAutocomplete = ({
     };
   };
 
+  const handleSelect = (feature: LocationIQFeature) => {
+    console.log('🟢 handleSelect called with feature:', {
+      display_name: feature.display_name,
+      osm_type: feature.osm_type,
+      place_id: feature.place_id
+    });
+    
+    const locationData = extractLocationData(feature);
+    console.log('📍 Extracted location data:', locationData);
+    
+    console.log('🔄 Setting new value and closing suggestions');
+    setInputValue(locationData.name);
+    onChange(locationData);
+    // showSuggestions-ը կփակվի useEffect-ի միջոցով
+  };
+
   const clearSelection = () => {
+    console.log('🗑️ Clearing selection');
     setInputValue('');
     onChange(null);
     setSuggestions([]);
     setShowSuggestions(false);
     inputRef.current?.focus();
-  };
-
-  const getIcon = (type: string) => {
-    switch (type) {
-      case 'port':
-      case 'harbor':
-      case 'dock':
-        return <Anchor className="h-4 w-4" />;
-      case 'airport':
-        return <Plane className="h-4 w-4" />;
-      case 'city':
-        return <Building className="h-4 w-4" />;
-      default:
-        return <MapPin className="h-4 w-4" />;
-    }
-  };
-
-  const getTypeLabel = (type: string): string => {
-    switch (type) {
-      case 'port': return 'Sea Port';
-      case 'airport': return 'Airport';
-      case 'city': return 'City';
-      default: return 'Location';
-    }
   };
 
   return (
@@ -618,8 +659,17 @@ const LocationIQAutocomplete = ({
           ref={inputRef}
           type="text"
           value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onFocus={() => setShowSuggestions(true)}
+          onChange={(e) => {
+            console.log('⌨️ Input changed:', e.target.value);
+            setInputValue(e.target.value);
+          }}
+          onFocus={() => {
+            console.log('🔍 Input focused, showing suggestions');
+            setShowSuggestions(true);
+          }}
+          onBlur={() => {
+            console.log('👁️ Input blurred');
+          }}
           placeholder={placeholder}
           className="pl-10 pr-10 w-full h-12 px-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-colors"
           required={required && !value}
@@ -672,12 +722,7 @@ const LocationIQAutocomplete = ({
                   Port Code: <code className="bg-white px-1.5 py-0.5 rounded border">{value.portCode}</code>
                 </div>
               )}
-              {apiStatus === 'success' && (
-                <div className="mt-1 text-xs text-gray-500 flex items-center gap-1">
-                  <Globe className="h-3 w-3" />
-                  Powered by LocationIQ
-                </div>
-              )}
+            
             </div>
             <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
           </div>
@@ -700,13 +745,13 @@ const LocationIQAutocomplete = ({
                   key={`${feature.place_id}-${feature.osm_id}`}
                   type="button"
                   onMouseDown={(e) => {
-                    // Կանխել input-ի blur-ը մինչև click-ը
-                    e.preventDefault();
+                    console.log('🖱️ Suggestion button mouse down');
+                    // e.preventDefault();
                   }}
                   onClick={(e) => {
+                    console.log('🖱️ Suggestion button clicked');
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('🟡 Button clicked');
                     handleSelect(feature);
                   }}
                   className="location-suggestion-button w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-start gap-3"
@@ -762,10 +807,16 @@ const LocationIQAutocomplete = ({
           </div>
         </div>
       )}
+      
+      {/* Debug info */}
+      {/* {process.env.NODE_ENV === 'development' && (
+        <div className="mt-2 text-xs text-gray-500">
+          Debug: showSuggestions={showSuggestions.toString()}, suggestions={suggestions.length}
+        </div>
+      )} */}
     </div>
   );
 };
-
 export default function ShippingValuePage() {
   // State-ներ
   const [cargoType, setCargoType] = useState('');
