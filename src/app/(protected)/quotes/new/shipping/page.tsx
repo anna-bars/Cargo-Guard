@@ -109,33 +109,32 @@ export default function ShippingValuePage() {
     return () => clearTimeout(timeoutId);
   }, [cargoType, otherCargoType, shipmentValue, startDate, endDate, transportationMode, origin, destination, quoteId]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!isFormComplete) {
-      alert('Խնդրում ենք լրացնել բոլոր պարտադիր դաշտերը');
-      return;
-    }
+const handleSubmit = (e: React.FormEvent) => {
+  e.preventDefault();
+  
+  if (!isFormComplete) {
+    alert('Խնդրում ենք լրացնել բոլոր պարտադիր դաշտերը');
+    return;
+  }
 
-    // Prepare the data to pass to next page
-    const quoteData = {
-      quoteId: quoteId || `q-${Date.now()}`,
-      cargoType: cargoType === 'other' ? otherCargoType : cargoType,
-      shipmentValue: parseFloat(shipmentValue),
-      origin,
-      destination,
-      startDate,
-      endDate,
-      transportationMode
-    };
-
-    // Save to localStorage for the next page
-    localStorage.setItem('quote_submission', JSON.stringify(quoteData));
-    
-    // Navigate to coverage page
-    router.push(`/quotes/new/coverage?quote_id=${quoteData.quoteId}`);
+  // Prepare the data to pass to next page
+  const quoteData = {
+    quoteId: quoteId || `q-${Date.now()}`,
+    cargoType: cargoType === 'other' ? otherCargoType : cargoType,
+    shipmentValue: parseFloat(shipmentValue),
+    origin,
+    destination,
+    startDate,
+    endDate,
+    transportationMode
   };
 
+  // Save to localStorage for the next page
+  localStorage.setItem('quote_submission', JSON.stringify(quoteData));
+  
+  // Navigate to insurance page
+  router.push(`/quotes/new/insurance?quote_id=${quoteData.quoteId}`);
+};
   const handleCancel = () => {
     if (window.confirm('Համոզված ե՞ք, որ ցանկանում եք չեղարկել: Բոլոր մուտքագրված տվյալները կկորչեն։')) {
       // Clear localStorage
