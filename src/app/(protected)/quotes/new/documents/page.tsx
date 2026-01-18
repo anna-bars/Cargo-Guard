@@ -356,7 +356,7 @@ export default function SubmitDocumentsPage() {
                 </span>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[2fr_0.02fr_0.7fr] gap-6 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-gray-500">
                     <Package className="w-4 h-4" />
