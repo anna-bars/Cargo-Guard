@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { submitQuoteToSupabase } from '@/lib/supabase/quotes';
+import { createClient } from '@/lib/supabase/client';
+
 import { 
   ArrowLeft, 
   CheckCircle, 
@@ -71,37 +74,91 @@ export default function SubmitDocumentsPage() {
   const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    // Simulate loading quote data from API or params
-    const mockQuoteData: QuoteData = {
-      id: 'Q-0025',
-      cargoType: 'Electronics & Consumer Goods',
-      shipmentValue: 45000,
-      origin: {
-        name: 'New York Port',
-        city: 'New York',
-        country: 'USA'
-      },
-      destination: {
-        name: 'Tokyo Port',
-        city: 'Tokyo',
-        country: 'Japan'
-      },
-      startDate: '2025-12-10',
-      endDate: '2025-12-25',
-      transportationMode: 'Air Freight',
-      coverageType: 'Premium Coverage',
-      premium: 1215,
-      deductible: 500
-    };
+useEffect(() => {
+  const loadQuoteData = async () => {
+    try {
+      // Ստանում ենք տվյալները localStorage-ից
+      const storageData = localStorage.getItem('quote_coverage_selection');
+      let quoteDataFromStorage = null;
+      
+      if (storageData) {
+        quoteDataFromStorage = JSON.parse(storageData);
+      }
+      
+      // Եթե localStorage-ում չկա տվյալ, օգտագործում ենք mock տվյալներ
+      if (!quoteDataFromStorage) {
+        const mockQuoteData: QuoteData = {
+          id: 'Q-0025',
+          cargoType: 'Electronics & Consumer Goods',
+          shipmentValue: 45000,
+          origin: {
+            name: 'New York Port',
+            city: 'New York',
+            country: 'USA'
+          },
+          destination: {
+            name: 'Tokyo Port',
+            city: 'Tokyo',
+            country: 'Japan'
+          },
+          startDate: '2025-12-10',
+          endDate: '2025-12-25',
+          transportationMode: 'Air Freight',
+          coverageType: 'Premium Coverage',
+          premium: 1215,
+          deductible: 500
+        };
+        
+        setQuoteData(mockQuoteData);
+        setLoading(false);
+        return;
+      }
+      
+      // Օգտագործում ենք localStorage-ից ստացված տվյալները
+      const coverageType = searchParams.get('coverage') || 'premium';
+      const coverageDisplayType = coverageType.charAt(0).toUpperCase() + coverageType.slice(1) + ' Coverage';
+      
+      const formattedQuoteData: QuoteData = {
+        id: quoteDataFromStorage.quoteId || `Q-${Date.now()}`,
+        cargoType: quoteDataFromStorage.cargoType || 'Unknown Cargo',
+        shipmentValue: quoteDataFromStorage.shipmentValue || 0,
+        origin: quoteDataFromStorage.origin || { name: 'Unknown', city: 'Unknown', country: 'Unknown' },
+        destination: quoteDataFromStorage.destination || { name: 'Unknown', city: 'Unknown', country: 'Unknown' },
+        startDate: quoteDataFromStorage.startDate || '',
+        endDate: quoteDataFromStorage.endDate || '',
+        transportationMode: quoteDataFromStorage.transportationMode || 'Unknown',
+        coverageType: coverageDisplayType,
+        premium: quoteDataFromStorage.coverageDetails?.premium || quoteDataFromStorage.orderSummary?.basePremium || 0,
+        deductible: quoteDataFromStorage.coverageDetails?.deductible || quoteDataFromStorage.orderSummary?.deductible || 0
+      };
+      
+      setQuoteData(formattedQuoteData);
+      
+    } catch (error) {
+      console.error('Error loading quote data:', error);
+      // Fallback to mock data
+      const mockQuoteData: QuoteData = {
+        id: 'Q-0025',
+        cargoType: 'Electronics & Consumer Goods',
+        shipmentValue: 45000,
+        origin: { name: 'New York Port', city: 'New York', country: 'USA' },
+        destination: { name: 'Tokyo Port', city: 'Tokyo', country: 'Japan' },
+        startDate: '2025-12-10',
+        endDate: '2025-12-25',
+        transportationMode: 'Air Freight',
+        coverageType: 'Premium Coverage',
+        premium: 1215,
+        deductible: 500
+      };
+      
+      setQuoteData(mockQuoteData);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    // Get coverage type from URL params if available
-    const coverageType = searchParams.get('coverage') || 'premium';
-    mockQuoteData.coverageType = coverageType.charAt(0).toUpperCase() + coverageType.slice(1) + ' Coverage';
-
-    setQuoteData(mockQuoteData);
-    setLoading(false);
-  }, [searchParams]);
+  loadQuoteData();
+}, [searchParams]);
 
  const handleFileUpload = (documentId: string, file: File) => {
   const updatedDocuments = documents.map(doc => {
@@ -223,25 +280,79 @@ export default function SubmitDocumentsPage() {
   const allDocumentsUploaded = documents.every(doc => doc.status === 'uploaded' || doc.status === 'verified');
 
   const handleSubmit = async () => {
-    if (!shipperName.trim()) {
-      alert('Please enter shipper name');
-      return;
-    }
+  if (!shipperName.trim()) {
+    alert('Please enter shipper name');
+    return;
+  }
 
-    if (!allDocumentsUploaded) {
-      alert('Please upload all required documents');
-      return;
-    }
+  if (!allDocumentsUploaded) {
+    alert('Please upload all required documents');
+    return;
+  }
 
-    setIsSubmitting(true);
+  setIsSubmitting(true);
+  
+  try {
+    // Ստանում ենք localStorage-ից quote-ի տվյալները
+    const quoteDataFromStorage = localStorage.getItem('quote_coverage_selection');
+    if (!quoteDataFromStorage) {
+      throw new Error('No quote data found. Please start over.');
+    }
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
+    const parsedQuoteData = JSON.parse(quoteDataFromStorage);
+    
+    // Պատրաստում ենք submit-ի համար պահանջվող տվյալները
+    const submitData = {
+      quoteId: parsedQuoteData.quoteId || quoteData?.id || `Q-${Date.now()}`,
+      cargoType: parsedQuoteData.cargoType || quoteData?.cargoType || '',
+      shipmentValue: parsedQuoteData.shipmentValue || quoteData?.shipmentValue || 0,
+      origin: parsedQuoteData.origin || quoteData?.origin || { name: '', city: '', country: '' },
+      destination: parsedQuoteData.destination || quoteData?.destination || { name: '', city: '', country: '' },
+      startDate: parsedQuoteData.startDate || quoteData?.startDate || '',
+      endDate: parsedQuoteData.endDate || quoteData?.endDate || '',
+      transportationMode: parsedQuoteData.transportationMode || quoteData?.transportationMode || '',
+      selectedCoverage: parsedQuoteData.selectedCoverage || 'standard',
+      premium: parsedQuoteData.coverageDetails?.premium || quoteData?.premium || 0,
+      deductible: parsedQuoteData.coverageDetails?.deductible || quoteData?.deductible || 0,
+      shipperName: shipperName,
+      referenceNumber: referenceNumber || '',
+      documents: documents
+        .filter(doc => doc.file)
+        .map(doc => ({
+          type: doc.type,
+          name: doc.name,
+          file: doc.file!
+        }))
+    };
+    
+    // Ուղարկում ենք Supabase
+    const result = await submitQuoteToSupabase(submitData);
+    
+    if (result.success) {
+      // Մաքրում ենք localStorage-ը
+      localStorage.removeItem('quote_coverage_selection');
+      localStorage.removeItem('quote_submission');
+      localStorage.removeItem('quote_draft');
+      
       alert('Quote submitted successfully! Our team will review your documents and get back to you within 24 hours.');
-      router.push('/quotes/pending');
-    }, 2000);
-  };
+      // router.push('/quotes/pending');
+    } else {
+      throw new Error('Failed to submit quote');
+    }
+    
+  } catch (error) {
+    console.error('Error submitting quote:', error);
+
+  const message =
+    error instanceof Error
+      ? error.message
+      : 'Unknown error occurred';
+
+  alert(`Error submitting quote: ${message}. Please try again.`);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   if (loading) {
     return (
