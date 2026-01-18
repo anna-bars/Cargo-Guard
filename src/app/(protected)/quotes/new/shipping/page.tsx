@@ -141,12 +141,11 @@ export default function ShippingValuePage() {
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_0.02fr_0.7fr]">
           {/* Left Column - Form */}
           <div className="lg:col-span-2 w-[99%]">
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+            <div className="bg-[#FFFFFE] rounded-2xl shadow-lg border border-gray-200 p-8">
               <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Cargo Type Section */}
                 <div>
                   <div className="flex items-center gap-2 mb-4">
-                    <Package className="w-5 h-5 text-blue-600" />
                     <h2 className="text-lg font-semibold text-gray-900">Cargo Information</h2>
                   </div>
                   
@@ -212,7 +211,6 @@ export default function ShippingValuePage() {
                 {/* Route Information */}
                 <div>
                   <div className="flex items-center gap-2 mb-4">
-                    <MapPin className="w-5 h-5 text-blue-600" />
                     <h2 className="text-lg font-semibold text-gray-900">Route Information</h2>
                   </div>
                   
@@ -264,7 +262,6 @@ export default function ShippingValuePage() {
                   {/* Dates */}
                   <div>
                     <div className="flex items-center gap-2 mb-4">
-                      <Calendar className="w-5 h-5 text-blue-600" />
                       <h2 className="text-lg font-semibold text-gray-900">Coverage Period</h2>
                     </div>
                     
@@ -310,7 +307,6 @@ export default function ShippingValuePage() {
                   {/* Transport Mode */}
                   <div>
                     <div className="flex items-center gap-2 mb-4">
-                      <Truck className="w-5 h-5 text-blue-600" />
                       <h2 className="text-lg font-semibold text-gray-900">Transport Mode *</h2>
                     </div>
                     
