@@ -188,8 +188,8 @@ const handleSubmit = (e: React.FormEvent) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <DashboardHeader userEmail={user?.email} />
-         
-      <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+      
+      <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 pb-6 md:pb-8">
         {/* Desktop Breadcrumb */}
         <div className="hidden md:block mb-8">
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">

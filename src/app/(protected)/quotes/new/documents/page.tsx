@@ -412,7 +412,7 @@ const handleSubmit = async () => {
     <div className="min-h-screen bg-gray-50">
       <DashboardHeader userEmail="client@example.com" />
       
-      <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         {/* Header with Breadcrumb */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">

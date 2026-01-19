@@ -334,7 +334,7 @@ export default function InsuranceQuotePage() {
     return (
       <div className="min-h-screen bg-gray-50">
         <DashboardHeader userEmail="client@example.com" />
-        <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 pb-8">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
             <AlertCircle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">No Quote Data Found</h2>
@@ -362,7 +362,7 @@ export default function InsuranceQuotePage() {
     <div className="min-h-screen bg-gray-50">
       <DashboardHeader userEmail="client@example.com" />
       
-      <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
