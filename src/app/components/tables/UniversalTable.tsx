@@ -26,6 +26,7 @@ interface TableRow {
     color: string;
     dot: string;
     textColor: string;
+    borderColor?: string;
   };
   date?: string;
   lastUpdate?: string;
@@ -270,6 +271,25 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
         {row[column.key]}
       </div>
     );
+  };
+
+  // Helper function to get status border color
+  const getStatusBorderColor = (status: TableRow['status']) => {
+    if (!status) return '#e5e7eb';
+    
+    // Map status colors to border colors
+    const statusBorderMap: Record<string, string> = {
+      'Active': '#10b981',
+      'Pending': '#f59e0b',
+      'Expiring': '#ef4444',
+      'Missing': '#8b5cf6',
+      'Declined': '#6b7280',
+      'Pending Approval': '#f59e0b',
+      'Document Missing': '#8b5cf6',
+      'Expires': '#ef4444'
+    };
+    
+    return statusBorderMap[status.text] || status.borderColor || '#e5e7eb';
   };
 
   const renderQuotesMobileDesign = (row: TableRow) => (
@@ -567,22 +587,41 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
           ">
             {filteredRows.length > 0 ? (
               filteredRows.map((row, rowIndex) => (
-                <div key={rowIndex} className="
-                  mob-ly-item tab-item 
-                  md:grid
-                  p-4 md:p-3 
-                  bg-[#fdfdf8f5] rounded-lg 
-                  flex flex-wrap items-center 
-                  hover:bg-[#ffffff] transition-colors duration-300
-                  xs:min-w-full xs:flex xs:bg-[rgba(250,252,255,0.8)] 
-                  xs:rounded-[16px] xs:flex-wrap xs:gap-4 xs:justify-between 
-                  xs:p-0 xs:mb-3 xs:border-b xs:border-solid xs:border-[#d1d1d140]
-                  xs:hover:bg-[#f6f6ec]
-                  md:bg-transparent md:!m-0 md:!border-b md:!border-solid md:!border-[#ededf3] md:!rounded-none
-                  md:hover:!bg-[#f0f0f5e8]"
-                     style={{ 
-                       gridTemplateColumns: computedDesktopGridCols
-                     }}>
+                <div 
+                  key={rowIndex} 
+                  className="
+                    mob-ly-item tab-item 
+                    md:grid
+                    p-4 md:p-3 
+                    bg-[#fdfdf8f5] rounded-lg 
+                    flex flex-wrap items-center 
+                    transition-all duration-300 ease-in-out
+                    xs:min-w-full xs:flex xs:bg-[rgba(250,252,255,0.8)] 
+                    xs:rounded-[16px] xs:flex-wrap xs:gap-4 xs:justify-between 
+                    xs:p-0 xs:mb-3 xs:border-b xs:border-solid xs:border-[#d1d1d140]
+                    md:bg-transparent md:!m-0 md:!border-b md:!border-solid md:!border-[#ededf3] md:!rounded-none
+                    
+                    relative overflow-hidden
+                    hover:shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)]
+                    hover:translate-y-[-1px]
+                    
+                    before:absolute before:left-0 before:top-0 before:bottom-0 
+                    before:w-1 before:transition-all before:duration-300
+                    before:opacity-0 hover:before:opacity-100
+                  "
+                  style={{ 
+                    gridTemplateColumns: computedDesktopGridCols,
+                    // Apply status-specific border color on hover
+                    '--status-border-color': getStatusBorderColor(row.status) 
+                  } as React.CSSProperties}
+                >
+                  {/* Status colored left border (desktop only) */}
+                  <div className="
+                    absolute left-0 top-0 bottom-0 w-1 
+                    transition-all duration-300
+                    opacity-0 hover:opacity-100
+                    md:block
+                  " style={{ backgroundColor: getStatusBorderColor(row.status) }} />
                   
                   {/* Desktop Columns */}
                   {visibleDesktopColumns.map((column, colIndex) => (
@@ -620,8 +659,8 @@ export const renderButton = (button: { text: string; variant: 'primary' | 'secon
   <button
     className={`h-9 px-4 rounded-lg font-poppins text-sm font-normal transition-colors duration-300 w-full xl:w-[140px] ${
       button.variant === 'primary'
-        ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]'
-        : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f3f4f6] hover:border-[#d1d5db]'
+        ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8] hover:shadow-[0_4px_12px_rgba(37,99,235,0.3)]'
+        : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f8fafc] hover:shadow-[0_2px_8px_rgba(0,0,0,0.05)] hover:border-[#d1d5db]'
     }`}
     onClick={() => button.onClick?.(row)}
   >
