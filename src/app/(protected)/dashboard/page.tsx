@@ -340,7 +340,7 @@ const handleQuoteAction = (row: any, quote: any) => {
       
       if (policy?.status === 'active') {
         // Գնալ policy էջ
-        router.push(`/policies/${policy.id}`)
+        router.push(`/shipments/${policy.id}`)
         return true;
       }
       

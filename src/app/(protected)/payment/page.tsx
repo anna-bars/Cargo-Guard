@@ -128,7 +128,7 @@ export default function PaymentPage() {
   // Check if policy already active
   if (policyData?.status === 'active') {
     toast.error('Policy is already active');
-    router.push(`/policies/${policyData.id}`);
+    router.push(`/shipments/${policyData.id}`);
     return;
   }
     
