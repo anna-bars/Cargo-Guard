@@ -84,11 +84,28 @@ const loadQuoteData = async () => {
   }
 };
 
-  const handleMakePayment = () => {
-    if (!quoteData) return;
-    toast.success('Redirecting to payment...');
-    router.push(`/payment?quoteId=${quoteData.id}&amount=${quoteData.calculated_premium}`);
-  };
+  // page.tsx-ում handleMakePayment ֆունկցիայում
+const handleMakePayment = async () => {
+  if (!quoteData) return;
+  
+  // 1. Ստեղծել policy եթե չկա
+  const response = await fetch('/api/policies/create', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ quoteId: quoteData.id }),
+  });
+  
+  const { policy, error } = await response.json();
+  
+  if (error) {
+    toast.error('Failed to create policy');
+    return;
+  }
+  
+  // 2. Redirect to payment page
+  toast.success('Redirecting to payment...');
+  router.push(`/payment?quoteId=${quoteData.id}&amount=${quoteData.calculated_premium}`);
+};
 
   const handleViewPolicy = () => {
     if (!quoteData) return;
