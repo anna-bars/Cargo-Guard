@@ -683,7 +683,7 @@ export const renderButton = (button: { text: string; variant: 'primary' | 'secon
         ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8] hover:shadow-[0_4px_12px_rgba(37,99,235,0.3)]'
         : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f8fafc] hover:shadow-[0_2px_8px_rgba(0,0,0,0.05)] hover:border-[#d1d5db]'
     }`}
-    onClick={() => button.onClick?.(row)}
+    onClick={() => button.onClick?.(row.id)}
   >
     {button.text}
   </button>

@@ -277,30 +277,27 @@ export default function DashboardPage() {
     ]
   };
 
-  // Action handlers
-  const handleQuoteAction = (row: any, status: string) => {
-    switch (status) {
-      case 'draft':
-        // Redirect to continue the quote
-        router.push(`/quotes/new?quote_id=${row.id}&continue=true`)
-        break
-      case 'submitted':
-      case 'under_review':
-        // View quote details
-        router.push(`/quotes/${row.id}`)
-        break
-      case 'approved':
-        // Go to payment
-        router.push(`/payment?quote_id=${row.id}`)
-        break
-      case 'rejected':
-        // Go to resubmit
-        router.push(`/quotes/resubmit/${row.id}`)
-        break
-      default:
-        router.push(`/quotes/${row.id}`)
-    }
-  };
+ const handleQuoteAction = (row: any, status: string) => {
+  const quoteId = row.rawData?.id || row.id;
+  
+  switch (status) {
+    case 'draft':
+      router.push(`/quotes/new?quote_id=${quoteId}&continue=true`)
+      break
+    case 'submitted':
+    case 'under_review':
+      router.push(`/quotes/${quoteId}`)
+      break
+    case 'approved':
+      router.push(`/payment?quote_id=${quoteId}`)
+      break
+    case 'rejected':
+      router.push(`/quotes/resubmit/${quoteId}`)
+      break
+    default:
+      router.push(`/quotes/${quoteId}`)
+  }
+}
 
   useEffect(() => {
     // Check screen size for mobile
