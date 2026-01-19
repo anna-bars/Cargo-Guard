@@ -79,7 +79,7 @@ export default function DashboardPage() {
   const router = useRouter()
   const supabase = createClient()
 
-// DashboardPage.tsx-ում ավելացրեք այս ֆունկցիան
+  // DashboardPage.tsx-ում ավելացրեք այս ֆունկցիան
 const calculateConversionData = (quotes: any[], period: string = 'This Month'): ConversionChartData => {
   if (!quotes.length) {
     // Fallback data
@@ -134,7 +134,6 @@ const calculateConversionData = (quotes: any[], period: string = 'This Month'): 
   };
 };
 // DashboardPage.tsx-ում useState-ներին ավելացրեք
-// DashboardPage.tsx-ում useState-ներին ավելացրեք
 const [conversionData, setConversionData] = useState<Record<string, ConversionChartData>>({
   'This Week': { approved: 0, declined: 0, expired: 0 },
   'This Month': { approved: 0, declined: 0, expired: 0 },
@@ -143,11 +142,50 @@ const [conversionData, setConversionData] = useState<Record<string, ConversionCh
 });
 
 const [activeConversionPeriod, setActiveConversionPeriod] = useState<string>('This Month');
-useEffect(() => {}, [user])
-// DashboardPage.tsx-ում `getStatusConfig` ֆունկցիայում
+  useEffect(() => {
+    const loadDashboardData = async () => {
+  if (!user) return
+  
+  try {
+    // 1. Ստանալ quote_requests-ը այս օգտատիրոջ համար
+    const { data: quotes, error: quotesError } = await supabase
+      .from('quote_requests')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(50) // Ավելի շատ տվյալներ conversion-ի համար
 
+    if (quotesError) throw quotesError
+
+    // 2. Ֆորմատավորել տվյալները
+    const formattedData = formatDashboardData(quotes || [])
+    setDashboardRows(formattedData)
+
+    // 3. Հաշվել վիճակագրությունը
+    calculateStats(quotes || [])
+
+    // 4. Հաշվել conversion data բոլոր ժամանակահատվածների համար
+    const periods = ['This Week', 'This Month', 'Last Month', 'Last Quarter'];
+    const newConversionData: Record<string, ConversionChartData> = {};
+    
+    periods.forEach(period => {
+      newConversionData[period] = calculateConversionData(quotes || [], period);
+    });
+    
+    setConversionData(newConversionData);
+
+  } catch (error) {
+    console.error('Error loading dashboard data:', error)
+    setDashboardRows(getFallbackData())
+  } finally {
+    setLoading(false)
+  }
+}
+
+    loadDashboardData()
+  }, [user])
+// DashboardPage.tsx-ում `getStatusConfig` ֆունկցիայում
 const getStatusConfig = (quote: any) => {
-  // Status map-ը մնում է նույնը, բայց փոխենք rejected-ի և fix_and_resubmit-ի button-ը
   const statusMap: Record<string, any> = {
     'draft': { 
       text: 'Continue Quote', 
@@ -186,8 +224,8 @@ const getStatusConfig = (quote: any) => {
       color: 'bg-rose-50', 
       dot: 'bg-rose-500', 
       textColor: 'text-rose-700',
-      buttonText: 'View Details', // Փոխարինել Resubmit → View Details
-      buttonVariant: 'secondary' as const // Փոխարինել primary → secondary
+      buttonText: 'View Details',
+      buttonVariant: 'secondary' as const
     },
     'pay_to_activate': { 
       text: 'Pay to Activate', 
@@ -218,8 +256,17 @@ const getStatusConfig = (quote: any) => {
       color: 'bg-amber-50', 
       dot: 'bg-amber-500', 
       textColor: 'text-amber-700',
-      buttonText: 'View Details', // Փոխարինել Resubmit → View Details
-      buttonVariant: 'secondary' as const // Փոխարինել primary → secondary
+      buttonText: 'View Details',
+      buttonVariant: 'secondary' as const
+    },
+    // ԱՎԵԼԱՑՈՒՄ՝ expired ստատուսի համար
+    'expired': { 
+      text: 'Expired', 
+      color: 'bg-gray-100', 
+      dot: 'bg-gray-400', 
+      textColor: 'text-gray-600',
+      buttonText: 'Create New',
+      buttonVariant: 'secondary' as const
     }
   };
 
@@ -232,6 +279,20 @@ const getStatusConfig = (quote: any) => {
       textColor: 'text-emerald-700',
       buttonText: 'View Policy',
       buttonVariant: 'success' as const
+    };
+  }
+
+  // Ստուգել expired ստատուսը (եթե expiration_time անցել է, բայց status չի թարմացվել)
+  const isExpired = quote.expiration_time && new Date(quote.expiration_time) < new Date();
+  if (isExpired && quote.status !== 'expired') {
+    // Եթե expiration_time անցել է, բայց status-ը դեռ չի թարմացվել
+    return {
+      text: 'Expired',
+      color: 'bg-gray-100',
+      dot: 'bg-gray-400',
+      textColor: 'text-gray-600',
+      buttonText: 'Create New',
+      buttonVariant: 'secondary' as const
     };
   }
 
@@ -313,7 +374,6 @@ const getStatusConfig = (quote: any) => {
     })
   };
 
-
   const getFallbackData = () => {
     return [
       {
@@ -361,11 +421,21 @@ const handleQuoteAction = (row: any, quote: any) => {
   const quoteId = row.rawData?.id || row.id;
   const status = quote.status;
   const paymentStatus = quote.payment_status;
+  const isExpired = quote.expiration_time && new Date(quote.expiration_time) < new Date();
+  
+  // Ստուգել արդյոք quote-ը expired է (չնայած status-ին)
+  if (isExpired) {
+    // Expired quote-ների համար տալ հնարավորություն նոր quote ստեղծելու
+    if (confirm('This quote has expired. Would you like to create a new one based on this?')) {
+      // Կրկնօրինակել quote-ն որպես նոր draft
+      router.push(`/quotes/new?duplicate=${quoteId}`);
+    }
+    return;
+  }
   
   // Սկզբում ստուգել policy-ն
   const checkPolicyAndRedirect = async () => {
     try {
-      // Ստուգել արդյոք policy կա
       const { data: policy } = await supabase
         .from('policies')
         .select('*')
@@ -373,7 +443,6 @@ const handleQuoteAction = (row: any, quote: any) => {
         .maybeSingle();
       
       if (policy?.status === 'active') {
-        // Գնալ policy էջ
         router.push(`/shipments/${policy.id}`)
         return true;
       }
@@ -397,21 +466,23 @@ const handleQuoteAction = (row: any, quote: any) => {
       break
     case 'approved':
       if (paymentStatus === 'paid') {
-        // Փորձել գտնել policy և գնալ այնտեղ
         checkPolicyAndRedirect().then((hasPolicy) => {
           if (!hasPolicy) {
-            // Եթե policy չկա, գնալ quote details
             router.push(`/quotes/${quoteId}`)
           }
         })
       } else {
-        // Approved բայց չվճարված
         router.push(`/quotes/${quoteId}`)
       }
       break
     case 'rejected':
     case 'fix_and_resubmit':
       router.push(`/quotes/${quoteId}`)
+      break
+    case 'expired': // Ավելացրեք expired case-ը
+      if (confirm('This quote has expired. Would you like to create a new one based on this?')) {
+        router.push(`/quotes/new?duplicate=${quoteId}`);
+      }
       break
     case 'pay_to_activate':
       router.push(`/quotes/${quoteId}`)
@@ -420,7 +491,6 @@ const handleQuoteAction = (row: any, quote: any) => {
       router.push(`/quotes/${quoteId}`)
   }
 }
-
   useEffect(() => {
     // Check screen size for mobile
     const checkScreenSize = () => {
