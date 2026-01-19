@@ -188,11 +188,10 @@ export default function DashboardPage() {
       const statusConfig = getStatusConfig(quote.status)
       
       const buttonAction = { 
-        text: statusConfig.buttonText, 
-        variant: statusConfig.buttonVariant,
-        onClick: (row: any) => handleQuoteAction(row, quote.status)
-      }
-
+  text: statusConfig.buttonText, 
+  variant: statusConfig.buttonVariant,
+  onClick: (row: any) => handleQuoteAction(row, quote.status) // <-- Այստեղ row-ը arrow function-ի պարամետր է
+}
       formattedData.push({
         type: 'Quote',
         id: formatQuoteId(quote.quote_id || quote.id),
