@@ -86,10 +86,31 @@ useEffect(() => {
         quoteDataFromStorage = JSON.parse(storageData);
       }
       
-      // Եթե localStorage-ում չկա տվյալ, օգտագործում ենք mock տվյալներ
+      // Գեներացնում ենք ֆորմատավորված quote ID
+      const generateQuoteId = () => {
+        if (quoteDataFromStorage?.quoteId && !quoteDataFromStorage.quoteId.startsWith('temp-')) {
+          return quoteDataFromStorage.quoteId;
+        }
+        
+        // Ստուգում ենք եթե արդեն կա գեներացված quote ID localStorage-ում
+        const savedQuoteId = localStorage.getItem('generated_quote_id');
+        if (savedQuoteId) {
+          return savedQuoteId;
+        }
+        
+        // Ստեղծում ենք նոր ֆորմատավորված ID
+        const randomNum = Math.floor(Math.random() * 10000).toString().padStart(5, '0');
+        const newQuoteId = `Q-${randomNum}`;
+        localStorage.setItem('generated_quote_id', newQuoteId);
+        return newQuoteId;
+      };
+
+      const formattedQuoteId = generateQuoteId();
+      
+      // Եթե localStorage-ում չկա տվյալ, օգտագործում ենք ֆորմատավորված ID-ով mock տվյալներ
       if (!quoteDataFromStorage) {
         const mockQuoteData: QuoteData = {
-          id: 'Q-0025',
+          id: formattedQuoteId, // ✅ Օգտագործում ենք ֆորմատավորված ID
           cargoType: 'Electronics & Consumer Goods',
           shipmentValue: 45000,
           origin: {
@@ -120,7 +141,7 @@ useEffect(() => {
       const coverageDisplayType = coverageType.charAt(0).toUpperCase() + coverageType.slice(1) + ' Coverage';
       
       const formattedQuoteData: QuoteData = {
-        id: quoteDataFromStorage.quoteId || `Q-${Date.now()}`,
+        id: formattedQuoteId, // ✅ Օգտագործում ենք ֆորմատավորված ID
         cargoType: quoteDataFromStorage.cargoType || 'Unknown Cargo',
         shipmentValue: quoteDataFromStorage.shipmentValue || 0,
         origin: quoteDataFromStorage.origin || { name: 'Unknown', city: 'Unknown', country: 'Unknown' },
@@ -137,9 +158,12 @@ useEffect(() => {
       
     } catch (error) {
       console.error('Error loading quote data:', error);
-      // Fallback to mock data
+      // Fallback to mock data with formatted ID
+      const randomNum = Math.floor(Math.random() * 10000).toString().padStart(5, '0');
+      const fallbackQuoteId = `Q-${randomNum}`;
+      
       const mockQuoteData: QuoteData = {
-        id: 'Q-0025',
+        id: fallbackQuoteId, // ✅ Օգտագործում ենք ֆորմատավորված ID
         cargoType: 'Electronics & Consumer Goods',
         shipmentValue: 45000,
         origin: { name: 'New York Port', city: 'New York', country: 'USA' },
@@ -160,7 +184,6 @@ useEffect(() => {
 
   loadQuoteData();
 }, [searchParams]);
-
  const handleFileUpload = (documentId: string, file: File) => {
   const updatedDocuments = documents.map(doc => {
     if (doc.id === documentId) {
@@ -280,7 +303,7 @@ useEffect(() => {
 
   const allDocumentsUploaded = documents.every(doc => doc.status === 'uploaded' || doc.status === 'verified');
 
-  const handleSubmit = async () => {
+const handleSubmit = async () => {
   if (!shipperName.trim()) {
     alert('Please enter shipper name');
     return;
@@ -302,9 +325,23 @@ useEffect(() => {
     
     const parsedQuoteData = JSON.parse(quoteDataFromStorage);
     
+    // Ստեղծում ենք ֆորմատավորված quote ID
+    const generateQuoteId = () => {
+      // Ստուգում ենք եթե արդեն կա quote ID
+      if (parsedQuoteData.quoteId && !parsedQuoteData.quoteId.startsWith('temp-')) {
+        return parsedQuoteData.quoteId;
+      }
+      
+      // Ստեղծում ենք նոր ֆորմատավորված ID
+      const randomNum = Math.floor(Math.random() * 10000).toString().padStart(5, '0');
+      return `Q-${randomNum}`;
+    };
+    
+    const formattedQuoteId = generateQuoteId();
+
     // Պատրաստում ենք submit-ի համար պահանջվող տվյալները
     const submitData = {
-      quoteId: parsedQuoteData.quoteId || quoteData?.id || `Q-${Date.now()}`,
+      quoteId: formattedQuoteId, // ✅ Օգտագործում ենք ֆորմատավորված ID
       cargoType: parsedQuoteData.cargoType || quoteData?.cargoType || '',
       shipmentValue: parsedQuoteData.shipmentValue || quoteData?.shipmentValue || 0,
       origin: parsedQuoteData.origin || quoteData?.origin || { name: '', city: '', country: '' },
@@ -335,8 +372,6 @@ useEffect(() => {
       localStorage.removeItem('quote_submission');
       localStorage.removeItem('quote_draft');
       
-      // alert('Quote submitted successfully! Our team will review your documents and get back to you within 24 hours.');
-      // router.push('/quotes/pending');
       toast.success('Quote submitted successfully! Our team will review your documents and get back to you within 24 hours.')
       router.push('/dashboard')
     } else {

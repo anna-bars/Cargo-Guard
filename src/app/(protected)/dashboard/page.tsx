@@ -124,79 +124,98 @@ export default function DashboardPage() {
   }, [user])
 
   const formatDashboardData = async (quotes: any[], policies: any[]) => {
-    const formattedData: any[] = []
+  const formattedData: any[] = []
 
-    // Ֆորմատավորել quotes
-    quotes.forEach(quote => {
-      let statusConfig = getStatusConfig(quote.status)
-      
-      // Determine button action based on status
-      let buttonAction = { 
-        text: 'View Details', 
-        variant: 'secondary' as const,
-        onClick: (row: any) => handleQuoteAction(row)
+  // Ֆորմատավորել quotes
+  quotes.forEach(quote => {
+    // Ֆորմատավորում ենք quote ID-ը
+    const formatQuoteId = (id: string) => {
+      if (id.startsWith('Q-')) {
+        return id;
       }
-
-      if (quote.status === 'pending') {
-        buttonAction = { 
-          text: 'Approve Quote', 
-          variant: 'primary' as const,
-          onClick: (row: any) => handleApproveQuote(row)
-        }
+      if (id.startsWith('temp-')) {
+        const randomNum = Math.floor(Math.random() * 10000).toString().padStart(5, '0');
+        return `Q-${randomNum}`;
       }
+      return `Q-${id.slice(-5)}`;
+    };
 
-      formattedData.push({
-        type: 'Quote',
-        id: quote.quote_id || quote.id,
-        cargo: quote.cargo_type || 'Unknown',
-        value: quote.shipment_value || 0,
-        status: statusConfig,
-        date: formatDate(quote.created_at),
-        button: buttonAction,
-        rawData: quote // Keep original data for reference
-      })
+    let statusConfig = getStatusConfig(quote.status)
+    
+    // Determine button action based on status
+    let buttonAction = { 
+      text: 'View Details', 
+      variant: 'secondary' as const,
+      onClick: (row: any) => handleQuoteAction(row)
+    }
+
+    if (quote.status === 'pending') {
+      buttonAction = { 
+        text: 'Approve Quote', 
+        variant: 'primary' as const,
+        onClick: (row: any) => handleApproveQuote(row)
+      }
+    }
+
+    formattedData.push({
+      type: 'Quote',
+      id: formatQuoteId(quote.quote_id || quote.id), // ✅ Ֆորմատավորված ID
+      cargo: quote.cargo_type || 'Unknown',
+      value: quote.shipment_value || 0,
+      status: statusConfig,
+      date: formatDate(quote.created_at),
+      button: buttonAction,
+      rawData: quote
     })
+  })
 
-    // Ֆորմատավորել policies (եթե կան)
-    policies.forEach(policy => {
-      let statusConfig = getStatusConfig(policy.status)
-      
-      // Determine button action based on policy status
-      let buttonAction = { 
-        text: 'View Policy', 
+  // Ֆորմատավորել policies
+  policies.forEach(policy => {
+    // Ֆորմատավորում ենք policy ID-ը
+    const formatPolicyId = (id: string) => {
+      if (id.startsWith('P-')) {
+        return id;
+      }
+      return `P-${id.slice(-5)}`;
+    };
+
+    let statusConfig = getStatusConfig(policy.status)
+    
+    // Determine button action based on policy status
+    let buttonAction = { 
+      text: 'View Policy', 
+      variant: 'secondary' as const,
+      onClick: (row: any) => handlePolicyAction(row)
+    }
+
+    if (policy.status === 'active') {
+      buttonAction = { 
+        text: 'Download Cert', 
         variant: 'secondary' as const,
-        onClick: (row: any) => handlePolicyAction(row)
+        onClick: (row: any) => handleDownloadCertificate(row)
       }
-
-      if (policy.status === 'active') {
-        buttonAction = { 
-          text: 'Download Cert', 
-          variant: 'secondary' as const,
-          onClick: (row: any) => handleDownloadCertificate(row)
-        }
-      } else if (policy.status === 'expiring') {
-        buttonAction = { 
-          text: 'Renew Policy', 
-          variant: 'secondary' as const,
-          onClick: (row: any) => handleRenewPolicy(row)
-        }
+    } else if (policy.status === 'expiring') {
+      buttonAction = { 
+        text: 'Renew Policy', 
+        variant: 'secondary' as const,
+        onClick: (row: any) => handleRenewPolicy(row)
       }
+    }
 
-      formattedData.push({
-        type: 'Policy',
-        id: policy.policy_number || policy.id,
-        cargo: policy.cargo_type || 'Unknown',
-        value: policy.insured_amount || policy.shipment_value || 0,
-        status: statusConfig,
-        date: formatDate(policy.created_at),
-        button: buttonAction,
-        rawData: policy
-      })
+    formattedData.push({
+      type: 'Policy',
+      id: formatPolicyId(policy.policy_number || policy.id), // ✅ Ֆորմատավորված ID
+      cargo: policy.cargo_type || 'Unknown',
+      value: policy.insured_amount || policy.shipment_value || 0,
+      status: statusConfig,
+      date: formatDate(policy.created_at),
+      button: buttonAction,
+      rawData: policy
     })
+  })
 
-    // Սորտավորել ըստ ամսաթվի (նորագույնը առաջինը)
-    return formattedData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-  }
+  return formattedData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+}
 
   const getStatusConfig = (status: string) => {
     const statusMap: Record<string, any> = {
