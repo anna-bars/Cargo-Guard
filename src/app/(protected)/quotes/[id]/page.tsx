@@ -266,7 +266,7 @@ export default function QuoteDetailsPage() {
   const statusConfig = getStatusConfig(quoteData.status);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+    <div className="min-h-screen bg-[#F3F3F6]">
       <DashboardHeader userEmail="client@example.com" />
       
       
