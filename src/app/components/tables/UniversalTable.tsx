@@ -154,75 +154,96 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
     }
   };
 
-  const getFilteredRows = () => {
-    let filtered = [...rows];
-    
-    if (filterConfig.showTimeframeFilter) {
-      if (selectedTimeframe === 'Last 7 days') {
-        filtered = filtered.slice(0, 3);
-      }
+const getFilteredRows = () => {
+  let filtered = [...rows];
+  
+  if (filterConfig.showTimeframeFilter) {
+    if (selectedTimeframe === 'Last 7 days') {
+      filtered = filtered.slice(0, 3);
     }
-    
-    if (filterConfig.showActivityFilter && selectedFilter !== 'All Activity') {
-      filtered = filtered.filter(row => {
-        if (row.status?.text) {
-          const statusMap: Record<string, string> = {
-            'Pending': 'Pending Approval',
-            'Active': 'Active',
-            'Expiring': 'Expires',
-            'Missing': 'Document Missing',
-            'Declined': 'Declined'
-          };
-          
-          const targetStatus = statusMap[selectedFilter];
-          return targetStatus ? row.status.text.includes(targetStatus) : false;
-        }
-        return false;
+  }
+  
+  if (filterConfig.showActivityFilter && selectedFilter !== 'All Activity') {
+    filtered = filtered.filter(row => {
+      if (row.status?.text) {
+        const statusMap: Record<string, string> = {
+          'Pending': 'Pending Approval',
+          'Active': 'Active',
+          'Expiring': 'Expires',
+          'Missing': 'Document Missing',
+          'Declined': 'Declined'
+        };
+        
+        const targetStatus = statusMap[selectedFilter];
+        return targetStatus ? row.status.text.includes(targetStatus) : false;
+      }
+      return false;
+    });
+  }
+  
+  return filtered;
+};
+
+const filteredRows = useMemo(() => {
+  const filtered = getFilteredRows();
+  
+  // Սորտավորումը կիրառենք արտաքին useMemo-ում
+  let sorted = [...filtered];
+  
+  if (filterConfig.showSortFilter) {
+    if (selectedSort === 'Date') {
+      sorted.sort((a, b) => {
+        const dateA = a.date ?? a.expirationDate ?? a.lastUpdate ?? '1970-01-01';
+        const dateB = b.date ?? b.expirationDate ?? b.lastUpdate ?? '1970-01-01';
+        return new Date(dateB).getTime() - new Date(dateA).getTime();
+      });
+    } else if (selectedSort === 'Value') {
+      sorted.sort((a, b) => {
+        const aValue = parseFloat((a.value || a.shipmentValue || '0').replace(/[^\d.-]/g, ''));
+        const bValue = parseFloat((b.value || b.shipmentValue || '0').replace(/[^\d.-]/g, ''));
+        return bValue - aValue;
+      });
+    } else if (selectedSort === 'Type') {
+      sorted.sort((a, b) => (a.type || '').localeCompare(b.type || ''));
+    } else if (selectedSort === 'Status') {
+      // Status sort - դեֆոլտ
+      const statusOrder: Record<string, number> = {
+        'Pending': 1,
+        'Active': 2,
+        'Expiring': 3,
+        'Missing': 4,
+        'Declined': 5
+      };
+      
+      sorted.sort((a, b) => {
+        const statusA = a.status?.text || '';
+        const statusB = b.status?.text || '';
+        const orderA = statusOrder[statusA] || 999;
+        const orderB = statusOrder[statusB] || 999;
+        return orderA - orderB;
       });
     }
-    
-    if (filterConfig.showSortFilter) {
-      if (selectedSort === 'Date') {
-        filtered.sort((a, b) => {
-          const dateA = a.date ?? a.expirationDate ?? a.lastUpdate ?? '1970-01-01';
-          const dateB = b.date ?? b.expirationDate ?? b.lastUpdate ?? '1970-01-01';
-          return new Date(dateB).getTime() - new Date(dateA).getTime();
-        });
-      } else if (selectedSort === 'Value') {
-        filtered.sort((a, b) => {
-          const aValue = parseFloat((a.value || a.shipmentValue || '0').replace(/[^\d.-]/g, ''));
-          const bValue = parseFloat((b.value || b.shipmentValue || '0').replace(/[^\d.-]/g, ''));
-          return bValue - aValue;
-        });
-      } else if (selectedSort === 'Type') {
-        filtered.sort((a, b) => (a.type || '').localeCompare(b.type || ''));
+  }
+  
+  if (!searchQuery.trim()) {
+    return sorted;
+  }
+  
+  const query = searchQuery.toLowerCase().trim();
+  return sorted.filter(row => {
+    return columns.some(column => {
+      const value = row[column.key];
+      if (typeof value === 'string') {
+        return value.toLowerCase().includes(query);
       }
-    }
-    
-    return filtered;
-  };
+      return false;
+    }) || 
+    row.type?.toLowerCase().includes(query) ||
+    row.id?.toString().toLowerCase().includes(query) ||
+    row.status?.text.toLowerCase().includes(query);
+  });
+}, [searchQuery, selectedFilter, selectedTimeframe, selectedSort, rows, columns, filterConfig.showSortFilter]);
 
-  const filteredRows = useMemo(() => {
-    const filtered = getFilteredRows();
-    
-    if (!searchQuery.trim()) {
-      return filtered;
-    }
-    
-    const query = searchQuery.toLowerCase().trim();
-    return filtered.filter(row => {
-      return columns.some(column => {
-        const value = row[column.key];
-        if (typeof value === 'string') {
-          return value.toLowerCase().includes(query);
-        }
-        return false;
-      }) || 
-      row.type?.toLowerCase().includes(query) ||
-      row.id?.toString().toLowerCase().includes(query) ||
-      row.status?.text.toLowerCase().includes(query);
-    });
-  }, [searchQuery, selectedFilter, selectedTimeframe, selectedSort, rows, columns]);
 
   const handleReset = () => {
     setSelectedFilter(initialFilters.activity || 'All Activity');

@@ -435,11 +435,7 @@ export default function DashboardPage() {
               showMobileHeader={false}
               rows={dashboardRows}
               columns={dashboardColumns}
-              initialFilters={{
-                activity: 'All Activity',
-                timeframe: 'Last 30 days',
-                sort: 'Date'
-              }}
+         
               filterConfig={{
                 showActivityFilter: true,
                 showTimeframeFilter: true,
