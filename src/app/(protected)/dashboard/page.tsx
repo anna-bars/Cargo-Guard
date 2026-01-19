@@ -288,10 +288,10 @@ export default function DashboardPage() {
       router.push(`/quotes/${quoteId}`)
       break
     case 'approved':
-      router.push(`/payment?quote_id=${quoteId}`)
+      router.push(`/quotes/${quoteId}`)
       break
     case 'rejected':
-      router.push(`/quotes/resubmit/${quoteId}`)
+      router.push(`/quotes/${quoteId}`)
       break
     default:
       router.push(`/quotes/${quoteId}`)
