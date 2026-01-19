@@ -186,6 +186,25 @@ const [activeConversionPeriod, setActiveConversionPeriod] = useState<string>('Th
   }, [user])
 // DashboardPage.tsx-ում `getStatusConfig` ֆունկցիայում
 const getStatusConfig = (quote: any) => {
+  // Հաշվել օրերի քանակը մինչև/ից expiration
+  const calculateDaysText = (expirationTime: string) => {
+    if (!expirationTime) return '';
+    
+    const now = new Date();
+    const expiration = new Date(expirationTime);
+    const diffTime = expiration.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays > 0) {
+      return ` (${diffDays} day${diffDays !== 1 ? 's' : ''} left)`;
+    } else if (diffDays < 0) {
+      const daysAgo = Math.abs(diffDays);
+      return ` (${daysAgo} day${daysAgo !== 1 ? 's' : ''} ago)`;
+    } else {
+      return ' (Today)';
+    }
+  };
+
   const statusMap: Record<string, any> = {
     'draft': { 
       text: 'Continue Quote', 
@@ -259,14 +278,15 @@ const getStatusConfig = (quote: any) => {
       buttonText: 'View Details',
       buttonVariant: 'secondary' as const
     },
-    // ԱՎԵԼԱՑՈՒՄ՝ expired ստատուսի համար
     'expired': { 
       text: 'Expired', 
       color: 'bg-gray-100', 
       dot: 'bg-gray-400', 
       textColor: 'text-gray-600',
       buttonText: 'Create New',
-      buttonVariant: 'secondary' as const
+      buttonVariant: 'secondary' as const,
+      // Ավելացնել օրերի տեքստը
+      daysText: calculateDaysText(quote.expiration_time)
     }
   };
 
@@ -282,18 +302,38 @@ const getStatusConfig = (quote: any) => {
     };
   }
 
-  // Ստուգել expired ստատուսը (եթե expiration_time անցել է, բայց status չի թարմացվել)
+  // Ստուգել expiration_time (նույնիսկ եթե status չի թարմացվել)
   const isExpired = quote.expiration_time && new Date(quote.expiration_time) < new Date();
-  if (isExpired && quote.status !== 'expired') {
-    // Եթե expiration_time անցել է, բայց status-ը դեռ չի թարմացվել
+  if (isExpired) {
     return {
       text: 'Expired',
       color: 'bg-gray-100',
       dot: 'bg-gray-400',
       textColor: 'text-gray-600',
       buttonText: 'Create New',
-      buttonVariant: 'secondary' as const
+      buttonVariant: 'secondary' as const,
+      daysText: calculateDaysText(quote.expiration_time),
+      isActuallyExpired: true
     };
+  }
+
+  // Ստուգել մոտենող expiration (վաղանշում)
+  const isExpiringSoon = quote.expiration_time && quote.status === 'submitted';
+  if (isExpiringSoon) {
+    const now = new Date();
+    const expiration = new Date(quote.expiration_time);
+    const diffDays = Math.ceil((expiration.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays <= 3 && diffDays > 0) {
+      // Մոտենում է expiration-ին
+      return {
+        ...statusMap[quote.status],
+        text: `Expires in ${diffDays} day${diffDays !== 1 ? 's' : ''}`,
+        color: 'bg-amber-50',
+        dot: 'bg-amber-500',
+        textColor: 'text-amber-700'
+      };
+    }
   }
 
   return statusMap[quote.status] || statusMap['draft'];
@@ -319,12 +359,16 @@ const getStatusConfig = (quote: any) => {
     })
   };
 
- const formatDashboardData = (quotes: any[]) => {
+const formatDashboardData = (quotes: any[]) => {
   const formattedData: any[] = []
 
-  // Ֆորմատավորել quotes
   quotes.forEach(quote => {
     const statusConfig = getStatusConfig(quote)
+    
+    // Ստեղծել status տեքստը օրերի տեղեկատվությամբ
+    const statusText = statusConfig.daysText 
+      ? `${statusConfig.text}${statusConfig.daysText}`
+      : statusConfig.text;
     
     const buttonAction = { 
       text: statusConfig.buttonText, 
@@ -338,12 +382,13 @@ const getStatusConfig = (quote: any) => {
       cargo: quote.cargo_type || 'Unknown',
       value: quote.shipment_value || 0,
       status: {
-        text: statusConfig.text,
+        text: statusText, // Օգտագործել օրերի տեղեկատվությամբ տեքստը
         color: statusConfig.color,
         dot: statusConfig.dot,
         textColor: statusConfig.textColor
       },
       date: formatDate(quote.created_at),
+      expirationDate: quote.expiration_time ? formatDate(quote.expiration_time) : null,
       button: buttonAction,
       rawData: quote,
       quoteStatus: quote.status,
@@ -351,9 +396,8 @@ const getStatusConfig = (quote: any) => {
     })
   })
 
-  // Սորտավորել ըստ ամսաթվի (նորագույնը առաջինը)
   return formattedData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-};
+}
 
   const calculateStats = (quotes: any[]) => {
     const draftQuotesCount = quotes.filter(q => q.status === 'draft').length
