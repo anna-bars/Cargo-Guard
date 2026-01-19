@@ -205,6 +205,15 @@ const getStatusConfig = (quote: any) => {
     }
   };
 
+  // Ստուգել արդյոք quote-ը վճարված է
+  const isPaid = quote.payment_status === 'paid';
+  
+  // Ստուգել արդյոք quote-ը expired է
+  const isExpired = quote.expiration_time && new Date(quote.expiration_time) < new Date();
+  
+  // Ստանալ daysText մի անգամ
+  const daysText = quote.expiration_time ? calculateDaysText(quote.expiration_time) : '';
+
   const statusMap: Record<string, any> = {
     'draft': { 
       text: 'Continue Quote', 
@@ -231,12 +240,12 @@ const getStatusConfig = (quote: any) => {
       buttonVariant: 'secondary' as const
     },
     'approved': { 
-      text: quote.payment_status === 'paid' ? 'Approved & Paid' : 'Pay to Activate', 
-      color: quote.payment_status === 'paid' ? 'bg-emerald-50' : 'bg-amber-50', 
-      dot: quote.payment_status === 'paid' ? 'bg-emerald-500' : 'bg-amber-500', 
-      textColor: quote.payment_status === 'paid' ? 'text-emerald-700' : 'text-amber-700',
-      buttonText: quote.payment_status === 'paid' ? 'View Policy' : 'Pay Now',
-      buttonVariant: quote.payment_status === 'paid' ? 'success' as const : 'primary' as const
+      text: isPaid ? 'Approved & Paid' : 'Pay to Activate', 
+      color: isPaid ? 'bg-emerald-50' : 'bg-amber-50', 
+      dot: isPaid ? 'bg-emerald-500' : 'bg-amber-500', 
+      textColor: isPaid ? 'text-emerald-700' : 'text-amber-700',
+      buttonText: isPaid ? 'View Policy' : 'Pay Now',
+      buttonVariant: isPaid ? 'success' as const : 'primary' as const
     },
     'rejected': { 
       text: 'Rejected', 
@@ -284,59 +293,35 @@ const getStatusConfig = (quote: any) => {
       dot: 'bg-gray-400', 
       textColor: 'text-gray-600',
       buttonText: 'Create New',
-      buttonVariant: 'secondary' as const,
-      // Ավելացնել օրերի տեքստը
-      daysText: calculateDaysText(quote.expiration_time)
+      buttonVariant: 'secondary' as const
     }
   };
 
-  // Ստուգել եթե quote-ը paid է
-  if (quote.payment_status === 'paid' && quote.status === 'approved') {
-    return {
-      text: 'Approved & Paid',
-      color: 'bg-emerald-50',
-      dot: 'bg-emerald-500',
-      textColor: 'text-emerald-700',
-      buttonText: 'View Policy',
-      buttonVariant: 'success' as const
-    };
-  }
-
-  // Ստուգել expiration_time (նույնիսկ եթե status չի թարմացվել)
-  const isExpired = quote.expiration_time && new Date(quote.expiration_time) < new Date();
+  // Ստուգել արդյոք quote-ը expired է (նույնիսկ եթե status-ը 'approved' է)
   if (isExpired) {
     return {
-      text: 'Expired',
+      text: 'Expired' + daysText,
       color: 'bg-gray-100',
       dot: 'bg-gray-400',
       textColor: 'text-gray-600',
       buttonText: 'Create New',
       buttonVariant: 'secondary' as const,
-      daysText: calculateDaysText(quote.expiration_time),
       isActuallyExpired: true
     };
   }
 
-  // Ստուգել մոտենող expiration (վաղանշում)
-  const isExpiringSoon = quote.expiration_time && quote.status === 'submitted';
-  if (isExpiringSoon) {
-    const now = new Date();
-    const expiration = new Date(quote.expiration_time);
-    const diffDays = Math.ceil((expiration.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    
-    if (diffDays <= 3 && diffDays > 0) {
-      // Մոտենում է expiration-ին
-      return {
-        ...statusMap[quote.status],
-        text: `Expires in ${diffDays} day${diffDays !== 1 ? 's' : ''}`,
-        color: 'bg-amber-50',
-        dot: 'bg-amber-500',
-        textColor: 'text-amber-700'
-      };
-    }
+  // Ստանդարտ status-ի համար վերադարձ
+  const baseConfig = statusMap[quote.status] || statusMap['draft'];
+  
+  // approved կամ pay_to_activate status-ի համար ավելացնել expiration տեղեկատվությունը
+  if (['approved', 'pay_to_activate', 'submitted'].includes(quote.status) && quote.expiration_time) {
+    return {
+      ...baseConfig,
+      text: baseConfig.text + daysText
+    };
   }
-
-  return statusMap[quote.status] || statusMap['draft'];
+  
+  return baseConfig;
 };
   const formatQuoteId = (id: string) => {
     if (id.startsWith('Q-')) {
