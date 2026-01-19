@@ -143,46 +143,7 @@ const [conversionData, setConversionData] = useState<Record<string, ConversionCh
 });
 
 const [activeConversionPeriod, setActiveConversionPeriod] = useState<string>('This Month');
-useEffect(() => {
-  const loadDashboardData = async () => {
-  if (!user) return
-  
-  try {
-    // 1. Ստանալ quote_requests-ը այս օգտատիրոջ համար
-    const { data: quotes, error: quotesError } = await supabase
-      .from('quote_requests')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(50) // Ավելի շատ տվյալներ conversion-ի համար
-
-    if (quotesError) throw quotesError
-
-    // 2. Ֆորմատավորել տվյալները
-    const formattedData = formatDashboardData(quotes || [])
-    setDashboardRows(formattedData)
-
-    // 3. Հաշվել վիճակագրությունը
-    calculateStats(quotes || [])
-
-    // 4. Հաշվել conversion data բոլոր ժամանակահատվածների համար
-    const periods = ['This Week', 'This Month', 'Last Month', 'Last Quarter'];
-    const newConversionData: Record<string, ConversionChartData> = {};
-    
-    periods.forEach(period => {
-      newConversionData[period] = calculateConversionData(quotes || [], period);
-    });
-    
-    setConversionData(newConversionData);
-
-  } catch (error) {
-    console.error('Error loading dashboard data:', error)
-    setDashboardRows(getFallbackData())
-  } finally {
-    setLoading(false)
-  }
-}
-}, [user])
+useEffect(() => {}, [user])
 // DashboardPage.tsx-ում `getStatusConfig` ֆունկցիայում
 
 const getStatusConfig = (quote: any) => {
@@ -585,7 +546,7 @@ const handleQuoteAction = (row: any, quote: any) => {
             />
 
             <div className="block md:hidden">
-<ConversionChart 
+              <ConversionChart 
   title="Quote Conversion Rate"
   data={conversionData}
   defaultActiveTime={activeConversionPeriod}
@@ -649,24 +610,7 @@ const handleQuoteAction = (row: any, quote: any) => {
 
             {/* Quote Conversion Rate */}
             <div className="flex-grow min-h-[calc(31%-4px)] xl:flex-[0_0_31%] xl:min-h-auto xl:h-auto">
-         
-<ConversionChart 
-  title="Quote Conversion Rate"
-  data={conversionData}
-  defaultActiveTime={activeConversionPeriod}
-  showTimeDropdown={true}
-  typeLabels={{
-    approved: 'approved',
-    declined: 'declined',
-    expired: 'expired'
-  }}
-  colors={{
-    approved: { start: '#BED5F8', end: '#669CEE' },
-    declined: { start: '#F8E2BE', end: '#EEDE66' },
-    expired: { start: '#FFA4A4', end: '#EB6025' }
-  }}
-  onTimeChange={(time) => setActiveConversionPeriod(time)}
-/>
+              <ConversionChart />
             </div>
 
             {/* High-Value Cargo Share Widget */}
