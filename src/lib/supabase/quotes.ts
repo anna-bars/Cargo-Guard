@@ -1,21 +1,11 @@
-// lib/supabase/quotes.ts - թարմացված տարբերակ
 import { createClient } from './client';
-import { v4 as uuidv4 } from 'uuid';
 
-interface SubmitQuoteData {
+export interface QuoteSubmitData {
   quoteId: string;
   cargoType: string;
   shipmentValue: number;
-  origin: {
-    name: string;
-    city: string;
-    country: string;
-  };
-  destination: {
-    name: string;
-    city: string;
-    country: string;
-  };
+  origin: any;
+  destination: any;
   startDate: string;
   endDate: string;
   transportationMode: string;
@@ -24,152 +14,172 @@ interface SubmitQuoteData {
   deductible: number;
   shipperName: string;
   referenceNumber?: string;
-  documents: Array<{
-    type: string;
-    name: string;
-    file: File;
-  }>;
+  status?: 'draft' | 'submitted' | 'under_review' | 'approved' | 'rejected';
+  documents?: any[];
 }
 
-export async function submitQuoteToSupabase(quoteData: SubmitQuoteData) {
+// ✅ Սանիտացնել filename-ը ASCII նիշերի համար
+const sanitizeFileName = (fileName: string): string => {
+  // Հեռացնել ոչ ASCII նիշերը
+  let sanitized = fileName.replace(/[^\x00-\x7F]/g, '');
+  
+  // Հեռացնել հատուկ նիշերը
+  sanitized = sanitized.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '_');
+  
+  // Հեռացնել բացատները և փոխարինել underscore-ով
+  sanitized = sanitized.replace(/\s+/g, '_');
+  
+  // Եթե արդյունքում դատարկ է, օգտագործել default անուն
+  if (!sanitized || sanitized.trim() === '') {
+    return 'document_' + Date.now() + '.png';
+  }
+  
+  return sanitized;
+};
+
+// ✅ Ստեղծել անվտանգ filename Supabase Storage-ի համար
+const createSafeFileName = (quoteId: string, docType: string, originalFileName: string): string => {
+  // Ստանալ file extension
+  const fileExt = originalFileName.split('.').pop() || 'png';
+  
+  // Սանիտացնել original filename-ը
+  const sanitizedOriginal = sanitizeFileName(originalFileName.replace(`.${fileExt}`, ''));
+  
+  // Ստեղծել անվտանգ filename
+  return `${quoteId}_${docType}_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt.toLowerCase()}`;
+};
+
+export const submitQuoteToSupabase = async (data: QuoteSubmitData) => {
   const supabase = createClient();
   
   try {
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    // Ստանում ենք current user-ին
+    const { data: { user } } = await supabase.auth.getUser();
     
-    if (userError || !user) {
+    if (!user) {
       throw new Error('User not authenticated');
     }
     
-    const quoteRequestId = uuidv4();
-    
-    // Սկզբում պահպանում ենք quote request առանց փաստաթղթերի
-    const insertData: any = {
-      id: quoteRequestId,
-      quote_id: quoteData.quoteId,
-      user_id: user.id,
-      cargo_type: quoteData.cargoType,
-      shipment_value: quoteData.shipmentValue,
-      origin: quoteData.origin,
-      destination: quoteData.destination,
-      start_date: quoteData.startDate,
-      end_date: quoteData.endDate,
-      transportation_mode: quoteData.transportationMode,
-      selected_coverage: quoteData.selectedCoverage,
-      calculated_premium: quoteData.premium,
-      deductible: quoteData.deductible,
-      shipper_name: quoteData.shipperName,
-      reference_number: quoteData.referenceNumber,
-      status: 'submitted',
-      is_active: true,
-      documents: [] // Սկզբում դատարկ array
-    };
-    
-    const { data: quoteRequest, error: quoteError } = await supabase
-      .from('quote_requests')
-      .insert(insertData)
-      .select()
-      .single();
-    
-    if (quoteError) {
-      throw new Error(`Failed to create quote request: ${quoteError.message}`);
-    }
-    
-    // Վերբեռնում ենք փաստաթղթերը
-    const uploadedDocuments: any[] = [];
-    
-    for (const doc of quoteData.documents) {
-      if (doc.file) {
-        // Ստեղծում ենք ֆայլի անունը
-        const fileName = `${quoteData.quoteId}_${doc.type}_${Date.now()}_${doc.file.name}`;
-        
-        // Վերբեռնում ենք ֆայլը
-        const { data: uploadData, error: uploadError } = await supabase
-          .storage
-          .from('documents')
-          .upload(fileName, doc.file, {
-            cacheControl: '3600',
-            upsert: false
-          });
-        
-        if (uploadError) {
-          console.error(`Failed to upload document ${doc.name}:`, uploadError);
-          continue;
+    // Upload documents if any
+    let documentUrls: any[] = [];
+    if (data.documents && data.documents.length > 0) {
+      for (const doc of data.documents) {
+        if (doc.file) {
+          try {
+            // ✅ Ստեղծել անվտանգ filename
+            const safeFileName = createSafeFileName(data.quoteId, doc.type, doc.file.name);
+            
+            console.log('Uploading document:', {
+              original: doc.file.name,
+              safe: safeFileName,
+              size: doc.file.size,
+              type: doc.file.type
+            });
+            
+            // Upload file to Supabase Storage
+            const { data: uploadData, error: uploadError } = await supabase.storage
+              .from('documents')
+              .upload(safeFileName, doc.file, {
+                cacheControl: '3600',
+                upsert: false
+              });
+            
+            if (uploadError) {
+              console.error('Upload error details:', {
+                error: uploadError,
+                fileName: safeFileName,
+                fileSize: doc.file.size,
+                fileType: doc.file.type
+              });
+              throw uploadError;
+            }
+            
+            // Ստանալ public URL
+            const { data: urlData } = supabase.storage
+              .from('documents')
+              .getPublicUrl(safeFileName);
+            
+            if (!urlData || !urlData.publicUrl) {
+              throw new Error('Failed to get public URL for uploaded file');
+            }
+            
+            documentUrls.push({
+              id: Math.random().toString(36).substring(7),
+              name: doc.name,
+              type: doc.type,
+              file_url: urlData.publicUrl,
+              file_name: safeFileName,
+              file_size: doc.file.size,
+              uploaded_at: new Date().toISOString(),
+              original_name: doc.file.name // Պահպանել original անունը
+            });
+            
+            console.log('Document uploaded successfully:', {
+              name: doc.name,
+              url: urlData.publicUrl,
+              fileName: safeFileName
+            });
+            
+          } catch (uploadError) {
+            console.error(`Failed to upload document ${doc.name}:`, uploadError);
+            // Շարունակել մյուս documents-ների upload-ը
+            continue;
+          }
         }
-        
-        // Ստանում ենք ֆայլի URL-ը
-        const { data: { publicUrl } } = supabase
-          .storage
-          .from('documents')
-          .getPublicUrl(fileName);
-        
-        // Ստեղծում ենք փաստաթղթի գրառում documents աղյուսակում
-        const { data: documentRecord, error: docError } = await supabase
-          .from('documents')
-          .insert({
-            user_id: user.id,
-            quote_request_id: quoteRequestId,
-            quote_id: null,
-            document_type: doc.type,
-            file_name: doc.file.name,
-            file_url: publicUrl,
-            file_size: doc.file.size,
-            status: 'pending',
-            uploaded_at: new Date().toISOString()
-          })
-          .select()
-          .single();
-        
-        if (docError) {
-          console.error(`Failed to save document record ${doc.name}:`, docError);
-          continue;
-        }
-        
-        // Հավաքում ենք փաստաթղթերի տեղեկությունները
-        uploadedDocuments.push({
-          id: documentRecord.id,
-          type: doc.type,
-          name: doc.name,
-          file_name: doc.file.name,
-          file_url: publicUrl,
-          file_size: doc.file.size,
-          uploaded_at: new Date().toISOString()
-        });
       }
     }
     
-    // Update quote request-ը փաստաթղթերի տվյալներով
-    if (uploadedDocuments.length > 0) {
-      await supabase
-        .from('quote_requests')
-        .update({
-          documents: uploadedDocuments,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', quoteRequestId);
+    // Ստեղծում ենք quote-ը database-ում
+    const quoteData = {
+      user_id: user.id,
+      quote_id: data.quoteId,
+      cargo_type: data.cargoType,
+      shipment_value: data.shipmentValue,
+      origin: data.origin,
+      destination: data.destination,
+      start_date: data.startDate,
+      end_date: data.endDate,
+      transportation_mode: data.transportationMode,
+      selected_coverage: data.selectedCoverage,
+      calculated_premium: data.premium,
+      deductible: data.deductible,
+      status: data.status || 'submitted', // Default to submitted
+      shipper_name: data.shipperName,
+      reference_number: data.referenceNumber || '',
+      documents: documentUrls,
+      is_active: true
+    };
+    
+    console.log('Inserting quote to database:', {
+      quoteId: data.quoteId,
+      documentsCount: documentUrls.length
+    });
+    
+    const { data: insertedData, error } = await supabase
+      .from('quote_requests')
+      .insert([quoteData])
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Database insert error:', error);
+      throw error;
     }
     
-    // Ստեղծում ենք notification
-    await supabase
-      .from('notifications')
-      .insert({
-        user_id: user.id,
-        type: 'quote_submitted',
-        title: 'Quote Submitted Successfully',
-        message: `Your quote ${quoteData.quoteId} has been submitted with ${uploadedDocuments.length} documents.`,
-        related_id: quoteRequestId,
-        related_type: 'quote_requests',
-        is_read: false
-      });
+    console.log('Quote submitted successfully:', insertedData);
     
     return {
       success: true,
-      quoteRequestId: quoteRequestId,
-      documents: uploadedDocuments
+      quoteId: data.quoteId,
+      message: 'Quote submitted successfully',
+      data: insertedData
     };
     
   } catch (error) {
-    console.error('Error submitting quote:', error);
-    throw error;
+    console.error('Error submitting quote to Supabase:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
   }
-}
+};
