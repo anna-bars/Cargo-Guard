@@ -33,55 +33,56 @@ export default function QuoteDetailsPage() {
     loadQuoteData();
   }, [quoteId]);
 
-  const loadQuoteData = async () => {
-    const supabase = createClient();
+ // loadQuoteData ֆունկցիայում
+const loadQuoteData = async () => {
+  const supabase = createClient();
+  
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
     
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast.error("Please login to view quote details");
-        router.push('/login');
-        return;
-      }
-      
-      const { data: quoteRequest, error: quoteError } = await supabase
-        .from('quote_requests')
-        .select('*')
-        .eq('id', quoteId)
-        .eq('user_id', user.id)
-        .single();
-      
-      if (quoteError || !quoteRequest) {
-        toast.error("Quote not found or access denied");
-        router.push('/dashboard');
-        return;
-      }
-      
-      const validPaymentStatuses = ['pending', 'paid', 'failed', 'refunded'];
-      if (!quoteRequest.payment_status || !validPaymentStatuses.includes(quoteRequest.payment_status)) {
-        quoteRequest.payment_status = 'pending';
-      }
-      
-      setQuoteData(quoteRequest as QuoteData);
-      
-      const { data: docs, error: docsError } = await supabase
-        .from('documents')
-        .select('*')
-        .eq('quote_request_id', quoteId)
-        .order('uploaded_at', { ascending: false });
-      
-      if (!docsError && docs) {
-        setDocuments(docs);
-      }
-      
-    } catch (error) {
-      console.error('Error loading quote data:', error);
-      toast.error("Failed to load quote details");
-    } finally {
-      setLoading(false);
+    if (!user) {
+      toast.error("Please login to view quote details");
+      router.push('/login');
+      return;
     }
-  };
+    
+    const { data: quoteRequest, error: quoteError } = await supabase
+      .from('quote_requests')
+      .select('*')
+      .eq('id', quoteId)
+      .eq('user_id', user.id)
+      .single();
+    
+    if (quoteError || !quoteRequest) {
+      toast.error("Quote not found or access denied");
+      router.push('/dashboard');
+      return;
+    }
+    
+    const validPaymentStatuses = ['pending', 'paid', 'failed', 'refunded'];
+    if (!quoteRequest.payment_status || !validPaymentStatuses.includes(quoteRequest.payment_status)) {
+      quoteRequest.payment_status = 'pending';
+    }
+    
+    setQuoteData(quoteRequest as QuoteData);
+    
+    // Documents are already included in quoteRequest.documents
+    // No need to query separate documents table
+    if (quoteRequest.documents && Array.isArray(quoteRequest.documents)) {
+      setDocuments(quoteRequest.documents);
+      console.log('Documents from quote request:', quoteRequest.documents);
+    } else {
+      console.log('No documents found in quote request');
+      setDocuments([]);
+    }
+    
+  } catch (error) {
+    console.error('Error loading quote data:', error);
+    toast.error("Failed to load quote details");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleMakePayment = () => {
     if (!quoteData) return;

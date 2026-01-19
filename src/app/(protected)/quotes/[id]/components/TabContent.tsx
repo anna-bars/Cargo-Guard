@@ -8,6 +8,7 @@ import { QuoteData, StatusConfig } from '../types';
 import StatusBanner from './StatusBanner';
 import CoverageDetails from './CoverageDetails';
 import AnalyticsContent from './AnalyticsContent';
+import DocumentsList from './DocumentsList';
 
 interface TabContentProps {
   activeTab: 'overview' | 'documents' | 'analytics';
@@ -210,82 +211,11 @@ export default function TabContent({
       )}
 
       {activeTab === 'documents' && (
-        <div className="bg-white/90 rounded-2xl border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">Documents</h2>
-              <p className="text-sm text-gray-600">
-                {documents.length > 0 ? 'Secure verified files' : 'Upload required documents'}
-              </p>
-            </div>
-            {(quoteData.status === 'fix_and_resubmit' || quoteData.status === 'draft') && (
-              <button className="px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:-translate-y-0.5">
-                <Upload className="w-4 h-4 inline mr-2" />
-                Upload New
-              </button>
-            )}
-          </div>
-          
-          {documents.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center mx-auto mb-4 border border-gray-300">
-                <FileText className="w-10 h-10 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No documents found</h3>
-              <p className="text-gray-600 mb-6">Upload documents to complete your submission</p>
-              {(quoteData.status === 'fix_and_resubmit' || quoteData.status === 'draft') && (
-                <button className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:-translate-y-0.5">
-                  <Upload className="w-4 h-4 inline mr-2" />
-                  Upload Documents
-                </button>
-              )}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {documents.map((doc, index) => (
-                <div key={doc.id} className="group bg-gradient-to-r from-gray-50 to-white border border-gray-300 rounded-xl hover:border-blue-500 p-4 transition-all duration-300">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3">
-                      <div className={`p-2.5 rounded-lg ${
-                        index % 3 === 0 ? 'bg-gradient-to-br from-blue-500/10 to-blue-600/10' :
-                        index % 3 === 1 ? 'bg-gradient-to-br from-emerald-500/10 to-emerald-600/10' :
-                        'bg-gradient-to-br from-purple-500/10 to-purple-600/10'
-                      }`}>
-                        <FileText className="w-5 h-5 text-gray-700" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{doc.document_type}</h3>
-                        <p className="text-sm text-gray-600 truncate max-w-[180px]">{doc.file_name}</p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <span className="text-xs px-2 py-1 bg-gray-200 rounded-full text-gray-700">{(doc.file_size / 1024 / 1024).toFixed(2)} MB</span>
-                          <span className="text-xs px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full">Verified</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => window.open(doc.file_url, '_blank')}
-                        className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all duration-300"
-                        title="Preview"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <a
-                        href={doc.file_url}
-                        download
-                        className="p-2 text-emerald-600 hover:bg-emerald-100 rounded-lg transition-all duration-300"
-                        title="Download"
-                      >
-                        <Download className="w-4 h-4" />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+  <DocumentsList 
+    documents={documents} 
+    status={quoteData.status} 
+  />
+)}
 
       {activeTab === 'analytics' && quoteData.status === 'approved' && quoteData.payment_status === 'paid' && (
         <AnalyticsContent quoteData={quoteData} formatDateTime={formatDateTime} />

@@ -1,5 +1,17 @@
 import { JSX } from "react";
 
+// types.ts
+export interface Document {
+  id: string;
+  name: string;
+  type: string;
+  file_url: string;
+  file_name: string;
+  file_size: number;
+  uploaded_at: string;
+  original_name: string;
+}
+
 export interface QuoteData {
   id: string;
   quote_id: string;
@@ -18,9 +30,8 @@ export interface QuoteData {
   shipper_name: string;
   reference_number: string;
   created_at: string;
-  documents?: any[];
+  documents?: Document[]; // Add documents field
 }
-
 export interface StatusConfig {
   color: string;
   border: string;
