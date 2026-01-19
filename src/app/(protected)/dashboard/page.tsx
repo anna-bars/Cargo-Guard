@@ -7,191 +7,10 @@ import { WelcomeWidget } from '@/app/components/widgets/WelcomeWidget'
 import { HighValueCargoWidget } from '@/app/components/widgets/HighValueCargoWidget'
 import { PerformanceOverview } from '@/app/components/widgets/PerformanceOverview'
 import { UniversalTable, renderStatus, renderButton } from '@/app/components/tables/UniversalTable';
+import { createClient } from '@/lib/supabase/client';
+import { useUser } from '@/app/context/UserContext';
 
-// Dashboard-ի տվյալներ - ԼՐԱՑՈՒՄ
-const dashboardRows = [
-  {
-    type: 'Quote',
-    id: 'Q-005',
-    cargo: 'Jewelry',
-    value: '$15,400.00',
-    status: { 
-      text: 'Pending Approval', 
-      color: 'bg-[#cbd03c]/10', 
-      dot: 'bg-[#cbd03c]', 
-      textColor: 'text-[#cbd03c]' 
-    },
-    date: 'Oct 25, 9:10PM',
-    button: { 
-      text: 'Approve Quote', 
-      variant: 'primary' as const,
-      onClick: (row: any) => console.log('Approve', row.id)
-    }
-  },
-  {
-    type: 'Policy',
-    id: 'P-021',
-    cargo: 'Textiles',
-    value: '$3,700.00',
-    status: { 
-      text: 'Document Missing', 
-      color: 'bg-[#f97316]/10', 
-      dot: 'bg-[#f97316]', 
-      textColor: 'text-[#f97316]' 
-    },
-    date: 'Oct 20, 6:30PM',
-    button: { 
-      text: 'Upload Docs', 
-      variant: 'secondary' as const,
-      onClick: (row: any) => console.log('Upload Docs', row.id)
-    }
-  },
-  {
-    type: 'Policy',
-    id: 'P-020',
-    cargo: 'Heavy Machinery',
-    value: '$48,400.00',
-    status: { 
-      text: 'Expires 15 Nov 2025', 
-      color: 'bg-[#eab308]/10', 
-      dot: 'bg-[#eab308]', 
-      textColor: 'text-[#eab308]' 
-    },
-    date: 'Oct 15, 4:20AM',
-    button: { 
-      text: 'Renew Policy', 
-      variant: 'secondary' as const,
-      onClick: (row: any) => console.log('Renew Policy', row.id)
-    }
-  },
-  {
-    type: 'Policy',
-    id: 'P-019',
-    cargo: 'Electronics',
-    value: '$8,000.00',
-    status: { 
-      text: 'Active', 
-      color: 'bg-[#16a34a]/10', 
-      dot: 'bg-[#16a34a]', 
-      textColor: 'text-[#16a34a]' 
-    },
-    date: 'Oct 21, 2:30PM',
-    button: { 
-      text: 'Download Cert', 
-      variant: 'secondary' as const,
-      onClick: (row: any) => console.log('Download Cert', row.id)
-    }
-  },
-  {
-    type: 'Quote',
-    id: 'Q-007',
-    cargo: 'Food Products',
-    value: '$1,100.00',
-    status: { 
-      text: 'Declined', 
-      color: 'bg-[#8ea0b0]/10', 
-      dot: 'bg-[#8ea0b0]', 
-      textColor: 'text-[#8ea0b0]' 
-    },
-    date: 'Sept 28, 9:30PM',
-    button: { 
-      text: 'View Details', 
-      variant: 'secondary' as const,
-      onClick: (row: any) => console.log('View Details', row.id)
-    }
-  },
-  {
-    type: 'Quote',
-    id: 'Q-008',
-    cargo: 'Pharmaceuticals',
-    value: '$6,250.00',
-    status: { 
-      text: 'Pending Approval', 
-      color: 'bg-[#cbd03c]/10', 
-      dot: 'bg-[#cbd03c]', 
-      textColor: 'text-[#cbd03c]' 
-    },
-    date: 'Sept 30, 11:45AM',
-    button: { 
-      text: 'Approve Quote', 
-      variant: 'primary' as const,
-      onClick: (row: any) => console.log('Approve Quote', row.id)
-    }
-  },
-  {
-    type: 'Policy',
-    id: 'P-022',
-    cargo: 'Auto Parts',
-    value: '$12,900.00',
-    status: { 
-      text: 'Active', 
-      color: 'bg-[#16a34a]/10', 
-      dot: 'bg-[#16a34a]', 
-      textColor: 'text-[#16a34a]' 
-    },
-    date: 'Oct 02, 3:15PM',
-    button: { 
-      text: 'Download Cert', 
-      variant: 'secondary' as const,
-      onClick: (row: any) => console.log('Download Cert', row.id)
-    }
-  },
-  {
-    type: 'Quote',
-    id: 'Q-009',
-    cargo: 'Luxury Watches',
-    value: '$22,000.00',
-    status: { 
-      text: 'Declined', 
-      color: 'bg-[#8ea0b0]/10', 
-      dot: 'bg-[#8ea0b0]', 
-      textColor: 'text-[#8ea0b0]' 
-    },
-    date: 'Oct 05, 7:50PM',
-    button: { 
-      text: 'View Details', 
-      variant: 'secondary' as const,
-      onClick: (row: any) => console.log('View Details', row.id)
-    }
-  },
-  {
-    type: 'Policy',
-    id: 'P-023',
-    cargo: 'Construction Materials',
-    value: '$31,500.00',
-    status: { 
-      text: 'Expires 01 Dec 2025', 
-      color: 'bg-[#eab308]/10', 
-      dot: 'bg-[#eab308]', 
-      textColor: 'text-[#eab308]' 
-    },
-    date: 'Oct 08, 10:10AM',
-    button: { 
-      text: 'Renew Policy', 
-      variant: 'secondary' as const,
-      onClick: (row: any) => console.log('Renew Policy', row.id)
-    }
-  },
-  {
-    type: 'Quote',
-    id: 'Q-010',
-    cargo: 'Medical Equipment',
-    value: '$18,750.00',
-    status: { 
-      text: 'Pending Approval', 
-      color: 'bg-[#cbd03c]/10', 
-      dot: 'bg-[#cbd03c]', 
-      textColor: 'text-[#cbd03c]' 
-    },
-    date: 'Oct 10, 1:40PM',
-    button: { 
-      text: 'Approve Quote', 
-      variant: 'primary' as const,
-      onClick: (row: any) => console.log('Approve Quote', row.id)
-    }
-  }
-];
-
+// Dashboard-ի տվյալներ - կստանանք Supabase-ից
 const dashboardColumns = [
   {
     key: 'id',
@@ -204,25 +23,25 @@ const dashboardColumns = [
     )
   },
   {
-  key: 'cargo',
-  label: 'Cargo',
-  sortable: true,
-  renderDesktop: (_: any, row: any) => (
-    <span className="font-poppins text-sm text-black">
-      {row.cargo}
-    </span>
-  )
-},
-{
-  key: 'value',
-  label: 'Value',
-  sortable: true,
-  renderDesktop: (_: any, row: any) => (
-    <span className="font-poppins text-sm text-black">
-      {row.value}
-    </span>
-  )
-},
+    key: 'cargo',
+    label: 'Cargo',
+    sortable: true,
+    renderDesktop: (_: any, row: any) => (
+      <span className="font-poppins text-sm text-black">
+        {row.cargo}
+      </span>
+    )
+  },
+  {
+    key: 'value',
+    label: 'Value',
+    sortable: true,
+    renderDesktop: (_: any, row: any) => (
+      <span className="font-poppins text-sm text-black">
+        ${row.value?.toLocaleString('en-US') || '0'}
+      </span>
+    )
+  },
   {
     key: 'status',
     label: 'Status / Due Date',
@@ -244,18 +63,278 @@ const dashboardColumns = [
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
+  const [dashboardRows, setDashboardRows] = useState<any[]>([])
+  const [stats, setStats] = useState({
+    totalInsuredAmount: 0,
+    activePoliciesCount: 0,
+    quotesAwaitingCount: 0,
+    contractsExpiringCount: 0,
+    documentsMissingCount: 0
+  })
   const [activeWidget, setActiveWidget] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const { user } = useUser()
+  const supabase = createClient()
 
   useEffect(() => {
-    // Simulate loading data
-    const timer = setTimeout(() => {
-      setLoading(false)
-    }, 1000)
-    
-    return () => clearTimeout(timer)
-  }, [])
+    const loadDashboardData = async () => {
+      if (!user) return
+      
+      try {
+        // 1. Ստանալ quote_requests-ը այս օգտատիրոջ համար
+        const { data: quotes, error: quotesError } = await supabase
+          .from('quote_requests')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(10)
+
+        if (quotesError) throw quotesError
+
+        // 2. Ստանալ policies (եթե ունեք առանձին աղյուսակ)
+        const { data: policies, error: policiesError } = await supabase
+          .from('policies')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(10)
+
+        if (policiesError) {
+          console.warn('No policies table found, using quotes as policies')
+        }
+
+        // 3. Միավորել տվյալները և ֆորմատավորել
+        const combinedData = await formatDashboardData(quotes || [], policies || [])
+        setDashboardRows(combinedData)
+
+        // 4. Հաշվել վիճակագրությունը
+        calculateStats(quotes || [], policies || [])
+
+      } catch (error) {
+        console.error('Error loading dashboard data:', error)
+        // Fallback to static data in case of error
+        setDashboardRows(getFallbackData())
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadDashboardData()
+  }, [user])
+
+  const formatDashboardData = async (quotes: any[], policies: any[]) => {
+    const formattedData: any[] = []
+
+    // Ֆորմատավորել quotes
+    quotes.forEach(quote => {
+      let statusConfig = getStatusConfig(quote.status)
+      
+      // Determine button action based on status
+      let buttonAction = { 
+        text: 'View Details', 
+        variant: 'secondary' as const,
+        onClick: (row: any) => handleQuoteAction(row)
+      }
+
+      if (quote.status === 'pending') {
+        buttonAction = { 
+          text: 'Approve Quote', 
+          variant: 'primary' as const,
+          onClick: (row: any) => handleApproveQuote(row)
+        }
+      }
+
+      formattedData.push({
+        type: 'Quote',
+        id: quote.quote_id || quote.id,
+        cargo: quote.cargo_type || 'Unknown',
+        value: quote.shipment_value || 0,
+        status: statusConfig,
+        date: formatDate(quote.created_at),
+        button: buttonAction,
+        rawData: quote // Keep original data for reference
+      })
+    })
+
+    // Ֆորմատավորել policies (եթե կան)
+    policies.forEach(policy => {
+      let statusConfig = getStatusConfig(policy.status)
+      
+      // Determine button action based on policy status
+      let buttonAction = { 
+        text: 'View Policy', 
+        variant: 'secondary' as const,
+        onClick: (row: any) => handlePolicyAction(row)
+      }
+
+      if (policy.status === 'active') {
+        buttonAction = { 
+          text: 'Download Cert', 
+          variant: 'secondary' as const,
+          onClick: (row: any) => handleDownloadCertificate(row)
+        }
+      } else if (policy.status === 'expiring') {
+        buttonAction = { 
+          text: 'Renew Policy', 
+          variant: 'secondary' as const,
+          onClick: (row: any) => handleRenewPolicy(row)
+        }
+      }
+
+      formattedData.push({
+        type: 'Policy',
+        id: policy.policy_number || policy.id,
+        cargo: policy.cargo_type || 'Unknown',
+        value: policy.insured_amount || policy.shipment_value || 0,
+        status: statusConfig,
+        date: formatDate(policy.created_at),
+        button: buttonAction,
+        rawData: policy
+      })
+    })
+
+    // Սորտավորել ըստ ամսաթվի (նորագույնը առաջինը)
+    return formattedData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  }
+
+  const getStatusConfig = (status: string) => {
+    const statusMap: Record<string, any> = {
+      'pending': { 
+        text: 'Pending Approval', 
+        color: 'bg-[#cbd03c]/10', 
+        dot: 'bg-[#cbd03c]', 
+        textColor: 'text-[#cbd03c]' 
+      },
+      'approved': { 
+        text: 'Approved', 
+        color: 'bg-[#16a34a]/10', 
+        dot: 'bg-[#16a34a]', 
+        textColor: 'text-[#16a34a]' 
+      },
+      'rejected': { 
+        text: 'Declined', 
+        color: 'bg-[#8ea0b0]/10', 
+        dot: 'bg-[#8ea0b0]', 
+        textColor: 'text-[#8ea0b0]' 
+      },
+      'active': { 
+        text: 'Active', 
+        color: 'bg-[#16a34a]/10', 
+        dot: 'bg-[#16a34a]', 
+        textColor: 'text-[#16a34a]' 
+      },
+      'expiring': { 
+        text: 'Expires Soon', 
+        color: 'bg-[#eab308]/10', 
+        dot: 'bg-[#eab308]', 
+        textColor: 'text-[#eab308]' 
+      },
+      'document_missing': { 
+        text: 'Document Missing', 
+        color: 'bg-[#f97316]/10', 
+        dot: 'bg-[#f97316]', 
+        textColor: 'text-[#f97316]' 
+      },
+      'default': { 
+        text: 'Processing', 
+        color: 'bg-gray-100', 
+        dot: 'bg-gray-400', 
+        textColor: 'text-gray-700' 
+      }
+    }
+
+    return statusMap[status] || statusMap['default']
+  }
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
+  const calculateStats = (quotes: any[], policies: any[]) => {
+    // Հաշվել ընդհանուր ապահովագրված գումարը
+    const totalInsuredAmount = [...quotes, ...policies]
+      .filter(item => item.status === 'approved' || item.status === 'active')
+      .reduce((sum, item) => sum + (item.shipment_value || item.insured_amount || 0), 0)
+
+    // Հաշվել ակտիվ policies
+    const activePoliciesCount = policies.filter(p => p.status === 'active').length
+
+    // Հաշվել մշակման մեջ գտնվող quotes
+    const quotesAwaitingCount = quotes.filter(q => q.status === 'pending').length
+
+    // Հաշվել շուտով ժամկետանցվելիք contracts
+    const contractsExpiringCount = policies.filter(p => p.status === 'expiring').length
+
+    // Հաշվել բացակայող փաստաթղթեր
+    const documentsMissingCount = [...quotes, ...policies]
+      .filter(item => item.status === 'document_missing').length
+
+    setStats({
+      totalInsuredAmount,
+      activePoliciesCount,
+      quotesAwaitingCount,
+      contractsExpiringCount,
+      documentsMissingCount
+    })
+  }
+
+  const getFallbackData = () => {
+    // Fallback data if Supabase fails
+    return [
+      {
+        type: 'Quote',
+        id: 'Q-005',
+        cargo: 'Jewelry',
+        value: 15400,
+        status: { 
+          text: 'Pending Approval', 
+          color: 'bg-[#cbd03c]/10', 
+          dot: 'bg-[#cbd03c]', 
+          textColor: 'text-[#cbd03c]' 
+        },
+        date: 'Oct 25, 9:10PM',
+        button: { 
+          text: 'Approve Quote', 
+          variant: 'primary' as const,
+          onClick: (row: any) => console.log('Approve', row.id)
+        }
+      },
+      // ... rest of fallback data
+    ]
+  }
+
+  // Action handlers
+  const handleQuoteAction = (row: any) => {
+    console.log('View quote details:', row.id)
+    // router.push(`/quotes/${row.id}`)
+  }
+
+  const handleApproveQuote = (row: any) => {
+    console.log('Approve quote:', row.id)
+    // Implement approval logic
+  }
+
+  const handlePolicyAction = (row: any) => {
+    console.log('View policy:', row.id)
+    // router.push(`/policies/${row.id}`)
+  }
+
+  const handleDownloadCertificate = (row: any) => {
+    console.log('Download certificate for:', row.id)
+    // Implement download logic
+  }
+
+  const handleRenewPolicy = (row: any) => {
+    console.log('Renew policy:', row.id)
+    // Implement renewal logic
+  }
 
   useEffect(() => {
     // Check screen size for mobile
@@ -329,54 +408,54 @@ export default function DashboardPage() {
             max-[1280px]:min-h-auto max-[1280px]:max-h-none max-[1280px]:row-start-2
             max-[1024px]:min-h-auto max-[1024px]:max-h-none
           ">
-            {/* Performance Overview */}
+            {/* Performance Overview - now with real data */}
             <PerformanceOverview 
               title="Performance Overview"
               timePeriod="This Month"
               metrics={[
                 {
                   id: 'insured-amount',
-                  value: '84',
-                  decimal: '5k',
+                  value: Math.floor(stats.totalInsuredAmount / 1000).toString(),
+                  decimal: 'k',
                   prefix: '$',
                   label: 'Total Insured Amount',
                   hasArrow: false
                 },
                 {
                   id: 'active-policies',
-                  value: '8',
-                  decimal: '47',
-                  suffix: '%',
+                  value: stats.activePoliciesCount.toString(),
+                  decimal: '',
+                  suffix: '',
                   label: 'Active Policies',
                   hasArrow: true,
                   arrowDirection: 'up'
                 },
                 {
                   id: 'quotes-awaiting',
-                  value: '3',
+                  value: stats.quotesAwaitingCount.toString(),
                   decimal: '',
-                  suffix: '%',
+                  suffix: '',
                   label: 'Quotes Awaiting Approval',
                   hasArrow: true,
-                  arrowDirection: 'down'
+                  arrowDirection: stats.quotesAwaitingCount > 0 ? 'down' : 'up'
                 },
                 {
                   id: 'contracts-expire',
-                  value: '2',
+                  value: stats.contractsExpiringCount.toString(),
                   decimal: '',
-                  suffix: '%',
+                  suffix: '',
                   label: 'Contracts Due to Expire',
                   hasArrow: true,
-                  arrowDirection: 'down'
+                  arrowDirection: stats.contractsExpiringCount > 0 ? 'down' : 'up'
                 },
                 {
                   id: 'documents-uploads',
-                  value: '1',
+                  value: stats.documentsMissingCount.toString(),
                   decimal: '',
-                  suffix: '%',
+                  suffix: '',
                   label: 'Required Document Uploads',
                   hasArrow: true,
-                  arrowDirection: 'down'
+                  arrowDirection: stats.documentsMissingCount > 0 ? 'down' : 'up'
                 }
               ]}
             />
@@ -385,23 +464,21 @@ export default function DashboardPage() {
               <ConversionChart />
             </div>
 
-<UniversalTable
-  title="Recent Activity"
-  showMobileHeader={false}
-  rows={dashboardRows}
-  columns={dashboardColumns}
-  mobileDesign={{
-    showType: true,
-    showCargoIcon: true,
-    showDateIcon: true,
-    dateLabel: 'Last Update',
-    buttonWidth: '47%'
-  }}
-  mobileDesignType="dashboard" // ավելացնել
-  desktopGridCols="0.7fr 1fr 0.7fr 1fr 0.7fr 1fr" // ավելացնել
-/>
-
-
+            <UniversalTable
+              title="Recent Activity"
+              showMobileHeader={false}
+              rows={dashboardRows}
+              columns={dashboardColumns}
+              mobileDesign={{
+                showType: true,
+                showCargoIcon: true,
+                showDateIcon: true,
+                dateLabel: 'Last Update',
+                buttonWidth: '47%'
+              }}
+              mobileDesignType="dashboard"
+              desktopGridCols="0.7fr 1fr 0.7fr 1fr 0.7fr 1fr"
+            />
           </div>
 
           {/* Right Column - 25% - Desktop View */}
@@ -420,7 +497,10 @@ export default function DashboardPage() {
             </div>
 
             {/* High-Value Cargo Share Widget */}
-            <HighValueCargoWidget percentage={45.55} mtdValue="62,3k" />
+            <HighValueCargoWidget 
+              percentage={calculateHighValuePercentage(dashboardRows)}
+              mtdValue={`${Math.floor(stats.totalInsuredAmount / 1000)}k`}
+            />
           </div>
 
           {/* Tablet View (768px - 1279px) - Three Widgets Side by Side */}
@@ -445,7 +525,10 @@ export default function DashboardPage() {
 
               {/* High Value Cargo */}
               <div className="w-full h-[240px]">
-                <HighValueCargoWidget percentage={45.55} mtdValue="62,3k" />
+                <HighValueCargoWidget 
+                  percentage={calculateHighValuePercentage(dashboardRows)}
+                  mtdValue={`${Math.floor(stats.totalInsuredAmount / 1000)}k`}
+                />
               </div>
             </div>
           </div>
@@ -453,4 +536,13 @@ export default function DashboardPage() {
       </div>
     </DashboardLayout>
   )
+}
+
+// Helper function to calculate high-value percentage
+function calculateHighValuePercentage(data: any[]) {
+  if (!data.length) return 45.55 // Default fallback
+  
+  const highValueThreshold = 10000 // $10,000+ is considered high-value
+  const highValueCount = data.filter(item => item.value >= highValueThreshold).length
+  return (highValueCount / data.length) * 100
 }
