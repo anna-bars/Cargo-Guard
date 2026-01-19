@@ -9,8 +9,9 @@ import { PerformanceOverview } from '@/app/components/widgets/PerformanceOvervie
 import { UniversalTable, renderStatus, renderButton } from '@/app/components/tables/UniversalTable';
 import { createClient } from '@/lib/supabase/client';
 import { useUser } from '@/app/context/UserContext';
+import { useRouter } from 'next/navigation';
 
-// Dashboard-ի տվյալներ - կստանանք Supabase-ից
+// Dashboard-ի columns
 const dashboardColumns = [
   {
     key: 'id',
@@ -44,13 +45,13 @@ const dashboardColumns = [
   },
   {
     key: 'status',
-    label: 'Status / Due Date',
+    label: 'Status',
     sortable: true,
     renderDesktop: (status: any) => renderStatus(status)
   },
   {
     key: 'date',
-    label: 'Last Update',
+    label: 'Created',
     sortable: true
   },
   {
@@ -66,15 +67,16 @@ export default function DashboardPage() {
   const [dashboardRows, setDashboardRows] = useState<any[]>([])
   const [stats, setStats] = useState({
     totalInsuredAmount: 0,
-    activePoliciesCount: 0,
-    quotesAwaitingCount: 0,
-    contractsExpiringCount: 0,
-    documentsMissingCount: 0
+    draftQuotesCount: 0,
+    submittedQuotesCount: 0,
+    underReviewCount: 0,
+    approvedQuotesCount: 0
   })
   const [activeWidget, setActiveWidget] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const { user } = useUser()
+  const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
@@ -92,28 +94,15 @@ export default function DashboardPage() {
 
         if (quotesError) throw quotesError
 
-        // 2. Ստանալ policies (եթե ունեք առանձին աղյուսակ)
-        const { data: policies, error: policiesError } = await supabase
-          .from('policies')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(10)
+        // 2. Ֆորմատավորել տվյալները
+        const formattedData = formatDashboardData(quotes || [])
+        setDashboardRows(formattedData)
 
-        if (policiesError) {
-          console.warn('No policies table found, using quotes as policies')
-        }
-
-        // 3. Միավորել տվյալները և ֆորմատավորել
-        const combinedData = await formatDashboardData(quotes || [], policies || [])
-        setDashboardRows(combinedData)
-
-        // 4. Հաշվել վիճակագրությունը
-        calculateStats(quotes || [], policies || [])
+        // 3. Հաշվել վիճակագրությունը
+        calculateStats(quotes || [])
 
       } catch (error) {
         console.error('Error loading dashboard data:', error)
-        // Fallback to static data in case of error
         setDashboardRows(getFallbackData())
       } finally {
         setLoading(false)
@@ -123,148 +112,63 @@ export default function DashboardPage() {
     loadDashboardData()
   }, [user])
 
-  const formatDashboardData = async (quotes: any[], policies: any[]) => {
-  const formattedData: any[] = []
-
-  // Ֆորմատավորել quotes
-  quotes.forEach(quote => {
-    // Ֆորմատավորում ենք quote ID-ը
-    const formatQuoteId = (id: string) => {
-      if (id.startsWith('Q-')) {
-        return id;
-      }
-      if (id.startsWith('temp-')) {
-        const randomNum = Math.floor(Math.random() * 10000).toString().padStart(5, '0');
-        return `Q-${randomNum}`;
-      }
-      return `Q-${id.slice(-5)}`;
-    };
-
-    let statusConfig = getStatusConfig(quote.status)
-    
-    // Determine button action based on status
-    let buttonAction = { 
-      text: 'View Details', 
-      variant: 'secondary' as const,
-      onClick: (row: any) => handleQuoteAction(row)
-    }
-
-    if (quote.status === 'pending') {
-      buttonAction = { 
-        text: 'Approve Quote', 
-        variant: 'primary' as const,
-        onClick: (row: any) => handleApproveQuote(row)
-      }
-    }
-
-    formattedData.push({
-      type: 'Quote',
-      id: formatQuoteId(quote.quote_id || quote.id), // ✅ Ֆորմատավորված ID
-      cargo: quote.cargo_type || 'Unknown',
-      value: quote.shipment_value || 0,
-      status: statusConfig,
-      date: formatDate(quote.created_at),
-      button: buttonAction,
-      rawData: quote
-    })
-  })
-
-  // Ֆորմատավորել policies
-  policies.forEach(policy => {
-    // Ֆորմատավորում ենք policy ID-ը
-    const formatPolicyId = (id: string) => {
-      if (id.startsWith('P-')) {
-        return id;
-      }
-      return `P-${id.slice(-5)}`;
-    };
-
-    let statusConfig = getStatusConfig(policy.status)
-    
-    // Determine button action based on policy status
-    let buttonAction = { 
-      text: 'View Policy', 
-      variant: 'secondary' as const,
-      onClick: (row: any) => handlePolicyAction(row)
-    }
-
-    if (policy.status === 'active') {
-      buttonAction = { 
-        text: 'Download Cert', 
-        variant: 'secondary' as const,
-        onClick: (row: any) => handleDownloadCertificate(row)
-      }
-    } else if (policy.status === 'expiring') {
-      buttonAction = { 
-        text: 'Renew Policy', 
-        variant: 'secondary' as const,
-        onClick: (row: any) => handleRenewPolicy(row)
-      }
-    }
-
-    formattedData.push({
-      type: 'Policy',
-      id: formatPolicyId(policy.policy_number || policy.id), // ✅ Ֆորմատավորված ID
-      cargo: policy.cargo_type || 'Unknown',
-      value: policy.insured_amount || policy.shipment_value || 0,
-      status: statusConfig,
-      date: formatDate(policy.created_at),
-      button: buttonAction,
-      rawData: policy
-    })
-  })
-
-  return formattedData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-}
-
   const getStatusConfig = (status: string) => {
     const statusMap: Record<string, any> = {
-      'pending': { 
-        text: 'Pending Approval', 
-        color: 'bg-[#cbd03c]/10', 
-        dot: 'bg-[#cbd03c]', 
-        textColor: 'text-[#cbd03c]' 
+      'draft': { 
+        text: 'Continue Quote', 
+        color: 'bg-gray-100', 
+        dot: 'bg-gray-500', 
+        textColor: 'text-gray-700',
+        buttonText: 'Continue Quote',
+        buttonVariant: 'primary' as const
+      },
+      'submitted': { 
+        text: 'Waiting for review', 
+        color: 'bg-blue-50', 
+        dot: 'bg-blue-500', 
+        textColor: 'text-blue-700',
+        buttonText: 'View Details',
+        buttonVariant: 'secondary' as const
+      },
+      'under_review': { 
+        text: 'Documents under review', 
+        color: 'bg-amber-50', 
+        dot: 'bg-amber-500', 
+        textColor: 'text-amber-700',
+        buttonText: 'Check Status',
+        buttonVariant: 'secondary' as const
       },
       'approved': { 
-        text: 'Approved', 
-        color: 'bg-[#16a34a]/10', 
-        dot: 'bg-[#16a34a]', 
-        textColor: 'text-[#16a34a]' 
+        text: 'Pay to Activate', 
+        color: 'bg-emerald-50', 
+        dot: 'bg-emerald-500', 
+        textColor: 'text-emerald-700',
+        buttonText: 'Pay Now',
+        buttonVariant: 'primary' as const
       },
       'rejected': { 
-        text: 'Declined', 
-        color: 'bg-[#8ea0b0]/10', 
-        dot: 'bg-[#8ea0b0]', 
-        textColor: 'text-[#8ea0b0]' 
-      },
-      'active': { 
-        text: 'Active', 
-        color: 'bg-[#16a34a]/10', 
-        dot: 'bg-[#16a34a]', 
-        textColor: 'text-[#16a34a]' 
-      },
-      'expiring': { 
-        text: 'Expires Soon', 
-        color: 'bg-[#eab308]/10', 
-        dot: 'bg-[#eab308]', 
-        textColor: 'text-[#eab308]' 
-      },
-      'document_missing': { 
-        text: 'Document Missing', 
-        color: 'bg-[#f97316]/10', 
-        dot: 'bg-[#f97316]', 
-        textColor: 'text-[#f97316]' 
-      },
-      'default': { 
-        text: 'Processing', 
-        color: 'bg-gray-100', 
-        dot: 'bg-gray-400', 
-        textColor: 'text-gray-700' 
+        text: 'Fix & Resubmit', 
+        color: 'bg-rose-50', 
+        dot: 'bg-rose-500', 
+        textColor: 'text-rose-700',
+        buttonText: 'Resubmit',
+        buttonVariant: 'primary' as const
       }
-    }
+    };
 
-    return statusMap[status] || statusMap['default']
-  }
+    return statusMap[status] || statusMap['draft'];
+  };
+
+  const formatQuoteId = (id: string) => {
+    if (id.startsWith('Q-')) {
+      return id;
+    }
+    if (id.startsWith('temp-')) {
+      const randomNum = Math.floor(Math.random() * 10000).toString().padStart(5, '0');
+      return `Q-${randomNum}`;
+    }
+    return `Q-${id.slice(-5)}`;
+  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -274,86 +178,129 @@ export default function DashboardPage() {
       hour: '2-digit',
       minute: '2-digit'
     })
-  }
+  };
 
-  const calculateStats = (quotes: any[], policies: any[]) => {
-    // Հաշվել ընդհանուր ապահովագրված գումարը
-    const totalInsuredAmount = [...quotes, ...policies]
-      .filter(item => item.status === 'approved' || item.status === 'active')
-      .reduce((sum, item) => sum + (item.shipment_value || item.insured_amount || 0), 0)
+  const formatDashboardData = (quotes: any[]) => {
+    const formattedData: any[] = []
 
-    // Հաշվել ակտիվ policies
-    const activePoliciesCount = policies.filter(p => p.status === 'active').length
+    // Ֆորմատավորել quotes
+    quotes.forEach(quote => {
+      const statusConfig = getStatusConfig(quote.status)
+      
+      const buttonAction = { 
+        text: statusConfig.buttonText, 
+        variant: statusConfig.buttonVariant,
+        onClick: (row: any) => handleQuoteAction(row, quote.status)
+      }
 
-    // Հաշվել մշակման մեջ գտնվող quotes
-    const quotesAwaitingCount = quotes.filter(q => q.status === 'pending').length
+      formattedData.push({
+        type: 'Quote',
+        id: formatQuoteId(quote.quote_id || quote.id),
+        cargo: quote.cargo_type || 'Unknown',
+        value: quote.shipment_value || 0,
+        status: {
+          text: statusConfig.text,
+          color: statusConfig.color,
+          dot: statusConfig.dot,
+          textColor: statusConfig.textColor
+        },
+        date: formatDate(quote.created_at),
+        button: buttonAction,
+        rawData: quote,
+        quoteStatus: quote.status
+      })
+    })
 
-    // Հաշվել շուտով ժամկետանցվելիք contracts
-    const contractsExpiringCount = policies.filter(p => p.status === 'expiring').length
+    // Սորտավորել ըստ ամսաթվի (նորագույնը առաջինը)
+    return formattedData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  };
 
-    // Հաշվել բացակայող փաստաթղթեր
-    const documentsMissingCount = [...quotes, ...policies]
-      .filter(item => item.status === 'document_missing').length
+  const calculateStats = (quotes: any[]) => {
+    const draftQuotesCount = quotes.filter(q => q.status === 'draft').length
+    const submittedQuotesCount = quotes.filter(q => q.status === 'submitted').length
+    const underReviewCount = quotes.filter(q => q.status === 'under_review').length
+    const approvedQuotesCount = quotes.filter(q => q.status === 'approved').length
+    
+    const totalInsuredAmount = quotes
+      .filter(item => item.status === 'approved')
+      .reduce((sum, item) => sum + (item.shipment_value || 0), 0)
 
     setStats({
       totalInsuredAmount,
-      activePoliciesCount,
-      quotesAwaitingCount,
-      contractsExpiringCount,
-      documentsMissingCount
+      draftQuotesCount,
+      submittedQuotesCount,
+      underReviewCount,
+      approvedQuotesCount
     })
-  }
+  };
 
   const getFallbackData = () => {
-    // Fallback data if Supabase fails
     return [
       {
         type: 'Quote',
-        id: 'Q-005',
-        cargo: 'Jewelry',
-        value: 15400,
+        id: 'Q-02154',
+        cargo: 'Electronics',
+        value: 45000,
         status: { 
-          text: 'Pending Approval', 
-          color: 'bg-[#cbd03c]/10', 
-          dot: 'bg-[#cbd03c]', 
-          textColor: 'text-[#cbd03c]' 
+          text: 'Waiting for review', 
+          color: 'bg-blue-50', 
+          dot: 'bg-blue-500', 
+          textColor: 'text-blue-700' 
         },
-        date: 'Oct 25, 9:10PM',
+        date: 'Jan 19, 2:30 PM',
         button: { 
-          text: 'Approve Quote', 
-          variant: 'primary' as const,
-          onClick: (row: any) => console.log('Approve', row.id)
-        }
+          text: 'View Details', 
+          variant: 'secondary' as const,
+          onClick: (row: any) => handleQuoteAction(row, 'submitted')
+        },
+        quoteStatus: 'submitted'
       },
-      // ... rest of fallback data
+      {
+        type: 'Quote',
+        id: 'Q-02153',
+        cargo: 'Pharmaceuticals',
+        value: 15000,
+        status: { 
+          text: 'Continue Quote', 
+          color: 'bg-gray-100', 
+          dot: 'bg-gray-500', 
+          textColor: 'text-gray-700' 
+        },
+        date: 'Jan 18, 11:45 AM',
+        button: { 
+          text: 'Continue Quote', 
+          variant: 'primary' as const,
+          onClick: (row: any) => handleQuoteAction(row, 'draft')
+        },
+        quoteStatus: 'draft'
+      }
     ]
-  }
+  };
 
   // Action handlers
-  const handleQuoteAction = (row: any) => {
-    console.log('View quote details:', row.id)
-    // router.push(`/quotes/${row.id}`)
-  }
-
-  const handleApproveQuote = (row: any) => {
-    console.log('Approve quote:', row.id)
-    // Implement approval logic
-  }
-
-  const handlePolicyAction = (row: any) => {
-    console.log('View policy:', row.id)
-    // router.push(`/policies/${row.id}`)
-  }
-
-  const handleDownloadCertificate = (row: any) => {
-    console.log('Download certificate for:', row.id)
-    // Implement download logic
-  }
-
-  const handleRenewPolicy = (row: any) => {
-    console.log('Renew policy:', row.id)
-    // Implement renewal logic
-  }
+  const handleQuoteAction = (row: any, status: string) => {
+    switch (status) {
+      case 'draft':
+        // Redirect to continue the quote
+        router.push(`/quotes/new?quote_id=${row.id}&continue=true`)
+        break
+      case 'submitted':
+      case 'under_review':
+        // View quote details
+        router.push(`/quotes/${row.id}`)
+        break
+      case 'approved':
+        // Go to payment
+        router.push(`/payment?quote_id=${row.id}`)
+        break
+      case 'rejected':
+        // Go to resubmit
+        router.push(`/quotes/resubmit/${row.id}`)
+        break
+      default:
+        router.push(`/quotes/${row.id}`)
+    }
+  };
 
   useEffect(() => {
     // Check screen size for mobile
@@ -365,7 +312,7 @@ export default function DashboardPage() {
     window.addEventListener('resize', checkScreenSize)
     
     return () => window.removeEventListener('resize', checkScreenSize)
-  }, [])
+  }, []);
 
   const handleScroll = () => {
     if (!scrollContainerRef.current || !isMobile) return
@@ -376,7 +323,7 @@ export default function DashboardPage() {
     const currentIndex = Math.round(scrollLeft / widgetWidth)
     
     setActiveWidget(currentIndex)
-  }
+  };
 
   const scrollToWidget = (index: number) => {
     if (!scrollContainerRef.current || !isMobile) return
@@ -387,7 +334,7 @@ export default function DashboardPage() {
       left: index * widgetWidth,
       behavior: 'smooth'
     })
-  }
+  };
 
   if (loading) {
     return (
@@ -401,7 +348,7 @@ export default function DashboardPage() {
     <DashboardLayout>
       <div className="min-w-[96%] max-w-[95.5%] !sm:min-w-[90.5%] mx-auto">
         {/* Mobile Header for Activity Section */}
-        <div className="flex gap-2 items-center  mt-4 mb-2 xl:hidden">
+        <div className="flex gap-2 items-center mt-4 mb-2 xl:hidden">
           <img
             src="/dashboard/hashtag.svg"
             alt=""
@@ -427,7 +374,7 @@ export default function DashboardPage() {
             max-[1280px]:min-h-auto max-[1280px]:max-h-none max-[1280px]:row-start-2
             max-[1024px]:min-h-auto max-[1024px]:max-h-none
           ">
-            {/* Performance Overview - now with real data */}
+            {/* Performance Overview with new stats */}
             <PerformanceOverview 
               title="Performance Overview"
               timePeriod="This Month"
@@ -437,44 +384,44 @@ export default function DashboardPage() {
                   value: Math.floor(stats.totalInsuredAmount / 1000).toString(),
                   decimal: 'k',
                   prefix: '$',
-                  label: 'Total Insured Amount',
+                  label: 'Approved Value',
                   hasArrow: false
                 },
                 {
-                  id: 'active-policies',
-                  value: stats.activePoliciesCount.toString(),
+                  id: 'draft-quotes',
+                  value: stats.draftQuotesCount.toString(),
                   decimal: '',
                   suffix: '',
-                  label: 'Active Policies',
+                  label: 'Draft Quotes',
                   hasArrow: true,
-                  arrowDirection: 'up'
+                  arrowDirection: stats.draftQuotesCount > 0 ? 'up' : 'down'
                 },
                 {
-                  id: 'quotes-awaiting',
-                  value: stats.quotesAwaitingCount.toString(),
+                  id: 'submitted-quotes',
+                  value: stats.submittedQuotesCount.toString(),
                   decimal: '',
                   suffix: '',
-                  label: 'Quotes Awaiting Approval',
+                  label: 'Submitted',
                   hasArrow: true,
-                  arrowDirection: stats.quotesAwaitingCount > 0 ? 'down' : 'up'
+                  arrowDirection: stats.submittedQuotesCount > 0 ? 'up' : 'down'
                 },
                 {
-                  id: 'contracts-expire',
-                  value: stats.contractsExpiringCount.toString(),
+                  id: 'under-review',
+                  value: stats.underReviewCount.toString(),
                   decimal: '',
                   suffix: '',
-                  label: 'Contracts Due to Expire',
+                  label: 'Under Review',
                   hasArrow: true,
-                  arrowDirection: stats.contractsExpiringCount > 0 ? 'down' : 'up'
+                  arrowDirection: stats.underReviewCount > 0 ? 'up' : 'down'
                 },
                 {
-                  id: 'documents-uploads',
-                  value: stats.documentsMissingCount.toString(),
+                  id: 'approved-quotes',
+                  value: stats.approvedQuotesCount.toString(),
                   decimal: '',
                   suffix: '',
-                  label: 'Required Document Uploads',
+                  label: 'Ready to Pay',
                   hasArrow: true,
-                  arrowDirection: stats.documentsMissingCount > 0 ? 'down' : 'up'
+                  arrowDirection: stats.approvedQuotesCount > 0 ? 'up' : 'down'
                 }
               ]}
             />
@@ -488,11 +435,31 @@ export default function DashboardPage() {
               showMobileHeader={false}
               rows={dashboardRows}
               columns={dashboardColumns}
+              initialFilters={{
+                activity: 'All Activity',
+                timeframe: 'Last 30 days',
+                sort: 'Date'
+              }}
+              filterConfig={{
+                showActivityFilter: true,
+                showTimeframeFilter: true,
+                showSortFilter: true,
+                activityOptions: [
+                  'All Activity', 
+                  'Draft', 
+                  'Submitted', 
+                  'Under Review', 
+                  'Approved', 
+                  'Rejected'
+                ],
+                timeframeOptions: ['Last 7 days', 'Last 30 days', 'Last 3 months', 'All time'],
+                sortOptions: ['Status', 'Date', 'Value', 'Type']
+              }}
               mobileDesign={{
                 showType: true,
                 showCargoIcon: true,
                 showDateIcon: true,
-                dateLabel: 'Last Update',
+                dateLabel: 'Created',
                 buttonWidth: '47%'
               }}
               mobileDesignType="dashboard"
