@@ -76,7 +76,7 @@ interface QuoteData {
   calculated_premium: number;
   deductible: number;
   status: 'submitted' | 'approved' | 'rejected' | 'pending' | 'draft' | 'pay_to_activate' | 'waiting_for_review' | 'documents_under_review' | 'fix_and_resubmit';
-  payment_status: 'pending' | 'paid' | 'failed' | 'refunded'; // Բոլոր հնարավոր արժեքները
+  payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
   shipper_name: string;
   reference_number: string;
   created_at: string;
@@ -141,7 +141,6 @@ export default function QuoteDetailsPage() {
         return;
       }
       
-      // Ensure payment_status has a valid value
       const validPaymentStatuses = ['pending', 'paid', 'failed', 'refunded'];
       if (!quoteRequest.payment_status || !validPaymentStatuses.includes(quoteRequest.payment_status)) {
         quoteRequest.payment_status = 'pending';
@@ -170,7 +169,6 @@ export default function QuoteDetailsPage() {
   const getStatusConfig = (status: string, paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded' = 'pending'): StatusConfig => {
     const lowerStatus = status.toLowerCase();
     
-    // For approved status, check payment status
     if (lowerStatus === 'approved') {
       if (paymentStatus === 'paid') {
         return {
@@ -228,7 +226,6 @@ export default function QuoteDetailsPage() {
           }
         };
       } else {
-        // pending payment status
         return {
           color: 'bg-gradient-to-r from-emerald-50 to-emerald-100 text-emerald-700',
           border: 'border border-emerald-200',
@@ -249,7 +246,6 @@ export default function QuoteDetailsPage() {
       }
     }
 
-    // For other statuses
     switch (lowerStatus) {
       case 'submitted':
         return {
@@ -281,10 +277,10 @@ export default function QuoteDetailsPage() {
             downloadQuote: false,
             makePayment: false,
             viewPolicy: false,
-            resubmit: true,
+            resubmit: false, // Ոչ մի resubmit կոճակ
             checkStatus: false,
-            delete: true,
-            edit: true
+            delete: true, // Կարող է լինել delete
+            edit: false // Ոչ մի edit
           }
         };
       case 'fix_and_resubmit':
@@ -416,12 +412,6 @@ export default function QuoteDetailsPage() {
     }
   };
 
-  const handleResubmit = () => {
-    if (!quoteData) return;
-    toast.success('Redirecting to quote editor...');
-    router.push(`/quotes/edit/${quoteData.id}`);
-  };
-
   const handleMakePayment = () => {
     if (!quoteData) return;
     toast.success('Redirecting to payment...');
@@ -431,13 +421,11 @@ export default function QuoteDetailsPage() {
   const handleViewPolicy = () => {
     if (!quoteData) return;
     toast.success('Opening policy document...');
-    // Logic to fetch and open policy PDF
   };
 
   const handleViewReceipt = () => {
     if (!quoteData) return;
     toast.success('Opening payment receipt...');
-    // Logic to fetch and open receipt
   };
 
   const handleDeleteQuote = async () => {
@@ -469,6 +457,12 @@ export default function QuoteDetailsPage() {
     router.push(`/quotes/edit/${quoteData.id}`);
   };
 
+  const handleResubmit = () => {
+    if (!quoteData) return;
+    toast.success('Redirecting to quote editor...');
+    router.push(`/quotes/edit/${quoteData.id}`);
+  };
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -496,15 +490,6 @@ export default function QuoteDetailsPage() {
       hour: '2-digit',
       minute: '2-digit'
     });
-  };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success('Copied to clipboard');
-  };
-
-  const handlePrint = () => {
-    window.print();
   };
 
   const refreshData = () => {
@@ -556,7 +541,6 @@ export default function QuoteDetailsPage() {
     <div className="min-h-screen bg-[#F3F3F6]">
       <DashboardHeader userEmail="client@example.com" />
       
-      {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 max-w-md w-full">
@@ -600,7 +584,7 @@ export default function QuoteDetailsPage() {
                 <span className="group-hover:underline">Back to quotes</span>
               </button>
               
-              <div className="flex items-start justify-between">
+              <div className="block md:flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
                     <div className="relative">
@@ -640,7 +624,7 @@ export default function QuoteDetailsPage() {
                   </p>
                 </div>
                 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 mt-2 md:pt-2">
                   {statusConfig.showActions.edit && (
                     <button
                       onClick={handleEditQuote}
@@ -667,7 +651,7 @@ export default function QuoteDetailsPage() {
                     <RefreshCw className="w-5 h-5 text-gray-700" />
                   </button>
                   <button
-                    onClick={handlePrint}
+                    onClick={() => window.print()}
                     className="p-2.5 bg-white/80 border border-gray-300 rounded-2xl hover:bg-white hover:border-blue-500 transition-all duration-300"
                     title="Print"
                   >
@@ -842,7 +826,7 @@ export default function QuoteDetailsPage() {
             <div className="transition-all duration-300">
               {activeTab === 'overview' && (
                 <div className="space-y-6">
-                  {/* Payment Status Banner */}
+                  {/* Payment Status Banner - Only for approved status */}
                   {quoteData.status === 'approved' && (
                     <div className={`rounded-2xl border p-6 ${
                       quoteData.payment_status === 'paid'
@@ -1005,14 +989,10 @@ export default function QuoteDetailsPage() {
                         <div>
                           <h2 className="text-xl font-bold text-gray-900">Quote Rejected</h2>
                           <p className="text-rose-600">This quote requires adjustments before it can be approved.</p>
+                          {/* No button - just information */}
                         </div>
                       </div>
-                      <button
-                        onClick={handleResubmit}
-                        className="px-6 py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white font-medium rounded-xl hover:from-rose-600 hover:to-rose-700 transition-all duration-300 transform hover:-translate-y-0.5"
-                      >
-                        Edit & Resubmit Quote
-                      </button>
+                      {/* No action button for rejected status */}
                     </div>
                   )}
 
@@ -1141,7 +1121,7 @@ export default function QuoteDetailsPage() {
                         {documents.length > 0 ? 'Secure verified files' : 'Upload required documents'}
                       </p>
                     </div>
-                    {(quoteData.status === 'rejected' || quoteData.status === 'fix_and_resubmit' || quoteData.status === 'draft') && (
+                    {(quoteData.status === 'fix_and_resubmit' || quoteData.status === 'draft') && (
                       <button className="px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:-translate-y-0.5">
                         <Upload className="w-4 h-4 inline mr-2" />
                         Upload New
@@ -1156,7 +1136,7 @@ export default function QuoteDetailsPage() {
                       </div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">No documents found</h3>
                       <p className="text-gray-600 mb-6">Upload documents to complete your submission</p>
-                      {(quoteData.status === 'rejected' || quoteData.status === 'fix_and_resubmit' || quoteData.status === 'draft') && (
+                      {(quoteData.status === 'fix_and_resubmit' || quoteData.status === 'draft') && (
                         <button className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:-translate-y-0.5">
                           <Upload className="w-4 h-4 inline mr-2" />
                           Upload Documents
@@ -1445,7 +1425,6 @@ export default function QuoteDetailsPage() {
         </div>
       </div>
 
-      {/* Custom Animations */}
       <style jsx global>{`
         @keyframes shimmer {
           0% { transform: translateX(-100%); }
