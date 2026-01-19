@@ -2,7 +2,7 @@
 
 import DashboardLayout from '../DashboardLayout'
 import { useEffect, useState, useRef } from 'react'
-import { ConversionChart } from '../../components/charts/ConversionChart'
+import { ConversionChart, ConversionChartData } from '../../components/charts/ConversionChart'
 import { WelcomeWidget } from '@/app/components/widgets/WelcomeWidget'
 import { HighValueCargoWidget } from '@/app/components/widgets/HighValueCargoWidget'
 import { PerformanceOverview } from '@/app/components/widgets/PerformanceOverview'
@@ -79,38 +79,110 @@ export default function DashboardPage() {
   const router = useRouter()
   const supabase = createClient()
 
-  useEffect(() => {
-    const loadDashboardData = async () => {
-      if (!user) return
-      
-      try {
-        // 1. Ստանալ quote_requests-ը այս օգտատիրոջ համար
-        const { data: quotes, error: quotesError } = await supabase
-          .from('quote_requests')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(10)
+// DashboardPage.tsx-ում ավելացրեք այս ֆունկցիան
+const calculateConversionData = (quotes: any[], period: string = 'This Month'): ConversionChartData => {
+  if (!quotes.length) {
+    // Fallback data
+    return { approved: 17, declined: 9, expired: 18 };
+  }
 
-        if (quotesError) throw quotesError
+  const now = new Date();
+  let startDate: Date;
 
-        // 2. Ֆորմատավորել տվյալները
-        const formattedData = formatDashboardData(quotes || [])
-        setDashboardRows(formattedData)
+  // Որոշել ժամանակահատվածը
+  switch (period) {
+    case 'This Week':
+      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+      break;
+    case 'Last Month':
+      startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      break;
+    case 'Last Quarter':
+      startDate = new Date(now.getFullYear(), now.getMonth() - 3, 1);
+      break;
+    case 'This Month':
+    default:
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      break;
+  }
 
-        // 3. Հաշվել վիճակագրությունը
-        calculateStats(quotes || [])
+  // Ֆիլտրել quotes ըստ ժամանակահատվածի
+  const filteredQuotes = quotes.filter(quote => {
+    const quoteDate = new Date(quote.created_at);
+    return quoteDate >= startDate && quoteDate <= now;
+  });
 
-      } catch (error) {
-        console.error('Error loading dashboard data:', error)
-        setDashboardRows(getFallbackData())
-      } finally {
-        setLoading(false)
-      }
-    }
+  // Հաշվել վիճակագրությունները
+  const approvedCount = filteredQuotes.filter(q => 
+    q.status === 'approved' && q.payment_status === 'paid'
+  ).length;
 
-    loadDashboardData()
-  }, [user])
+  const declinedCount = filteredQuotes.filter(q => 
+    q.status === 'rejected' || q.status === 'fix_and_resubmit'
+  ).length;
+
+  const expiredCount = filteredQuotes.filter(q => 
+    q.status === 'expired' || 
+    (q.status === 'approved' && q.payment_status !== 'paid' && 
+     new Date(q.created_at) < new Date(new Date().setDate(new Date().getDate() - 30)))
+  ).length;
+
+  return {
+    approved: approvedCount,
+    declined: declinedCount,
+    expired: expiredCount
+  };
+};
+// DashboardPage.tsx-ում useState-ներին ավելացրեք
+// DashboardPage.tsx-ում useState-ներին ավելացրեք
+const [conversionData, setConversionData] = useState<Record<string, ConversionChartData>>({
+  'This Week': { approved: 0, declined: 0, expired: 0 },
+  'This Month': { approved: 0, declined: 0, expired: 0 },
+  'Last Month': { approved: 0, declined: 0, expired: 0 },
+  'Last Quarter': { approved: 0, declined: 0, expired: 0 }
+});
+
+const [activeConversionPeriod, setActiveConversionPeriod] = useState<string>('This Month');
+useEffect(() => {
+  const loadDashboardData = async () => {
+  if (!user) return
+  
+  try {
+    // 1. Ստանալ quote_requests-ը այս օգտատիրոջ համար
+    const { data: quotes, error: quotesError } = await supabase
+      .from('quote_requests')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(50) // Ավելի շատ տվյալներ conversion-ի համար
+
+    if (quotesError) throw quotesError
+
+    // 2. Ֆորմատավորել տվյալները
+    const formattedData = formatDashboardData(quotes || [])
+    setDashboardRows(formattedData)
+
+    // 3. Հաշվել վիճակագրությունը
+    calculateStats(quotes || [])
+
+    // 4. Հաշվել conversion data բոլոր ժամանակահատվածների համար
+    const periods = ['This Week', 'This Month', 'Last Month', 'Last Quarter'];
+    const newConversionData: Record<string, ConversionChartData> = {};
+    
+    periods.forEach(period => {
+      newConversionData[period] = calculateConversionData(quotes || [], period);
+    });
+    
+    setConversionData(newConversionData);
+
+  } catch (error) {
+    console.error('Error loading dashboard data:', error)
+    setDashboardRows(getFallbackData())
+  } finally {
+    setLoading(false)
+  }
+}
+}, [user])
 // DashboardPage.tsx-ում `getStatusConfig` ֆունկցիայում
 
 const getStatusConfig = (quote: any) => {
@@ -279,6 +351,7 @@ const getStatusConfig = (quote: any) => {
       approvedQuotesCount
     })
   };
+
 
   const getFallbackData = () => {
     return [
@@ -512,7 +585,23 @@ const handleQuoteAction = (row: any, quote: any) => {
             />
 
             <div className="block md:hidden">
-              <ConversionChart />
+<ConversionChart 
+  title="Quote Conversion Rate"
+  data={conversionData}
+  defaultActiveTime={activeConversionPeriod}
+  showTimeDropdown={true}
+  typeLabels={{
+    approved: 'approved',
+    declined: 'declined',
+    expired: 'expired'
+  }}
+  colors={{
+    approved: { start: '#BED5F8', end: '#669CEE' },
+    declined: { start: '#F8E2BE', end: '#EEDE66' },
+    expired: { start: '#FFA4A4', end: '#EB6025' }
+  }}
+  onTimeChange={(time) => setActiveConversionPeriod(time)}
+/>
             </div>
 
             <UniversalTable
@@ -560,7 +649,24 @@ const handleQuoteAction = (row: any, quote: any) => {
 
             {/* Quote Conversion Rate */}
             <div className="flex-grow min-h-[calc(31%-4px)] xl:flex-[0_0_31%] xl:min-h-auto xl:h-auto">
-              <ConversionChart />
+         
+<ConversionChart 
+  title="Quote Conversion Rate"
+  data={conversionData}
+  defaultActiveTime={activeConversionPeriod}
+  showTimeDropdown={true}
+  typeLabels={{
+    approved: 'approved',
+    declined: 'declined',
+    expired: 'expired'
+  }}
+  colors={{
+    approved: { start: '#BED5F8', end: '#669CEE' },
+    declined: { start: '#F8E2BE', end: '#EEDE66' },
+    expired: { start: '#FFA4A4', end: '#EB6025' }
+  }}
+  onTimeChange={(time) => setActiveConversionPeriod(time)}
+/>
             </div>
 
             {/* High-Value Cargo Share Widget */}
@@ -586,7 +692,23 @@ const handleQuoteAction = (row: any, quote: any) => {
               {/* Conversion Chart */}
               <div className="w-full h-[240px]">
                 <div className="h-full w-full">
-                  <ConversionChart />
+                  <ConversionChart 
+  title="Quote Conversion Rate"
+  data={conversionData}
+  defaultActiveTime={activeConversionPeriod}
+  showTimeDropdown={true}
+  typeLabels={{
+    approved: 'approved',
+    declined: 'declined',
+    expired: 'expired'
+  }}
+  colors={{
+    approved: { start: '#BED5F8', end: '#669CEE' },
+    declined: { start: '#F8E2BE', end: '#EEDE66' },
+    expired: { start: '#FFA4A4', end: '#EB6025' }
+  }}
+  onTimeChange={(time) => setActiveConversionPeriod(time)}
+/>
                 </div> 
               </div>
 
