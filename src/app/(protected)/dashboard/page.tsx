@@ -693,7 +693,7 @@ const handleQuoteAction = (row: any, quote: any) => {
                 buttonWidth: '47%'
               }}
               mobileDesignType="dashboard"
-              desktopGridCols="0.7fr 1fr 0.7fr 1fr 0.7fr 1fr"
+              desktopGridCols="0.7fr 1fr 0.7fr 1.3fr 0.2fr 1fr"
             />
           </div>
 
