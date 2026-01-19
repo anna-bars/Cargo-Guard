@@ -76,6 +76,21 @@ const loadQuoteData = async () => {
       setDocuments([]);
     }
     
+     // Load policy status
+  const { data: policy, error: policyError } = await supabase
+    .from('policies')
+    .select('status, payment_status')
+    .eq('quote_request_id', quoteId)
+    .maybeSingle();
+  
+  console.log('Policy status:', policy);
+  
+  // Set quote data with policy info
+  setQuoteData({
+    ...quoteRequest,
+    policy_status: policy?.status,
+    policy_payment_status: policy?.payment_status
+  } as QuoteData);
   } catch (error) {
     console.error('Error loading quote data:', error);
     toast.error("Failed to load quote details");

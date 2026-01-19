@@ -676,15 +676,34 @@ export const renderStatus = (status: { text: string; color: string; dot: string;
   </span>
 );
 
-export const renderButton = (button: { text: string; variant: 'primary' | 'secondary'; onClick?: (row: any) => void }, row: any) => (
-  <button
-    className={`h-9 px-4 rounded-lg font-poppins text-sm font-normal transition-colors duration-300 w-full xl:w-[140px] ${
-      button.variant === 'primary'
-        ? 'bg-[#2563eb] text-white hover:bg-[#1d4ed8] hover:shadow-[0_4px_12px_rgba(37,99,235,0.3)]'
-        : 'bg-transparent text-[#374151] border border-[#e3e6ea] hover:bg-[#f8fafc] hover:shadow-[0_2px_8px_rgba(0,0,0,0.05)] hover:border-[#d1d5db]'
-    }`}
-    onClick={() => button.onClick?.(row)}
-  >
-    {button.text}
-  </button>
-);
+// src/app/components/tables/UniversalTable.tsx
+
+// Ստեղծեք interface button-ի համար
+interface TableButton {
+  text: string;
+  variant: 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
+  onClick?: (row: any) => void;
+}
+
+// const buttonClasses-ը դարձրեք Record տեսակի
+const buttonClasses: Record<string, string> = {
+  primary: 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white',
+  secondary: 'bg-transparent border border-[#2563eb] text-[#2563eb] hover:bg-[#2563eb] hover:text-white',
+  success: 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white',
+  warning: 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white',
+  danger: 'bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white'
+};
+
+export const renderButton = (button: TableButton | undefined, row: any) => {
+  const variant = button?.variant || 'primary';
+  const baseClasses = 'px-4 py-1.5 rounded-[12px] text-xs font-semibold transition-all duration-300 flex items-center gap-1 whitespace-nowrap';
+  
+  return (
+    <button
+      onClick={() => button?.onClick?.(row)}
+      className={`${baseClasses} ${buttonClasses[variant] || buttonClasses.primary}`}
+    >
+      {button?.text || 'Action'}
+    </button>
+  );
+};

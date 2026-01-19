@@ -106,6 +106,8 @@ export default function QuoteHeader({
               </button>
             </div>
           </div>
+          
+          
         </div>
       </div>
     </div>

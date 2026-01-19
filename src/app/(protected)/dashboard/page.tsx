@@ -111,54 +111,99 @@ export default function DashboardPage() {
 
     loadDashboardData()
   }, [user])
+// DashboardPage.tsx-ում `getStatusConfig` ֆունկցիայում
 
-  const getStatusConfig = (status: string) => {
-    const statusMap: Record<string, any> = {
-      'draft': { 
-        text: 'Continue Quote', 
-        color: 'bg-gray-100', 
-        dot: 'bg-gray-500', 
-        textColor: 'text-gray-700',
-        buttonText: 'Continue Quote',
-        buttonVariant: 'primary' as const
-      },
-      'submitted': { 
-        text: 'Waiting for review', 
-        color: 'bg-blue-50', 
-        dot: 'bg-blue-500', 
-        textColor: 'text-blue-700',
-        buttonText: 'View Details',
-        buttonVariant: 'secondary' as const
-      },
-      'under_review': { 
-        text: 'Documents under review', 
-        color: 'bg-amber-50', 
-        dot: 'bg-amber-500', 
-        textColor: 'text-amber-700',
-        buttonText: 'Check Status',
-        buttonVariant: 'secondary' as const
-      },
-      'approved': { 
-        text: 'Pay to Activate', 
-        color: 'bg-emerald-50', 
-        dot: 'bg-emerald-500', 
-        textColor: 'text-emerald-700',
-        buttonText: 'Pay Now',
-        buttonVariant: 'primary' as const
-      },
-      'rejected': { 
-        text: 'Rejected', 
-        color: 'bg-rose-50', 
-        dot: 'bg-rose-500', 
-        textColor: 'text-rose-700',
-        buttonText: 'Resubmit',
-        buttonVariant: 'primary' as const
-      }
-    };
-
-    return statusMap[status] || statusMap['draft'];
+const getStatusConfig = (quote: any) => {
+  // Status map-ը մնում է նույնը, բայց փոխենք rejected-ի և fix_and_resubmit-ի button-ը
+  const statusMap: Record<string, any> = {
+    'draft': { 
+      text: 'Continue Quote', 
+      color: 'bg-gray-100', 
+      dot: 'bg-gray-500', 
+      textColor: 'text-gray-700',
+      buttonText: 'Continue Quote',
+      buttonVariant: 'primary' as const
+    },
+    'submitted': { 
+      text: 'Waiting for review', 
+      color: 'bg-blue-50', 
+      dot: 'bg-blue-500', 
+      textColor: 'text-blue-700',
+      buttonText: 'View Details',
+      buttonVariant: 'secondary' as const
+    },
+    'under_review': { 
+      text: 'Documents under review', 
+      color: 'bg-amber-50', 
+      dot: 'bg-amber-500', 
+      textColor: 'text-amber-700',
+      buttonText: 'View Details',
+      buttonVariant: 'secondary' as const
+    },
+    'approved': { 
+      text: quote.payment_status === 'paid' ? 'Approved & Paid' : 'Pay to Activate', 
+      color: quote.payment_status === 'paid' ? 'bg-emerald-50' : 'bg-amber-50', 
+      dot: quote.payment_status === 'paid' ? 'bg-emerald-500' : 'bg-amber-500', 
+      textColor: quote.payment_status === 'paid' ? 'text-emerald-700' : 'text-amber-700',
+      buttonText: quote.payment_status === 'paid' ? 'View Policy' : 'Pay Now',
+      buttonVariant: quote.payment_status === 'paid' ? 'success' as const : 'primary' as const
+    },
+    'rejected': { 
+      text: 'Rejected', 
+      color: 'bg-rose-50', 
+      dot: 'bg-rose-500', 
+      textColor: 'text-rose-700',
+      buttonText: 'View Details', // Փոխարինել Resubmit → View Details
+      buttonVariant: 'secondary' as const // Փոխարինել primary → secondary
+    },
+    'pay_to_activate': { 
+      text: 'Pay to Activate', 
+      color: 'bg-amber-50', 
+      dot: 'bg-amber-500', 
+      textColor: 'text-amber-700',
+      buttonText: 'Pay Now',
+      buttonVariant: 'primary' as const
+    },
+    'waiting_for_review': { 
+      text: 'Waiting for Review', 
+      color: 'bg-cyan-50', 
+      dot: 'bg-cyan-500', 
+      textColor: 'text-cyan-700',
+      buttonText: 'View Details',
+      buttonVariant: 'secondary' as const
+    },
+    'documents_under_review': { 
+      text: 'Documents Under Review', 
+      color: 'bg-indigo-50', 
+      dot: 'bg-indigo-500', 
+      textColor: 'text-indigo-700',
+      buttonText: 'View Details',
+      buttonVariant: 'secondary' as const
+    },
+    'fix_and_resubmit': { 
+      text: 'Fix & Resubmit', 
+      color: 'bg-amber-50', 
+      dot: 'bg-amber-500', 
+      textColor: 'text-amber-700',
+      buttonText: 'View Details', // Փոխարինել Resubmit → View Details
+      buttonVariant: 'secondary' as const // Փոխարինել primary → secondary
+    }
   };
 
+  // Ստուգել եթե quote-ը paid է
+  if (quote.payment_status === 'paid' && quote.status === 'approved') {
+    return {
+      text: 'Approved & Paid',
+      color: 'bg-emerald-50',
+      dot: 'bg-emerald-500',
+      textColor: 'text-emerald-700',
+      buttonText: 'View Policy',
+      buttonVariant: 'success' as const
+    };
+  }
+
+  return statusMap[quote.status] || statusMap['draft'];
+};
   const formatQuoteId = (id: string) => {
     if (id.startsWith('Q-')) {
       return id;
@@ -180,39 +225,41 @@ export default function DashboardPage() {
     })
   };
 
-  const formatDashboardData = (quotes: any[]) => {
-    const formattedData: any[] = []
+ const formatDashboardData = (quotes: any[]) => {
+  const formattedData: any[] = []
 
-    // Ֆորմատավորել quotes
-    quotes.forEach(quote => {
-      const statusConfig = getStatusConfig(quote.status)
-      
-      const buttonAction = { 
-  text: statusConfig.buttonText, 
-  variant: statusConfig.buttonVariant,
-  onClick: (row: any) => handleQuoteAction(row, quote.status) // <-- Այստեղ row-ը arrow function-ի պարամետր է
-}
-      formattedData.push({
-        type: 'Quote',
-        id: formatQuoteId(quote.quote_id || quote.id),
-        cargo: quote.cargo_type || 'Unknown',
-        value: quote.shipment_value || 0,
-        status: {
-          text: statusConfig.text,
-          color: statusConfig.color,
-          dot: statusConfig.dot,
-          textColor: statusConfig.textColor
-        },
-        date: formatDate(quote.created_at),
-        button: buttonAction,
-        rawData: quote,
-        quoteStatus: quote.status
-      })
+  // Ֆորմատավորել quotes
+  quotes.forEach(quote => {
+    const statusConfig = getStatusConfig(quote)
+    
+    const buttonAction = { 
+      text: statusConfig.buttonText, 
+      variant: statusConfig.buttonVariant,
+      onClick: (row: any) => handleQuoteAction(row, quote)
+    }
+    
+    formattedData.push({
+      type: 'Quote',
+      id: formatQuoteId(quote.quote_id || quote.id),
+      cargo: quote.cargo_type || 'Unknown',
+      value: quote.shipment_value || 0,
+      status: {
+        text: statusConfig.text,
+        color: statusConfig.color,
+        dot: statusConfig.dot,
+        textColor: statusConfig.textColor
+      },
+      date: formatDate(quote.created_at),
+      button: buttonAction,
+      rawData: quote,
+      quoteStatus: quote.status,
+      paymentStatus: quote.payment_status
     })
+  })
 
-    // Սորտավորել ըստ ամսաթվի (նորագույնը առաջինը)
-    return formattedData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-  };
+  // Սորտավորել ըստ ամսաթվի (նորագույնը առաջինը)
+  return formattedData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+};
 
   const calculateStats = (quotes: any[]) => {
     const draftQuotesCount = quotes.filter(q => q.status === 'draft').length
@@ -276,8 +323,33 @@ export default function DashboardPage() {
     ]
   };
 
- const handleQuoteAction = (row: any, status: string) => {
+const handleQuoteAction = (row: any, quote: any) => {
   const quoteId = row.rawData?.id || row.id;
+  const status = quote.status;
+  const paymentStatus = quote.payment_status;
+  
+  // Սկզբում ստուգել policy-ն
+  const checkPolicyAndRedirect = async () => {
+    try {
+      // Ստուգել արդյոք policy կա
+      const { data: policy } = await supabase
+        .from('policies')
+        .select('*')
+        .eq('quote_request_id', quoteId)
+        .maybeSingle();
+      
+      if (policy?.status === 'active') {
+        // Գնալ policy էջ
+        router.push(`/policies/${policy.id}`)
+        return true;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('Error checking policy:', error)
+      return false;
+    }
+  }
   
   switch (status) {
     case 'draft':
@@ -285,12 +357,29 @@ export default function DashboardPage() {
       break
     case 'submitted':
     case 'under_review':
+    case 'waiting_for_review':
+    case 'documents_under_review':
       router.push(`/quotes/${quoteId}`)
       break
     case 'approved':
-      router.push(`/quotes/${quoteId}`)
+      if (paymentStatus === 'paid') {
+        // Փորձել գտնել policy և գնալ այնտեղ
+        checkPolicyAndRedirect().then((hasPolicy) => {
+          if (!hasPolicy) {
+            // Եթե policy չկա, գնալ quote details
+            router.push(`/quotes/${quoteId}`)
+          }
+        })
+      } else {
+        // Approved բայց չվճարված
+        router.push(`/quotes/${quoteId}`)
+      }
       break
     case 'rejected':
+    case 'fix_and_resubmit':
+      router.push(`/quotes/${quoteId}`)
+      break
+    case 'pay_to_activate':
       router.push(`/quotes/${quoteId}`)
       break
     default:
