@@ -247,13 +247,13 @@ export default function QuoteDetailsPage() {
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
         <DashboardHeader userEmail="client@example.com" />
         <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl border border-gray-200/50 p-8 text-center shadow-2xl">
+          <div className="bg-white/80 rounded-3xl border border-gray-200/50 p-8 text-center">
             <AlertCircle className="w-16 h-16 text-amber-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Quote Not Found</h2>
             <p className="text-gray-600 mb-6">The quote you're looking for doesn't exist in our database.</p>
             <button
               onClick={() => router.push('/dashboard')}
-              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-2xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-2xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:-translate-y-0.5"
             >
               Back to Dashboard
             </button>
@@ -308,14 +308,14 @@ export default function QuoteDetailsPage() {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={refreshData}
-                    className="p-2.5 bg-white/80 backdrop-blur-sm border border-gray-300 rounded-2xl hover:bg-white hover:border-blue-500 transition-all duration-300 shadow-sm hover:shadow"
+                    className="p-2.5 bg-white/80 border border-gray-300 rounded-2xl hover:bg-white hover:border-blue-500 transition-all duration-300 "
                     title="Refresh"
                   >
                     <RefreshCw className="w-5 h-5 text-gray-700" />
                   </button>
                   <button
                     onClick={handlePrint}
-                    className="p-2.5 bg-white/80 backdrop-blur-sm border border-gray-300 rounded-2xl hover:bg-white hover:border-blue-500 transition-all duration-300 shadow-sm hover:shadow"
+                    className="p-2.5 bg-white/80  border border-gray-300 rounded-2xl hover:bg-white hover:border-blue-500 transition-all duration-300 "
                     title="Print"
                   >
                     <Printer className="w-5 h-5 text-gray-700" />
@@ -334,7 +334,7 @@ export default function QuoteDetailsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="relative group">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-blue-600/5 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                <div className="relative bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-5 hover:border-blue-500 transition-all duration-300 shadow-lg hover:shadow-xl">
+                <div className="relative bg-white/90 rounded-2xl border border-gray-200 p-5 hover:border-blue-500 transition-all duration-300">
                   <div className="flex items-center justify-between mb-3">
                     <div className="p-2.5 bg-gradient-to-br from-blue-500/10 to-blue-600/10 rounded-xl">
                       <DollarSign className="w-6 h-6 text-blue-600" />
@@ -351,7 +351,7 @@ export default function QuoteDetailsPage() {
               
               <div className="relative group">
                 <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-emerald-600/5 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                <div className="relative bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-5 hover:border-emerald-500 transition-all duration-300 shadow-lg hover:shadow-xl">
+                <div className="relative bg-white/90  rounded-2xl border border-gray-200 p-5 hover:border-emerald-500 transition-all duration-300">
                   <div className="flex items-center justify-between mb-3">
                     <div className="p-2.5 bg-gradient-to-br from-emerald-500/10 to-emerald-600/10 rounded-xl">
                       <ShieldCheck className="w-6 h-6 text-emerald-600" />
@@ -368,7 +368,7 @@ export default function QuoteDetailsPage() {
               
               <div className="relative group">
                 <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 to-amber-600/5 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                <div className="relative bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-5 hover:border-amber-500 transition-all duration-300 shadow-lg hover:shadow-xl">
+                <div className="relative bg-white/90  rounded-2xl border border-gray-200 p-5 hover:border-amber-500 transition-all duration-300">
                   <div className="flex items-center justify-between mb-3">
                     <div className="p-2.5 bg-gradient-to-br from-amber-500/10 to-amber-600/10 rounded-xl">
                       <Package className="w-6 h-6 text-amber-600" />
@@ -384,7 +384,7 @@ export default function QuoteDetailsPage() {
               
               <div className="relative group">
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-purple-600/5 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                <div className="relative bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-5 hover:border-purple-500 transition-all duration-300 shadow-lg hover:shadow-xl">
+                <div className="relative bg-white/90 rounded-2xl border border-gray-200 p-5 hover:border-purple-500 transition-all duration-300">
                   <div className="flex items-center justify-between mb-3">
                     <div className="p-2.5 bg-gradient-to-br from-purple-500/10 to-purple-600/10 rounded-xl">
                       <Truck className="w-6 h-6 text-purple-600" />
@@ -401,7 +401,7 @@ export default function QuoteDetailsPage() {
             </div>
 
             {/* Navigation Tabs */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200 p-1 shadow-lg">
+            <div className="bg-white/80 rounded-2xl border border-gray-200 p-1">
               <div className="flex space-x-1">
                 <button
                   onClick={() => setActiveTab('overview')}
@@ -450,7 +450,7 @@ export default function QuoteDetailsPage() {
               {activeTab === 'overview' && (
                 <div className="space-y-6">
                   {/* Shipment Details */}
-                  <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 shadow-lg">
+                  <div className="bg-white/90 rounded-2xl border border-gray-200 p-6">
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center gap-3">
                         <div className="p-2.5 bg-gradient-to-br from-blue-500/10 to-blue-600/10 rounded-xl">
@@ -542,7 +542,7 @@ export default function QuoteDetailsPage() {
                   </div>
 
                   {/* Coverage Details */}
-                  <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl border border-blue-200 p-6 shadow-lg">
+                  <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl border border-blue-200 p-6">
                     <div className="flex items-center gap-3 mb-6">
                       <div className="p-2.5 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl">
                         <ShieldIcon className="w-6 h-6 text-white" />
@@ -554,7 +554,7 @@ export default function QuoteDetailsPage() {
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="bg-white/90 backdrop-blur-sm rounded-xl p-5 border border-blue-200">
+                      <div className="bg-white/90 rounded-xl p-5 border border-blue-200">
                         <div className="flex items-center gap-3 mb-3">
                           <div className="p-2.5 bg-gradient-to-br from-blue-500/10 to-blue-600/10 rounded-lg">
                             <PieChart className="w-5 h-5 text-blue-600" />
@@ -572,7 +572,7 @@ export default function QuoteDetailsPage() {
                         </div>
                       </div>
                       
-                      <div className="bg-white/90 backdrop-blur-sm rounded-xl p-5 border border-blue-200">
+                      <div className="bg-white/90 rounded-xl p-5 border border-blue-200">
                         <div className="flex items-center gap-3 mb-3">
                           <div className="p-2.5 bg-gradient-to-br from-amber-500/10 to-amber-600/10 rounded-lg">
                             <CreditCard className="w-5 h-5 text-amber-600" />
@@ -595,7 +595,7 @@ export default function QuoteDetailsPage() {
               )}
 
               {activeTab === 'documents' && (
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 shadow-lg">
+                <div className="bg-white/90 rounded-2xl border border-gray-200 p-6">
                   <div className="flex items-center justify-between mb-6">
                     <div>
                       <h2 className="text-xl font-bold text-gray-900">Documents</h2>
@@ -603,7 +603,7 @@ export default function QuoteDetailsPage() {
                         Secure verified files
                       </p>
                     </div>
-                    <button className="px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                    <button className="px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:-translate-y-0.5">
                       Upload New
                     </button>
                   </div>
@@ -615,14 +615,14 @@ export default function QuoteDetailsPage() {
                       </div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">No documents found</h3>
                       <p className="text-gray-600 mb-6">Upload documents to complete your submission</p>
-                      <button className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                      <button className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:-translate-y-0.5">
                         Upload Documents
                       </button>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {documents.map((doc, index) => (
-                        <div key={doc.id} className="group bg-gradient-to-r from-gray-50 to-white border border-gray-300 rounded-xl hover:border-blue-500 p-4 hover:shadow-lg transition-all duration-300">
+                        <div key={doc.id} className="group bg-gradient-to-r from-gray-50 to-white border border-gray-300 rounded-xl hover:border-blue-500 p-4 transition-all duration-300">
                           <div className="flex items-start justify-between">
                             <div className="flex items-start gap-3">
                               <div className={`p-2.5 rounded-lg ${
@@ -667,7 +667,7 @@ export default function QuoteDetailsPage() {
               )}
 
               {activeTab === 'analytics' && (
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 shadow-lg">
+                <div className="bg-white/90 rounded-2xl border border-gray-200 p-6">
                   <h2 className="text-xl font-bold text-gray-900 mb-6">Analytics</h2>
                   
                   <div className="space-y-6">
@@ -749,15 +749,15 @@ export default function QuoteDetailsPage() {
           {/* Right Column - Sidebar */}
           <div className="space-y-6">
             {/* Quick Actions */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 shadow-lg">
+            <div className="bg-white/90 rounded-2xl border border-gray-200 p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
               <div className="space-y-3">
-                <button className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                <button className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
                   <Download className="w-5 h-5" />
                   Download Quote PDF
                 </button>
                 
-                <button className="w-full py-3 px-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-medium rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                <button className="w-full py-3 px-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-medium rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
                   <CreditCard className="w-5 h-5" />
                   Make Payment
                 </button>
@@ -770,7 +770,7 @@ export default function QuoteDetailsPage() {
             </div>
 
             {/* Cost Summary */}
-            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl border border-blue-200 p-6 shadow-lg">
+            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl border border-blue-200 p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Cost Summary</h3>
               
               <div className="space-y-3">
@@ -813,7 +813,7 @@ export default function QuoteDetailsPage() {
             </div>
 
             {/* Support */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 p-6 shadow-lg">
+            <div className="bg-white/90 rounded-2xl border border-gray-200 p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2.5 bg-gradient-to-br from-blue-500/10 to-blue-600/10 rounded-xl">
                   <Terminal className="w-6 h-6 text-blue-600" />
@@ -828,7 +828,7 @@ export default function QuoteDetailsPage() {
                 Our team is here to help with any questions about your shipment protection.
               </p>
               
-              <button className="w-full py-3.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+              <button className="w-full py-3.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:-translate-y-0.5">
                 Contact Support
               </button>
             </div>
