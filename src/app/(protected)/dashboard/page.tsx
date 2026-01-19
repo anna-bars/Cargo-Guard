@@ -147,7 +147,7 @@ export default function DashboardPage() {
         buttonVariant: 'primary' as const
       },
       'rejected': { 
-        text: 'Fix & Resubmit', 
+        text: 'Rejected', 
         color: 'bg-rose-50', 
         dot: 'bg-rose-500', 
         textColor: 'text-rose-700',

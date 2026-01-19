@@ -50,7 +50,15 @@ import {
   Terminal,
   Layers,
   Activity,
-  PieChart
+  PieChart,
+  AlertTriangle,
+  Edit,
+  Trash2,
+  Upload,
+  Check,
+  X,
+  CreditCard as CreditCardIcon,
+  Receipt
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -67,11 +75,31 @@ interface QuoteData {
   selected_coverage: string;
   calculated_premium: number;
   deductible: number;
-  status: string;
+  status: 'submitted' | 'approved' | 'rejected' | 'pending' | 'draft' | 'pay_to_activate' | 'waiting_for_review' | 'documents_under_review' | 'fix_and_resubmit';
+  payment_status: 'pending' | 'paid' | 'failed' | 'refunded'; // Բոլոր հնարավոր արժեքները
   shipper_name: string;
   reference_number: string;
   created_at: string;
   documents?: any[];
+}
+
+interface StatusConfig {
+  color: string;
+  border: string;
+  icon: JSX.Element;
+  label: string;
+  description: string;
+  accent: string;
+  showActions: {
+    downloadQuote: boolean;
+    makePayment: boolean;
+    viewPolicy: boolean;
+    resubmit: boolean;
+    checkStatus: boolean;
+    delete: boolean;
+    edit: boolean;
+    viewReceipt?: boolean;
+  };
 }
 
 export default function QuoteDetailsPage() {
@@ -81,6 +109,7 @@ export default function QuoteDetailsPage() {
   const [quoteData, setQuoteData] = useState<QuoteData | null>(null);
   const [documents, setDocuments] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'overview' | 'documents' | 'analytics'>('overview');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const quoteId = params.id as string;
 
   useEffect(() => {
@@ -112,7 +141,13 @@ export default function QuoteDetailsPage() {
         return;
       }
       
-      setQuoteData(quoteRequest);
+      // Ensure payment_status has a valid value
+      const validPaymentStatuses = ['pending', 'paid', 'failed', 'refunded'];
+      if (!quoteRequest.payment_status || !validPaymentStatuses.includes(quoteRequest.payment_status)) {
+        quoteRequest.payment_status = 'pending';
+      }
+      
+      setQuoteData(quoteRequest as QuoteData);
       
       const { data: docs, error: docsError } = await supabase
         .from('documents')
@@ -130,6 +165,308 @@ export default function QuoteDetailsPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getStatusConfig = (status: string, paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded' = 'pending'): StatusConfig => {
+    const lowerStatus = status.toLowerCase();
+    
+    // For approved status, check payment status
+    if (lowerStatus === 'approved') {
+      if (paymentStatus === 'paid') {
+        return {
+          color: 'bg-gradient-to-r from-emerald-50 to-emerald-100 text-emerald-700',
+          border: 'border border-emerald-200',
+          icon: <BadgeCheck className="w-5 h-5" />,
+          label: 'Approved & Paid',
+          description: 'Policy is active',
+          accent: 'border-l-4 border-emerald-500',
+          showActions: {
+            downloadQuote: true,
+            makePayment: false,
+            viewPolicy: true,
+            resubmit: false,
+            checkStatus: false,
+            delete: false,
+            edit: false,
+            viewReceipt: true
+          }
+        };
+      } else if (paymentStatus === 'failed') {
+        return {
+          color: 'bg-gradient-to-r from-red-50 to-red-100 text-red-700',
+          border: 'border border-red-200',
+          icon: <AlertCircle className="w-5 h-5" />,
+          label: 'Payment Failed',
+          description: 'Payment unsuccessful',
+          accent: 'border-l-4 border-red-500',
+          showActions: {
+            downloadQuote: true,
+            makePayment: true,
+            viewPolicy: false,
+            resubmit: false,
+            checkStatus: false,
+            delete: false,
+            edit: false
+          }
+        };
+      } else if (paymentStatus === 'refunded') {
+        return {
+          color: 'bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700',
+          border: 'border border-gray-200',
+          icon: <Receipt className="w-5 h-5" />,
+          label: 'Refunded',
+          description: 'Payment has been refunded',
+          accent: 'border-l-4 border-gray-500',
+          showActions: {
+            downloadQuote: true,
+            makePayment: false,
+            viewPolicy: false,
+            resubmit: false,
+            checkStatus: false,
+            delete: false,
+            edit: false
+          }
+        };
+      } else {
+        // pending payment status
+        return {
+          color: 'bg-gradient-to-r from-emerald-50 to-emerald-100 text-emerald-700',
+          border: 'border border-emerald-200',
+          icon: <BadgeCheck className="w-5 h-5" />,
+          label: 'Approved',
+          description: 'Payment required to activate',
+          accent: 'border-l-4 border-emerald-500',
+          showActions: {
+            downloadQuote: true,
+            makePayment: true,
+            viewPolicy: false,
+            resubmit: false,
+            checkStatus: false,
+            delete: false,
+            edit: false
+          }
+        };
+      }
+    }
+
+    // For other statuses
+    switch (lowerStatus) {
+      case 'submitted':
+        return {
+          color: 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700',
+          border: 'border border-blue-200',
+          icon: <Sparkles className="w-5 h-5" />,
+          label: 'Submitted',
+          description: 'AI analysis in progress',
+          accent: 'border-l-4 border-blue-500',
+          showActions: {
+            downloadQuote: true,
+            makePayment: false,
+            viewPolicy: false,
+            resubmit: false,
+            checkStatus: false,
+            delete: true,
+            edit: false
+          }
+        };
+      case 'rejected':
+        return {
+          color: 'bg-gradient-to-r from-rose-50 to-rose-100 text-rose-700',
+          border: 'border border-rose-200',
+          icon: <AlertCircle className="w-5 h-5" />,
+          label: 'Rejected',
+          description: 'Requires adjustment',
+          accent: 'border-l-4 border-rose-500',
+          showActions: {
+            downloadQuote: false,
+            makePayment: false,
+            viewPolicy: false,
+            resubmit: true,
+            checkStatus: false,
+            delete: true,
+            edit: true
+          }
+        };
+      case 'fix_and_resubmit':
+        return {
+          color: 'bg-gradient-to-r from-amber-50 to-amber-100 text-amber-700',
+          border: 'border border-amber-200',
+          icon: <AlertTriangle className="w-5 h-5" />,
+          label: 'Fix & Resubmit',
+          description: 'Please fix and resubmit',
+          accent: 'border-l-4 border-amber-500',
+          showActions: {
+            downloadQuote: false,
+            makePayment: false,
+            viewPolicy: false,
+            resubmit: true,
+            checkStatus: false,
+            delete: true,
+            edit: true
+          }
+        };
+      case 'pay_to_activate':
+        return {
+          color: 'bg-gradient-to-r from-purple-50 to-purple-100 text-purple-700',
+          border: 'border border-purple-200',
+          icon: <CreditCardIcon className="w-5 h-5" />,
+          label: 'Pay to Activate',
+          description: 'Payment required',
+          accent: 'border-l-4 border-purple-500',
+          showActions: {
+            downloadQuote: true,
+            makePayment: true,
+            viewPolicy: false,
+            resubmit: false,
+            checkStatus: false,
+            delete: false,
+            edit: false
+          }
+        };
+      case 'waiting_for_review':
+        return {
+          color: 'bg-gradient-to-r from-cyan-50 to-cyan-100 text-cyan-700',
+          border: 'border border-cyan-200',
+          icon: <Clock className="w-5 h-5" />,
+          label: 'Waiting for Review',
+          description: 'Under initial assessment',
+          accent: 'border-l-4 border-cyan-500',
+          showActions: {
+            downloadQuote: false,
+            makePayment: false,
+            viewPolicy: false,
+            resubmit: false,
+            checkStatus: false,
+            delete: true,
+            edit: false
+          }
+        };
+      case 'documents_under_review':
+        return {
+          color: 'bg-gradient-to-r from-indigo-50 to-indigo-100 text-indigo-700',
+          border: 'border border-indigo-200',
+          icon: <FileSearch className="w-5 h-5" />,
+          label: 'Documents Under Review',
+          description: 'Documents being verified',
+          accent: 'border-l-4 border-indigo-500',
+          showActions: {
+            downloadQuote: false,
+            makePayment: false,
+            viewPolicy: false,
+            resubmit: false,
+            checkStatus: true,
+            delete: true,
+            edit: false
+          }
+        };
+      case 'draft':
+        return {
+          color: 'bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700',
+          border: 'border border-gray-200',
+          icon: <Edit className="w-5 h-5" />,
+          label: 'Draft',
+          description: 'Not submitted yet',
+          accent: 'border-l-4 border-gray-500',
+          showActions: {
+            downloadQuote: false,
+            makePayment: false,
+            viewPolicy: false,
+            resubmit: false,
+            checkStatus: false,
+            delete: true,
+            edit: true
+          }
+        };
+      case 'pending':
+        return {
+          color: 'bg-gradient-to-r from-amber-50 to-amber-100 text-amber-700',
+          border: 'border border-amber-200',
+          icon: <Clock className="w-5 h-5" />,
+          label: 'Processing',
+          description: 'Initial assessment',
+          accent: 'border-l-4 border-amber-500',
+          showActions: {
+            downloadQuote: false,
+            makePayment: false,
+            viewPolicy: false,
+            resubmit: false,
+            checkStatus: true,
+            delete: false,
+            edit: false
+          }
+        };
+      default:
+        return {
+          color: 'bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700',
+          border: 'border border-gray-200',
+          icon: <Clock className="w-5 h-5" />,
+          label: status,
+          description: '',
+          accent: 'border-l-4 border-gray-500',
+          showActions: {
+            downloadQuote: true,
+            makePayment: false,
+            viewPolicy: false,
+            resubmit: false,
+            checkStatus: false,
+            delete: false,
+            edit: false
+          }
+        };
+    }
+  };
+
+  const handleResubmit = () => {
+    if (!quoteData) return;
+    toast.success('Redirecting to quote editor...');
+    router.push(`/quotes/edit/${quoteData.id}`);
+  };
+
+  const handleMakePayment = () => {
+    if (!quoteData) return;
+    toast.success('Redirecting to payment...');
+    router.push(`/payment?quoteId=${quoteData.id}&amount=${quoteData.calculated_premium}`);
+  };
+
+  const handleViewPolicy = () => {
+    if (!quoteData) return;
+    toast.success('Opening policy document...');
+    // Logic to fetch and open policy PDF
+  };
+
+  const handleViewReceipt = () => {
+    if (!quoteData) return;
+    toast.success('Opening payment receipt...');
+    // Logic to fetch and open receipt
+  };
+
+  const handleDeleteQuote = async () => {
+    if (!quoteData) return;
+    
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from('quote_requests')
+        .delete()
+        .eq('id', quoteData.id);
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast.success('Quote deleted successfully');
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Error deleting quote:', error);
+      toast.error('Failed to delete quote');
+    } finally {
+      setShowDeleteConfirm(false);
+    }
+  };
+
+  const handleEditQuote = () => {
+    if (!quoteData) return;
+    router.push(`/quotes/edit/${quoteData.id}`);
   };
 
   const formatCurrency = (amount: number) => {
@@ -159,56 +496,6 @@ export default function QuoteDetailsPage() {
       hour: '2-digit',
       minute: '2-digit'
     });
-  };
-
-  const getStatusConfig = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'submitted':
-        return {
-          color: 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700',
-          border: 'border border-blue-200',
-          icon: <Sparkles className="w-5 h-5" />,
-          label: 'In Review',
-          description: 'AI analysis in progress',
-          accent: 'border-l-4 border-blue-500'
-        };
-      case 'approved':
-        return {
-          color: 'bg-gradient-to-r from-emerald-50 to-emerald-100 text-emerald-700',
-          border: 'border border-emerald-200',
-          icon: <BadgeCheck className="w-5 h-5" />,
-          label: 'Active',
-          description: 'Coverage is active',
-          accent: 'border-l-4 border-emerald-500'
-        };
-      case 'rejected':
-        return {
-          color: 'bg-gradient-to-r from-rose-50 to-rose-100 text-rose-700',
-          border: 'border border-rose-200',
-          icon: <AlertCircle className="w-5 h-5" />,
-          label: 'Declined',
-          description: 'Requires adjustment',
-          accent: 'border-l-4 border-rose-500'
-        };
-      case 'pending':
-        return {
-          color: 'bg-gradient-to-r from-amber-50 to-amber-100 text-amber-700',
-          border: 'border border-amber-200',
-          icon: <Clock className="w-5 h-5" />,
-          label: 'Processing',
-          description: 'Initial assessment',
-          accent: 'border-l-4 border-amber-500'
-        };
-      default:
-        return {
-          color: 'bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700',
-          border: 'border border-gray-200',
-          icon: <Clock className="w-5 h-5" />,
-          label: status,
-          description: '',
-          accent: 'border-l-4 border-gray-500'
-        };
-    }
   };
 
   const copyToClipboard = (text: string) => {
@@ -263,12 +550,42 @@ export default function QuoteDetailsPage() {
     );
   }
 
-  const statusConfig = getStatusConfig(quoteData.status);
+  const statusConfig = getStatusConfig(quoteData.status, quoteData.payment_status);
 
   return (
     <div className="min-h-screen bg-[#F3F3F6]">
       <DashboardHeader userEmail="client@example.com" />
       
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-red-100 rounded-xl">
+                <Trash2 className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Delete Quote</h3>
+                <p className="text-gray-600 text-sm">Are you sure you want to delete this quote? This action cannot be undone.</p>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1 py-3 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-all duration-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteQuote}
+                className="flex-1 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white font-medium rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-300"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       
       <div className="relative max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
@@ -295,27 +612,63 @@ export default function QuoteDetailsPage() {
                     <div className={`px-3 py-1.5 rounded-full flex items-center gap-2 ${statusConfig.color} ${statusConfig.border}`}>
                       {statusConfig.icon}
                       <span className="font-semibold text-sm">{statusConfig.label}</span>
+                      {quoteData.status === 'approved' && quoteData.payment_status === 'paid' && (
+                        <Check className="w-4 h-4 text-emerald-600" />
+                      )}
                     </div>
+                    {quoteData.status === 'approved' && quoteData.payment_status === 'pending' && (
+                      <div className="px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-50 to-amber-100 text-amber-700 border border-amber-200 flex items-center gap-2">
+                        <CreditCardIcon className="w-4 h-4" />
+                        <span className="font-semibold text-sm">Payment Pending</span>
+                      </div>
+                    )}
+                    {quoteData.payment_status === 'failed' && (
+                      <div className="px-3 py-1.5 rounded-full bg-gradient-to-r from-red-50 to-red-100 text-red-700 border border-red-200 flex items-center gap-2">
+                        <AlertCircle className="w-4 h-4" />
+                        <span className="font-semibold text-sm">Payment Failed</span>
+                      </div>
+                    )}
                   </div>
                   <h1 className="text-4xl font-bold text-gray-900 mt-2">
-                    Shipment Protection
+                    {quoteData.cargo_type.charAt(0).toUpperCase() + quoteData.cargo_type.slice(1)} Shipment
                   </h1>
                   <p className="text-gray-600 mt-2">
                     Created on <span className="font-medium text-gray-900">{formatDateTime(quoteData.created_at)}</span>
+                    {statusConfig.description && (
+                      <> • <span className="font-medium">{statusConfig.description}</span></>
+                    )}
                   </p>
                 </div>
                 
                 <div className="flex items-center gap-3">
+                  {statusConfig.showActions.edit && (
+                    <button
+                      onClick={handleEditQuote}
+                      className="p-2.5 bg-white/80 border border-gray-300 rounded-2xl hover:bg-white hover:border-blue-500 transition-all duration-300"
+                      title="Edit Quote"
+                    >
+                      <Edit className="w-5 h-5 text-gray-700" />
+                    </button>
+                  )}
+                  {statusConfig.showActions.delete && (
+                    <button
+                      onClick={() => setShowDeleteConfirm(true)}
+                      className="p-2.5 bg-white/80 border border-gray-300 rounded-2xl hover:bg-white hover:border-red-500 transition-all duration-300"
+                      title="Delete Quote"
+                    >
+                      <Trash2 className="w-5 h-5 text-gray-700" />
+                    </button>
+                  )}
                   <button
                     onClick={refreshData}
-                    className="p-2.5 bg-white/80 border border-gray-300 rounded-2xl hover:bg-white hover:border-blue-500 transition-all duration-300 "
+                    className="p-2.5 bg-white/80 border border-gray-300 rounded-2xl hover:bg-white hover:border-blue-500 transition-all duration-300"
                     title="Refresh"
                   >
                     <RefreshCw className="w-5 h-5 text-gray-700" />
                   </button>
                   <button
                     onClick={handlePrint}
-                    className="p-2.5 bg-white/80  border border-gray-300 rounded-2xl hover:bg-white hover:border-blue-500 transition-all duration-300 "
+                    className="p-2.5 bg-white/80 border border-gray-300 rounded-2xl hover:bg-white hover:border-blue-500 transition-all duration-300"
                     title="Print"
                   >
                     <Printer className="w-5 h-5 text-gray-700" />
@@ -334,24 +687,44 @@ export default function QuoteDetailsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="relative group">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-blue-600/5 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                <div className="relative bg-white/90 rounded-2xl border border-gray-200 p-5 hover:border-blue-500 transition-all duration-300">
+                <div className={`relative bg-white/90 rounded-2xl border p-5 transition-all duration-300 ${quoteData.status === 'rejected' || quoteData.status === 'fix_and_resubmit' ? 'border-rose-200' : 'border-gray-200 hover:border-blue-500'}`}>
                   <div className="flex items-center justify-between mb-3">
-                    <div className="p-2.5 bg-gradient-to-br from-blue-500/10 to-blue-600/10 rounded-xl">
-                      <DollarSign className="w-6 h-6 text-blue-600" />
+                    <div className={`p-2.5 bg-gradient-to-br rounded-xl ${
+                      quoteData.status === 'rejected' || quoteData.status === 'fix_and_resubmit' 
+                        ? 'from-rose-500/10 to-rose-600/10' 
+                        : 'from-blue-500/10 to-blue-600/10'
+                    }`}>
+                      <DollarSign className={`w-6 h-6 ${
+                        quoteData.status === 'rejected' || quoteData.status === 'fix_and_resubmit' 
+                          ? 'text-rose-600' 
+                          : 'text-blue-600'
+                      }`} />
                     </div>
-                    <TrendingUp className="w-5 h-5 text-emerald-500" />
+                    {quoteData.status === 'pay_to_activate' || (quoteData.status === 'approved' && quoteData.payment_status === 'pending') ? (
+                      <TrendingUp className="w-5 h-5 text-emerald-500" />
+                    ) : null}
                   </div>
                   <h3 className="text-sm font-medium text-gray-600 mb-1">Premium</h3>
-                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(quoteData.calculated_premium)}</p>
+                  <p className={`text-2xl font-bold ${
+                    quoteData.status === 'rejected' || quoteData.status === 'fix_and_resubmit' 
+                      ? 'text-rose-700' 
+                      : 'text-gray-900'
+                  }`}>
+                    {formatCurrency(quoteData.calculated_premium)}
+                  </p>
                   <div className="mt-3 h-1 w-full bg-gray-200 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full animate-pulse"></div>
+                    <div className={`h-full rounded-full ${
+                      quoteData.status === 'rejected' || quoteData.status === 'fix_and_resubmit'
+                        ? 'bg-gradient-to-r from-rose-500 to-rose-600'
+                        : 'bg-gradient-to-r from-blue-500 to-blue-600 animate-pulse'
+                    }`}></div>
                   </div>
                 </div>
               </div>
               
               <div className="relative group">
                 <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-emerald-600/5 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                <div className="relative bg-white/90  rounded-2xl border border-gray-200 p-5 hover:border-emerald-500 transition-all duration-300">
+                <div className="relative bg-white/90 rounded-2xl border border-gray-200 p-5 hover:border-emerald-500 transition-all duration-300">
                   <div className="flex items-center justify-between mb-3">
                     <div className="p-2.5 bg-gradient-to-br from-emerald-500/10 to-emerald-600/10 rounded-xl">
                       <ShieldCheck className="w-6 h-6 text-emerald-600" />
@@ -360,15 +733,33 @@ export default function QuoteDetailsPage() {
                   <h3 className="text-sm font-medium text-gray-600 mb-1">Coverage</h3>
                   <p className="text-lg font-bold text-gray-900 truncate">{quoteData.selected_coverage}</p>
                   <div className="mt-3 flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                    <span className="text-xs text-emerald-600">Active Protection</span>
+                    <div className={`w-2 h-2 rounded-full ${
+                      quoteData.status === 'approved' && quoteData.payment_status === 'paid' 
+                        ? 'bg-emerald-500 animate-pulse' 
+                        : quoteData.payment_status === 'failed'
+                        ? 'bg-red-500'
+                        : 'bg-amber-500'
+                    }`}></div>
+                    <span className={`text-xs ${
+                      quoteData.status === 'approved' && quoteData.payment_status === 'paid'
+                        ? 'text-emerald-600'
+                        : quoteData.payment_status === 'failed'
+                        ? 'text-red-600'
+                        : 'text-amber-600'
+                    }`}>
+                      {quoteData.status === 'approved' && quoteData.payment_status === 'paid' 
+                        ? 'Active Protection' 
+                        : quoteData.payment_status === 'failed'
+                        ? 'Payment Failed'
+                        : 'Payment Required'}
+                    </span>
                   </div>
                 </div>
               </div>
               
               <div className="relative group">
                 <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 to-amber-600/5 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                <div className="relative bg-white/90  rounded-2xl border border-gray-200 p-5 hover:border-amber-500 transition-all duration-300">
+                <div className="relative bg-white/90 rounded-2xl border border-gray-200 p-5 hover:border-amber-500 transition-all duration-300">
                   <div className="flex items-center justify-between mb-3">
                     <div className="p-2.5 bg-gradient-to-br from-amber-500/10 to-amber-600/10 rounded-xl">
                       <Package className="w-6 h-6 text-amber-600" />
@@ -429,19 +820,21 @@ export default function QuoteDetailsPage() {
                     Documents ({documents.length})
                   </div>
                 </button>
-                <button
-                  onClick={() => setActiveTab('analytics')}
-                  className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-300 ${
-                    activeTab === 'analytics'
-                      ? 'bg-gradient-to-r from-blue-500/10 to-blue-600/10 text-blue-700 border border-blue-300'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100/50'
-                  }`}
-                >
-                  <div className="flex items-center justify-center gap-2">
-                    <LineChart className="w-4 h-4" />
-                    Analytics
-                  </div>
-                </button>
+                {quoteData.status === 'approved' && quoteData.payment_status === 'paid' && (
+                  <button
+                    onClick={() => setActiveTab('analytics')}
+                    className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-300 ${
+                      activeTab === 'analytics'
+                        ? 'bg-gradient-to-r from-blue-500/10 to-blue-600/10 text-blue-700 border border-blue-300'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100/50'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <LineChart className="w-4 h-4" />
+                      Analytics
+                    </div>
+                  </button>
+                )}
               </div>
             </div>
 
@@ -449,6 +842,65 @@ export default function QuoteDetailsPage() {
             <div className="transition-all duration-300">
               {activeTab === 'overview' && (
                 <div className="space-y-6">
+                  {/* Payment Status Banner */}
+                  {quoteData.status === 'approved' && (
+                    <div className={`rounded-2xl border p-6 ${
+                      quoteData.payment_status === 'paid'
+                        ? 'bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200'
+                        : quoteData.payment_status === 'failed'
+                        ? 'bg-gradient-to-br from-red-50 to-red-100 border-red-200'
+                        : 'bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200'
+                    }`}>
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className={`p-2.5 rounded-xl ${
+                          quoteData.payment_status === 'paid'
+                            ? 'bg-gradient-to-br from-emerald-500 to-emerald-600'
+                            : quoteData.payment_status === 'failed'
+                            ? 'bg-gradient-to-br from-red-500 to-red-600'
+                            : 'bg-gradient-to-br from-amber-500 to-amber-600'
+                        }`}>
+                          {quoteData.payment_status === 'paid' ? (
+                            <Check className="w-6 h-6 text-white" />
+                          ) : quoteData.payment_status === 'failed' ? (
+                            <AlertCircle className="w-6 h-6 text-white" />
+                          ) : (
+                            <CreditCardIcon className="w-6 h-6 text-white" />
+                          )}
+                        </div>
+                        <div>
+                          <h2 className="text-xl font-bold text-gray-900">
+                            {quoteData.payment_status === 'paid' ? 'Payment Completed' : 
+                             quoteData.payment_status === 'failed' ? 'Payment Failed' : 
+                             'Payment Required'}
+                          </h2>
+                          <p className={`${
+                            quoteData.payment_status === 'paid' ? 'text-emerald-600' : 
+                            quoteData.payment_status === 'failed' ? 'text-red-600' : 
+                            'text-amber-600'
+                          }`}>
+                            {quoteData.payment_status === 'paid'
+                              ? 'Your policy is now active and coverage has begun.'
+                              : quoteData.payment_status === 'failed'
+                              ? 'Your payment was unsuccessful. Please try again.'
+                              : 'Complete payment to activate your coverage and policy.'}
+                          </p>
+                        </div>
+                      </div>
+                      {(quoteData.payment_status === 'pending' || quoteData.payment_status === 'failed') && (
+                        <button
+                          onClick={handleMakePayment}
+                          className={`px-6 py-3 ${
+                            quoteData.payment_status === 'failed'
+                              ? 'bg-gradient-to-r from-red-500 to-red-600'
+                              : 'bg-gradient-to-r from-amber-500 to-amber-600'
+                          } text-white font-medium rounded-xl hover:opacity-90 transition-all duration-300 transform hover:-translate-y-0.5`}
+                        >
+                          {quoteData.payment_status === 'failed' ? 'Retry Payment' : 'Make Payment'} - {formatCurrency(quoteData.calculated_premium)}
+                        </button>
+                      )}
+                    </div>
+                  )}
+
                   {/* Shipment Details */}
                   <div className="bg-white/90 rounded-2xl border border-gray-200 p-6">
                     <div className="flex items-center justify-between mb-6">
@@ -461,10 +913,12 @@ export default function QuoteDetailsPage() {
                           <p className="text-sm text-gray-600">AI-powered risk assessment</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                        <span className="text-sm text-emerald-600">Live Analysis</span>
-                      </div>
+                      {(quoteData.status === 'submitted' || quoteData.status === 'waiting_for_review') && (
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                          <span className="text-sm text-emerald-600">Live Analysis</span>
+                        </div>
+                      )}
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -541,56 +995,140 @@ export default function QuoteDetailsPage() {
                     </div>
                   </div>
 
-                  {/* Coverage Details */}
-                  <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl border border-blue-200 p-6">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="p-2.5 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl">
-                        <ShieldIcon className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <h2 className="text-xl font-bold text-gray-900">Coverage Details</h2>
-                        <p className="text-sm text-blue-600">Real-time protection metrics</p>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="bg-white/90 rounded-xl p-5 border border-blue-200">
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="p-2.5 bg-gradient-to-br from-blue-500/10 to-blue-600/10 rounded-lg">
-                            <PieChart className="w-5 h-5 text-blue-600" />
-                          </div>
-                          <div>
-                            <p className="text-sm text-gray-600">Premium Analysis</p>
-                            <p className="text-2xl font-bold text-gray-900">
-                              {formatCurrency(quoteData.calculated_premium)}
-                            </p>
-                          </div>
+                  {/* Status-specific messages */}
+                  {quoteData.status === 'rejected' && (
+                    <div className="bg-gradient-to-br from-rose-50 to-rose-100 rounded-2xl border border-rose-200 p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2.5 bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl">
+                          <AlertCircle className="w-6 h-6 text-white" />
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Zap className="w-4 h-4 text-blue-600" />
-                          <span className="text-xs text-blue-600">Optimized Rate</span>
+                        <div>
+                          <h2 className="text-xl font-bold text-gray-900">Quote Rejected</h2>
+                          <p className="text-rose-600">This quote requires adjustments before it can be approved.</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={handleResubmit}
+                        className="px-6 py-3 bg-gradient-to-r from-rose-500 to-rose-600 text-white font-medium rounded-xl hover:from-rose-600 hover:to-rose-700 transition-all duration-300 transform hover:-translate-y-0.5"
+                      >
+                        Edit & Resubmit Quote
+                      </button>
+                    </div>
+                  )}
+
+                  {quoteData.status === 'fix_and_resubmit' && (
+                    <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl border border-amber-200 p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2.5 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl">
+                          <AlertTriangle className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h2 className="text-xl font-bold text-gray-900">Fix Required</h2>
+                          <p className="text-amber-600">Please review and resubmit your quote with the required changes.</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={handleResubmit}
+                        className="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-medium rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all duration-300 transform hover:-translate-y-0.5"
+                      >
+                        Fix & Resubmit
+                      </button>
+                    </div>
+                  )}
+
+                  {quoteData.status === 'waiting_for_review' && (
+                    <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 rounded-2xl border border-cyan-200 p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2.5 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-xl">
+                          <Clock className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h2 className="text-xl font-bold text-gray-900">Waiting for Review</h2>
+                          <p className="text-cyan-600">Your quote is currently under review by our team. We'll notify you once it's processed.</p>
+                        </div>
+                      </div>
+                      <p className="text-sm text-cyan-700">Estimated review time: 1-2 business days</p>
+                    </div>
+                  )}
+
+                  {quoteData.status === 'documents_under_review' && (
+                    <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-2xl border border-indigo-200 p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-2.5 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl">
+                          <FileSearch className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h2 className="text-xl font-bold text-gray-900">Documents Under Review</h2>
+                          <p className="text-indigo-600">Your documents are being verified. We'll update the status once complete.</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setActiveTab('documents')}
+                        className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white font-medium rounded-xl hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 transform hover:-translate-y-0.5"
+                      >
+                        View Documents
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Coverage Details - Show for approved statuses */}
+                  {quoteData.status === 'approved' && (
+                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl border border-blue-200 p-6">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2.5 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl">
+                          <ShieldIcon className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h2 className="text-xl font-bold text-gray-900">Coverage Details</h2>
+                          <p className="text-sm text-blue-600">
+                            {quoteData.payment_status === 'paid' 
+                              ? 'Active protection coverage' 
+                              : 'Ready for activation upon payment'}
+                          </p>
                         </div>
                       </div>
                       
-                      <div className="bg-white/90 rounded-xl p-5 border border-blue-200">
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="p-2.5 bg-gradient-to-br from-amber-500/10 to-amber-600/10 rounded-lg">
-                            <CreditCard className="w-5 h-5 text-amber-600" />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-white/90 rounded-xl p-5 border border-blue-200">
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="p-2.5 bg-gradient-to-br from-blue-500/10 to-blue-600/10 rounded-lg">
+                              <PieChart className="w-5 h-5 text-blue-600" />
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-600">Premium Analysis</p>
+                              <p className="text-2xl font-bold text-gray-900">
+                                {formatCurrency(quoteData.calculated_premium)}
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="text-sm text-gray-600">Deductible</p>
-                            <p className="text-2xl font-bold text-gray-900">
-                              {formatCurrency(quoteData.deductible)}
-                            </p>
+                          <div className="flex items-center gap-2">
+                            <Zap className="w-4 h-4 text-blue-600" />
+                            <span className="text-xs text-blue-600">
+                              {quoteData.payment_status === 'paid' ? 'Active' : 'Pending'}
+                            </span>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Target className="w-4 h-4 text-amber-600" />
-                          <span className="text-xs text-amber-600">Risk Buffer</span>
+                        
+                        <div className="bg-white/90 rounded-xl p-5 border border-blue-200">
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="p-2.5 bg-gradient-to-br from-amber-500/10 to-amber-600/10 rounded-lg">
+                              <CreditCard className="w-5 h-5 text-amber-600" />
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-600">Deductible</p>
+                              <p className="text-2xl font-bold text-gray-900">
+                                {formatCurrency(quoteData.deductible)}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Target className="w-4 h-4 text-amber-600" />
+                            <span className="text-xs text-amber-600">Risk Buffer</span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               )}
 
@@ -600,12 +1138,15 @@ export default function QuoteDetailsPage() {
                     <div>
                       <h2 className="text-xl font-bold text-gray-900">Documents</h2>
                       <p className="text-sm text-gray-600">
-                        Secure verified files
+                        {documents.length > 0 ? 'Secure verified files' : 'Upload required documents'}
                       </p>
                     </div>
-                    <button className="px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:-translate-y-0.5">
-                      Upload New
-                    </button>
+                    {(quoteData.status === 'rejected' || quoteData.status === 'fix_and_resubmit' || quoteData.status === 'draft') && (
+                      <button className="px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:-translate-y-0.5">
+                        <Upload className="w-4 h-4 inline mr-2" />
+                        Upload New
+                      </button>
+                    )}
                   </div>
                   
                   {documents.length === 0 ? (
@@ -615,9 +1156,12 @@ export default function QuoteDetailsPage() {
                       </div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">No documents found</h3>
                       <p className="text-gray-600 mb-6">Upload documents to complete your submission</p>
-                      <button className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:-translate-y-0.5">
-                        Upload Documents
-                      </button>
+                      {(quoteData.status === 'rejected' || quoteData.status === 'fix_and_resubmit' || quoteData.status === 'draft') && (
+                        <button className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:-translate-y-0.5">
+                          <Upload className="w-4 h-4 inline mr-2" />
+                          Upload Documents
+                        </button>
+                      )}
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -666,7 +1210,7 @@ export default function QuoteDetailsPage() {
                 </div>
               )}
 
-              {activeTab === 'analytics' && (
+              {activeTab === 'analytics' && quoteData.status === 'approved' && quoteData.payment_status === 'paid' && (
                 <div className="bg-white/90 rounded-2xl border border-gray-200 p-6">
                   <h2 className="text-xl font-bold text-gray-900 mb-6">Analytics</h2>
                   
@@ -748,69 +1292,134 @@ export default function QuoteDetailsPage() {
 
           {/* Right Column - Sidebar */}
           <div className="space-y-6">
-            {/* Quick Actions */}
+            {/* Quick Actions - Dynamic based on status */}
             <div className="bg-white/90 rounded-2xl border border-gray-200 p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
               <div className="space-y-3">
-                <button className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
-                  <Download className="w-5 h-5" />
-                  Download Quote PDF
-                </button>
+                {statusConfig.showActions.downloadQuote && (
+                  <button className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                    <Download className="w-5 h-5" />
+                    Download Quote PDF
+                  </button>
+                )}
                 
-                <button className="w-full py-3 px-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-medium rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
-                  <CreditCard className="w-5 h-5" />
-                  Make Payment
-                </button>
+                {statusConfig.showActions.makePayment && (
+                  <button
+                    onClick={handleMakePayment}
+                    className="w-full py-3 px-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-medium rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                  >
+                    <CreditCard className="w-5 h-5" />
+                    {quoteData.payment_status === 'failed' ? 'Retry Payment' : 'Make Payment'}
+                  </button>
+                )}
                 
-                <button className="w-full py-3 px-4 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 hover:border-blue-500 transition-all duration-300 flex items-center justify-center gap-2">
-                  <ExternalLink className="w-5 h-5" />
-                  View Policy
-                </button>
+                {statusConfig.showActions.viewPolicy && (
+                  <button
+                    onClick={handleViewPolicy}
+                    className="w-full py-3 px-4 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 hover:border-blue-500 transition-all duration-300 flex items-center justify-center gap-2"
+                  >
+                    <ExternalLink className="w-5 h-5" />
+                    View Policy
+                  </button>
+                )}
+                
+                {statusConfig.showActions.viewReceipt && (
+                  <button
+                    onClick={handleViewReceipt}
+                    className="w-full py-3 px-4 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 hover:border-blue-500 transition-all duration-300 flex items-center justify-center gap-2"
+                  >
+                    <Receipt className="w-5 h-5" />
+                    View Receipt
+                  </button>
+                )}
+                
+                {statusConfig.showActions.resubmit && (
+                  <button
+                    onClick={handleResubmit}
+                    className="w-full py-3 px-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-medium rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
+                  >
+                    <Upload className="w-5 h-5" />
+                    Resubmit Quote
+                  </button>
+                )}
+                
+                {statusConfig.showActions.checkStatus && (
+                  <button
+                    onClick={refreshData}
+                    className="w-full py-3 px-4 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 hover:border-blue-500 transition-all duration-300 flex items-center justify-center gap-2"
+                  >
+                    <RefreshCw className="w-5 h-5" />
+                    Check Status
+                  </button>
+                )}
+                
+                {!statusConfig.showActions.downloadQuote && 
+                 !statusConfig.showActions.makePayment && 
+                 !statusConfig.showActions.viewPolicy && 
+                 !statusConfig.showActions.viewReceipt &&
+                 !statusConfig.showActions.resubmit && 
+                 !statusConfig.showActions.checkStatus && (
+                  <div className="text-center py-4 text-gray-500">
+                    No actions available for this status
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Cost Summary */}
-            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl border border-blue-200 p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Cost Summary</h3>
-              
-              <div className="space-y-3">
-                <div className="flex justify-between items-center pb-3 border-b border-blue-200">
-                  <span className="text-gray-700">Premium</span>
-                  <span className="font-semibold text-gray-900">
-                    {formatCurrency(quoteData.calculated_premium)}
-                  </span>
-                </div>
+            {/* Cost Summary - Show for approved statuses */}
+            {quoteData.status === 'approved' && (
+              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl border border-blue-200 p-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Cost Summary</h3>
                 
-                <div className="flex justify-between items-center pb-3 border-b border-blue-200">
-                  <span className="text-gray-700">Service Fee</span>
-                  <span className="font-semibold text-gray-900">$99.00</span>
-                </div>
-                
-                <div className="flex justify-between items-center pb-3 border-b border-blue-200">
-                  <span className="text-gray-700">Taxes</span>
-                  <span className="font-semibold text-gray-900">
-                    {formatCurrency(quoteData.calculated_premium * 0.08)}
-                  </span>
-                </div>
-                
-                <div className="pt-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-lg font-bold text-gray-900">Total Amount</span>
-                    <span className="text-2xl font-bold text-blue-700">
-                      {formatCurrency(
-                        quoteData.calculated_premium + 99 + (quoteData.calculated_premium * 0.08)
-                      )}
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center pb-3 border-b border-blue-200">
+                    <span className="text-gray-700">Premium</span>
+                    <span className="font-semibold text-gray-900">
+                      {formatCurrency(quoteData.calculated_premium)}
                     </span>
                   </div>
-                  <div className={`text-sm font-medium ${
-                    quoteData.status === 'approved' ? 'text-emerald-600' : 'text-blue-600'
-                  } flex items-center gap-2`}>
-                    <div className={`w-2 h-2 rounded-full ${quoteData.status === 'approved' ? 'bg-emerald-500' : 'bg-blue-500'} animate-pulse`}></div>
-                    {quoteData.status === 'approved' ? '✅ Ready for payment' : '⏳ Processing'}
+                  
+                  <div className="flex justify-between items-center pb-3 border-b border-blue-200">
+                    <span className="text-gray-700">Service Fee</span>
+                    <span className="font-semibold text-gray-900">$99.00</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center pb-3 border-b border-blue-200">
+                    <span className="text-gray-700">Taxes</span>
+                    <span className="font-semibold text-gray-900">
+                      {formatCurrency(quoteData.calculated_premium * 0.08)}
+                    </span>
+                  </div>
+                  
+                  <div className="pt-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-lg font-bold text-gray-900">Total Amount</span>
+                      <span className="text-2xl font-bold text-blue-700">
+                        {formatCurrency(
+                          quoteData.calculated_premium + 99 + (quoteData.calculated_premium * 0.08)
+                        )}
+                      </span>
+                    </div>
+                    <div className={`text-sm font-medium ${
+                      quoteData.payment_status === 'paid' ? 'text-emerald-600' : 
+                      quoteData.payment_status === 'failed' ? 'text-red-600' : 
+                      'text-blue-600'
+                    } flex items-center gap-2`}>
+                      <div className={`w-2 h-2 rounded-full ${
+                        quoteData.payment_status === 'paid' ? 'bg-emerald-500' : 
+                        quoteData.payment_status === 'failed' ? 'bg-red-500' : 
+                        'bg-blue-500'
+                      } animate-pulse`}></div>
+                      {quoteData.payment_status === 'paid' 
+                        ? '✅ Payment Completed' 
+                        : quoteData.payment_status === 'failed'
+                        ? '❌ Payment Failed'
+                        : '⏳ Payment Required'}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Support */}
             <div className="bg-white/90 rounded-2xl border border-gray-200 p-6">
