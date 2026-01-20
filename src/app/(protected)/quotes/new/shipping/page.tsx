@@ -11,6 +11,7 @@ import CargoTypeSelector from './components/CargoTypeSelector';
 import { useUser } from '@/app/context/UserContext';
 import { PremiumCalculator } from '@/lib/services/premiumCalculator';
 import { quotes } from '@/lib/supabase/quotes';
+import { QuoteProcessor } from '@/lib/services/quoteProcessor';
 
 export default function ShippingValuePage() {
   const router = useRouter();
@@ -26,6 +27,7 @@ export default function ShippingValuePage() {
   const [otherCargoType, setOtherCargoType] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   const today = new Date().toISOString().split('T')[0];
   const tomorrow = new Date();
@@ -106,22 +108,24 @@ export default function ShippingValuePage() {
     e.preventDefault();
     
     if (!isFormComplete) {
-      alert('Please complete all required fields');
+      setError('Please complete all required fields');
       return;
     }
 
     if (!user) {
-      alert('Please login to create a quote');
+      setError('Please login to create a quote');
       router.push('/login');
       return;
     }
 
     setIsSubmitting(true);
+    setError('');
 
     try {
       // Prepare data for premium calculation
+      const finalCargoType = cargoType === 'other' ? otherCargoType : cargoType;
       const premiumInput = {
-        cargoType: cargoType === 'other' ? otherCargoType : cargoType,
+        cargoType: finalCargoType,
         shipmentValue: parseFloat(shipmentValue),
         transportationMode,
         coverageType: 'premium', // Default to premium for calculation
@@ -129,20 +133,27 @@ export default function ShippingValuePage() {
         endDate
       };
 
-      // Calculate premium (we'll recalculate on insurance page)
+      // Calculate premium
       const premiumResult = PremiumCalculator.calculate(premiumInput);
+
+      console.log('Creating quote with data:', {
+        user_id: user.id,
+        cargo_type: finalCargoType,
+        shipment_value: premiumInput.shipmentValue,
+        transportation_mode: transportationMode
+      });
 
       // Create quote in database
       const quoteData = {
         user_id: user.id,
-        cargo_type: premiumInput.cargoType,
+        cargo_type: finalCargoType,
         shipment_value: premiumInput.shipmentValue,
         origin: origin || {},
         destination: destination || {},
         start_date: startDate,
         end_date: endDate,
         transportation_mode: transportationMode as 'sea' | 'air' | 'road',
-        selected_coverage: 'premium' as 'premium', // Default
+        selected_coverage: 'premium' as 'premium', // Default for initial calculation
         calculated_premium: premiumResult.basePremium,
         deductible: premiumResult.deductible,
         quote_expires_at: calculateExpirationDate()
@@ -150,12 +161,46 @@ export default function ShippingValuePage() {
 
       const quote = await quotes.create(quoteData);
 
-      // Navigate to insurance page with quote ID
-      router.push(`/quotes/new/insurance?quote_id=${quote.id}`);
+      console.log('Quote created, processing validation:', quote.id);
+
+      // Immediately process quote for approval/rejection
+      const processedResult = await QuoteProcessor.processQuote(quote.id);
+
+      console.log('Quote processed:', {
+        status: processedResult.quote.status,
+        autoApproved: processedResult.autoApproved,
+        validation: processedResult.validation
+      });
+
+      // Navigate based on quote status
+      switch (processedResult.quote.status) {
+        case 'approved':
+          // Approved quotes go to insurance page
+          router.push(`/quotes/new/insurance?quote_id=${quote.id}&approved=true`);
+          break;
+        case 'under_review':
+          // Under review - show waiting page
+          router.push(`/quotes/${quote.id}/review`);
+          break;
+        case 'rejected':
+          // Rejected - show rejection page
+          router.push(`/quotes/${quote.id}/rejected`);
+          break;
+        default:
+          // Default to insurance page
+          router.push(`/quotes/new/insurance?quote_id=${quote.id}`);
+      }
 
     } catch (error) {
       console.error('Error creating quote:', error);
-      alert('Failed to create quote. Please try again.');
+      
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      
+      if (errorMessage.includes('database') || errorMessage.includes('schema')) {
+        setError('System error. Please try again or contact support.');
+      } else {
+        setError(`Failed to create quote: ${errorMessage}`);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -217,6 +262,18 @@ export default function ShippingValuePage() {
         </div> 
 
         <MobileTipsCard completionPercentage={completionPercentage} />
+        
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-center gap-2 text-red-700">
+              <AlertCircle className="w-5 h-5" />
+              <div>
+                <p className="font-medium">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
         
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_0.02fr_0.7fr]">
           <div className="lg:col-span-2 w-full lg:w-[99%]">
