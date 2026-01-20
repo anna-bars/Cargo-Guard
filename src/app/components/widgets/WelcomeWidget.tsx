@@ -22,6 +22,7 @@ export const WelcomeWidget: React.FC<WelcomeWidgetProps> = ({
       max-[768px]:flex-shrink-0 max-[768px]:w-[100%] max-[768px]:min-h-[240px] 
       max-[768px]:max-h-[280px]
       max-[480px]:w-[100%] max-[480px]:min-h-[100%] max-[480px]:max-h-[100%]
+      group  {/* Ավելացնենք group-ը այստեղ */}
     ">
       <img 
         src="https://c.animaapp.com/mjiggi0jSqvoj5/img/frame-76.png" 
@@ -89,7 +90,7 @@ export const WelcomeWidget: React.FC<WelcomeWidgetProps> = ({
               max-[480px]:w-8 max-[480px]:h-8
               focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white
               active:scale-95
-              relative group
+              relative
             "
             aria-label="Get new quote"
           >
@@ -99,14 +100,13 @@ export const WelcomeWidget: React.FC<WelcomeWidgetProps> = ({
               className="w-full h-full"
             />
             
-            {/* Փոքրիկ hover էֆեկտ */}
+            {/* Այժմ օգտագործում ենք group-hover վիդգեթի վրա hover անելու համար */}
             <div className="
               absolute inset-0 rounded-full
               bg-white/0 group-hover:bg-white/10
               transition-all duration-300
             " />
             
-            {/* Pulse էֆեկտ hover-ի ժամանակ */}
             <div className="
               absolute inset-[-2px] rounded-full
               border-2 border-white/0 group-hover:border-white/30
