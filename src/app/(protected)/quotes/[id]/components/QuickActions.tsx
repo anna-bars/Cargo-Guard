@@ -1,8 +1,10 @@
-import { Download, CreditCard, ExternalLink, Upload, RefreshCw, Receipt } from 'lucide-react';
-import { QuoteData, StatusConfig } from '../types';
+// ./components/QuickActions.tsx
+import React from 'react';
+import { FileText, CreditCard, CheckCircle, AlertCircle, RefreshCw, Edit } from 'lucide-react';
+import { QuoteData } from '../types';
+
 interface QuickActionsProps {
   statusConfig: any;
-  onDownloadPDF: () => void;
   onMakePayment: () => void;
   onViewPolicy: () => void;
   onViewReceipt: () => void;
@@ -11,10 +13,8 @@ interface QuickActionsProps {
   quoteData: QuoteData;
 }
 
-
 export default function QuickActions({
   statusConfig,
-  onDownloadPDF,
   onMakePayment,
   onViewPolicy,
   onViewReceipt,
@@ -22,75 +22,80 @@ export default function QuickActions({
   onCheckStatus,
   quoteData
 }: QuickActionsProps) {
+  const showMakePayment = statusConfig?.showActions?.makePayment && quoteData.payment_status !== 'paid';
+  const showViewPolicy = statusConfig?.showActions?.viewPolicy && quoteData.policy_id;
+  const showViewReceipt = statusConfig?.showActions?.viewReceipt && quoteData.payment_status === 'paid';
+  const showResubmit = statusConfig?.showActions?.resubmit;
+  const showCheckStatus = statusConfig?.showActions?.checkStatus;
+
   return (
-    <div className="bg-white/90 rounded-2xl border border-gray-200 p-6">
-      <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-2 rounded-lg bg-blue-100">
+          <CreditCard className="w-5 h-5 text-blue-600" />
+        </div>
+        <div>
+          <h3 className="text-lg font-bold text-gray-900">Quick Actions</h3>
+          <p className="text-sm text-gray-600">Manage your quote</p>
+        </div>
+      </div>
+      
       <div className="space-y-3">
-        {statusConfig.showActions.downloadQuote && (
-          <button className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
-            <Download className="w-5 h-5" />
-            Download Quote PDF
-          </button>
-        )}
-        
-        {statusConfig.showActions.makePayment && (
+        {showMakePayment && (
           <button
             onClick={onMakePayment}
-            className="w-full py-3 px-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-medium rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
+            className="w-full flex items-center gap-3 px-4 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors text-left"
           >
             <CreditCard className="w-5 h-5" />
-            Make Payment
+            <span>Make Payment</span>
           </button>
         )}
         
-        {statusConfig.showActions.viewPolicy && (
+        {showViewPolicy && (
           <button
             onClick={onViewPolicy}
-            className="w-full py-3 px-4 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 hover:border-blue-500 transition-all duration-300 flex items-center justify-center gap-2"
+            className="w-full flex items-center gap-3 px-4 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors text-left"
           >
-            <ExternalLink className="w-5 h-5" />
-            View Policy
+            <FileText className="w-5 h-5" />
+            <span>View Policy</span>
           </button>
         )}
         
-        {statusConfig.showActions.viewReceipt && (
+        {showViewReceipt && (
           <button
             onClick={onViewReceipt}
-            className="w-full py-3 px-4 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 hover:border-blue-500 transition-all duration-300 flex items-center justify-center gap-2"
+            className="w-full flex items-center gap-3 px-4 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors text-left"
           >
-            <Receipt className="w-5 h-5" />
-            View Receipt
+            <CheckCircle className="w-5 h-5" />
+            <span>View Receipt</span>
           </button>
         )}
         
-        {statusConfig.showActions.resubmit && (
+        {showResubmit && (
           <button
             onClick={onResubmit}
-            className="w-full py-3 px-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-medium rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
+            className="w-full flex items-center gap-3 px-4 py-3 bg-yellow-600 text-white font-medium rounded-lg hover:bg-yellow-700 transition-colors text-left"
           >
-            <Upload className="w-5 h-5" />
-            Resubmit Quote
+            <Edit className="w-5 h-5" />
+            <span>Resubmit Quote</span>
           </button>
         )}
         
-        {statusConfig.showActions.checkStatus && (
+        {showCheckStatus && (
           <button
             onClick={onCheckStatus}
-            className="w-full py-3 px-4 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 hover:border-blue-500 transition-all duration-300 flex items-center justify-center gap-2"
+            className="w-full flex items-center gap-3 px-4 py-3 bg-gray-600 text-white font-medium rounded-lg hover:bg-gray-700 transition-colors text-left"
           >
             <RefreshCw className="w-5 h-5" />
-            Check Status
+            <span>Check Status</span>
           </button>
         )}
         
-        {!statusConfig.showActions.downloadQuote && 
-          !statusConfig.showActions.makePayment && 
-          !statusConfig.showActions.viewPolicy && 
-          !statusConfig.showActions.viewReceipt &&
-          !statusConfig.showActions.resubmit && 
-          !statusConfig.showActions.checkStatus && (
+        {!showMakePayment && !showViewPolicy && !showViewReceipt && !showResubmit && !showCheckStatus && (
           <div className="text-center py-4 text-gray-500">
-            No actions available for this status
+            <AlertCircle className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+            <p>No actions available</p>
+            <p className="text-sm mt-1">Complete the quote process to see available actions</p>
           </div>
         )}
       </div>

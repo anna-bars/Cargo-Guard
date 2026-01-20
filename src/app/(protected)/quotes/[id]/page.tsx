@@ -103,51 +103,6 @@ export default function QuoteDetailsPage() {
     }
   };
 
-  const handleDownloadPDF = () => {
-    if (!quoteData) return;
-    
-    toast.loading('Generating PDF...');
-    
-    setTimeout(() => {
-      toast.dismiss();
-      
-      const pdfContent = `
-        CARGO GUARD INSURANCE
-        QUOTE SUMMARY
-        
-        Quote Number: ${quoteData.quote_number}
-        Date: ${formatDateTime(quoteData.created_at)}
-        Status: ${quoteData.status.toUpperCase()}
-        
-        SHIPMENT DETAILS:
-        • Cargo Type: ${quoteData.cargo_type}
-        • Shipment Value: ${formatCurrency(quoteData.shipment_value)}
-        • Origin: ${quoteData.origin?.city || 'N/A'}
-        • Destination: ${quoteData.destination?.city || 'N/A'}
-        • Transportation: ${quoteData.transportation_mode}
-        • Coverage Period: ${new Date(quoteData.start_date).toLocaleDateString()} - ${new Date(quoteData.end_date).toLocaleDateString()}
-        
-        INSURANCE DETAILS:
-        • Premium: ${formatCurrency(quoteData.calculated_premium || 0)}
-        • Service Fee: $99
-        • Total: ${formatCurrency((quoteData.calculated_premium || 0) + 99)}
-        
-        This is a computer-generated quote. For official documents, please contact support.
-      `;
-      
-      const blob = new Blob([pdfContent], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `Quote-${quoteData.quote_number}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-      
-      toast.success('PDF downloaded successfully');
-    }, 1500);
-  };
 
   const handleViewPolicy = () => {
     if (!quoteData) return;
@@ -443,7 +398,6 @@ export default function QuoteDetailsPage() {
           <div className="space-y-6">
             <QuickActions
               statusConfig={statusConfig}
-              onDownloadPDF={handleDownloadPDF}
               onMakePayment={handleMakePayment}
               onViewPolicy={handleViewPolicy}
               onViewReceipt={handleViewReceipt}
