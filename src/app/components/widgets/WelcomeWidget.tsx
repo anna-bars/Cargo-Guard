@@ -88,13 +88,32 @@ export const WelcomeWidget: React.FC<WelcomeWidgetProps> = ({
               max-[1024px]:w-9 max-[1024px]:h-9
               max-[480px]:w-8 max-[480px]:h-8
               focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white
+              active:scale-95
+              relative group
             "
+            aria-label="Get new quote"
           >
             <img 
               src="https://c.animaapp.com/mjiggi0jSqvoj5/img/group-84.png" 
               alt="Arrow" 
               className="w-full h-full"
             />
+            
+            {/* Փոքրիկ hover էֆեկտ */}
+            <div className="
+              absolute inset-0 rounded-full
+              bg-white/0 group-hover:bg-white/10
+              transition-all duration-300
+            " />
+            
+            {/* Pulse էֆեկտ hover-ի ժամանակ */}
+            <div className="
+              absolute inset-[-2px] rounded-full
+              border-2 border-white/0 group-hover:border-white/30
+              group-hover:animate-ping
+              transition-all duration-300
+              pointer-events-none
+            " />
           </button>
         </div>
       </div>
