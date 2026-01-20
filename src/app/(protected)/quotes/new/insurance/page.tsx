@@ -62,7 +62,6 @@ export default function InsuranceQuotePage() {
   const { user } = useUser();
   
   const quoteId = searchParams.get('quote_id');
-  const isApproved = searchParams.get('approved') === 'true';
   
   const [quoteData, setQuoteData] = useState<QuoteData | null>(null);
   const [selectedCoverage, setSelectedCoverage] = useState<'standard' | 'premium' | 'enterprise'>('premium');
@@ -70,88 +69,90 @@ export default function InsuranceQuotePage() {
   const [coverageOptions, setCoverageOptions] = useState<CoverageOption[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
+  const [isApproving, setIsApproving] = useState(false);
 
   useEffect(() => {
-    // Insurance page-ում loadQuoteData ֆունկցիայի մեջ
-// Insurance page-ում loadQuoteData ֆունկցիայի մեջ
-const loadQuoteData = async () => {
-  if (!quoteId || !user) return;
+    const loadQuoteData = async () => {
+      if (!quoteId || !user) return;
 
-  try {
-    setLoading(true);
-    
-    // Load quote from database
-    const quote = await quotes.getById(quoteId);
-    setQuoteData(quote);
-
-    // ✅ ՓՈՓՈԽՈՒՄ ԵՆՔ QuoteProcessor-ի օգտագործումը
-    // Եթե quote-ը դեռ մշակված չէ, մենք պետք է ավտոմատ մշակենք այն
-    if (!quote.status || quote.status === 'draft' || quote.status === 'submitted') {
       try {
-        // ✅ ՕԳՏԱԳՈՐԾԵՆՔ STATIC ՄԵԹՈԴԸ
-        const result = await QuoteProcessor.processQuote(quote.id);
+        setLoading(true);
         
-        // Վերաբեռնենք quote-ը մշակվելուց հետո
-        const updatedQuote = await quotes.getById(quoteId);
-        setQuoteData(updatedQuote);
+        // Load quote from database
+        const quote = await quotes.getById(quoteId);
+        setQuoteData(quote);
+
+        // ✅ ՊԱՐԶԱՊԱՇՏՈՒՄ: ԹՈՒՅԼ ՏԱԼ ԲՈԼՈՐ QUOTE-ներին ՄՈՒՏՔ
+        // Մենք status-ը կստուգենք միայն "Proceed to Payment" կոճակ սեղմելուց հետո
         
-        // Ստուգենք, թե արդյոք quote-ը հաստատված է
-        if (updatedQuote.status !== 'approved') {
-          setError(`This quote is ${updatedQuote.status}. ${updatedQuote.status === 'under_review' ? 'Our team is reviewing it.' : ''} ${updatedQuote.status === 'rejected' ? 'It has been rejected.' : ''}`);
-          return;
-        }
-      } catch (processingError) {
-        console.error('Error processing quote:', processingError);
-        setError('Failed to process quote. Please try again or contact support.');
-        return;
+        // Calculate premiums for all coverage options
+        const premiumInput = {
+          cargoType: quote.cargo_type,
+          shipmentValue: quote.shipment_value,
+          transportationMode: quote.transportation_mode,
+          coverageType: 'standard',
+          startDate: quote.start_date,
+          endDate: quote.end_date
+        };
+
+        const options: CoverageOption[] = [
+          {
+            id: 'standard',
+            name: 'Standard Coverage',
+            description: 'Essential protection for common risks during transit.',
+            premium: PremiumCalculator.calculate({...premiumInput, coverageType: 'standard'}).basePremium,
+            coverage: ['All Risks', 'Theft Protection', 'Accidental Damage', 'Basic Liability'],
+            deductible: 1000,
+            features: ['Standard claims processing', 'Email support', 'Basic tracking'],
+            color: 'from-gray-100 to-gray-50',
+            badge: 'Popular'
+          },
+          {
+            id: 'premium',
+            name: 'Premium Coverage',
+            description: 'Comprehensive protection including special risks and priority service.',
+            premium: PremiumCalculator.calculate({...premiumInput, coverageType: 'premium'}).basePremium,
+            coverage: ['All Risks +', 'War & Political Risks', 'Strike Coverage', 'Cyber Protection', 'Delay Compensation'],
+            deductible: 500,
+            features: [
+              '24/7 Priority Support',
+              'Dedicated Risk Manager',
+              'Expedited Claims (<24h)',
+              'Real-time Tracking',
+              'Monthly Risk Reports'
+            ],
+            color: 'from-blue-50 to-indigo-50',
+            badge: 'Recommended'
+          },
+          {
+            id: 'enterprise',
+            name: 'Enterprise Plan',
+            description: 'Maximum protection with white-glove service for high-value shipments.',
+            premium: PremiumCalculator.calculate({...premiumInput, coverageType: 'enterprise'}).basePremium,
+            coverage: ['All Inclusive', 'War & Terrorism', 'Customs Delay', 'Inventory Protection', 'Revenue Loss'],
+            deductible: 250,
+            features: [
+              '24/7 Dedicated Team',
+              'Same-day Claims',
+              'Custom Coverage',
+              'API Integration',
+              'Quarterly Reviews'
+            ],
+            color: 'from-purple-50 to-pink-50',
+            badge: 'Enterprise'
+          }
+        ];
+
+        setCoverageOptions(options);
+
+      } catch (error) {
+        console.error('Error loading quote data:', error);
+        setError('Failed to load quote data. Please try again.');
+      } finally {
+        setLoading(false);
       }
-    } 
-    // Ստուգել, թե արդյոք quote-ը հաստատված է
-    else if (quote.status !== 'approved') {
-      setError(`This quote is ${quote.status}. ${quote.status === 'under_review' ? 'Our team is reviewing it.' : ''} ${quote.status === 'rejected' ? 'It has been rejected.' : ''}`);
-      return;
-    }
+    };
 
-    // Continue with the rest of the code...
-    // ... rest of the function
-
-  } catch (error) {
-    console.error('Error loading quote data:', error);
-    setError('Failed to load quote data. Please try again.');
-  } finally {
-    setLoading(false);
-  }
-};
-
-// Ավելի պարզ տարբերակ - չփոխել status-ը
-const handleProceedToPayment = async () => {
-  if (!quoteData || !selectedCoverage) return;
-  
-  setIsProcessing(true);
-  setError('');
-
-  try {
-    // Update quote with selected coverage and premium
-    const selectedCoverageData = coverageOptions.find(coverage => coverage.id === selectedCoverage);
-    
-    // ✅ ՄԻԱՅՆ փոխել coverage և premium դաշտերը, status-ը թողնել ինչ կա
-    await quotes.continueDraft(quoteData.id, {
-      selected_coverage: selectedCoverage,
-      calculated_premium: selectedCoverageData?.premium || 0,
-      deductible: selectedCoverageData?.deductible || 0,
-      // ❌ ՄԻ փոխանցեք status-ը, թողեք այն ինչ կա database-ում
-    });
-
-    // Navigate to payment page
-    router.push(`/quotes/${quoteData.id}/payment`);
-
-  } catch (error) {
-    console.error('Error updating quote:', error);
-    setError('Failed to update quote. Please try again.');
-  } finally {
-    setIsProcessing(false);
-  }
-};
     loadQuoteData();
   }, [quoteId, user]);
 
@@ -182,33 +183,100 @@ const handleProceedToPayment = async () => {
     return modeMap[mode] || mode;
   };
 
-  const handleProceedToPayment = async () => {
-    if (!quoteData || !selectedCoverage) return;
+const handleProceedToPayment = async () => {
+  if (!quoteData || !selectedCoverage) return;
+  
+  setIsProcessing(true);
+  setIsApproving(true);
+  setError('');
+
+  try {
+    console.log('Step 1: Starting quote approval process for quote:', quoteData.id);
     
-    setIsProcessing(true);
-    setError('');
-
+    // Step 1: Update quote with selected coverage
+    const selectedCoverageData = coverageOptions.find(coverage => coverage.id === selectedCoverage);
+    
+    console.log('Step 2: Updating quote with coverage:', selectedCoverage, 'Premium:', selectedCoverageData?.premium);
+    
+    // Ստուգենք, թե արդյոք quote-ը գոյություն ունի
     try {
-      // Update quote with selected coverage and premium
-      const selectedCoverageData = coverageOptions.find(coverage => coverage.id === selectedCoverage);
-      
-      await quotes.continueDraft(quoteData.id, {
-        selected_coverage: selectedCoverage,
-        calculated_premium: selectedCoverageData?.premium || 0,
-        deductible: selectedCoverageData?.deductible || 0,
-        status: 'approved' // Ensure status is approved
-      });
-
-      // Navigate to payment page
-      router.push(`/quotes/${quoteData.id}/payment`);
-
-    } catch (error) {
-      console.error('Error updating quote:', error);
-      setError('Failed to update quote. Please try again.');
-    } finally {
+      const quoteCheck = await quotes.getById(quoteData.id);
+      console.log('Quote exists:', !!quoteCheck);
+    } catch (checkError) {
+      console.error('Quote check failed:', checkError);
+      setError('Quote not found. Please create a new quote.');
       setIsProcessing(false);
+      setIsApproving(false);
+      return;
     }
-  };
+    
+    // Փորձենք update անել quote-ը
+    const updateResult = await quotes.continueDraft(quoteData.id, {
+      selected_coverage: selectedCoverage,
+      calculated_premium: selectedCoverageData?.premium || 0,
+      deductible: selectedCoverageData?.deductible || 0,
+    });
+    
+    console.log('Step 3: Quote updated successfully:', updateResult);
+    
+    // Step 2: Now process the quote for approval
+    console.log('Step 4: Processing quote for approval');
+    const result = await QuoteProcessor.processQuote(quoteData.id);
+    console.log('Quote processing result:', result);
+    
+    // Step 3: Check if approved
+    if (result.quote.status === 'rejected') {
+      setError(`Your quote was rejected: ${result.quote.rejection_reason || 'Please contact support for more information.'}`);
+      setIsProcessing(false);
+      setIsApproving(false);
+      return;
+    }
+    
+    if (result.quote.status === 'under_review' || result.quote.status === 'needs_info') {
+      setError('Your quote requires manual review. Our team will contact you within 24 hours.');
+      setIsProcessing(false);
+      setIsApproving(false);
+      return;
+    }
+
+    // Step 4: If approved, navigate to payment
+    if (result.quote.status === 'approved') {
+      console.log('Step 5: Quote approved, navigating to payment');
+      router.push(`/quotes/${quoteData.id}/payment`);
+    } else {
+      setError('Quote is still being processed. Please try again in a moment.');
+      setIsProcessing(false);
+      setIsApproving(false);
+    }
+
+  } catch (error) {
+    // ✅ TypeScript-ի համար ավելացնենք type checking
+    console.error('Error updating quote:', error);
+    
+    // ✅ Ստուգենք, թե արդյոք error-ը ունի message property
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    const errorCode = error && typeof error === 'object' && 'code' in error ? (error as any).code : undefined;
+    const errorDetails = error && typeof error === 'object' && 'details' in error ? (error as any).details : undefined;
+    
+    console.error('Error details:', {
+      message: errorMessage,
+      code: errorCode,
+      details: errorDetails
+    });
+    
+    // Ավելի մանրամասն error message
+    if (errorCode === 'PGRST116') {
+      setError('Database error: Could not update quote. Please try again or contact support.');
+    } else if (errorMessage.includes('Cannot coerce')) {
+      setError('Quote update failed. The quote may have been deleted or is corrupted.');
+    } else {
+      setError(`Failed to update quote: ${errorMessage || 'Please try again.'}`);
+    }
+    
+    setIsProcessing(false);
+    setIsApproving(false);
+  }
+};
 
   const handleModifyInputs = () => {
     router.push(`/quotes/${quoteData?.id}/edit`);
@@ -251,48 +319,51 @@ const handleProceedToPayment = async () => {
     );
   }
 
-  // Check if quote is approved
-  if (quoteData.status !== 'approved') {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <DashboardHeader userEmail={user?.email} />
-        <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-            <div className="text-center mb-8">
-              <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <AlertCircle className="w-10 h-10 text-yellow-600" />
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                {quoteData.status === 'under_review' ? 'Quote Under Review' : 
-                 quoteData.status === 'rejected' ? 'Quote Rejected' : 
-                 'Quote Pending Approval'}
-              </h2>
-              <p className="text-gray-600 mb-6">
-                Quote #{quoteData.quote_number} is not yet approved.
-                {quoteData.status === 'under_review' && ' Our team is reviewing your quote.'}
-                {quoteData.status === 'rejected' && ' Your quote has been rejected.'}
-              </p>
-            </div>
+  // ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ 
+  // ❌ ՀԵՌԱՑՆԵՆՔ ԱՅՍ ՍՏՈՒԳՈՒՄԸ։ Մենք չենք ցուցադրում "Quote Pending Approval" էջը
+  // ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ 
+  
+  // if (quoteData.status !== 'approved') {
+  //   return (
+  //     <div className="min-h-screen bg-gray-50">
+  //       <DashboardHeader userEmail={user?.email} />
+  //       <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+  //         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+  //           <div className="text-center mb-8">
+  //             <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+  //               <AlertCircle className="w-10 h-10 text-yellow-600" />
+  //             </div>
+  //             <h2 className="text-2xl font-bold text-gray-900 mb-2">
+  //               {quoteData.status === 'under_review' ? 'Quote Under Review' : 
+  //                quoteData.status === 'rejected' ? 'Quote Rejected' : 
+  //                'Quote Pending Approval'}
+  //             </h2>
+  //             <p className="text-gray-600 mb-6">
+  //               Quote #{quoteData.quote_number} is not yet approved.
+  //               {quoteData.status === 'under_review' && ' Our team is reviewing your quote.'}
+  //               {quoteData.status === 'rejected' && ' Your quote has been rejected.'}
+  //             </p>
+  //           </div>
             
-            <div className="flex justify-center gap-4">
-              <button
-                onClick={() => router.push(`/quotes/${quoteData.id}`)}
-                className="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                View Quote Details
-              </button>
-              <button
-                onClick={() => router.push('/quotes/new/shipping')}
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all"
-              >
-                Create New Quote
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  //           <div className="flex justify-center gap-4">
+  //             <button
+  //               onClick={() => router.push(`/quotes/${quoteData.id}`)}
+  //               className="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+  //             >
+  //               View Quote Details
+  //             </button>
+  //             <button
+  //               onClick={() => router.push('/quotes/new/shipping')}
+  //               className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all"
+  //             >
+  //               Create New Quote
+  //             </button>
+  //           </div>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   const selectedCoverageData = coverageOptions.find(coverage => coverage.id === selectedCoverage);
   const basePremium = selectedCoverageData?.premium || 0;
@@ -327,48 +398,131 @@ const handleProceedToPayment = async () => {
                 <span className="text-gray-900 font-medium">Quote #{quoteData.quote_number}</span>
               </div>
               <h1 className="text-3xl font-bold text-gray-900">Complete Your Insurance</h1>
-              <p className="text-gray-600 mt-2">Your quote has been approved! Select coverage and proceed to payment.</p>
+              <p className="text-gray-600 mt-2">
+                {quoteData.status === 'approved' 
+                  ? 'Your quote has been approved! Select coverage and proceed to payment.'
+                  : 'Select your coverage plan to get your final premium and approval.'
+                }
+              </p>
             </div>
             
+            {/* ✅ ՓՈՒՇՏԱՆՈՒՄ ԵՆՔ BADGE-Ը՝ ՓՈԽԱՐԵՆԵՆՔ "Pending Approval" */}
             <div className="hidden lg:flex items-center gap-4">
               <div className="text-right">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                  <p className="text-sm font-medium text-green-700">Approved</p>
+                  <div className={`w-3 h-3 rounded-full ${
+                    quoteData.status === 'approved' ? 'bg-green-500' : 
+                    quoteData.status === 'rejected' ? 'bg-red-500' : 
+                    quoteData.status === 'under_review' ? 'bg-yellow-500' : 'bg-blue-500'
+                  }`}></div>
+                  <p className={`text-sm font-medium ${
+                    quoteData.status === 'approved' ? 'text-green-700' : 
+                    quoteData.status === 'rejected' ? 'text-red-700' : 
+                    quoteData.status === 'under_review' ? 'text-yellow-700' : 'text-blue-700'
+                  }`}>
+                    {quoteData.status === 'approved' ? 'Approved' : 
+                     quoteData.status === 'rejected' ? 'Rejected' : 
+                     quoteData.status === 'under_review' ? 'Under Review' : 'Pending Approval'}
+                  </p>
                 </div>
                 <p className="text-xs text-gray-500">Quote #{quoteData.quote_number}</p>
               </div>
-              <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                <CheckCircle className="w-5 h-5 text-green-600" />
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                quoteData.status === 'approved' ? 'bg-green-100' : 
+                quoteData.status === 'rejected' ? 'bg-red-100' : 
+                quoteData.status === 'under_review' ? 'bg-yellow-100' : 'bg-blue-100'
+              }`}>
+                {quoteData.status === 'approved' ? (
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                ) : quoteData.status === 'rejected' ? (
+                  <AlertCircle className="w-5 h-5 text-red-600" />
+                ) : (
+                  <Clock className="w-5 h-5 text-blue-600" />
+                )}
               </div>
             </div>
           </div>
 
-          {/* Approval Banner */}
-          <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900">Quote Approved!</h3>
-                <p className="text-sm text-gray-600">
-                  Your quote has been approved. Select your coverage plan and proceed to payment to activate your insurance policy.
-                </p>
+          {/* ✅ ՓՈՖԱՆՈՒՄ ԵՆՔ APPROVAL BANNER-ը */}
+          {quoteData.status === 'approved' ? (
+            <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Quote Approved!</h3>
+                  <p className="text-sm text-gray-600">
+                    Your quote has been approved. Select your coverage plan and proceed to payment to activate your insurance policy.
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+          ) : quoteData.status === 'rejected' ? (
+            <div className="mb-6 p-4 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-xl">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                  <AlertCircle className="w-5 h-5 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Quote Rejected</h3>
+                  <p className="text-sm text-gray-600">
+                    Your quote has been rejected. Please modify your shipment details or contact support.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : quoteData.status === 'under_review' ? (
+            <div className="mb-6 p-4 bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-xl">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-yellow-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Quote Under Review</h3>
+                  <p className="text-sm text-gray-600">
+                    Your quote is being reviewed by our team. This usually takes 1-2 business days.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Complete Coverage Selection</h3>
+                  <p className="text-sm text-gray-600">
+                    Select your coverage plan to get your final premium and approval decision.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
+          {/* Progress bar */}
           <div className="mb-8">
             <div className="flex items-center justify-between max-w-[75%]">
               <div className="flex items-center">
                 <div className="flex items-center">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-600 text-white">
-                    <CheckCircle className="w-5 h-5" />
+                  <div className={`flex items-center justify-center w-10 h-10 rounded-full ${
+                    quoteData.status === 'approved' ? 'bg-green-600' : 'bg-blue-600'
+                  } text-white`}>
+                    {quoteData.status === 'approved' ? (
+                      <CheckCircle className="w-5 h-5" />
+                    ) : (
+                      1
+                    )}
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm font-medium text-gray-900">Quote Approved</p>
-                    <p className="text-xs text-gray-500">Completed</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {quoteData.status === 'approved' ? 'Quote Approved' : 'Shipment Details'}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {quoteData.status === 'approved' ? 'Completed' : 'Completed'}
+                    </p>
                   </div>
                 </div>
                 
@@ -415,8 +569,15 @@ const handleProceedToPayment = async () => {
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold text-gray-900">Shipment Summary</h2>
-                <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                  Approved
+                <span className={`px-3 py-1 text-xs font-medium rounded-full ${
+                  quoteData.status === 'approved' ? 'bg-green-100 text-green-800' :
+                  quoteData.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                  quoteData.status === 'under_review' ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-blue-100 text-blue-800'
+                }`}>
+                  {quoteData.status === 'approved' ? 'Approved' :
+                   quoteData.status === 'rejected' ? 'Rejected' :
+                   quoteData.status === 'under_review' ? 'Under Review' : 'Pending Approval'}
                 </span>
               </div>
               
@@ -462,7 +623,7 @@ const handleProceedToPayment = async () => {
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900 mb-2">Select Coverage Plan</h2>
-                  <p className="text-gray-600 text-sm">Choose the protection level for your approved quote</p>
+                  <p className="text-gray-600 text-sm">Choose the protection level for your shipment</p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-gray-500">Premium</p>
@@ -638,18 +799,29 @@ const handleProceedToPayment = async () => {
               <div className="mt-6 space-y-3">
                 <button
                   onClick={handleProceedToPayment}
-                  disabled={isProcessing}
-                  className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                  disabled={isProcessing || quoteData.status === 'rejected'}
+                  className={`w-full py-3 px-4 font-medium rounded-lg transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2 ${
+                    quoteData.status === 'rejected' 
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700'
+                  }`}
                 >
                   {isProcessing ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                      Processing...
+                      {isApproving ? 'Getting Approval...' : 'Processing...'}
                     </>
-                  ) : (
+                  ) : quoteData.status === 'approved' ? (
                     <>
                       <CreditCard className="w-4 h-4" />
                       Proceed to Payment
+                    </>
+                  ) : quoteData.status === 'rejected' ? (
+                    'Quote Rejected'
+                  ) : (
+                    <>
+                      <CheckCircle className="w-4 h-4" />
+                      Get Quote Approved
                     </>
                   )}
                 </button>
@@ -675,12 +847,23 @@ const handleProceedToPayment = async () => {
               <h4 className="font-semibold text-gray-900 mb-4">Next Steps</h4>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-blue-600"></div>
+                  <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
+                    quoteData.status === 'approved' ? 'bg-green-100' : 'bg-blue-100'
+                  }`}>
+                    <div className={`w-2 h-2 rounded-full ${
+                      quoteData.status === 'approved' ? 'bg-green-600' : 'bg-blue-600'
+                    }`}></div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">Complete Payment</p>
-                    <p className="text-xs text-gray-500">Secure payment to activate your policy</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {quoteData.status === 'approved' ? 'Proceed to Payment' : 'Get Quote Approved'}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {quoteData.status === 'approved' 
+                        ? 'Secure payment to activate your policy'
+                        : 'We\'ll review your quote based on selected coverage'
+                      }
+                    </p>
                   </div>
                 </div>
                 

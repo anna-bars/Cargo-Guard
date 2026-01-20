@@ -153,21 +153,27 @@ export const quotes = {
   },
 
   // Շարունակել draft quote
-  async continueDraft(id: string, updates: Partial<CreateQuoteInput>) {
+ async continueDraft(quoteId: string, updates: Partial<CreateQuoteInput>) {
     const supabase = createClient();
+    
+    console.log('continueDraft called with:', { quoteId, updates });
+    
     const { data, error } = await supabase
       .from('quotes')
       .update({
         ...updates,
-        status: 'submitted', // Change status to submitted when continuing
         updated_at: new Date().toISOString()
       })
-      .eq('id', id)
-      .eq('status', 'draft')
-      .select()
-      .single();
-
-    if (error) throw error;
+      .eq('id', quoteId)
+      .select()  // ✅ Սա կարևոր է - պետք է .select() ավելացնել
+      .single(); // ✅ Եթե ցանկանում ենք միայն մեկ row վերադարձնել
+    
+    if (error) {
+      console.error('Supabase update error:', error);
+      throw error;
+    }
+    
+    console.log('continueDraft successful:', data);
     return data;
   },
   
