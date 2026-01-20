@@ -47,7 +47,7 @@ const loadQuoteData = async () => {
     }
     
     const { data: quoteRequest, error: quoteError } = await supabase
-      .from('quote_requests')
+      .from('quotes')
       .select('*')
       .eq('id', quoteId)
       .eq('user_id', user.id)
@@ -138,7 +138,7 @@ const handleMakePayment = async () => {
     try {
       const supabase = createClient();
       const { error } = await supabase
-        .from('quote_requests')
+        .from('quotes')
         .delete()
         .eq('id', quoteData.id);
       
