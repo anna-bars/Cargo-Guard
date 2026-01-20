@@ -401,7 +401,7 @@ export default function InsuranceQuotePage() {
           </div>
 
           <div className="mb-8">
-            <div className="flex items-center justify-between max-w-2xl">
+            <div className="flex items-center justify-between max-w-[75%]">
               <div className="flex items-center">
                 <div className="flex items-center">
                   <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white">
