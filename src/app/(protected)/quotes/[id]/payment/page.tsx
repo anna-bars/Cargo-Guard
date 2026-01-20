@@ -145,60 +145,67 @@ export default function QuotePaymentPage() {
     return 'unknown';
   };
 
-  const handlePayment = async () => {
-    if (!quoteId || !quoteData || !user) return;
+const handlePayment = async () => {
+  if (!quoteId || !quoteData || !user) return;
+  
+  if (paymentMethod === 'card') {
+    if (!cardDetails.number || cardDetails.number.replace(/\s/g, '').length !== 16) {
+      toast.error('Please enter a valid 16-digit card number');
+      return;
+    }
+    if (!cardDetails.expiry || !cardDetails.expiry.includes('/')) {
+      toast.error('Please enter a valid expiry date (MM/YY)');
+      return;
+    }
+    if (!cardDetails.cvv || cardDetails.cvv.length !== 3) {
+      toast.error('Please enter a valid CVV');
+      return;
+    }
+    if (!cardDetails.name) {
+      toast.error('Please enter the name on card');
+      return;
+    }
+  }
+  
+  setProcessing(true);
+  
+  try {
+    toast.loading('Processing payment...');
     
-    if (paymentMethod === 'card') {
-      if (!cardDetails.number || cardDetails.number.replace(/\s/g, '').length !== 16) {
-        toast.error('Please enter a valid 16-digit card number');
-        return;
-      }
-      if (!cardDetails.expiry || !cardDetails.expiry.includes('/')) {
-        toast.error('Please enter a valid expiry date (MM/YY)');
-        return;
-      }
-      if (!cardDetails.cvv || cardDetails.cvv.length !== 3) {
-        toast.error('Please enter a valid CVV');
-        return;
-      }
-      if (!cardDetails.name) {
-        toast.error('Please enter the name on card');
-        return;
-      }
+    const supabase = createClient();
+    
+    // 1. Update quote status FIRST
+    const { error: quoteUpdateError } = await supabase
+      .from('quotes')
+      .update({
+        payment_status: 'paid',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', quoteId);
+    
+    if (quoteUpdateError) {
+      console.error('Quote update error:', quoteUpdateError);
+      throw quoteUpdateError;
     }
     
-    setProcessing(true);
+    console.log('Quote status updated to paid');
     
+    // 2. Try to create payment record
+    let payment = null;
     try {
-      toast.loading('Processing payment...');
+      const { error: paymentsCheckError } = await supabase
+        .from('payments')
+        .select('id')
+        .limit(1);
       
-      const supabase = createClient();
-      
-      // 1. First try to check if payments table exists
-      let paymentTableExists = true;
-      try {
-        const { error: paymentsCheckError } = await supabase
-          .from('payments')
-          .select('id')
-          .limit(1);
-        if (paymentsCheckError?.code === '42P01') {
-          paymentTableExists = false;
-          console.log('Payments table does not exist, skipping payment record creation');
-        }
-      } catch (e) {
-        paymentTableExists = false;
-      }
-      
-      let payment = null;
-      
-      if (paymentTableExists) {
+      if (!paymentsCheckError) {
         const paymentData = {
           quote_id: quoteId,
           user_id: user.id,
           amount: totalAmount,
           currency: 'USD',
           payment_method: paymentMethod === 'card' ? 'credit_card' : 'bank_transfer',
-          payment_status: 'processing',
+          payment_status: 'completed',
           ...(paymentMethod === 'card' && {
             card_last_four: cardDetails.number.replace(/\s/g, '').slice(-4),
             card_brand: getCardBrand(cardDetails.number),
@@ -209,8 +216,11 @@ export default function QuotePaymentPage() {
           }),
           transaction_id: `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           gateway: 'demo',
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
+          completed_at: new Date().toISOString()
         };
+        
+        console.log('Creating payment record:', paymentData);
         
         const { data: newPayment, error: paymentInsertError } = await supabase
           .from('payments')
@@ -222,127 +232,112 @@ export default function QuotePaymentPage() {
           console.error('Payment insert error:', paymentInsertError);
         } else {
           payment = newPayment;
+          console.log('Payment record created:', payment);
         }
       }
+    } catch (paymentError) {
+      console.error('Payment creation error:', paymentError);
+    }
+    
+    // 3. Create policy with CORRECT field names
+    let policy = null;
+    try {
+      const { error: policiesCheckError } = await supabase
+        .from('policies')
+        .select('id')
+        .limit(1);
       
-      // 2. Try to create policy if policies table exists
-      let policyTableExists = true;
-      let policy = null;
-      
-      try {
-        const { error: policiesCheckError } = await supabase
-          .from('policies')
-          .select('id')
-          .limit(1);
-        if (policiesCheckError?.code === '42P01') {
-          policyTableExists = false;
-          console.log('Policies table does not exist, skipping policy creation');
-        }
-      } catch (e) {
-        policyTableExists = false;
-      }
-      
-      if (policyTableExists) {
-        try {
-          const policyDataBase = {
-            quote_id: quoteId,
-            user_id: user.id,
-            policy_number: `POL-${Math.floor(100000 + Math.random() * 900000)}`,
-            status: 'active',
-            premium_amount: quoteData.calculated_premium || 0,
-            deductible: quoteData.deductible || 0,
-            start_date: quoteData.start_date,
-            end_date: quoteData.end_date,
-            created_at: new Date().toISOString(),
-            activated_at: new Date().toISOString()
-          };
-          
-          const { data: newPolicy, error: policyError } = await supabase
-            .from('policies')
-            .insert([policyDataBase])
-            .select()
-            .single();
-          
-          if (policyError) {
-            console.error('Policy creation error:', policyError);
-          } else {
-            policy = newPolicy;
-          }
-        } catch (policyError) {
-          console.error('Policy creation catch error:', policyError);
-        }
-      }
-      
-      // 3. Update payment record if it exists
-      if (payment && paymentTableExists) {
-        const updateData: any = {
-          payment_status: 'completed',
-          completed_at: new Date().toISOString(),
+      if (!policiesCheckError) {
+        // Convert dates from string to Date object
+        const startDate = new Date(quoteData.start_date);
+        const endDate = new Date(quoteData.end_date);
+        
+        // Policy data with CORRECT field names
+        const policyData = {
+          quote_id: quoteId,
+          user_id: user.id,
+          policy_number: `POL-${Math.floor(100000 + Math.random() * 900000)}`,
+          status: 'active',
+          payment_status: 'paid',
+          premium_amount: quoteData.calculated_premium || 0,
+          coverage_amount: quoteData.shipment_value || 0,
+          deductible: quoteData.deductible || 0,
+          cargo_type: quoteData.cargo_type || 'general',
+          transportation_mode: quoteData.transportation_mode || 'road',
+          origin: quoteData.origin || {},
+          destination: quoteData.destination || {},
+          coverage_start: startDate.toISOString().split('T')[0], // Convert to YYYY-MM-DD
+          coverage_end: endDate.toISOString().split('T')[0], // Convert to YYYY-MM-DD
+          activated_at: new Date().toISOString(),
+          created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         };
         
-        if (policy) {
-          updateData.policy_id = policy.id;
-        }
+        console.log('Creating policy with data:', policyData);
         
-        await supabase
-          .from('payments')
-          .update(updateData)
-          .eq('id', payment.id);
-      }
-      
-      // 4. ALWAYS update quote status (this is the most important part)
-      const { error: quoteUpdateError } = await supabase
-        .from('quotes')
-        .update({
-          payment_status: 'paid',
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', quoteId);
-      
-      if (quoteUpdateError) {
-        console.error('Quote update error:', quoteUpdateError);
-        throw quoteUpdateError;
-      }
-      
-      toast.dismiss();
-      toast.success('Payment successful! Your insurance is now active.');
-      
-      setQuoteData(prev => prev ? { ...prev, payment_status: 'paid' } : null);
-      
-      setTimeout(() => {
-        router.push(`/quotes/${quoteId}?payment=success`);
-      }, 1500);
-      
-    } catch (error: any) {
-      console.error('Payment error:', error);
-      
-      // Try to update payment status to failed if payment record exists
-      try {
-        const supabase = createClient();
-        const { error: checkError } = await supabase
-          .from('payments')
-          .select('id')
-          .limit(1);
+        const { data: newPolicy, error: policyError } = await supabase
+          .from('policies')
+          .insert([policyData])
+          .select()
+          .single();
         
-        if (!checkError) {
-          await supabase
-            .from('payments')
-            .update({
-              payment_status: 'failed',
-              updated_at: new Date().toISOString()
-            })
-            .eq('quote_id', quoteId)
-            .eq('payment_status', 'processing');
+        if (policyError) {
+          console.error('Policy creation error:', policyError);
+          
+          // Try without optional fields if there's an error
+          const simplerPolicyData = {
+            quote_id: quoteId,
+            user_id: user.id,
+            policy_number: `POL-${Math.floor(100000 + Math.random() * 900000)}`,
+            premium_amount: quoteData.calculated_premium || 0,
+            coverage_amount: quoteData.shipment_value || 0,
+            deductible: quoteData.deductible || 0,
+            cargo_type: quoteData.cargo_type || 'general',
+            transportation_mode: quoteData.transportation_mode || 'road',
+            coverage_start: startDate.toISOString().split('T')[0],
+            coverage_end: endDate.toISOString().split('T')[0],
+            created_at: new Date().toISOString()
+          };
+          
+          const { data: simplerPolicy, error: simplerError } = await supabase
+            .from('policies')
+            .insert([simplerPolicyData])
+            .select()
+            .single();
+          
+          if (simplerError) {
+            console.error('Simpler policy creation error:', simplerError);
+          } else {
+            policy = simplerPolicy;
+            console.log('Simpler policy created:', policy);
+          }
+        } else {
+          policy = newPolicy;
+          console.log('Policy created successfully:', policy);
         }
-      } catch (updateError) {
-        console.error('Failed to update payment status:', updateError);
+      } else {
+        console.log('Policies table check error:', policiesCheckError);
       }
-      
-      toast.error('Payment failed. Please try again.');
-      setProcessing(false);
+    } catch (policyError) {
+      console.error('Policy creation catch error:', policyError);
     }
-  };
+    
+    toast.dismiss();
+    toast.success('Payment successful! Your insurance is now active.');
+    
+    setQuoteData(prev => prev ? { ...prev, payment_status: 'paid' } : null);
+    
+    setTimeout(() => {
+      router.push(`/quotes/${quoteId}?payment=success`);
+    }, 1500);
+    
+  } catch (error: any) {
+    console.error('Payment error:', error);
+    
+    toast.error('Payment failed. Please try again.');
+    setProcessing(false);
+  }
+};
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
