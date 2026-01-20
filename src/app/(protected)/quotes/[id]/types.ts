@@ -11,10 +11,10 @@ export interface Document {
   uploaded_at: string;
   original_name: string;
 }
-
+// ./types.ts
 export interface QuoteData {
   id: string;
-  quote_id: string;
+  quote_number: string;
   cargo_type: string;
   shipment_value: number;
   origin: any;
@@ -22,15 +22,26 @@ export interface QuoteData {
   start_date: string;
   end_date: string;
   transportation_mode: string;
-  selected_coverage: string;
-  calculated_premium: number;
-  deductible: number;
-  status: 'submitted' | 'approved' | 'rejected' | 'pending' | 'draft' | 'pay_to_activate' | 'waiting_for_review' | 'documents_under_review' | 'fix_and_resubmit';
-  payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
-  shipper_name: string;
-  reference_number: string;
+  status: string;
+  payment_status: 'pending' | 'paid' | 'failed' | 'refunded'; // Fix type
+  selected_coverage?: 'standard' | 'premium' | 'enterprise';
+  calculated_premium?: number;
+  deductible?: number;
   created_at: string;
-  documents?: Document[]; // Add documents field
+  updated_at: string;
+  user_id?: string;
+  
+  // Add these fields
+  policy_id?: string | null;
+  policy_number?: string | null;
+  policy_status?: string | null;
+  payment_id?: string | null;
+  transaction_id?: string | null;
+  payment_amount?: number;
+  payment_completed_at?: string;
+  coverage_start?: string;
+  coverage_end?: string;
+  premium_amount?: number;
 }
 export interface StatusConfig {
   color: string;

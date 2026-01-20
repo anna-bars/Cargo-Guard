@@ -6,8 +6,6 @@ import { createClient } from '@/lib/supabase/client';
 import DashboardHeader from '@/app/components/dashboard/DashboardHeader';
 import QuoteHeader from './components/QuoteHeader';
 import StatsGrid from './components/StatsGrid';
-import NavigationTabs from './components/NavigationTabs';
-import TabContent from './components/TabContent';
 import QuickActions from './components/QuickActions';
 import CostSummary from './components/CostSummary';
 import SupportCard from './components/SupportCard';
@@ -24,8 +22,6 @@ export default function QuoteDetailsPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [quoteData, setQuoteData] = useState<QuoteData | null>(null);
-  const [documents, setDocuments] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'overview' | 'documents' | 'analytics'>('overview');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const quoteId = params.id as string;
 
@@ -59,6 +55,12 @@ export default function QuoteDetailsPage() {
         return;
       }
       
+      // Ensure payment_status has valid value
+      const validPaymentStatuses = ['pending', 'paid', 'failed', 'refunded'] as const;
+      const paymentStatus = (validPaymentStatuses.includes(quote.payment_status as any) 
+        ? quote.payment_status 
+        : 'pending') as 'pending' | 'paid' | 'failed' | 'refunded';
+      
       // Load policy data if exists
       const { data: policy, error: policyError } = await supabase
         .from('policies')
@@ -78,12 +80,12 @@ export default function QuoteDetailsPage() {
       // Combine all data
       const combinedData: QuoteData = {
         ...quote,
+        payment_status: paymentStatus, // Use validated status
         policy_id: policy?.id || null,
         policy_number: policy?.policy_number || null,
         policy_status: policy?.status || null,
         payment_id: payment?.id || null,
         transaction_id: payment?.transaction_id || null,
-        payment_status: payment?.payment_status || 'pending',
         premium_amount: policy?.premium_amount || quote.calculated_premium,
         coverage_start: policy?.coverage_start || quote.start_date,
         coverage_end: policy?.coverage_end || quote.end_date,
@@ -92,13 +94,6 @@ export default function QuoteDetailsPage() {
       };
       
       setQuoteData(combinedData);
-      
-      // Load documents from quotes.documents field
-      if (quote.documents && Array.isArray(quote.documents)) {
-        setDocuments(quote.documents);
-      } else {
-        setDocuments([]);
-      }
       
     } catch (error) {
       console.error('Error loading quote data:', error);
@@ -113,11 +108,9 @@ export default function QuoteDetailsPage() {
     
     toast.loading('Generating PDF...');
     
-    // Simulate PDF generation
     setTimeout(() => {
       toast.dismiss();
       
-      // Create a simple PDF download
       const pdfContent = `
         CARGO GUARD INSURANCE
         QUOTE SUMMARY
@@ -142,7 +135,6 @@ export default function QuoteDetailsPage() {
         This is a computer-generated quote. For official documents, please contact support.
       `;
       
-      // Create and download PDF
       const blob = new Blob([pdfContent], { type: 'application/pdf' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -167,7 +159,6 @@ export default function QuoteDetailsPage() {
     
     toast.loading('Loading policy...');
     
-    // Simulate loading and redirect to policy page
     setTimeout(() => {
       toast.dismiss();
       router.push(`/policies/${quoteData.policy_id}`);
@@ -177,18 +168,16 @@ export default function QuoteDetailsPage() {
   const handleViewReceipt = () => {
     if (!quoteData) return;
     
-    if (quoteData.payment_status !== 'completed' && quoteData.payment_status !== 'paid') {
+    if (quoteData.payment_status !== 'paid') {
       toast.error('No payment receipt available');
       return;
     }
     
     toast.loading('Loading receipt...');
     
-    // Simulate receipt display
     setTimeout(() => {
       toast.dismiss();
       
-      // Create receipt content
       const receiptContent = `
         CARGO GUARD INSURANCE
         PAYMENT RECEIPT
@@ -213,7 +202,6 @@ export default function QuoteDetailsPage() {
         This is a computer-generated receipt.
       `;
       
-      // Display receipt in a new window
       const receiptWindow = window.open();
       if (receiptWindow) {
         receiptWindow.document.write(`
@@ -255,7 +243,7 @@ export default function QuoteDetailsPage() {
       return;
     }
     
-    if (quoteData.payment_status === 'paid' || quoteData.payment_status === 'completed') {
+    if (quoteData.payment_status === 'paid') {
       toast.error('Payment already completed');
       return;
     }
@@ -290,7 +278,7 @@ export default function QuoteDetailsPage() {
   const handleEditQuote = () => {
     if (!quoteData) return;
     
-    if (quoteData.payment_status === 'paid' || quoteData.payment_status === 'completed') {
+    if (quoteData.payment_status === 'paid') {
       toast.error('Cannot edit paid quotes');
       return;
     }
@@ -301,7 +289,7 @@ export default function QuoteDetailsPage() {
   const handleResubmit = () => {
     if (!quoteData) return;
     
-    if (quoteData.payment_status === 'paid' || quoteData.payment_status === 'completed') {
+    if (quoteData.payment_status === 'paid') {
       toast.error('Cannot resubmit paid quotes');
       return;
     }
@@ -351,30 +339,105 @@ export default function QuoteDetailsPage() {
           <div className="lg:col-span-2 space-y-6">
             <StatsGrid quoteData={quoteData} statusConfig={statusConfig} />
             
-            {/* Remove Analytics tab - show only Overview and Documents */}
-            <NavigationTabs
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-              documentsCount={documents.length}
-              showAnalytics={false} // Disable analytics tab
-            />
-            
-            <TabContent
-              activeTab={activeTab}
-              quoteData={quoteData}
-              statusConfig={statusConfig}
-              documents={documents}
-              onMakePayment={handleMakePayment}
-              onResubmit={handleResubmit}
-              onViewDocuments={() => setActiveTab('documents')}
-              formatCurrency={formatCurrency}
-              formatDate={(dateString) => new Date(dateString).toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric'
-              })}
-              formatDateTime={formatDateTime}
-            />
+            {/* Overview Section - No Tabs */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              {quoteData.payment_status === 'paid' ? (
+                <div className="mb-6 p-4 bg-green-50 rounded-lg border border-green-200">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                      <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-green-800">Payment Completed</h3>
+                      <p className="text-sm text-green-600">
+                        Your policy is now active and coverage has begun.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : quoteData.payment_status === 'pending' && quoteData.status === 'approved' ? (
+                <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                      <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-blue-800">Ready for Payment</h3>
+                      <p className="text-sm text-blue-600">
+                        Your quote is approved. Complete payment to activate your coverage.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="text-sm font-medium text-gray-700 mb-3">Shipment Details</h3>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-xs text-gray-500">Cargo Type</p>
+                      <p className="font-medium text-gray-900">{quoteData.cargo_type}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Transportation</p>
+                      <p className="font-medium text-gray-900">{quoteData.transportation_mode}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Coverage Type</p>
+                      <p className="font-medium text-gray-900">{quoteData.selected_coverage || 'Standard'}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="text-sm font-medium text-gray-700 mb-3">Coverage Timeline</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-xs text-gray-500">Start Date</p>
+                      <p className="font-medium text-gray-900">
+                        {new Date(quoteData.start_date).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric'
+                        })}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">End Date</p>
+                      <p className="font-medium text-gray-900">
+                        {new Date(quoteData.end_date).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="pt-4 border-t border-gray-200">
+                <h3 className="text-sm font-medium text-gray-700 mb-3">Route Information</h3>
+                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                  <div>
+                    <p className="text-xs text-gray-500">Origin</p>
+                    <p className="font-medium text-gray-900">{quoteData.origin?.city || 'Unknown'}</p>
+                  </div>
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                  <div>
+                    <p className="text-xs text-gray-500">Destination</p>
+                    <p className="font-medium text-gray-900">{quoteData.destination?.city || 'Unknown'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="space-y-6">
@@ -386,12 +449,12 @@ export default function QuoteDetailsPage() {
               onViewReceipt={handleViewReceipt}
               onResubmit={handleResubmit}
               onCheckStatus={refreshData}
-              quoteData={quoteData} // Pass quoteData to QuickActions for conditional rendering
+              quoteData={quoteData}
             />
             
             {quoteData.status === 'approved' && (
               <CostSummary
-                calculatedPremium={quoteData.calculated_premium}
+                calculatedPremium={quoteData.calculated_premium || 0}
                 paymentStatus={quoteData.payment_status}
               />
             )}

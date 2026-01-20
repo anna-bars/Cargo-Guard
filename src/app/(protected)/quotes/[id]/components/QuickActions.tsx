@@ -1,22 +1,26 @@
 import { Download, CreditCard, ExternalLink, Upload, RefreshCw, Receipt } from 'lucide-react';
-import { StatusConfig } from '../types';
-
+import { QuoteData, StatusConfig } from '../types';
 interface QuickActionsProps {
-  statusConfig: StatusConfig;
+  statusConfig: any;
+  onDownloadPDF: () => void;
   onMakePayment: () => void;
   onViewPolicy: () => void;
   onViewReceipt: () => void;
   onResubmit: () => void;
   onCheckStatus: () => void;
+  quoteData: QuoteData;
 }
+
 
 export default function QuickActions({
   statusConfig,
+  onDownloadPDF,
   onMakePayment,
   onViewPolicy,
   onViewReceipt,
   onResubmit,
   onCheckStatus,
+  quoteData
 }: QuickActionsProps) {
   return (
     <div className="bg-white/90 rounded-2xl border border-gray-200 p-6">
