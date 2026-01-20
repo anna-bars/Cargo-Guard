@@ -71,6 +71,10 @@ export const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({
   const [hoveredMetricId, setHoveredMetricId] = useState<string | null>(null);
 
   const getMetricColor = (metric: MetricItem, isDecimal: boolean = false) => {
+    if (hoveredMetricId === metric.id) {
+      return metric.arrowDirection === 'up' ? '#669CEE' : '#EE6666';
+    }
+    
     if (hoveredMetricId !== metric.id) {
       return isDecimal ? '#c7c7c7' : 'black';
     }
@@ -85,14 +89,25 @@ export const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({
   };
 
   const getArrowFilter = (metric: MetricItem) => {
-    if (hoveredMetricId !== metric.id) {
-      return '';
+    // Եթե hover է, ապա գույնը փոխել
+    if (hoveredMetricId === metric.id) {
+      if (metric.arrowDirection === 'up') {
+        return 'invert(49%) sepia(57%) saturate(4783%) hue-rotate(192deg) brightness(95%) contrast(95%)'; // Կապույտ
+      } else if (metric.arrowDirection === 'down') {
+        return 'invert(39%) sepia(89%) saturate(1720%) hue-rotate(331deg) brightness(95%) contrast(99%)'; // Կարմիր
+      }
     }
     
+    // Ստատիկ վիճակում - սև
+    return 'invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%)'; // Սև
+  };
+
+  const getTopArrowFilter = (metric: MetricItem) => {
+    // Top arrow-ի համար միշտ գույնը (ոչ սև)
     if (metric.arrowDirection === 'up') {
-      return 'invert(49%) sepia(57%) saturate(4783%) hue-rotate(192deg) brightness(95%) contrast(95%)';
+      return 'invert(49%) sepia(57%) saturate(4783%) hue-rotate(192deg) brightness(95%) contrast(95%)'; // Կապույտ
     } else if (metric.arrowDirection === 'down') {
-      return 'invert(39%) sepia(89%) saturate(1720%) hue-rotate(331deg) brightness(95%) contrast(99%)';
+      return 'invert(39%) sepia(89%) saturate(1720%) hue-rotate(331deg) brightness(95%) contrast(99%)'; // Կարմիր
     }
     
     return '';
@@ -102,7 +117,7 @@ export const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({
     <section className="
       border border-[#d1d1d1]/33 bg-[#fdfdf8cf] rounded-2xl p-4 h-auto
       max-[768px]:p-4
-  max-[768px]:pl-4.5
+      max-[768px]:pl-4.5
     ">
       <div className="flex justify-between items-start mb-2 
         max-[1336px]:items-center
@@ -195,7 +210,8 @@ export const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({
                     style={{ 
                       width: '28px', 
                       marginLeft: '6px',
-                      filter: getArrowFilter(metric)
+                      filter: getArrowFilter(metric), // Ստատիկում սև, hover-ում գույն
+                      transition: 'filter 0.3s ease'
                     }}
                   />
                 ) : null}
@@ -227,28 +243,24 @@ export const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({
                   </span>
                 )}
                 
-                {/* Arrow indicators - սլաները աջից */}
-                {metric.hasArrow && metric.arrowDirection === 'up' && (
-                  <span className="absolute -right-5 top-3 text-[12px]">
+                {/* Arrow indicators - միշտ օգտագործել top-arrow.svg, բայց պտտել երբ down է */}
+                {metric.hasArrow && (
+                  <span 
+                    className="absolute -right-5 top-3 text-[12px]"
+                    style={{
+                      transform: metric.arrowDirection === 'down' ? 'rotateZ(180deg)' : 'none'
+                    }}
+                  >
                     <img 
                       src="/dashboard/top-arrow.svg" 
-                      alt="Up arrow" 
-                      className="transition-all duration-300 group-hover:-translate-y-0.5"
+                      alt={metric.arrowDirection === 'up' ? 'Up arrow' : 'Down arrow'} 
+                      className={`transition-all duration-300 ${
+                        metric.arrowDirection === 'up' 
+                          ? 'group-hover:-translate-y-0.5' 
+                          : 'group-hover:translate-y-0.5'
+                      }`}
                       style={{ 
-                        filter: getArrowFilter(metric)
-                      }}
-                    />
-                  </span>
-                )}
-                
-                {metric.hasArrow && metric.arrowDirection === 'down' && (
-                  <span className="absolute -right-5 top-3 text-[12px]">
-                    <img 
-                      src="/dashboard/bottom-arrow.svg" 
-                      alt="Down arrow" 
-                      className="transition-all duration-300 group-hover:translate-y-0.5"
-                      style={{ 
-                        filter: getArrowFilter(metric)
+                        filter: getTopArrowFilter(metric), // Միշտ գույնով
                       }}
                     />
                   </span>
