@@ -8,6 +8,10 @@ interface WelcomeWidgetProps {
 export const WelcomeWidget: React.FC<WelcomeWidgetProps> = ({ 
   userName = "Lucas" 
 }) => {
+  const handleArrowClick = () => {
+    window.location.href = "http://localhost:3001/quotes/new/shipping";
+  };
+
   return (
     <div className="
       relative rounded-2xl overflow-hidden w-full transition-shadow duration-300 
@@ -75,17 +79,23 @@ export const WelcomeWidget: React.FC<WelcomeWidgetProps> = ({
             Get Your New Quote Instantly
           </h3>
 
-          <img 
-            src="https://c.animaapp.com/mjiggi0jSqvoj5/img/group-84.png" 
-            alt="Arrow" 
+          <button 
+            onClick={handleArrowClick}
             className="
               outline-[4px] outline-[#f4f4f1] rounded-full 
               w-[42px] h-[42px] lg:w-10 lg:h-10 md:w-9 md:h-9 sm:w-8 sm:h-8
-              hover:scale-102 transition-transform duration-300
+              hover:scale-102 transition-transform duration-300 cursor-pointer
               max-[1024px]:w-9 max-[1024px]:h-9
               max-[480px]:w-8 max-[480px]:h-8
+              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white
             "
-          />
+          >
+            <img 
+              src="https://c.animaapp.com/mjiggi0jSqvoj5/img/group-84.png" 
+              alt="Arrow" 
+              className="w-full h-full"
+            />
+          </button>
         </div>
       </div>
     </div>
