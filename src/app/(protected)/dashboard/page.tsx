@@ -295,135 +295,152 @@ export default function DashboardPage() {
   }, [user])
 
   // Status config ֆունկցիա
-  const getStatusConfig = (quote: any) => {
-    const calculateDaysText = (expirationTime: string) => {
-      if (!expirationTime) return '';
-      
-      const now = new Date();
-      const expiration = new Date(expirationTime);
-      const diffTime = expiration.getTime() - now.getTime();
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      
-      if (diffDays > 0) {
-        return ` (${diffDays} day${diffDays !== 1 ? 's' : ''} left)`;
-      } else if (diffDays < 0) {
-        const daysAgo = Math.abs(diffDays);
-        return ` (${daysAgo} day${daysAgo !== 1 ? 's' : ''} ago)`;
-      } else {
-        return ' (Today)';
-      }
-    };
-
-    const isPaid = quote.payment_status === 'paid';
-    const isExpired = quote.expiration_time && new Date(quote.expiration_time) < new Date();
-    const daysText = quote.expiration_time ? calculateDaysText(quote.expiration_time) : '';
-
-    const statusMap: Record<string, any> = {
-      'draft': { 
-        text: 'Continue Quote', 
-        color: 'bg-gray-100', 
-        dot: 'bg-gray-500', 
-        textColor: 'text-gray-700',
-        buttonText: 'Continue Quote',
-        buttonVariant: 'primary' as const
-      },
-      'submitted': { 
-        text: 'Waiting for review', 
-        color: 'bg-blue-50', 
-        dot: 'bg-blue-500', 
-        textColor: 'text-blue-700',
-        buttonText: 'View Details',
-        buttonVariant: 'secondary' as const
-      },
-      'under_review': { 
-        text: 'Documents under review', 
-        color: 'bg-amber-50', 
-        dot: 'bg-amber-500', 
-        textColor: 'text-amber-700',
-        buttonText: 'View Details',
-        buttonVariant: 'secondary' as const
-      },
-      'approved': { 
-        text: isPaid ? 'Approved & Paid' : 'Pay to Activate', 
-        color: isPaid ? 'bg-emerald-50' : 'bg-amber-50', 
-        dot: isPaid ? 'bg-emerald-500' : 'bg-amber-500', 
-        textColor: isPaid ? 'text-emerald-700' : 'text-amber-700',
-        buttonText: isPaid ? 'View Policy' : 'Pay Now',
-        buttonVariant: isPaid ? 'success' as const : 'primary' as const
-      },
-      'rejected': { 
-        text: 'Rejected', 
-        color: 'bg-rose-50', 
-        dot: 'bg-rose-500', 
-        textColor: 'text-rose-700',
-        buttonText: 'View Details',
-        buttonVariant: 'secondary' as const
-      },
-      'pay_to_activate': { 
-        text: 'Pay to Activate', 
-        color: 'bg-amber-50', 
-        dot: 'bg-amber-500', 
-        textColor: 'text-amber-700',
-        buttonText: 'Pay Now',
-        buttonVariant: 'primary' as const
-      },
-      'waiting_for_review': { 
-        text: 'Waiting for Review', 
-        color: 'bg-cyan-50', 
-        dot: 'bg-cyan-500', 
-        textColor: 'text-cyan-700',
-        buttonText: 'View Details',
-        buttonVariant: 'secondary' as const
-      },
-      'documents_under_review': { 
-        text: 'Documents Under Review', 
-        color: 'bg-indigo-50', 
-        dot: 'bg-indigo-500', 
-        textColor: 'text-indigo-700',
-        buttonText: 'View Details',
-        buttonVariant: 'secondary' as const
-      },
-      'fix_and_resubmit': { 
-        text: 'Fix & Resubmit', 
-        color: 'bg-amber-50', 
-        dot: 'bg-amber-500', 
-        textColor: 'text-amber-700',
-        buttonText: 'View Details',
-        buttonVariant: 'secondary' as const
-      },
-      'expired': { 
-        text: 'Expired', 
-        color: 'bg-gray-100', 
-        dot: 'bg-gray-400', 
-        textColor: 'text-gray-600',
-        buttonText: 'View Details',
-        buttonVariant: 'secondary' as const
-      }
-    };
-
-    if (isExpired) {
-      return {
-        text: 'Expired' + daysText,
-        color: 'bg-gray-100',
-        dot: 'bg-gray-400',
-        textColor: 'text-gray-600',
-        buttonText: 'View Details',
-        buttonVariant: 'secondary' as const,
-        isActuallyExpired: true
-      };
-    }
-
-    const baseConfig = statusMap[quote.status] || statusMap['draft'];
+const getStatusConfig = (quote: any) => {
+  const calculateDaysText = (expirationTime: string) => {
+    if (!expirationTime) return '';
     
-    if (['approved', 'pay_to_activate', 'submitted'].includes(quote.status) && quote.expiration_time) {
-      return {
-        ...baseConfig,
-        text: baseConfig.text + daysText
-      };
-    }
+    const now = new Date();
+    const expiration = new Date(expirationTime);
+    const diffTime = expiration.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
-    return baseConfig;
+    if (diffDays > 0) {
+      return ` (${diffDays} day${diffDays !== 1 ? 's' : ''} left)`;
+    } else if (diffDays < 0) {
+      const daysAgo = Math.abs(diffDays);
+      return ` (${daysAgo} day${daysAgo !== 1 ? 's' : ''} ago)`;
+    } else {
+      return ' (Today)';
+    }
   };
+
+  const isPaid = quote.payment_status === 'paid';
+  const isExpired = quote.expiration_time && new Date(quote.expiration_time) < new Date();
+  const daysText = quote.expiration_time ? calculateDaysText(quote.expiration_time) : '';
+
+  // Եթե quote-ը արդեն approved և paid է, ապա հաշվի չառնել expiration-ը
+  const isApprovedAndPaid = quote.status === 'approved' && isPaid;
+  
+  const statusMap: Record<string, any> = {
+    'draft': { 
+      text: 'Continue Quote', 
+      color: 'bg-gray-100', 
+      dot: 'bg-gray-500', 
+      textColor: 'text-gray-700',
+      buttonText: 'Continue Quote',
+      buttonVariant: 'primary' as const
+    },
+    'submitted': { 
+      text: 'Waiting for review', 
+      color: 'bg-blue-50', 
+      dot: 'bg-blue-500', 
+      textColor: 'text-blue-700',
+      buttonText: 'View Details',
+      buttonVariant: 'secondary' as const
+    },
+    'under_review': { 
+      text: 'Documents under review', 
+      color: 'bg-amber-50', 
+      dot: 'bg-amber-500', 
+      textColor: 'text-amber-700',
+      buttonText: 'View Details',
+      buttonVariant: 'secondary' as const
+    },
+    'approved': { 
+      text: isPaid ? 'Approved & Paid' : 'Pay to Activate', 
+      color: isPaid ? 'bg-emerald-50' : 'bg-amber-50', 
+      dot: isPaid ? 'bg-emerald-500' : 'bg-amber-500', 
+      textColor: isPaid ? 'text-emerald-700' : 'text-amber-700',
+      buttonText: isPaid ? 'View Policy' : 'Pay Now',
+      buttonVariant: isPaid ? 'success' as const : 'primary' as const
+    },
+    'rejected': { 
+      text: 'Rejected', 
+      color: 'bg-rose-50', 
+      dot: 'bg-rose-500', 
+      textColor: 'text-rose-700',
+      buttonText: 'View Details',
+      buttonVariant: 'secondary' as const
+    },
+    'pay_to_activate': { 
+      text: 'Pay to Activate', 
+      color: 'bg-amber-50', 
+      dot: 'bg-amber-500', 
+      textColor: 'text-amber-700',
+      buttonText: 'Pay Now',
+      buttonVariant: 'primary' as const
+    },
+    'waiting_for_review': { 
+      text: 'Waiting for Review', 
+      color: 'bg-cyan-50', 
+      dot: 'bg-cyan-500', 
+      textColor: 'text-cyan-700',
+      buttonText: 'View Details',
+      buttonVariant: 'secondary' as const
+    },
+    'documents_under_review': { 
+      text: 'Documents Under Review', 
+      color: 'bg-indigo-50', 
+      dot: 'bg-indigo-500', 
+      textColor: 'text-indigo-700',
+      buttonText: 'View Details',
+      buttonVariant: 'secondary' as const
+    },
+    'fix_and_resubmit': { 
+      text: 'Fix & Resubmit', 
+      color: 'bg-amber-50', 
+      dot: 'bg-amber-500', 
+      textColor: 'text-amber-700',
+      buttonText: 'View Details',
+      buttonVariant: 'secondary' as const
+    },
+    'expired': { 
+      text: 'Expired', 
+      color: 'bg-gray-100', 
+      dot: 'bg-gray-400', 
+      textColor: 'text-gray-600',
+      buttonText: 'View Details',
+      buttonVariant: 'secondary' as const
+    }
+  };
+
+  // 1. Ստուգենք, արդյոք quote-ն expired է
+  if (isExpired) {
+    return {
+      text: 'Expired' + daysText,
+      color: 'bg-gray-100',
+      dot: 'bg-gray-400',
+      textColor: 'text-gray-600',
+      buttonText: 'View Details',
+      buttonVariant: 'secondary' as const,
+      isActuallyExpired: true
+    };
+  }
+
+  // 2. Եթե արդեն approved և paid է, ապա պարզապես ցույց տալ "Approved & Paid"
+  if (isApprovedAndPaid) {
+    return {
+      text: 'Approved & Paid',
+      color: 'bg-emerald-50',
+      dot: 'bg-emerald-500',
+      textColor: 'text-emerald-700',
+      buttonText: 'View Policy',
+      buttonVariant: 'success' as const
+    };
+  }
+
+  const baseConfig = statusMap[quote.status] || statusMap['draft'];
+  
+  // 3. Մնացած դեպքերում ավելացնել ժամանակ, եթե կա
+  if (['approved', 'pay_to_activate', 'submitted'].includes(quote.status) && quote.expiration_time && !isApprovedAndPaid) {
+    return {
+      ...baseConfig,
+      text: baseConfig.text + daysText
+    };
+  }
+  
+  return baseConfig;
+};
 
   const formatQuoteId = (id: string) => {
     if (id.startsWith('Q-')) {
