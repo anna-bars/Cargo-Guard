@@ -696,7 +696,7 @@ const buttonClasses: Record<string, string> = {
 
 export const renderButton = (button: TableButton | undefined, row: any) => {
   const variant = button?.variant || 'primary';
-  const baseClasses = 'px-4 py-1.5 rounded-[12px] text-xs font-semibold transition-all duration-300 flex items-center gap-1 whitespace-nowrap';
+  const baseClasses = 'w-[65%] flex justify-center px-4 py-1.5 rounded-[8px] text-[13px] font-semibold transition-all duration-300 flex items-center gap-1 whitespace-nowrap';
   
   return (
     <button
