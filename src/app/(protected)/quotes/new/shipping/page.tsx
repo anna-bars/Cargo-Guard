@@ -102,65 +102,69 @@ export default function ShippingValuePage() {
     return () => clearTimeout(timeoutId);
   }, [cargoType, otherCargoType, shipmentValue, startDate, endDate, transportationMode, origin, destination]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!isFormComplete) {
-      alert('Please complete all required fields');
-      return;
-    }
+// Shipping page-ում handleSubmit ֆունկցիայում
+// Shipping page-ում handleSubmit ֆունկցիայի մեջ
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  
+  if (!isFormComplete) {
+    alert('Please complete all required fields');
+    return;
+  }
 
-    if (!user) {
-      alert('Please login to create a quote');
-      router.push('/login');
-      return;
-    }
+  if (!user) {
+    alert('Please login to create a quote');
+    router.push('/login');
+    return;
+  }
 
-    setIsSubmitting(true);
+  setIsSubmitting(true);
 
-    try {
-      // Prepare data for premium calculation
-      const premiumInput = {
-        cargoType: cargoType === 'other' ? otherCargoType : cargoType,
-        shipmentValue: parseFloat(shipmentValue),
-        transportationMode,
-        coverageType: 'premium', // Default to premium for calculation
-        startDate,
-        endDate
-      };
+  try {
+    // Prepare data for premium calculation
+    const premiumInput = {
+      cargoType: cargoType === 'other' ? otherCargoType : cargoType,
+      shipmentValue: parseFloat(shipmentValue),
+      transportationMode,
+      coverageType: 'premium', // Default to premium for calculation
+      startDate,
+      endDate
+    };
 
-      // Calculate premium (we'll recalculate on insurance page)
-      const premiumResult = PremiumCalculator.calculate(premiumInput);
+    // Calculate premium
+    const premiumResult = PremiumCalculator.calculate(premiumInput);
 
-      // Create quote in database
-      const quoteData = {
-        user_id: user.id,
-        cargo_type: premiumInput.cargoType,
-        shipment_value: premiumInput.shipmentValue,
-        origin: origin || {},
-        destination: destination || {},
-        start_date: startDate,
-        end_date: endDate,
-        transportation_mode: transportationMode as 'sea' | 'air' | 'road',
-        selected_coverage: 'premium' as 'premium', // Default
-        calculated_premium: premiumResult.basePremium,
-        deductible: premiumResult.deductible,
-        quote_expires_at: calculateExpirationDate()
-      };
+    // Create quote in database with correct type
+    const quoteData = {
+      user_id: user.id,
+      cargo_type: premiumInput.cargoType,
+      shipment_value: premiumInput.shipmentValue,
+      origin: origin || {},
+      destination: destination || {},
+      start_date: startDate,
+      end_date: endDate,
+      transportation_mode: transportationMode as 'sea' | 'air' | 'road',
+      selected_coverage: 'premium' as 'premium',
+      calculated_premium: premiumResult.basePremium,
+      deductible: premiumResult.deductible,
+      quote_expires_at: calculateExpirationDate(),
+      // ✅ Օգտագործել correct status type
+      status: 'submitted' as const, // Use 'as const' for literal type
+      payment_status: 'pending' as const
+    };
 
-      const quote = await quotes.create(quoteData);
+    const quote = await quotes.create(quoteData);
 
-      // Navigate to insurance page with quote ID
-      router.push(`/quotes/new/insurance?quote_id=${quote.id}`);
+    // Navigate to insurance page with quote ID
+    router.push(`/quotes/new/insurance?quote_id=${quote.id}`);
 
-    } catch (error) {
-      console.error('Error creating quote:', error);
-      alert('Failed to create quote. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
+  } catch (error) {
+    console.error('Error creating quote:', error);
+    alert('Failed to create quote. Please try again.');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
   const handleCancel = () => {
     if (window.confirm('Are you sure you want to cancel? All entered data will be lost.')) {
       localStorage.removeItem('quote_draft');
