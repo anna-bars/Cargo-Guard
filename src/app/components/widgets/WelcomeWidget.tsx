@@ -22,13 +22,22 @@ export const WelcomeWidget: React.FC<WelcomeWidgetProps> = ({
       max-[768px]:flex-shrink-0 max-[768px]:w-[100%] max-[768px]:min-h-[240px] 
       max-[768px]:max-h-[280px]
       max-[480px]:w-[100%] max-[480px]:min-h-[100%] max-[480px]:max-h-[100%]
-      group  {/* Ավելացնենք group-ը այստեղ */}
+      hover:shadow-xl hover:shadow-blue-500/10
+      transition-all duration-500
+      cursor-pointer
+      group
     ">
       <img 
         src="https://c.animaapp.com/mjiggi0jSqvoj5/img/frame-76.png" 
         alt="Background" 
-        className="absolute inset-0 w-full h-full object-cover"
+        className="
+          absolute inset-0 w-full h-full object-cover
+          transition-transform duration-700 ease-out
+          group-hover:scale-105
+          transform-gpu
+        "
       />
+      
       <div className="max-[480px]:min-h-[240px] relative z-10 p-4 h-full flex flex-col justify-between
         max-[1024px]:p-3 max-[1024px]:min-h-[240px] max-[1280px]:min-h-[240px]
         max-[480px]:p-4
@@ -85,7 +94,7 @@ export const WelcomeWidget: React.FC<WelcomeWidgetProps> = ({
             className="
               outline-[4px] outline-[#f4f4f1] rounded-full 
               w-[42px] h-[42px] lg:w-10 lg:h-10 md:w-9 md:h-9 sm:w-8 sm:h-8
-              hover:scale-102 transition-transform duration-300 cursor-pointer
+              hover:scale-105 transition-transform duration-300 cursor-pointer
               max-[1024px]:w-9 max-[1024px]:h-9
               max-[480px]:w-8 max-[480px]:h-8
               focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white
@@ -100,16 +109,16 @@ export const WelcomeWidget: React.FC<WelcomeWidgetProps> = ({
               className="w-full h-full"
             />
             
-            {/* Այժմ օգտագործում ենք group-hover վիդգեթի վրա hover անելու համար */}
+            {/* Group hover էֆֆեկտ */}
             <div className="
               absolute inset-0 rounded-full
-              bg-white/0 group-hover:bg-white/10
+              bg-white/0 group-hover:bg-white/20
               transition-all duration-300
             " />
             
             <div className="
               absolute inset-[-2px] rounded-full
-              border-2 border-white/0 group-hover:border-white/30
+              border-2 border-white/0 group-hover:border-white/40
               group-hover:animate-ping
               transition-all duration-300
               pointer-events-none
