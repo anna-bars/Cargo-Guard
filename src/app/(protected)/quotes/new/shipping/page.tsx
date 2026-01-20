@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -7,10 +7,10 @@ import DashboardHeader from '@/app/components/dashboard/DashboardHeader';
 import CustomDatePicker from './components/CustomDatePicker';
 import LocationIQAutocomplete from './components/LocationIQAutocomplete';
 import MobileTipsCard from './components/MobileTipsCard';
-import MobileStepIndicator from './components/MobileStepIndicator';
 import CargoTypeSelector from './components/CargoTypeSelector';
-import { LocationData } from './components/LocationIQAutocomplete';
 import { useUser } from '@/app/context/UserContext';
+import { PremiumCalculator } from '@/lib/services/premiumCalculator';
+import { quotes } from '@/lib/supabase/quotes';
 
 export default function ShippingValuePage() {
   const router = useRouter();
@@ -18,35 +18,34 @@ export default function ShippingValuePage() {
   
   const [cargoType, setCargoType] = useState('');
   const [shipmentValue, setShipmentValue] = useState('');
-  const [origin, setOrigin] = useState<LocationData | null>(null);
-  const [destination, setDestination] = useState<LocationData | null>(null);
+  const [origin, setOrigin] = useState<any>(null);
+  const [destination, setDestination] = useState<any>(null);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [transportationMode, setTransportationMode] = useState('');
-  const [step, setStep] = useState(1);
   const [otherCargoType, setOtherCargoType] = useState('');
-  const [quoteId, setQuoteId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // Փոխել true-ից false
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const today = new Date().toISOString().split('T')[0];
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
 
+  // Calculate quote expiration (72 hours from now)
+  const calculateExpirationDate = () => {
+    const expiration = new Date();
+    expiration.setHours(expiration.getHours() + 72);
+    return expiration.toISOString();
+  };
+
   const transportModes = [
-    { id: 'sea', name: 'Sea Freight', icon: Ship, color: 'blue' },
-    { id: 'air', name: 'Air Freight', icon: Plane, color: 'emerald' },
-    { id: 'road', name: 'Road Freight', icon: Truck, color: 'amber' },
+    { id: 'sea', name: 'Sea Freight', icon: Ship, description: '20-40 days' },
+    { id: 'air', name: 'Air Freight', icon: Plane, description: '2-7 days' },
+    { id: 'road', name: 'Road Freight', icon: Truck, description: '3-10 days' },
   ];
 
-  const steps = [
-    { id: 1, name: 'Shipment Details', status: 'current' },
-    { id: 2, name: 'Coverage Options', status: 'upcoming' },
-    { id: 3, name: 'Quote Review', status: 'upcoming' },
-  ];
-
-  // Load draft from localStorage on component mount
+  // Load draft from localStorage
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -63,17 +62,12 @@ export default function ShippingValuePage() {
           setTransportationMode(draft.transportationMode || '');
           setOrigin(draft.origin || null);
           setDestination(draft.destination || null);
-          setQuoteId(draft.quoteId || `temp-${Date.now()}`);
         } else {
-          // Create new draft ID
-          setQuoteId(`temp-${Date.now()}`);
           setStartDate(today);
           setEndDate(tomorrowFormatted);
         }
       } catch (error) {
-        console.error('Error loading draft from localStorage:', error);
-        // Create new draft ID as fallback
-        setQuoteId(`temp-${Date.now()}`);
+        console.error('Error loading draft:', error);
         setStartDate(today);
         setEndDate(tomorrowFormatted);
       }
@@ -82,13 +76,12 @@ export default function ShippingValuePage() {
     loadDraftFromLocalStorage();
   }, []);
 
-  // Auto-save to localStorage with debounce
+  // Auto-save to localStorage
   useEffect(() => {
-    if (typeof window === 'undefined' || !quoteId) return;
+    if (typeof window === 'undefined') return;
 
     const timeoutId = setTimeout(() => {
       const draftData = {
-        quoteId,
         cargoType,
         otherCargoType,
         shipmentValue,
@@ -102,57 +95,75 @@ export default function ShippingValuePage() {
       
       localStorage.setItem('quote_draft', JSON.stringify(draftData));
       setIsSaving(false);
-    }, 1000); // Debounce 1 second
+    }, 1000);
 
     setIsSaving(true);
 
     return () => clearTimeout(timeoutId);
-  }, [cargoType, otherCargoType, shipmentValue, startDate, endDate, transportationMode, origin, destination, quoteId]);
+  }, [cargoType, otherCargoType, shipmentValue, startDate, endDate, transportationMode, origin, destination]);
 
-const handleSubmit = (e: React.FormEvent) => {
-  e.preventDefault();
-  
-  if (!isFormComplete) {
-    alert('Խնդրում ենք լրացնել բոլոր պարտադիր դաշտերը');
-    return;
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!isFormComplete) {
+      alert('Please complete all required fields');
+      return;
+    }
 
-  // Prepare the data to pass to next page
-  const quoteData = {
-    quoteId: quoteId || `q-${Date.now()}`,
-    cargoType: cargoType === 'other' ? otherCargoType : cargoType,
-    shipmentValue: parseFloat(shipmentValue),
-    origin,
-    destination,
-    startDate,
-    endDate,
-    transportationMode
+    if (!user) {
+      alert('Please login to create a quote');
+      router.push('/login');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Prepare data for premium calculation
+      const premiumInput = {
+        cargoType: cargoType === 'other' ? otherCargoType : cargoType,
+        shipmentValue: parseFloat(shipmentValue),
+        transportationMode,
+        coverageType: 'premium', // Default to premium for calculation
+        startDate,
+        endDate
+      };
+
+      // Calculate premium (we'll recalculate on insurance page)
+      const premiumResult = PremiumCalculator.calculate(premiumInput);
+
+      // Create quote in database
+      const quoteData = {
+        user_id: user.id,
+        cargo_type: premiumInput.cargoType,
+        shipment_value: premiumInput.shipmentValue,
+        origin: origin || {},
+        destination: destination || {},
+        start_date: startDate,
+        end_date: endDate,
+        transportation_mode: transportationMode as 'sea' | 'air' | 'road',
+        selected_coverage: 'premium' as 'premium', // Default
+        calculated_premium: premiumResult.basePremium,
+        deductible: premiumResult.deductible,
+        quote_expires_at: calculateExpirationDate()
+      };
+
+      const quote = await quotes.create(quoteData);
+
+      // Navigate to insurance page with quote ID
+      router.push(`/quotes/new/insurance?quote_id=${quote.id}`);
+
+    } catch (error) {
+      console.error('Error creating quote:', error);
+      alert('Failed to create quote. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  // Save to localStorage for the next page
-  localStorage.setItem('quote_submission', JSON.stringify(quoteData));
-  
-  // Navigate to insurance page
-  router.push(`/quotes/new/insurance?quote_id=${quoteData.quoteId}`);
-};
   const handleCancel = () => {
-    if (window.confirm('Համոզված ե՞ք, որ ցանկանում եք չեղարկել: Բոլոր մուտքագրված տվյալները կկորչեն։')) {
-      // Clear localStorage
+    if (window.confirm('Are you sure you want to cancel? All entered data will be lost.')) {
       localStorage.removeItem('quote_draft');
-      
-      // Reset form
-      setCargoType('');
-      setOtherCargoType('');
-      setShipmentValue('');
-      setOrigin(null);
-      setDestination(null);
-      setStartDate('');
-      setEndDate('');
-      setTransportationMode('');
-      setQuoteId(null);
-      setStep(1);
-      
-      // Navigate back
       router.push('/quotes');
     }
   };
@@ -171,26 +182,12 @@ const handleSubmit = (e: React.FormEvent) => {
   const completionPercentage = Math.round((completedFields / totalFields) * 100);
   const isFormComplete = completedFields === totalFields;
 
-  // Remove loading state since we're not waiting for API
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        <DashboardHeader userEmail={user?.email} />
-        <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <DashboardHeader userEmail={user?.email} />
       
       <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 pb-6 md:pb-8">
-        {/* Desktop Breadcrumb */}
+        {/* Header */}
         <div className="hidden md:block mb-8">
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
             <button 
@@ -202,46 +199,6 @@ const handleSubmit = (e: React.FormEvent) => {
             </button>
             <span>/</span>
             <span className="text-gray-900 font-medium">New Quote</span>
-          </div>
-          
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-2xl font-bold text-gray-900">Create Shipping Insurance Quote</h1>
-              <span className="text-sm text-gray-500">Step {step} of 3</span>
-            </div>
-            
-            <div className="flex items-center">
-              {steps.map((stepItem, index) => (
-                <div key={stepItem.id} className="flex items-center">
-                  <div className={`
-                    flex items-center justify-center w-8 h-8 rounded-full border-2
-                    ${stepItem.id === step 
-                      ? 'border-blue-600 bg-blue-600 text-white' 
-                      : stepItem.id < step
-                      ? 'border-green-500 bg-green-500 text-white'
-                      : 'border-gray-300 bg-white text-gray-400'
-                    }
-                  `}>
-                    {stepItem.id < step ? (
-                      <CheckCircle className="w-4 h-4" />
-                    ) : (
-                      stepItem.id
-                    )}
-                  </div>
-                  <span className={`ml-2 text-sm font-medium ${
-                    stepItem.id === step ? 'text-blue-600' : 
-                    stepItem.id < step ? 'text-green-600' : 'text-gray-500'
-                  }`}>
-                    {stepItem.name}
-                  </span>
-                  {index < steps.length - 1 && (
-                    <div className={`h-0.5 w-16 mx-4 ${
-                      stepItem.id < step ? 'bg-green-500' : 'bg-gray-300'
-                    }`} />
-                  )}
-                </div>
-              ))}
-            </div>
           </div>
         </div>
         
@@ -259,16 +216,12 @@ const handleSubmit = (e: React.FormEvent) => {
           )}
         </div> 
 
-        {/* Mobile Header */}
-        <MobileStepIndicator currentStep={step} />
         <MobileTipsCard completionPercentage={completionPercentage} />
         
-
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_0.02fr_0.7fr]">
           <div className="lg:col-span-2 w-full lg:w-[99%]">
             <div className="bg-[#FFFFFE] rounded-2xl shadow-lg border border-gray-200 p-4 md:p-8">
               <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
-                {/* Cargo Type Section */}
                 <CargoTypeSelector 
                   cargoType={cargoType}
                   otherCargoType={otherCargoType}
@@ -290,7 +243,7 @@ const handleSubmit = (e: React.FormEvent) => {
                       value={shipmentValue}
                       onChange={(e) => setShipmentValue(e.target.value)}
                       placeholder="Enter total value"
-                      className="pl-10 w-full h-12 px-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-colors text-sm md:text-base placeholder:text-sm md:placeholder:text-base"
+                      className="pl-10 w-full h-12 px-4 rounded-xl border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none transition-colors text-sm md:text-base"
                       required
                       min="0"
                       step="0.01"
@@ -368,11 +321,6 @@ const handleSubmit = (e: React.FormEvent) => {
                     <div className="flex flex-col sm:flex-row sm:justify-between gap-3">
                       {transportModes.map((mode) => {
                         const Icon = mode.icon;
-                        const transportDescriptions = {
-                          'sea': '20-40 days',
-                          'air': '2-7 days', 
-                          'road': '3-10 days'
-                        };
                         
                         return (
                           <button
@@ -381,7 +329,7 @@ const handleSubmit = (e: React.FormEvent) => {
                             onClick={() => setTransportationMode(mode.id)}
                             className={`
                               w-full sm:w-[32.7%] relative p-4 rounded-xl border-2 transition-all duration-200
-                              flex flex-col sm:flex-col items-center gap-3 md:gap-4 mb-0
+                              flex flex-col items-center gap-3 md:gap-4
                               ${transportationMode === mode.id
                                 ? 'border-blue-500 bg-blue-50'
                                 : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
@@ -400,7 +348,7 @@ const handleSubmit = (e: React.FormEvent) => {
                             <div className="flex-1 text-center">
                               <div className="font-medium text-gray-900 text-sm md:text-base">{mode.name}</div>
                               <div className="text-xs md:text-sm text-gray-500">
-                                {transportDescriptions[mode.id as keyof typeof transportDescriptions]}
+                                {mode.description}
                               </div>
                             </div>
                             {transportationMode === mode.id && (
@@ -435,10 +383,17 @@ const handleSubmit = (e: React.FormEvent) => {
                     </button>
                     <button
                       type="submit"
-                      disabled={!isFormComplete}
+                      disabled={!isFormComplete || isSubmitting}
                       className="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl text-sm md:text-base order-1 sm:order-2"
                     >
-                      Continue to Coverage Options
+                      {isSubmitting ? (
+                        <>
+                          <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></span>
+                          Creating Quote...
+                        </>
+                      ) : (
+                        'Continue to Coverage Options'
+                      )}
                     </button>
                   </div>
                 </div>
@@ -446,7 +401,7 @@ const handleSubmit = (e: React.FormEvent) => {
             </div>
           </div>
 
-          {/* Right Column - Tips & Help (Desktop only) */}
+          {/* Right Column - Tips & Help */}
           <div className="hidden lg:block space-y-6">
             <div className="bg-[url('/quotes/new/shipping-wd-back.png')] bg-cover flex flex-col gap-8 rounded-2xl shadow-lg p-6 text-white">
               <div className="flex items-center gap-2 mb-4">
@@ -504,20 +459,6 @@ const handleSubmit = (e: React.FormEvent) => {
               </button>
             </div>
           </div>
-        </div>
-
-        {/* Mobile Help Card (Fixed at bottom) */}
-        <div className="lg:hidden mt-6 bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-          <div className="flex items-center gap-2 mb-3">
-            <AlertCircle className="w-5 h-5 text-amber-500" />
-            <h3 className="text-lg font-semibold text-gray-900">Need Help?</h3>
-          </div>
-          <p className="text-sm text-gray-600 mb-4">
-            Our team is here to assist you with any questions about your shipment insurance.
-          </p>
-          <button className="w-full py-3 rounded-xl border-2 border-blue-600 text-blue-600 font-medium hover:bg-blue-50 transition-colors">
-            Contact Support
-          </button>
         </div>
       </div>
     </div>

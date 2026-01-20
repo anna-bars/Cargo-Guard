@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -6,10 +6,9 @@ import {
   ArrowLeft, 
   CheckCircle, 
   ChevronRight, 
-  CreditCard,
+  Shield,
   Download,
   HelpCircle,
-  Shield,
   AlertCircle,
   Zap,
   Clock,
@@ -23,28 +22,26 @@ import {
   Phone
 } from 'lucide-react';
 import DashboardHeader from '@/app/components/dashboard/DashboardHeader';
+import { useUser } from '@/app/context/UserContext';
+import { quotes } from '@/lib/supabase/quotes';
+import { PremiumCalculator } from '@/lib/services/premiumCalculator';
 
 interface QuoteData {
-  quoteId: string;
-  cargoType: string;
-  shipmentValue: number;
-  origin: {
-    name: string;
-    city: string;
-    country: string;
-  };
-  destination: {
-    name: string;
-    city: string;
-    country: string;
-  };
-  startDate: string;
-  endDate: string;
-  transportationMode: string;
+  id: string;
+  quote_number: string;
+  cargo_type: string;
+  shipment_value: number;
+  origin: any;
+  destination: any;
+  start_date: string;
+  end_date: string;
+  transportation_mode: string;
+  status: string;
+  payment_status: string;
 }
 
 interface CoverageOption {
-  id: string;
+  id: 'standard' | 'premium' | 'enterprise';
   name: string;
   description: string;
   premium: number;
@@ -53,197 +50,100 @@ interface CoverageOption {
   features: string[];
   color: string;
   badge: string;
-  icon: React.ReactNode;
 }
 
 export default function InsuranceQuotePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { user } = useUser();
+  
+  const quoteId = searchParams.get('quote_id');
+  
   const [quoteData, setQuoteData] = useState<QuoteData | null>(null);
-  const [selectedCoverage, setSelectedCoverage] = useState<string>('premium');
+  const [selectedCoverage, setSelectedCoverage] = useState<'standard' | 'premium' | 'enterprise'>('premium');
   const [loading, setLoading] = useState(true);
+  const [coverageOptions, setCoverageOptions] = useState<CoverageOption[]>([]);
 
   useEffect(() => {
-    const loadQuoteData = () => {
+    const loadQuoteData = async () => {
+      if (!quoteId || !user) return;
+
       try {
-        const submissionData = localStorage.getItem('quote_submission');
-        if (submissionData) {
-          const parsedData = JSON.parse(submissionData);
-          setQuoteData({
-            quoteId: parsedData.quoteId || `q-${Date.now()}`,
-            cargoType: parsedData.cargoType || 'Unknown Cargo',
-            shipmentValue: parsedData.shipmentValue || 0,
-            origin: parsedData.origin || { name: 'Unknown', city: 'Unknown', country: 'Unknown' },
-            destination: parsedData.destination || { name: 'Unknown', city: 'Unknown', country: 'Unknown' },
-            startDate: parsedData.startDate || new Date().toISOString().split('T')[0],
-            endDate: parsedData.endDate || new Date().toISOString().split('T')[0],
-            transportationMode: parsedData.transportationMode || 'Unknown'
-          });
-        } else {
-          const draftData = localStorage.getItem('quote_draft');
-          if (draftData) {
-            const parsedData = JSON.parse(draftData);
-            setQuoteData({
-              quoteId: parsedData.quoteId || `q-${Date.now()}`,
-              cargoType: parsedData.cargoType === 'other' ? parsedData.otherCargoType : parsedData.cargoType || 'Unknown Cargo',
-              shipmentValue: parseFloat(parsedData.shipmentValue) || 0,
-              origin: parsedData.origin || { name: 'Unknown', city: 'Unknown', country: 'Unknown' },
-              destination: parsedData.destination || { name: 'Unknown', city: 'Unknown', country: 'Unknown' },
-              startDate: parsedData.startDate || new Date().toISOString().split('T')[0],
-              endDate: parsedData.endDate || new Date().toISOString().split('T')[0],
-              transportationMode: parsedData.transportationMode || 'Unknown'
-            });
-          } else {
-            console.warn('No quote data found in localStorage');
-            setQuoteData({
-              quoteId: `q-${Date.now()}`,
-              cargoType: 'No data found',
-              shipmentValue: 0,
-              origin: { name: 'Unknown', city: 'Unknown', country: 'Unknown' },
-              destination: { name: 'Unknown', city: 'Unknown', country: 'Unknown' },
-              startDate: new Date().toISOString().split('T')[0],
-              endDate: new Date().toISOString().split('T')[0],
-              transportationMode: 'Unknown'
-            });
+        setLoading(true);
+        
+        // Load quote from database
+        const quote = await quotes.getById(quoteId);
+        setQuoteData(quote);
+
+        // Calculate premiums for all coverage options
+        const premiumInput = {
+          cargoType: quote.cargo_type,
+          shipmentValue: quote.shipment_value,
+          transportationMode: quote.transportation_mode,
+          coverageType: 'standard',
+          startDate: quote.start_date,
+          endDate: quote.end_date
+        };
+
+        const options: CoverageOption[] = [
+          {
+            id: 'standard',
+            name: 'Standard Coverage',
+            description: 'Essential protection for common risks during transit.',
+            premium: PremiumCalculator.calculate({...premiumInput, coverageType: 'standard'}).basePremium,
+            coverage: ['All Risks', 'Theft Protection', 'Accidental Damage', 'Basic Liability'],
+            deductible: 1000,
+            features: ['Standard claims processing', 'Email support', 'Basic tracking'],
+            color: 'from-gray-100 to-gray-50',
+            badge: 'Popular'
+          },
+          {
+            id: 'premium',
+            name: 'Premium Coverage',
+            description: 'Comprehensive protection including special risks and priority service.',
+            premium: PremiumCalculator.calculate({...premiumInput, coverageType: 'premium'}).basePremium,
+            coverage: ['All Risks +', 'War & Political Risks', 'Strike Coverage', 'Cyber Protection', 'Delay Compensation'],
+            deductible: 500,
+            features: [
+              '24/7 Priority Support',
+              'Dedicated Risk Manager',
+              'Expedited Claims (<24h)',
+              'Real-time Tracking',
+              'Monthly Risk Reports'
+            ],
+            color: 'from-blue-50 to-indigo-50',
+            badge: 'Recommended'
+          },
+          {
+            id: 'enterprise',
+            name: 'Enterprise Plan',
+            description: 'Maximum protection with white-glove service for high-value shipments.',
+            premium: PremiumCalculator.calculate({...premiumInput, coverageType: 'enterprise'}).basePremium,
+            coverage: ['All Inclusive', 'War & Terrorism', 'Customs Delay', 'Inventory Protection', 'Revenue Loss'],
+            deductible: 250,
+            features: [
+              '24/7 Dedicated Team',
+              'Same-day Claims',
+              'Custom Coverage',
+              'API Integration',
+              'Quarterly Reviews'
+            ],
+            color: 'from-purple-50 to-pink-50',
+            badge: 'Enterprise'
           }
-        }
+        ];
+
+        setCoverageOptions(options);
+
       } catch (error) {
         console.error('Error loading quote data:', error);
-        setQuoteData({
-          quoteId: `q-${Date.now()}`,
-          cargoType: 'Error loading data',
-          shipmentValue: 0,
-          origin: { name: 'Error', city: 'Error', country: 'Error' },
-          destination: { name: 'Error', city: 'Error', country: 'Error' },
-          startDate: new Date().toISOString().split('T')[0],
-          endDate: new Date().toISOString().split('T')[0],
-          transportationMode: 'Error'
-        });
       } finally {
         setLoading(false);
       }
     };
 
-    setTimeout(loadQuoteData, 100);
-  }, []);
-
-  const coverageOptions: CoverageOption[] = [
-    {
-      id: 'standard',
-      name: 'Standard Coverage',
-      description: 'Essential protection for common risks during transit.',
-      premium: calculatePremium('standard'),
-      coverage: ['All Risks', 'Theft Protection', 'Accidental Damage', 'Basic Liability'],
-      deductible: 1000,
-      features: ['Standard claims processing', 'Email support', 'Basic tracking'],
-      color: 'from-gray-100 to-gray-50',
-      badge: 'Popular',
-      icon: <Shield className="w-5 h-5 text-gray-600" />
-    },
-    {
-      id: 'premium',
-      name: 'Premium Coverage',
-      description: 'Comprehensive protection including special risks and priority service.',
-      premium: calculatePremium('premium'),
-      coverage: ['All Risks +', 'War & Political Risks', 'Strike Coverage', 'Cyber Protection', 'Delay Compensation'],
-      deductible: 500,
-      features: [
-        '24/7 Priority Support',
-        'Dedicated Risk Manager',
-        'Expedited Claims (<24h)',
-        'Real-time Tracking',
-        'Monthly Risk Reports'
-      ],
-      color: 'from-blue-50 to-indigo-50',
-      badge: 'Recommended',
-      icon: <Zap className="w-5 h-5 text-blue-600" />
-    },
-    {
-      id: 'enterprise',
-      name: 'Enterprise Plan',
-      description: 'Maximum protection with white-glove service for high-value shipments.',
-      premium: calculatePremium('enterprise'),
-      coverage: ['All Inclusive', 'War & Terrorism', 'Customs Delay', 'Inventory Protection', 'Revenue Loss'],
-      deductible: 250,
-      features: [
-        '24/7 Dedicated Team',
-        'Same-day Claims',
-        'Custom Coverage',
-        'API Integration',
-        'Quarterly Reviews'
-      ],
-      color: 'from-purple-50 to-pink-50',
-      badge: 'Enterprise',
-      icon: <BadgeCheck className="w-5 h-5 text-purple-600" />
-    }
-  ];
-
-  function calculatePremium(type: string): number {
-    if (!quoteData) return 0;
-    
-    // Base rate: 2.3% of shipment value for standard coverage
-    const baseRate = quoteData.shipmentValue * 0.023;
-    
-    // Cargo type risk multipliers
-    const cargoRiskMultipliers: Record<string, number> = {
-      'electronics': 1.0,
-      'apparel': 0.9,
-      'machinery': 1.0,
-      'food products': 1.2,
-      'chemicals': 1.5,
-      'pharmaceuticals': 1.0,
-      'other cargo': 1.0
-    };
-    
-    const cargoType = quoteData.cargoType.toLowerCase();
-    const cargoMultiplier = cargoRiskMultipliers[cargoType] || 1.0;
-    
-    // Transportation mode multipliers
-    const modeMultipliers: Record<string, number> = {
-      'air': 1.0,
-      'sea': 1.0,
-      'road': 1.1,
-      'air freight': 1.0,
-      'sea freight': 1.0,
-      'road freight': 1.1
-    };
-    
-    const mode = quoteData.transportationMode.toLowerCase();
-    const modeMultiplier = modeMultipliers[mode] || 1.0;
-    
-    // Coverage type multipliers
-    const typeMultipliers = {
-      'standard': 1.0,
-      'premium': 1.5,
-      'enterprise': 2.0
-    };
-    
-    const typeMultiplier = typeMultipliers[type as keyof typeof typeMultipliers] || 1.0;
-    
-    // Duration multiplier
-    const durationDays = Math.ceil(
-      (new Date(quoteData.endDate).getTime() - new Date(quoteData.startDate).getTime()) / (1000 * 60 * 60 * 24)
-    );
-    const durationMultiplier = Math.max(1, durationDays / 30);
-    
-    // Calculate final premium
-    let calculatedPremium = baseRate * cargoMultiplier * modeMultiplier * typeMultiplier * durationMultiplier;
-    
-    // Apply minimum premium ($450 for standard, $675 for premium, $900 for enterprise)
-    const minimumPremiums = {
-      'standard': 450,
-      'premium': 675,
-      'enterprise': 900
-    };
-    
-    const minimum = minimumPremiums[type as keyof typeof minimumPremiums] || 0;
-    
-    if (calculatedPremium < minimum) {
-      calculatedPremium = minimum;
-    }
-    
-    return Math.round(calculatedPremium);
-  }
+    loadQuoteData();
+  }, [quoteId, user]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -269,55 +169,37 @@ export default function InsuranceQuotePage() {
       'sea': 'Sea Freight',
       'road': 'Road Freight'
     };
-    return modeMap[mode.toLowerCase()] || mode;
+    return modeMap[mode] || mode;
   };
 
-  const handleDownloadDocuments = () => {
-  if (!quoteData) return;
-  
-  // Get the selected coverage data without React components
-  const selectedCoverageData = coverageOptions.find(coverage => coverage.id === selectedCoverage);
-  
-  // Create a simplified version without React components
-  const simplifiedCoverageDetails = selectedCoverageData ? {
-    id: selectedCoverageData.id,
-    name: selectedCoverageData.name,
-    description: selectedCoverageData.description,
-    premium: selectedCoverageData.premium,
-    deductible: selectedCoverageData.deductible,
-    coverage: selectedCoverageData.coverage,
-    features: selectedCoverageData.features,
-    badge: selectedCoverageData.badge
-  } : null;
-  
-  const quoteDataToSave = {
-    ...quoteData,
-    selectedCoverage,
-    coverageDetails: simplifiedCoverageDetails,
-    orderSummary: {
-      basePremium: simplifiedCoverageDetails?.premium || 0,
-      deductible: simplifiedCoverageDetails?.deductible || 0,
-      serviceFee: 99,
-      taxes: Math.round((simplifiedCoverageDetails?.premium || 0) * 0.08),
-      totalAmount: (simplifiedCoverageDetails?.premium || 0) + 99 + Math.round((simplifiedCoverageDetails?.premium || 0) * 0.08)
-    },
-    timestamp: new Date().toISOString()
+  const handleDownloadDocuments = async () => {
+    if (!quoteData || !selectedCoverage) return;
+    
+    try {
+      // Update quote with selected coverage
+      await quotes.continueDraft(quoteData.id, {
+        selected_coverage: selectedCoverage,
+        calculated_premium: coverageOptions.find(coverage => coverage.id === selectedCoverage)?.premium || 0,
+        deductible: coverageOptions.find(coverage => coverage.id === selectedCoverage)?.deductible || 0
+      });
+
+      // Navigate to documents page
+      router.push(`/quotes/${quoteData.id}/documents`);
+
+    } catch (error) {
+      console.error('Error updating quote:', error);
+      alert('Failed to update quote. Please try again.');
+    }
   };
-  
-  localStorage.setItem('quote_coverage_selection', JSON.stringify(quoteDataToSave));
-  
-  // Navigate to documents page
-  router.push('/quotes/new/documents');
-};
 
   const handleModifyInputs = () => {
-    router.back();
+    router.push(`/quotes/${quoteData?.id}/edit`);
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <DashboardHeader userEmail="client@example.com" />
+        <DashboardHeader userEmail={user?.email} />
         <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-center h-96">
             <div className="text-center">
@@ -333,14 +215,14 @@ export default function InsuranceQuotePage() {
   if (!quoteData) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <DashboardHeader userEmail="client@example.com" />
+        <DashboardHeader userEmail={user?.email} />
         <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 pb-8">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
             <AlertCircle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">No Quote Data Found</h2>
             <p className="text-gray-600 mb-6">Please go back and fill out the shipment details form.</p>
             <button
-              onClick={() => router.push('/shipping')}
+              onClick={() => router.push('/quotes/new/shipping')}
               className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
             >
               Go to Shipment Details
@@ -360,7 +242,7 @@ export default function InsuranceQuotePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DashboardHeader userEmail="client@example.com" />
+      <DashboardHeader userEmail={user?.email} />
       
       <div className="max-w-[100%] mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         <div className="mb-8">
@@ -391,7 +273,7 @@ export default function InsuranceQuotePage() {
               <div className="text-right">
                 <p className="text-sm text-gray-500">Quote ID</p>
                 <p className="font-mono font-medium">
-                  #{quoteData?.quoteId ? quoteData.quoteId.replace('temp-', 'Q-') : 'Loading...'}
+                  {quoteData.quote_number}
                 </p>
               </div>
               <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
@@ -457,7 +339,7 @@ export default function InsuranceQuotePage() {
                     <Package className="w-4 h-4" />
                     <span className="text-sm">Cargo Type</span>
                   </div>
-                  <p className="font-medium">{quoteData?.cargoType || 'N/A'}</p>
+                  <p className="font-medium">{quoteData.cargo_type}</p>
                 </div>
                 
                 <div className="space-y-2">
@@ -465,7 +347,7 @@ export default function InsuranceQuotePage() {
                     <DollarSign className="w-4 h-4" />
                     <span className="text-sm">Shipment Value</span>
                   </div>
-                  <p className="font-medium">{formatCurrency(quoteData?.shipmentValue || 0)}</p>
+                  <p className="font-medium">{formatCurrency(quoteData.shipment_value)}</p>
                 </div>
                 
                 <div className="space-y-2">
@@ -474,8 +356,8 @@ export default function InsuranceQuotePage() {
                     <span className="text-sm">Route</span>
                   </div>
                   <p className="font-medium">
-                    {quoteData?.origin?.city || quoteData?.origin?.name || 'Unknown'} → 
-                    {quoteData?.destination?.city || quoteData?.destination?.name || 'Unknown'}
+                    {quoteData.origin?.city || quoteData.origin?.name || 'Unknown'} → 
+                    {quoteData.destination?.city || quoteData.destination?.name || 'Unknown'}
                   </p>
                 </div>
                 
@@ -484,7 +366,7 @@ export default function InsuranceQuotePage() {
                     <Truck className="w-4 h-4" />
                     <span className="text-sm">Transport Mode</span>
                   </div>
-                  <p className="font-medium">{getTransportationModeDisplay(quoteData?.transportationMode || '')}</p>
+                  <p className="font-medium">{getTransportationModeDisplay(quoteData.transportation_mode)}</p>
                 </div>
               </div>
             </div>
@@ -543,7 +425,9 @@ export default function InsuranceQuotePage() {
                             coverage.id === 'standard' ? 'bg-gray-100' :
                             coverage.id === 'premium' ? 'bg-blue-100' : 'bg-purple-100'
                           }`}>
-                            {coverage.icon}
+                            {coverage.id === 'standard' ? <Shield className="w-5 h-5 text-gray-600" /> :
+                             coverage.id === 'premium' ? <Zap className="w-5 h-5 text-blue-600" /> :
+                             <BadgeCheck className="w-5 h-5 text-purple-600" />}
                           </div>
                           <h3 className="font-semibold text-gray-900">{coverage.name}</h3>
                         </div>
@@ -580,45 +464,6 @@ export default function InsuranceQuotePage() {
                     </div>
                   </div>
                 ))}
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Coverage Details</h3>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-2">What's Covered:</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {coverageOptions
-                      .find(coverage => coverage.id === selectedCoverage)
-                      ?.coverage.map((item, index) => (
-                        <div key={index} className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                          <span className="text-sm text-gray-700">{item}</span>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-                
-                <div className="pt-4 border-t border-gray-200">
-                  <h4 className="font-medium text-gray-900 mb-2">Claims Process:</h4>
-                  <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-gray-600">
-                        {selectedCoverage === 'standard' ? '3-5 business days' : 
-                         selectedCoverage === 'premium' ? '<24 hours' : 'Same day'}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-gray-600">
-                        {selectedCoverage === 'standard' ? 'Email Support' : 
-                         selectedCoverage === 'premium' ? '24/7 Priority Support' : 'Dedicated Team'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -680,88 +525,6 @@ export default function InsuranceQuotePage() {
                 >
                   Modify Shipment Details
                 </button>
-              </div>
-              
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <p className="text-xs text-gray-500 text-center">
-                  By continuing, you agree to our{' '}
-                  <a href="#" className="text-blue-600 hover:text-blue-700">Terms of Service</a>
-                  {' '}and{' '}
-                  <a href="#" className="text-blue-600 hover:text-blue-700">Privacy Policy</a>
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100 p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
-                  <Users className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-900">Need Assistance?</h4>
-                  <p className="text-sm text-gray-600">Our team is here to help</p>
-                </div>
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 p-3 bg-white/50 rounded-lg">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                    <Phone className="w-3 h-3 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Call Us</p>
-                    <p className="text-xs text-gray-600">1-800-INS-CARGO</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3 p-3 bg-white/50 rounded-lg">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                    <AlertCircle className="w-3 h-3 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Live Chat</p>
-                    <p className="text-xs text-gray-600">Available 24/7</p>
-                  </div>
-                </div>
-              </div>
-              
-              <button className="w-full mt-4 py-2 px-4 bg-white text-blue-600 font-medium rounded-lg border border-blue-200 hover:bg-blue-50 transition-colors">
-                Schedule a Call
-              </button>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h4 className="font-semibold text-gray-900 mb-4">Next Steps</h4>
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-blue-600"></div>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Document Download</p>
-                    <p className="text-xs text-gray-500">Download quote and insurance documents</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-gray-400"></div>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Review Documents</p>
-                    <p className="text-xs text-gray-500">Review terms and conditions</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-gray-400"></div>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Finalize Quote</p>
-                    <p className="text-xs text-gray-500">Accept and finalize your insurance quote</p>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
