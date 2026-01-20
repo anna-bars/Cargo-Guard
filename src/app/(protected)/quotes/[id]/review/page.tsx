@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Clock, CheckCircle, Users, Mail, Phone } from 'lucide-react';
+import { Clock, CheckCircle, Users, Mail, Phone, RefreshCw } from 'lucide-react';
 import DashboardHeader from '@/app/components/dashboard/DashboardHeader';
+import QuoteStatusUpdater from '@/app/components/quotes/QuoteStatusUpdater';
 import { useUser } from '@/app/context/UserContext';
 import { quotes } from '@/lib/supabase/quotes';
+import { createClient } from '@/lib/supabase/client';
 
 export default function QuoteReviewPage() {
   const params = useParams();
@@ -15,6 +17,9 @@ export default function QuoteReviewPage() {
   const quoteId = params.id as string;
   const [quote, setQuote] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [manualCheck, setManualCheck] = useState(false);
+
+  const supabase = createClient();
 
   useEffect(() => {
     if (!quoteId || !user) return;
@@ -23,6 +28,40 @@ export default function QuoteReviewPage() {
       try {
         const quoteData = await quotes.getById(quoteId);
         setQuote(quoteData);
+        
+        // Subscribe to real-time updates
+        const subscription = supabase
+          .channel(`quote-${quoteId}`)
+          .on(
+            'postgres_changes',
+            {
+              event: 'UPDATE',
+              schema: 'public',
+              table: 'quotes',
+              filter: `id=eq.${quoteId}`
+            },
+            (payload) => {
+              console.log('Real-time update:', payload.new);
+              setQuote(payload.new);
+              
+              // Auto-redirect if status changed
+              const newStatus = payload.new.status;
+              if (newStatus !== 'under_review' && newStatus !== 'needs_info') {
+                setTimeout(() => {
+                  if (newStatus === 'approved') {
+                    router.push(`/quotes/new/insurance?quote_id=${quoteId}&approved=true`);
+                  } else if (newStatus === 'rejected') {
+                    router.push(`/quotes/${quoteId}/rejected`);
+                  }
+                }, 2000);
+              }
+            }
+          )
+          .subscribe();
+
+        return () => {
+          subscription.unsubscribe();
+        };
       } catch (error) {
         console.error('Error loading quote:', error);
       } finally {
@@ -31,7 +70,24 @@ export default function QuoteReviewPage() {
     };
 
     loadQuote();
-  }, [quoteId, user]);
+  }, [quoteId, user, router, supabase]);
+
+  const handleManualStatusCheck = async () => {
+    setManualCheck(true);
+    try {
+      const { data } = await supabase
+        .from('quotes')
+        .select('*')
+        .eq('id', quoteId)
+        .single();
+      
+      setQuote(data);
+    } catch (error) {
+      console.error('Manual check failed:', error);
+    } finally {
+      setManualCheck(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -61,69 +117,93 @@ export default function QuoteReviewPage() {
     );
   }
 
+  // If quote is no longer under review, redirect
+  if (quote.status !== 'under_review' && quote.status !== 'needs_info') {
+    router.push(`/quotes/${quoteId}`);
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <DashboardHeader userEmail={user?.email} />
       
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Real-time Status Updater */}
+        <div className="mb-8">
+          <QuoteStatusUpdater 
+            quoteId={quoteId}
+            initialStatus={quote.status}
+            autoRedirect={true}
+          />
+        </div>
+
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-8 text-center">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-100 rounded-full mb-6">
-              <Clock className="w-10 h-10 text-blue-600" />
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-8">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                  <Clock className="w-8 h-8 text-blue-600" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">
+                    {quote.status === 'needs_info' ? 'Additional Information Required' : 'Under Review'}
+                  </h1>
+                  <p className="text-gray-600">
+                    Quote #{quote.quote_number} is being reviewed by our team
+                  </p>
+                </div>
+              </div>
+              
+              <button
+                onClick={handleManualStatusCheck}
+                disabled={manualCheck}
+                className="flex items-center gap-2 px-4 py-2 bg-white border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 disabled:opacity-50"
+              >
+                <RefreshCw className={`w-4 h-4 ${manualCheck ? 'animate-spin' : ''}`} />
+                {manualCheck ? 'Checking...' : 'Refresh Status'}
+              </button>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Under Review
-            </h1>
-            <p className="text-gray-600">
-              Quote #{quote.quote_number} is being reviewed by our team
-            </p>
           </div>
 
           {/* Content */}
           <div className="p-8">
-            {/* Progress Steps */}
-            <div className="mb-10">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center">
-                    <CheckCircle className="w-5 h-5" />
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm font-medium text-gray-900">Quote Submitted</p>
-                    <p className="text-xs text-gray-500">Completed</p>
-                  </div>
-                </div>
-                
-                <div className="h-0.5 w-16 mx-4 bg-gray-300" />
-                
-                <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center">
-                    <Users className="w-5 h-5" />
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm font-medium text-gray-900">Manual Review</p>
-                    <p className="text-xs text-gray-500">Current Step</p>
-                  </div>
-                </div>
-                
-                <div className="h-0.5 w-16 mx-4 bg-gray-300" />
-                
-                <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-full border-2 border-gray-300 bg-white text-gray-400 flex items-center justify-center">
-                    <CheckCircle className="w-5 h-5" />
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm font-medium text-gray-500">Decision</p>
-                    <p className="text-xs text-gray-500">Pending</p>
-                  </div>
-                </div>
-              </div>
+            {/* What to Expect */}
+            <div className="mb-8">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                What Happens Next
+              </h2>
               
-              <div className="text-center">
-                <p className="text-sm text-gray-600">
-                  Our team is reviewing your quote. You'll receive an email notification once a decision is made.
-                </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mb-3">
+                    <Users className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <h3 className="font-medium text-gray-900 mb-1">Expert Review</h3>
+                  <p className="text-sm text-gray-600">
+                    Our underwriters are reviewing your shipment details against risk criteria
+                  </p>
+                </div>
+                
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mb-3">
+                    <CheckCircle className="w-5 h-5 text-green-600" />
+                  </div>
+                  <h3 className="font-medium text-gray-900 mb-1">Quick Decision</h3>
+                  <p className="text-sm text-gray-600">
+                    Most reviews are completed within 2-4 hours during business hours
+                  </p>
+                </div>
+                
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mb-3">
+                    <Mail className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <h3 className="font-medium text-gray-900 mb-1">Notification</h3>
+                  <p className="text-sm text-gray-600">
+                    You'll receive an email when the review is complete
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -153,58 +233,27 @@ export default function QuoteReviewPage() {
                 
                 <div className="flex items-start gap-4">
                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                    <Clock className="w-4 h-4 text-blue-600" />
+                    <Clock className="w-4 h-4 text-blue-600 animate-pulse" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-medium text-gray-900">Underwriter Review</h3>
+                    <div className="flex justify-between">
+                      <h3 className="font-medium text-gray-900">Underwriter Review</h3>
+                      <span className="text-sm text-blue-600 font-medium">In Progress</span>
+                    </div>
                     <p className="text-sm text-gray-600 mt-1">
                       Our underwriting team is assessing your shipment details against our risk criteria.
                     </p>
-                    <div className="mt-2 text-xs text-blue-600">
-                      Estimated completion: Within 24 hours
+                    <div className="mt-2">
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div 
+                          className="bg-blue-600 h-2 rounded-full transition-all duration-1000"
+                          style={{ width: '60%' }}
+                        />
+                      </div>
+                      <p className="text-xs text-blue-600 mt-1">
+                        Estimated completion: Within 24 hours
+                      </p>
                     </div>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                    <Mail className="w-4 h-4 text-gray-400" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium text-gray-500">Decision Notification</h3>
-                    <p className="text-sm text-gray-500 mt-1">
-                      You'll receive an email with the final decision and next steps.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Quote Details */}
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Quote Details
-              </h2>
-              
-              <div className="bg-gray-50 rounded-lg p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-600">Cargo Type</p>
-                    <p className="font-medium">{quote.cargo_type}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Shipment Value</p>
-                    <p className="font-medium">${quote.shipment_value?.toLocaleString()}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Route</p>
-                    <p className="font-medium">
-                      {quote.origin?.city || quote.origin?.name} → {quote.destination?.city || quote.destination?.name}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Transport Mode</p>
-                    <p className="font-medium">{quote.transportation_mode}</p>
                   </div>
                 </div>
               </div>

@@ -1,8 +1,19 @@
 import { createClient } from '../supabase/client';
-import { QuoteValidator } from './quoteValidator';
+import { QuoteValidator, ValidationResult } from './quoteValidator';
+import { QuoteReviewService } from './quoteReviewService';
+
+export interface ProcessQuoteResult {
+  quote: any;
+  validation: ValidationResult;
+  immediateDecision: boolean;
+  decision: 'approved' | 'rejected' | 'under_review' | 'needs_info';
+  requiresDocuments?: boolean;
+  message: string;
+  autoApproved?: boolean;
+}
 
 export class QuoteProcessor {
-  static async processQuote(quoteId: string) {
+  static async processQuote(quoteId: string, requestImmediateDecision = true): Promise<ProcessQuoteResult> {
     const supabase = createClient();
     
     // Get quote
@@ -22,57 +33,99 @@ export class QuoteProcessor {
       status: quote.status
     });
 
-    // Validate quote
+    // Step 1: Validate quote
     const validation = QuoteValidator.validateQuote(quote);
     
-    // Calculate risk score
+    // Step 2: Calculate risk score
     const riskScore = QuoteValidator.calculateRiskScore(quote);
     
-    console.log('Validation results:', {
+    console.log('Initial validation:', {
       isValid: validation.isValid,
       status: validation.status,
       reasons: validation.reasons,
       riskScore: riskScore
     });
 
-    let newStatus = quote.status;
-    let approvedAt = null;
-    let rejectionReason = null;
+    // If validation fails, reject immediately
+    if (!validation.isValid || validation.status === 'rejected') {
+      const updateData = {
+        status: 'rejected' as const,
+        rejection_reason: QuoteValidator.getRejectionMessage(validation.reasons),
+        risk_score: riskScore,
+        updated_at: new Date().toISOString()
+      };
 
-    if (validation.isValid) {
-      if (validation.status === 'approved') {
-        newStatus = 'approved';
-        approvedAt = new Date().toISOString();
-      } else if (validation.status === 'under_review') {
-        newStatus = 'under_review';
-      } else {
-        newStatus = 'rejected';
-        rejectionReason = QuoteValidator.getRejectionMessage(validation.reasons);
-      }
-    } else {
-      newStatus = 'rejected';
-      rejectionReason = QuoteValidator.getRejectionMessage(validation.reasons);
+      const { data: updatedQuote, error: updateError } = await supabase
+        .from('quotes')
+        .update(updateData)
+        .eq('id', quoteId)
+        .select()
+        .single();
+
+      if (updateError) throw updateError;
+
+      return {
+        quote: updatedQuote,
+        validation: validation,
+        immediateDecision: true,
+        decision: 'rejected',
+        message: 'Quote rejected based on initial validation',
+        autoApproved: false
+      };
     }
 
-    // Prepare update data
-    const updateData: any = {
-      status: newStatus,
-      updated_at: new Date().toISOString(),
-      risk_score: riskScore
+    // Step 3: Apply risk score
+    const initialUpdateData: any = {
+      risk_score: riskScore,
+      updated_at: new Date().toISOString()
     };
 
-    if (approvedAt) {
-      updateData.approved_at = approvedAt;
+    // Step 4: Make immediate decision or mark for review
+    let finalStatus: 'approved' | 'rejected' | 'under_review' | 'needs_info';
+    let isImmediateDecision = false;
+    let autoApproved = false;
+
+    if (validation.status === 'approved' && riskScore <= 4) {
+      // Auto-approve low risk quotes
+      finalStatus = 'approved';
+      isImmediateDecision = true;
+      autoApproved = true;
+      initialUpdateData.status = 'approved';
+      initialUpdateData.approved_at = new Date().toISOString();
+    } else if (validation.status === 'under_review' || riskScore > 4) {
+      // Mark for review
+      finalStatus = 'under_review';
+      isImmediateDecision = false;
+      initialUpdateData.status = 'under_review';
+      initialUpdateData.review_queued_at = new Date().toISOString();
+      
+      // If immediate decision is requested, process now
+      if (requestImmediateDecision) {
+        try {
+          const decision = await QuoteReviewService.makeAutomaticDecision(quoteId);
+          finalStatus = decision.decision === 'approved' ? 'approved' : 
+                       decision.decision === 'rejected' ? 'rejected' : 
+                       decision.decision === 'needs_more_info' ? 'needs_info' : 'under_review';
+          isImmediateDecision = decision.decision !== 'needs_more_info';
+          autoApproved = decision.decision === 'approved';
+        } catch (reviewError) {
+          console.error('Error making automatic decision:', reviewError);
+          // Keep as under_review if review fails
+        }
+      }
+    } else {
+      // Default to approved
+      finalStatus = 'approved';
+      isImmediateDecision = true;
+      autoApproved = true;
+      initialUpdateData.status = 'approved';
+      initialUpdateData.approved_at = new Date().toISOString();
     }
 
-    if (rejectionReason) {
-      updateData.rejection_reason = rejectionReason;
-    }
-
-    // Update quote
+    // Update quote with final status
     const { data: updatedQuote, error: updateError } = await supabase
       .from('quotes')
-      .update(updateData)
+      .update(initialUpdateData)
       .eq('id', quoteId)
       .select()
       .single();
@@ -82,17 +135,20 @@ export class QuoteProcessor {
     // Log the action
     await this.logQuoteAction(quoteId, {
       fromStatus: quote.status,
-      toStatus: newStatus,
+      toStatus: finalStatus,
       validationResults: validation,
-      riskScore
+      riskScore,
+      immediateDecision: isImmediateDecision
     });
 
     return {
       quote: updatedQuote,
       validation: validation,
-      autoApproved: newStatus === 'approved',
-      requiresDocuments: newStatus === 'approved',
-      message: this.getStatusMessage(newStatus, validation)
+      immediateDecision: isImmediateDecision,
+      decision: finalStatus,
+      requiresDocuments: finalStatus === 'approved',
+      message: this.getStatusMessage(finalStatus, validation),
+      autoApproved
     };
   }
 
@@ -114,16 +170,18 @@ export class QuoteProcessor {
     }
   }
 
-  private static getStatusMessage(status: string, validation: any): string {
+  private static getStatusMessage(status: string, validation: ValidationResult): string {
     switch (status) {
       case 'approved':
         return 'Your quote has been approved! You can now proceed to payment and document submission.';
       case 'under_review':
-        return 'Your quote requires manual review. Our team will contact you within 24 hours.';
+        return 'Your quote requires additional review. Our team will process it shortly.';
       case 'rejected':
         return validation.reasons.length > 0 
           ? `Quote rejected: ${validation.reasons.join(', ')}`
           : 'Quote rejected. Please contact support for more information.';
+      case 'needs_info':
+        return 'Additional information is required to process your quote.';
       default:
         return 'Quote is being processed.';
     }
