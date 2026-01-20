@@ -78,7 +78,7 @@ export default function DashboardPage() {
   const { user } = useUser()
   const router = useRouter()
   const supabase = createClient()
-
+ const [userName, setUserName] = useState<string>('')
   // Conversion data հաշվարկ
 const calculateConversionData = (quotes: any[], period: string = 'This Month'): ConversionChartData => {
   if (!quotes || !quotes.length) {
@@ -214,46 +214,74 @@ const calculateConversionData = (quotes: any[], period: string = 'This Month'): 
 
   const [activeConversionPeriod, setActiveConversionPeriod] = useState<string>('This Month');
 
-  useEffect(() => {
-    const loadDashboardData = async () => {
-      if (!user) return
-      
-      try {
-        const { data: quotes, error: quotesError } = await supabase
-          .from('quote_requests')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(50)
+useEffect(() => {
+  const loadDashboardData = async () => {
+    if (!user) return
+    
+    try {
+      // Ստանալ օգտատիրոջ տվյալները profiles աղյուսակից
+      const { data: userProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('full_name, email')
+        .eq('id', user.id)
+        .single()
 
-        if (quotesError) throw quotesError
-
-        const formattedData = formatDashboardData(quotes || [])
-        setDashboardRows(formattedData)
-
-        calculateStats(quotes || [])
-
-        // Հաշվել conversion data բոլոր ժամանակահատվածների համար
-        const periods = ['This Week', 'This Month', 'Last Month', 'Last Quarter'];
-        const newConversionData: Record<string, ConversionChartData> = {};
-        
-        periods.forEach(period => {
-          newConversionData[period] = calculateConversionData(quotes || [], period);
-        });
-        
-        console.log('Conversion Data:', newConversionData);
-        setConversionData(newConversionData);
-
-      } catch (error) {
-        console.error('Error loading dashboard data:', error)
-        setDashboardRows(getFallbackData())
-      } finally {
-        setLoading(false)
+      if (profileError) {
+        console.error('Error fetching user profile:', profileError)
+        // Եթե profile չկա, ստեղծել default անուն email-ից
+        if (profileError.code === 'PGRST116') {
+          // PGRST116: No rows returned (profile doesn't exist)
+          const emailName = user?.email?.split('@')[0] || 'User'
+          setUserName(emailName)
+        }
+      } else if (userProfile?.full_name) {
+        // Տարբերակ 1: Վերցնել միայն առաջին անունը
+        const firstName = userProfile.full_name.split(' ')[0]
+        setUserName(firstName)
+        // Կամ ամբողջ անունը
+        // setUserName(userProfile.full_name)
+      } else {
+        // Եթե full_name դատարկ է, օգտագործել email-ից
+        const emailName = userProfile?.email?.split('@')[0] || user?.email?.split('@')[0] || 'User'
+        setUserName(emailName)
       }
-    }
 
-    loadDashboardData()
-  }, [user])
+      // Ստանալ quote_requests-ները
+      const { data: quotes, error: quotesError } = await supabase
+        .from('quote_requests')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(50)
+
+      if (quotesError) throw quotesError
+
+      const formattedData = formatDashboardData(quotes || [])
+      setDashboardRows(formattedData)
+
+      calculateStats(quotes || [])
+
+      // Հաշվել conversion data բոլոր ժամանակահատվածների համար
+      const periods = ['This Week', 'This Month', 'Last Month', 'Last Quarter'];
+      const newConversionData: Record<string, ConversionChartData> = {};
+      
+      periods.forEach(period => {
+        newConversionData[period] = calculateConversionData(quotes || [], period);
+      });
+      
+      console.log('Conversion Data:', newConversionData);
+      setConversionData(newConversionData);
+
+    } catch (error) {
+      console.error('Error loading dashboard data:', error)
+      setDashboardRows(getFallbackData())
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  loadDashboardData()
+}, [user])
 
   // Status config ֆունկցիա
   const getStatusConfig = (quote: any) => {
@@ -761,7 +789,7 @@ const calculateConversionData = (quotes: any[], period: string = 'This Month'): 
             max-[1280px]:hidden
           ">
             {/* Welcome Widget */}
-            <WelcomeWidget userName="Lucas" />
+            <WelcomeWidget userName={userName} /> 
 
             {/* Quote Conversion Rate */}
             <div className="flex-grow min-h-[calc(31%-4px)] xl:flex-[0_0_31%] xl:min-h-auto xl:h-auto">
@@ -801,7 +829,7 @@ const calculateConversionData = (quotes: any[], period: string = 'This Month'): 
             <div className="grid grid-cols-3 gap-2 w-full">
               {/* Welcome Widget */}
               <div className="w-full h-[240px]">
-                <WelcomeWidget userName="Lucas" />
+                <WelcomeWidget userName={userName} /> 
               </div>
 
               {/* Conversion Chart */}

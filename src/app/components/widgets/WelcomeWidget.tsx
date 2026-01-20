@@ -2,11 +2,11 @@
 import React from 'react';
 
 interface WelcomeWidgetProps {
-  userName?: string;
+  userName?: string; // Այստեղ կստանանք օգտատիրոջ անունը
 }
 
 export const WelcomeWidget: React.FC<WelcomeWidgetProps> = ({ 
-  userName = "Lucas" 
+  userName = "Lucas" // Default արժեքը, եթե ոչինչ չեկավ
 }) => {
   const handleArrowClick = () => {
     window.location.href = "http://localhost:3001/quotes/new/shipping";
