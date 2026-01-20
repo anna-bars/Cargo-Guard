@@ -396,7 +396,7 @@ export default function DashboardPage() {
         color: 'bg-gray-100', 
         dot: 'bg-gray-400', 
         textColor: 'text-gray-600',
-        buttonText: 'Create New',
+        buttonText: 'View Details',
         buttonVariant: 'secondary' as const
       }
     };
@@ -407,7 +407,7 @@ export default function DashboardPage() {
         color: 'bg-gray-100',
         dot: 'bg-gray-400',
         textColor: 'text-gray-600',
-        buttonText: 'Create New',
+        buttonText: 'View Details',
         buttonVariant: 'secondary' as const,
         isActuallyExpired: true
       };
@@ -515,7 +515,7 @@ export default function DashboardPage() {
         },
         date: 'Jan 19, 11:30 PM',
         button: { 
-          text: 'Create New', 
+          text: 'View Details', 
           variant: 'secondary' as const,
           onClick: (row: any) => handleQuoteAction(row, { status: 'expired' })
         },
@@ -534,7 +534,7 @@ export default function DashboardPage() {
         },
         date: 'Jan 19, 10:52 PM',
         button: { 
-          text: 'Create New', 
+          text: 'View Details', 
           variant: 'secondary' as const,
           onClick: (row: any) => handleQuoteAction(row, { status: 'expired' })
         },
@@ -606,13 +606,7 @@ export default function DashboardPage() {
     const paymentStatus = quote.payment_status;
     const isExpired = quote.expiration_time && new Date(quote.expiration_time) < new Date();
     
-    if (isExpired) {
-      if (confirm('This quote has expired. Would you like to create a new one based on this?')) {
-        router.push(`/quotes/new?duplicate=${quoteId}`);
-      }
-      return;
-    }
-    
+   
     const checkPolicyAndRedirect = async () => {
       try {
         const { data: policy } = await supabase
