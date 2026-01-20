@@ -153,31 +153,41 @@ export const UniversalTable: React.FC<UniversalTableProps> = ({
       });
     }
   };
-
 const getFilteredRows = () => {
   let filtered = [...rows];
   
+  // Ֆիլտրել ըստ ժամանակային միջակայքի (եթե կան օրինակներ)
   if (filterConfig.showTimeframeFilter) {
     if (selectedTimeframe === 'Last 7 days') {
       filtered = filtered.slice(0, 3);
     }
   }
   
+  // Ֆիլտրել ըստ activity (status)
   if (filterConfig.showActivityFilter && selectedFilter !== 'All Activity') {
     filtered = filtered.filter(row => {
-      if (row.status?.text) {
-        const statusMap: Record<string, string> = {
-          'Pending': 'Pending Approval',
-          'Active': 'Active',
-          'Expiring': 'Expires',
-          'Missing': 'Document Missing',
-          'Declined': 'Declined'
-        };
-        
-        const targetStatus = statusMap[selectedFilter];
-        return targetStatus ? row.status.text.includes(targetStatus) : false;
-      }
-      return false;
+      const statusText = row.status?.text?.toLowerCase() || '';
+      const rowStatus = row.quoteStatus || row.status?.text || '';
+      
+      // Status-ների քարտեզագրում ըստ selectedFilter-ի
+      const filterMap: Record<string, string[]> = {
+        'Draft': ['draft', 'continue quote'],
+        'Submitted': ['submitted', 'waiting for review'],
+        'Under Review': ['under review', 'documents under review'],
+        'Approved': ['approved', 'approved & paid'],
+        'Rejected': ['rejected'],
+        'Expired': ['expired'],
+        'Fix & Resubmit': ['fix and resubmit'],
+        'Pay to Activate': ['pay to activate']
+      };
+      
+      const targetStatuses = filterMap[selectedFilter] || [];
+      
+      // Ստուգել թե՛ status.text, թե՛ quoteStatus
+      return targetStatuses.some(target => 
+        statusText.includes(target.toLowerCase()) || 
+        rowStatus.toLowerCase().includes(target.toLowerCase())
+      );
     });
   }
   
@@ -426,28 +436,30 @@ const filteredRows = useMemo(() => {
       </div>
     </div>
   );
-
-  const renderDashboardMobileDesign = (row: TableRow) => (
-    <div className="md:hidden w-full mob-lay">
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center gap-2">
-          {mobileDesign.showType && row.type && (
-            <span className="font-poppins text-sm font-normal text-black xs:text-[16px]">{row.type}</span>
-          )}
-          <span className="font-poppins text-sm text-[#2563eb] underline xs:text-[#2563eb]">{row.id}</span>
-        </div>
-        
-        {row.status && (
-          <div className="row-cell flex-shrink-0">
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs ${row.status.color} ${row.status.textColor} 
-              w-fit min-w-fit whitespace-nowrap pl-3 pr-3 h-[26px] items-center transition-all duration-300
-              xs:text-[10px] xs:px-2 xs:py-1.5 xs:h-[22px] xs3:text-[11px] xs3:px-2.5 xs3:py-1.5 xs3:h-[24px]`}>
-              <span className={`w-2 h-2 rounded-full ${row.status.dot}`}></span>
-              {row.status.text}
-            </span>
-          </div>
+const renderDashboardMobileDesign = (row: TableRow) => (
+  <div className="md:hidden w-full mob-lay">
+    <div className="flex justify-between items-center mb-4">
+      <div className="flex items-center gap-2">
+        {mobileDesign.showType && row.type && (
+          <span className="font-poppins text-sm font-normal text-black xs:text-[16px]">{row.type}</span>
         )}
+        <span className="font-poppins text-sm text-[#2563eb] underline xs:text-[#2563eb]">{row.id}</span>
       </div>
+      
+      {row.status && (
+        <div className="row-cell flex-shrink-0">
+          <span className={`
+            inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[37px] font-poppins text-xs 
+            ${row.status.color} ${row.status.textColor}
+            w-fit min-w-fit whitespace-nowrap pl-3 pr-3 h-[26px] items-center transition-all duration-300
+            xs:text-[10px] xs:px-2 xs:py-1.5 xs:h-[22px] xs3:text-[11px] xs3:px-2.5 xs3:py-1.5 xs3:h-[24px]
+          `}>
+            <span className={`w-2 h-2 rounded-full ${row.status.dot}`}></span>
+            {row.status.text}
+          </span>
+        </div>
+      )}
+    </div>
       
       {(row.cargo || row.shipmentValue) && (
         <div className="flex justify-between items-center mb-4">
