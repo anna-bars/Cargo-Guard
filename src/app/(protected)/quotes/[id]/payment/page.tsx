@@ -190,136 +190,114 @@ const handlePayment = async () => {
     
     console.log('Quote status updated to paid');
     
-    // 2. Try to create payment record
+    // Generate unique IDs
+    const policyNumber = `POL-${Math.floor(100000 + Math.random() * 900000)}`;
+    const transactionId = `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
+    // 2. Create payment record
     let payment = null;
+    
     try {
-      const { error: paymentsCheckError } = await supabase
-        .from('payments')
-        .select('id')
-        .limit(1);
+      const paymentData = {
+        quote_id: quoteId,
+        user_id: user.id,
+        amount: totalAmount,
+        currency: 'USD',
+        payment_method: paymentMethod === 'card' ? 'credit_card' : 'bank_transfer',
+        payment_status: 'completed',
+        ...(paymentMethod === 'card' && {
+          card_last_four: cardDetails.number.replace(/\s/g, '').slice(-4),
+          card_brand: getCardBrand(cardDetails.number),
+        }),
+        ...(paymentMethod === 'bank' && {
+          bank_name: 'Global Cargo Bank',
+          bank_account_last_four: '3456',
+        }),
+        transaction_id: transactionId,
+        gateway: 'demo',
+        created_at: new Date().toISOString(),
+        completed_at: new Date().toISOString()
+      };
       
-      if (!paymentsCheckError) {
-        const paymentData = {
-          quote_id: quoteId,
-          user_id: user.id,
-          amount: totalAmount,
-          currency: 'USD',
-          payment_method: paymentMethod === 'card' ? 'credit_card' : 'bank_transfer',
-          payment_status: 'completed',
-          ...(paymentMethod === 'card' && {
-            card_last_four: cardDetails.number.replace(/\s/g, '').slice(-4),
-            card_brand: getCardBrand(cardDetails.number),
-          }),
-          ...(paymentMethod === 'bank' && {
-            bank_name: 'Global Cargo Bank',
-            bank_account_last_four: '3456',
-          }),
-          transaction_id: `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          gateway: 'demo',
-          created_at: new Date().toISOString(),
-          completed_at: new Date().toISOString()
-        };
-        
-        console.log('Creating payment record:', paymentData);
-        
-        const { data: newPayment, error: paymentInsertError } = await supabase
-          .from('payments')
-          .insert([paymentData])
-          .select()
-          .single();
-        
-        if (paymentInsertError) {
-          console.error('Payment insert error:', paymentInsertError);
-        } else {
-          payment = newPayment;
-          console.log('Payment record created:', payment);
-        }
+      console.log('Creating payment record:', paymentData);
+      
+      const { data: newPayment, error: paymentInsertError } = await supabase
+        .from('payments')
+        .insert([paymentData])
+        .select()
+        .single();
+      
+      if (paymentInsertError) {
+        console.error('Payment insert error:', paymentInsertError);
+      } else {
+        payment = newPayment;
+        console.log('Payment record created:', payment);
       }
     } catch (paymentError) {
       console.error('Payment creation error:', paymentError);
     }
     
-    // 3. Create policy with CORRECT field names
+    // 3. First create policy with placeholder URLs
     let policy = null;
+    let createdPolicyId = null;
+    
     try {
-      const { error: policiesCheckError } = await supabase
-        .from('policies')
-        .select('id')
-        .limit(1);
+      const startDate = new Date(quoteData.start_date);
+      const endDate = new Date(quoteData.end_date);
       
-      if (!policiesCheckError) {
-        // Convert dates from string to Date object
-        const startDate = new Date(quoteData.start_date);
-        const endDate = new Date(quoteData.end_date);
-        
-        // Policy data with CORRECT field names
-        const policyData = {
-          quote_id: quoteId,
-          user_id: user.id,
-          policy_number: `POL-${Math.floor(100000 + Math.random() * 900000)}`,
-          status: 'active',
-          payment_status: 'paid',
-          premium_amount: quoteData.calculated_premium || 0,
-          coverage_amount: quoteData.shipment_value || 0,
-          deductible: quoteData.deductible || 0,
-          cargo_type: quoteData.cargo_type || 'general',
-          transportation_mode: quoteData.transportation_mode || 'road',
-          origin: quoteData.origin || {},
-          destination: quoteData.destination || {},
-          coverage_start: startDate.toISOString().split('T')[0], // Convert to YYYY-MM-DD
-          coverage_end: endDate.toISOString().split('T')[0], // Convert to YYYY-MM-DD
-          activated_at: new Date().toISOString(),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        };
-        
-        console.log('Creating policy with data:', policyData);
-        
-        const { data: newPolicy, error: policyError } = await supabase
-          .from('policies')
-          .insert([policyData])
-          .select()
-          .single();
-        
-        if (policyError) {
-          console.error('Policy creation error:', policyError);
-          
-          // Try without optional fields if there's an error
-          const simplerPolicyData = {
-            quote_id: quoteId,
-            user_id: user.id,
-            policy_number: `POL-${Math.floor(100000 + Math.random() * 900000)}`,
-            premium_amount: quoteData.calculated_premium || 0,
-            coverage_amount: quoteData.shipment_value || 0,
-            deductible: quoteData.deductible || 0,
-            cargo_type: quoteData.cargo_type || 'general',
-            transportation_mode: quoteData.transportation_mode || 'road',
-            coverage_start: startDate.toISOString().split('T')[0],
-            coverage_end: endDate.toISOString().split('T')[0],
-            created_at: new Date().toISOString()
-          };
-          
-          const { data: simplerPolicy, error: simplerError } = await supabase
-            .from('policies')
-            .insert([simplerPolicyData])
-            .select()
-            .single();
-          
-          if (simplerError) {
-            console.error('Simpler policy creation error:', simplerError);
-          } else {
-            policy = simplerPolicy;
-            console.log('Simpler policy created:', policy);
-          }
-        } else {
-          policy = newPolicy;
-          console.log('Policy created successfully:', policy);
-        }
+      // Create placeholder URLs (will be updated after certificate generation)
+      const placeholderCertificateUrl = `/api/certificates/${policyNumber}`;
+      const termsUrl = `https://storage.cargoguard.com/legal/terms-and-conditions-v1.0.pdf`;
+      const receiptUrl = `/api/receipts/${transactionId}`;
+      
+      const policyData = {
+        quote_id: quoteId,
+        user_id: user.id,
+        policy_number: policyNumber,
+        status: 'active',
+        payment_status: 'paid',
+        premium_amount: quoteData.calculated_premium || 0,
+        coverage_amount: quoteData.shipment_value || 0,
+        deductible: quoteData.deductible || 0,
+        cargo_type: quoteData.cargo_type || 'general',
+        transportation_mode: quoteData.transportation_mode || 'road',
+        origin: quoteData.origin || {},
+        destination: quoteData.destination || {},
+        coverage_start: startDate.toISOString().split('T')[0],
+        coverage_end: endDate.toISOString().split('T')[0],
+        insurance_certificate_url: placeholderCertificateUrl,
+        terms_url: termsUrl,
+        receipt_url: receiptUrl,
+        activated_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      console.log('Creating policy:', policyData);
+      
+      const { data: newPolicy, error: policyError } = await supabase
+        .from('policies')
+        .insert([policyData])
+        .select()
+        .single();
+      
+      if (policyError) {
+        console.error('Policy creation error:', policyError);
+        throw new Error('Failed to create policy');
       } else {
-        console.log('Policies table check error:', policiesCheckError);
+        policy = newPolicy;
+        createdPolicyId = newPolicy.id;
+        console.log('Policy created successfully:', policy);
       }
     } catch (policyError) {
       console.error('Policy creation catch error:', policyError);
+      throw policyError;
+    }
+    
+    // 4. Generate insurance certificate (async - don't wait for completion)
+    if (createdPolicyId) {
+      // Start certificate generation in background
+      generateCertificateAsync(policyNumber, quoteData, user, createdPolicyId, transactionId);
     }
     
     toast.dismiss();
@@ -328,15 +306,69 @@ const handlePayment = async () => {
     setQuoteData(prev => prev ? { ...prev, payment_status: 'paid' } : null);
     
     setTimeout(() => {
-    //   router.push(`/quotes/${quoteId}?payment=success`);
+      if (createdPolicyId) {
+        router.push(`/shipments/${createdPolicyId}`);
+      } else {
         router.push(`/quotes/${quoteId}`);
-}, 1500);
+      }
+    }, 1500);
     
   } catch (error: any) {
     console.error('Payment error:', error);
     
     toast.error('Payment failed. Please try again.');
     setProcessing(false);
+  }
+};
+
+// Async function to generate certificate (runs in background)
+const generateCertificateAsync = async (
+  policyNumber: string, 
+  quoteData: QuoteData, 
+  user: any, 
+  policyId: string,
+  transactionId: string
+) => {
+  try {
+    console.log('Starting certificate generation for policy:', policyNumber);
+    
+    const supabase = createClient();
+    
+    // Call certificate generation API
+    const response = await fetch('/api/documents/generate-certificate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        policyId,
+        policyNumber,
+        quoteData,
+        user
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    if (result.success && result.certificateUrl) {
+      // Update policy with actual certificate URL
+      await supabase
+        .from('policies')
+        .update({ 
+          insurance_certificate_url: result.certificateUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', policyId);
+      
+      console.log('Certificate generated and policy updated:', result.certificateUrl);
+    } else {
+      console.warn('Certificate generation failed:', result.error);
+    }
+  } catch (error) {
+    console.error('Certificate generation failed:', error);
+    // Don't fail the payment if certificate generation fails
   }
 };
 
