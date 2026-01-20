@@ -116,7 +116,7 @@ export default function QuoteDetailsPage() {
     
     setTimeout(() => {
       toast.dismiss();
-      router.push(`/policies/${quoteData.policy_id}`);
+      router.push(`/shipments/${quoteData.policy_id}`);
     }, 1000);
   };
 
