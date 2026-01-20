@@ -328,8 +328,9 @@ const handlePayment = async () => {
     setQuoteData(prev => prev ? { ...prev, payment_status: 'paid' } : null);
     
     setTimeout(() => {
-      router.push(`/quotes/${quoteId}?payment=success`);
-    }, 1500);
+    //   router.push(`/quotes/${quoteId}?payment=success`);
+        router.push(`/quotes/${quoteId}`);
+}, 1500);
     
   } catch (error: any) {
     console.error('Payment error:', error);
