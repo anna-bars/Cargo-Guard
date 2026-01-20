@@ -135,17 +135,17 @@ export const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({
           </h2>
         </div>
         <div className="
-          flex items-center gap-3 px-3 py-2 rounded-lg border border-[#c7c7c7]/51 
+          flex items-center gap-3 px-3 py-1 rounded-lg border border-[#c7c7c7]/51 
           hover:border-[#a0a0a0]/51 transition-colors duration-300 cursor-pointer
         ">
           <span className="font-montserrat text-[12px] font-normal text-[#7b7b7b]">
             {timePeriod}
           </span>
-          <img 
+          {/* <img 
             src="https://c.animaapp.com/mjiggi0jSqvoj5/img/arrow-3-1.svg" 
             alt="Dropdown" 
             className="w-2 h-1"
-          />
+          /> */}
         </div>
       </div>
       
