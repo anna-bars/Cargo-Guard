@@ -138,102 +138,205 @@ const handleFileUpload = async (
   try {
     const supabase = createClient();
     
-    // Upload to Supabase Storage
-    const filePath = `documents/${policy.policy_number}/${type}/${Date.now()}-${file.name}`;
+    // Sanitize filename - remove Cyrillic, spaces, special characters
+    const sanitizeFileName = (filename: string): string => {
+      // Remove file extension temporarily
+      const extension = filename.substring(filename.lastIndexOf('.'));
+      
+      // Remove extension from filename
+      let name = filename.substring(0, filename.lastIndexOf('.'));
+      
+      // Replace Cyrillic with Latin equivalents or remove
+      const cyrillicMap: Record<string, string> = {
+        'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
+        'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
+        'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
+        'ф': 'f', 'х': 'kh', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'shch',
+        'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya',
+        'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Е': 'E', 'Ё': 'YO',
+        'Ж': 'ZH', 'З': 'Z', 'И': 'I', 'Й': 'Y', 'К': 'K', 'Л': 'L', 'М': 'M',
+        'Н': 'N', 'О': 'O', 'П': 'P', 'Р': 'R', 'С': 'S', 'Т': 'T', 'У': 'U',
+        'Ф': 'F', 'Х': 'KH', 'Ц': 'TS', 'Ч': 'CH', 'Ш': 'SH', 'Щ': 'SHCH',
+        'Ъ': '', 'Ы': 'Y', 'Ь': '', 'Э': 'E', 'Ю': 'YU', 'Я': 'YA'
+      };
+      
+      // Convert Cyrillic characters
+      name = name.split('').map(char => cyrillicMap[char] || char).join('');
+      
+      // Remove any remaining non-ASCII characters
+      name = name.replace(/[^\x00-\x7F]/g, '');
+      
+      // Replace spaces and special characters with underscores
+      name = name.replace(/[\s\W]+/g, '_');
+      
+      // Remove multiple underscores and trailing underscores
+      name = name.replace(/_+/g, '_').replace(/^_+|_+$/g, '');
+      
+      // Limit filename length
+      if (name.length > 100) {
+        name = name.substring(0, 100);
+      }
+      
+      // If name is empty after sanitization, use a default
+      if (!name) {
+        name = 'document';
+      }
+      
+      // Add timestamp for uniqueness
+      const timestamp = Date.now();
+      
+      return `${name}_${timestamp}${extension}`;
+    };
+    
+    const sanitizedFileName = sanitizeFileName(file.name);
+    console.log('Original filename:', file.name);
+    console.log('Sanitized filename:', sanitizedFileName);
+    
+    // Create file path
+    const filePath = `${policy.policy_number}/${type}/${sanitizedFileName}`;
+    
+    // Simulate upload progress
+    const progressInterval = setInterval(() => {
+      setUploading(prev => {
+        if (prev.progress >= 90) {
+          clearInterval(progressInterval);
+          return prev;
+        }
+        return { ...prev, progress: prev.progress + 10 };
+      });
+    }, 200);
     
     let uploadResult;
+    let bucketName = 'shipment-documents';
+    
     try {
       uploadResult = await supabase.storage
-        .from('shipment-documents')
+        .from(bucketName)
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: false
         });
     } catch (bucketError) {
-      console.log('Bucket might not exist, trying to create...');
-      
-      // Try to create bucket
-      await supabase.storage.createBucket('shipment-documents', {
-        public: true
-      });
-      
-      // Retry upload
+      console.log('Trying documents bucket instead...');
+      bucketName = 'documents';
       uploadResult = await supabase.storage
-        .from('shipment-documents')
-        .upload(filePath, file);
+        .from(bucketName)
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
     }
+    
+    clearInterval(progressInterval);
+    setUploading({ type, progress: 100 });
     
     const { data: uploadData, error: uploadError } = uploadResult;
     
     if (uploadError) {
-      throw uploadError;
-    }
-    
-    // Get public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('shipment-documents')
-      .getPublicUrl(filePath);
-    
-    // Update database - ՍԱՐՔԵՆՔ ՄԵԹՈԴ, ՈՐ ՉԻ ՉԱՐՏԱՐԵԼ single() ՊԱՅՄԱՆՆԵՐՈՒՄ
-    const updateData: any = {
-      updated_at: new Date().toISOString()
-    };
-    
-    if (type === 'commercial_invoice') {
-      updateData.commercial_invoice_url = publicUrl;
-      updateData.commercial_invoice_status = 'uploaded';
-    } else if (type === 'packing_list') {
-      updateData.packing_list_url = publicUrl;
-      updateData.packing_list_status = 'uploaded';
-    } else if (type === 'bill_of_lading') {
-      updateData.bill_of_lading_url = publicUrl;
-      updateData.bill_of_lading_status = 'uploaded';
-    }
-    
-    // Սկզբում փորձենք գտնել գոյություն ունեցող գրառում
-    const { data: existingDoc, error: findError } = await supabase
-      .from('documents')
-      .select('id')
-      .eq('policy_id', shipmentId)
-      .maybeSingle();
-    
-    let updatedDocument;
-    
-    if (existingDoc) {
-      // Եթե գրառումը գոյություն ունի, update
-      const { data, error } = await supabase
-        .from('documents')
-        .update(updateData)
-        .eq('id', existingDoc.id)
-        .select()
-        .single();
+      console.error('Upload error details:', uploadError);
       
-      if (error) throw error;
-      updatedDocument = data;
+      // Try one more time with a simpler filename
+      const simpleFileName = `${type}_${Date.now()}.${file.name.split('.').pop()}`;
+      const simplePath = `${policy.policy_number}/${type}/${simpleFileName}`;
+      
+      console.log('Trying with simple filename:', simpleFileName);
+      
+      const retryResult = await supabase.storage
+        .from(bucketName)
+        .upload(simplePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+      
+      if (retryResult.error) {
+        throw retryResult.error;
+      }
+      
+      // Use retry path
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucketName)
+        .getPublicUrl(simplePath);
+      
+      await updateDocumentRecord(type, publicUrl);
+      
     } else {
-      // Եթե գրառումը չկա, insert
-      const { data, error } = await supabase
-        .from('documents')
-        .insert({
-          policy_id: shipmentId,
-          ...updateData
-        })
-        .select()
-        .single();
+      // Get public URL for successful upload
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucketName)
+        .getPublicUrl(filePath);
       
-      if (error) throw error;
-      updatedDocument = data;
+      await updateDocumentRecord(type, publicUrl);
     }
     
-    setDocuments(updatedDocument);
     toast.success(`${getDocumentName(type)} uploaded successfully!`);
     
-  } catch (error) {
+    setTimeout(() => {
+      setUploading({ type: null, progress: 0 });
+    }, 1000);
+    
+  } catch (error: any) {
     console.error('Upload error:', error);
-    toast.error('Failed to upload document');
-  } finally {
+    toast.error(`Failed to upload document: ${error.message}`);
     setUploading({ type: null, progress: 0 });
   }
+};
+
+// Helper function to update document record
+const updateDocumentRecord = async (type: string, publicUrl: string) => {
+  const supabase = createClient();
+  
+  const updateData: any = {
+    updated_at: new Date().toISOString()
+  };
+  
+  if (type === 'commercial_invoice') {
+    updateData.commercial_invoice_url = publicUrl;
+    updateData.commercial_invoice_status = 'uploaded';
+  } else if (type === 'packing_list') {
+    updateData.packing_list_url = publicUrl;
+    updateData.packing_list_status = 'uploaded';
+  } else if (type === 'bill_of_lading') {
+    updateData.bill_of_lading_url = publicUrl;
+    updateData.bill_of_lading_status = 'uploaded';
+  }
+  
+  // First try to find existing document
+  const { data: existingDoc, error: findError } = await supabase
+    .from('documents')
+    .select('id')
+    .eq('policy_id', shipmentId)
+    .maybeSingle();
+  
+  let updatedDocument;
+  
+  if (existingDoc) {
+    // If exists, update
+    const { data, error } = await supabase
+      .from('documents')
+      .update(updateData)
+      .eq('id', existingDoc.id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    updatedDocument = data;
+  } else {
+    // If doesn't exist, insert
+    const { data, error } = await supabase
+      .from('documents')
+      .insert({
+        policy_id: shipmentId,
+        ...updateData,
+        created_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    updatedDocument = data;
+  }
+  
+  setDocuments(updatedDocument);
 };
   const getDocumentName = (type: string) => {
     switch (type) {
