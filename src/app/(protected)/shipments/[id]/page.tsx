@@ -75,6 +75,7 @@ export default function ShipmentDetailPage() {
         router.push('/dashboard');
         return;
       }
+      console.log(policyData)
       
       setPolicy(policyData);
       
