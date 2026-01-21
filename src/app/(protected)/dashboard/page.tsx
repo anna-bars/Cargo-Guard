@@ -10,9 +10,8 @@ import { UniversalTable, renderStatus, renderButton } from '@/app/components/tab
 import { createClient } from '@/lib/supabase/client';
 import { useUser } from '@/app/context/UserContext';
 import { useRouter } from 'next/navigation';
-import { Package, DollarSign, Calendar, MapPin, Shield, FileText, CheckCircle, XCircle, Clock } from 'lucide-react';
 
-// Dashboard-ի columns - թարմացված
+// Dashboard-ի columns
 const dashboardColumns = [
   {
     key: 'id',
@@ -79,7 +78,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [dashboardRows, setDashboardRows] = useState<any[]>([])
   const [userName, setUserName] = useState<string>('')
-  
+  const [sortedRows, setSortedRows] = useState<any[]>([]);
   // Performance metrics
   const [performanceMetrics, setPerformanceMetrics] = useState({
     totalInsured: { value: '84', decimal: '5k', total: 84500 },
@@ -215,7 +214,7 @@ export default function DashboardPage() {
       if (!user) return
       
       try {
-        // Ստանալ օգտատիրոջ տվյալները
+        // Ստանալ օգտատիրոջ տվյալները profiles աղյուսակից
         const { data: userProfile, error: profileError } = await supabase
           .from('profiles')
           .select('full_name, email')
@@ -234,7 +233,7 @@ export default function DashboardPage() {
           setUserName(emailName.charAt(0).toUpperCase() + emailName.slice(1))
         }
 
-        // Ստանալ բոլոր quotes-ը
+        // Ստանալ quote_requests-ները
         const { data: quotes, error: quotesError } = await supabase
           .from('quotes')
           .select('*')
@@ -244,7 +243,7 @@ export default function DashboardPage() {
 
         if (quotesError) throw quotesError
 
-        // Ստանալ բոլոր policies-ը
+        // Ստանալ policies-ները
         const { data: policies, error: policiesError } = await supabase
           .from('policies')
           .select('*')
@@ -254,8 +253,11 @@ export default function DashboardPage() {
 
         if (policiesError) throw policiesError
 
-        // Միավորել quotes և policies տվյալները
-        const formattedData = formatCombinedData(quotes || [], policies || [])
+        // Միավորել և format անել տվյալները - ԹԱՐՄԵՐԸ ՎԵՐԵՎՈՒՄ
+        const formattedData = formatCombinedData(
+          quotes || [],
+          policies || []
+        )
         setDashboardRows(formattedData)
 
         // Հաշվել conversion data բոլոր ժամանակահատվածների համար
@@ -276,8 +278,9 @@ export default function DashboardPage() {
         const submittedQuotesCount = (quotes || []).filter(q => q.status === 'submitted').length;
         const underReviewCount = (quotes || []).filter(q => q.status === 'under_review').length;
         const draftQuotesCount = (quotes || []).filter(q => q.status === 'draft').length;
-        const totalItems = (quotes?.length || 0) + (policies?.length || 0) || 1;
+        const totalQuotes = quotes?.length || 1;
 
+        // Ավելի ճշգրիտ հաշվարկներ
         const totalInsuredInK = Math.floor(totalInsuredAmount / 1000);
         const decimalPart = Math.round((totalInsuredAmount % 1000) / 10);
         
@@ -289,19 +292,19 @@ export default function DashboardPage() {
           },
           activePolicies: { 
             count: activePoliciesCount, 
-            percentage: Math.round((activePoliciesCount / totalItems) * 100) || 47
+            percentage: Math.round((activePoliciesCount / totalQuotes) * 100) || 47
           },
           quotesAwaiting: { 
             count: submittedQuotesCount, 
-            percentage: Math.round((submittedQuotesCount / totalItems) * 100) || 25
+            percentage: Math.round((submittedQuotesCount / totalQuotes) * 100) || 25
           },
           underReview: { 
             count: underReviewCount, 
-            percentage: Math.round((underReviewCount / totalItems) * 100)
+            percentage: Math.round((underReviewCount / totalQuotes) * 100)
           },
           readyToPay: { 
             count: draftQuotesCount, 
-            percentage: Math.round((draftQuotesCount / totalItems) * 100) || 17
+            percentage: Math.round((draftQuotesCount / totalQuotes) * 100) || 17
           }
         });
 
@@ -316,47 +319,7 @@ export default function DashboardPage() {
     loadDashboardData()
   }, [user])
 
-  // Policy-ի համար status config
-  const getPolicyStatusConfig = (policy: any) => {
-    const statusMap: Record<string, any> = {
-      'active': { 
-        text: 'Active', 
-        color: 'bg-emerald-50', 
-        dot: 'bg-emerald-500', 
-        textColor: 'text-emerald-700',
-        buttonText: 'View Shipment',
-        buttonVariant: 'success' as const
-      },
-      'pending': { 
-        text: 'Pending Activation', 
-        color: 'bg-blue-50', 
-        dot: 'bg-blue-500', 
-        textColor: 'text-blue-700',
-        buttonText: 'View Details',
-        buttonVariant: 'secondary' as const
-      },
-      'expired': { 
-        text: 'Expired', 
-        color: 'bg-gray-100', 
-        dot: 'bg-gray-400', 
-        textColor: 'text-gray-600',
-        buttonText: 'View Details',
-        buttonVariant: 'secondary' as const
-      },
-      'cancelled': { 
-        text: 'Cancelled', 
-        color: 'bg-rose-50', 
-        dot: 'bg-rose-500', 
-        textColor: 'text-rose-700',
-        buttonText: 'View Details',
-        buttonVariant: 'secondary' as const
-      }
-    };
-
-    return statusMap[policy.status] || statusMap['pending'];
-  };
-
-  // Quote-ի համար status config
+  // Status config ֆունկցիա quotes-ի համար
   const getQuoteStatusConfig = (quote: any) => {
     const calculateDaysText = (expirationTime: string) => {
       if (!expirationTime) return '';
@@ -379,6 +342,8 @@ export default function DashboardPage() {
     const isPaid = quote.payment_status === 'paid';
     const isExpired = quote.quote_expires_at && new Date(quote.quote_expires_at) < new Date();
     const daysText = quote.expiration_time ? calculateDaysText(quote.expiration_time) : '';
+
+    // Եթե quote-ը արդեն approved և paid է, ապա հաշվի չառնել expiration-ը
     const isApprovedAndPaid = quote.status === 'approved' && isPaid;
     
     const statusMap: Record<string, any> = {
@@ -429,9 +394,26 @@ export default function DashboardPage() {
         textColor: 'text-gray-600',
         buttonText: 'View Details',
         buttonVariant: 'secondary' as const
+      },
+      'converted': { 
+        text: 'Converted to Policy', 
+        color: 'bg-emerald-50', 
+        dot: 'bg-emerald-500', 
+        textColor: 'text-emerald-700',
+        buttonText: 'View Policy',
+        buttonVariant: 'success' as const
+      },
+      'waiting_for_docs': { 
+        text: 'Waiting for Documents', 
+        color: 'bg-cyan-50', 
+        dot: 'bg-cyan-500', 
+        textColor: 'text-cyan-700',
+        buttonText: 'View Details',
+        buttonVariant: 'secondary' as const
       }
     };
 
+    // 1. Ստուգենք, արդյոք quote-ն expired է
     if (isExpired) {
       return {
         text: 'Expired' + daysText,
@@ -444,6 +426,7 @@ export default function DashboardPage() {
       };
     }
 
+    // 2. Եթե արդեն approved և paid է, ապա պարզապես ցույց տալ "Approved & Paid"
     if (isApprovedAndPaid) {
       return {
         text: 'Approved & Paid',
@@ -457,6 +440,7 @@ export default function DashboardPage() {
 
     const baseConfig = statusMap[quote.status] || statusMap['draft'];
     
+    // 3. Մնացած դեպքերում ավելացնել ժամանակ, եթե կա
     if (['approved', 'pay_to_activate', 'submitted'].includes(quote.status) && quote.expiration_time && !isApprovedAndPaid) {
       return {
         ...baseConfig,
@@ -465,6 +449,70 @@ export default function DashboardPage() {
     }
     
     return baseConfig;
+  };
+
+  // Status config ֆունկցիա policies-ի համար
+  const getPolicyStatusConfig = (policy: any) => {
+    const statusMap: Record<string, any> = {
+      'active': { 
+        text: 'Active', 
+        color: 'bg-emerald-50', 
+        dot: 'bg-emerald-500', 
+        textColor: 'text-emerald-700',
+        buttonText: 'View Shipment',
+        buttonVariant: 'success' as const
+      },
+      'pending': { 
+        text: 'Pending Activation', 
+        color: 'bg-blue-50', 
+        dot: 'bg-blue-500', 
+        textColor: 'text-blue-700',
+        buttonText: 'View Details',
+        buttonVariant: 'secondary' as const
+      },
+      'expired': { 
+        text: 'Expired', 
+        color: 'bg-gray-100', 
+        dot: 'bg-gray-400', 
+        textColor: 'text-gray-600',
+        buttonText: 'View Details',
+        buttonVariant: 'secondary' as const
+      },
+      'cancelled': { 
+        text: 'Cancelled', 
+        color: 'bg-rose-50', 
+        dot: 'bg-rose-500', 
+        textColor: 'text-rose-700',
+        buttonText: 'View Details',
+        buttonVariant: 'secondary' as const
+      }
+    };
+
+    return statusMap[policy.status] || statusMap['pending'];
+  };
+useEffect(() => {
+  if (dashboardRows.length > 0) {
+    // Sort ըստ ամսաթվի - ամենանորերը վերևում
+    const sorted = [...dashboardRows].sort((a, b) => {
+      const dateA = new Date(a.rawData?.created_at || a.date || '1970-01-01').getTime();
+      const dateB = new Date(b.rawData?.created_at || b.date || '1970-01-01').getTime();
+      return dateB - dateA;
+    });
+    setSortedRows(sorted);
+  } else {
+    setSortedRows(getFallbackData());
+  }
+}, [dashboardRows]);
+
+  const formatQuoteId = (id: string) => {
+    if (id.startsWith('Q-')) {
+      return id;
+    }
+    if (id.startsWith('temp-')) {
+      const randomNum = Math.floor(Math.random() * 10000).toString().padStart(5, '0');
+      return `Q-${randomNum}`;
+    }
+    return `Q-${id.slice(-5)}`;
   };
 
   const formatDate = (dateString: string) => {
@@ -477,23 +525,24 @@ export default function DashboardPage() {
     })
   };
 
-// Միավորել quotes և policies տվյալները՝ նորերը վերևում
+// formatCombinedData ֆունկցիան պետք է ուղղենք
 const formatCombinedData = (quotes: any[], policies: any[]) => {
-  const combinedData: any[] = []
+  const allItems: any[] = [];
 
-  // Ավելացնել quotes
+  // Ստեղծել quotes-ի տարրերը
   quotes.forEach(quote => {
-    const statusConfig = getQuoteStatusConfig(quote)
+    const statusConfig = getQuoteStatusConfig(quote);
+    const createdAt = new Date(quote.created_at);
     
     const buttonAction = { 
       text: statusConfig.buttonText, 
       variant: statusConfig.buttonVariant,
       onClick: (row: any) => handleQuoteAction(row, quote)
-    }
+    };
     
-    combinedData.push({
+    allItems.push({
       type: 'Quote',
-      id: quote.quote_number || `Q-${quote.id.slice(-5)}`,
+      id: quote.quote_number || formatQuoteId(quote.id),
       cargo: quote.cargo_type || 'Unknown',
       value: quote.shipment_value || 0,
       status: {
@@ -502,27 +551,30 @@ const formatCombinedData = (quotes: any[], policies: any[]) => {
         dot: statusConfig.dot,
         textColor: statusConfig.textColor
       },
-      date: formatDate(quote.created_at), // Այստեղ արդեն ֆորմատավորված
+      date: formatDate(quote.created_at),
       button: buttonAction,
       rawData: quote,
       dataType: 'quote',
       quoteStatus: quote.status,
       paymentStatus: quote.payment_status,
-      sortDate: new Date(quote.created_at).getTime() // Համեմատության համար
-    })
-  })
+      // Կարևոր! - պահպանել ISO ամսաթիվը sort-ի համար
+      sortDate: quote.created_at, // Պահպանել ISO string-ը
+      timestamp: createdAt.getTime() // Պահպանել timestamp-ը
+    });
+  });
 
-  // Ավելացնել policies
+  // Ստեղծել policies-ի տարրերը
   policies.forEach(policy => {
-    const statusConfig = getPolicyStatusConfig(policy)
+    const statusConfig = getPolicyStatusConfig(policy);
+    const createdAt = new Date(policy.created_at);
     
     const buttonAction = { 
       text: statusConfig.buttonText, 
       variant: statusConfig.buttonVariant,
       onClick: (row: any) => handlePolicyAction(row, policy)
-    }
+    };
     
-    combinedData.push({
+    allItems.push({
       type: 'Policy',
       id: policy.policy_number,
       cargo: policy.cargo_type || 'Unknown',
@@ -533,91 +585,29 @@ const formatCombinedData = (quotes: any[], policies: any[]) => {
         dot: statusConfig.dot,
         textColor: statusConfig.textColor
       },
-      date: formatDate(policy.created_at), // Այստեղ արդեն ֆորմատավորված
+      date: formatDate(policy.created_at),
       button: buttonAction,
       rawData: policy,
       dataType: 'policy',
       policyStatus: policy.status,
-      coverageStart: policy.coverage_start,
-      coverageEnd: policy.coverage_end,
-      sortDate: new Date(policy.created_at).getTime() // Համեմատության համար
-    })
-  })
+      // Կարևոր! - պահպանել ISO ամսաթիվը sort-ի համար
+      sortDate: policy.created_at, // Պահպանել ISO string-ը
+      timestamp: createdAt.getTime() // Պահպանել timestamp-ը
+    });
+  });
 
-  // Դասակարգել ըստ ամսաթվի՝ նորերը վերևում
-  return combinedData.sort((a, b) => b.sortDate - a.sortDate)
-}
-  const handleQuoteAction = (row: any, quote: any) => {
-    const quoteId = row.rawData?.id || row.id;
-    const status = quote.status;
-    const paymentStatus = quote.payment_status;
-    const isExpired = quote.quote_expires_at && new Date(quote.quote_expires_at) < new Date();
-    
-    const checkPolicyAndRedirect = async () => {
-      try {
-        const { data: policy } = await supabase
-          .from('policies')
-          .select('*')
-          .eq('quote_id', quoteId)
-          .maybeSingle();
-        
-        if (policy?.status === 'active') {
-          router.push(`/shipments/${policy.id}`)
-          return true;
-        }
-        
-        return false;
-      } catch (error) {
-        console.error('Error checking policy:', error)
-        return false;
-      }
+  // SORT անել ըստ ամսաթվի - ԹԱՐՄԵՐԸ ՎԵՐԵՎՈՒՄ
+  // Օգտագործել timestamp-ը կամ ISO string-ը
+  return allItems.sort((a, b) => {
+    // Ստուգել, թե արդյոք տվյալներն ունեն timestamp
+    if (a.timestamp && b.timestamp) {
+      return b.timestamp - a.timestamp;
     }
-    
-    switch (status) {
-      case 'draft':
-        router.push(`/quotes/new?quote_id=${quoteId}&continue=true`)
-        break
-      case 'submitted':
-      case 'under_review':
-        router.push(`/quotes/${quoteId}`)
-        break
-      case 'approved':
-        if (paymentStatus === 'paid') {
-          checkPolicyAndRedirect().then((hasPolicy) => {
-            if (!hasPolicy) {
-              router.push(`/quotes/${quoteId}`)
-            }
-          })
-        } else {
-          router.push(`/quotes/${quoteId}`)
-        }
-        break
-      case 'rejected':
-        router.push(`/quotes/${quoteId}`)
-        break
-      case 'expired':
-        if (confirm('This quote has expired. Would you like to create a new one based on this?')) {
-          router.push(`/quotes/new?duplicate=${quoteId}`);
-        }
-        break
-      case 'pay_to_activate':
-        router.push(`/quotes/${quoteId}`)
-        break
-      default:
-        router.push(`/quotes/${quoteId}`)
-    }
-  };
-
-  const handlePolicyAction = (row: any, policy: any) => {
-    const policyId = row.rawData?.id || row.id;
-    
-    if (policy.status === 'active') {
-      router.push(`/shipments/${policyId}`)
-    } else {
-      router.push(`/quotes/${policy.quote_id}`)
-    }
-  };
-
+    // Հակառակ դեպքում օգտագործել ISO string-ը
+    return new Date(b.sortDate || b.rawData?.created_at).getTime() - 
+           new Date(a.sortDate || a.rawData?.created_at).getTime();
+  });
+};
   const getFallbackData = () => {
     return [
       {
@@ -676,8 +666,177 @@ const formatCombinedData = (quotes: any[], policies: any[]) => {
           onClick: (row: any) => router.push('/shipments/8973bd4b-d206-42fc-ac7c-b7f16c051509')
         },
         dataType: 'policy'
+      },
+      {
+        type: 'Quote',
+        id: 'Q-T-001',
+        cargo: 'Unknown',
+        value: 0,
+        status: { 
+          text: 'Expired (Today)', 
+          color: 'bg-gray-100', 
+          dot: 'bg-gray-400', 
+          textColor: 'text-gray-600' 
+        },
+        date: 'Jan 19, 11:30 PM',
+        button: { 
+          text: 'View Details', 
+          variant: 'secondary' as const,
+          onClick: (row: any) => handleQuoteAction(row, { status: 'expired' })
+        },
+        dataType: 'quote'
+      },
+      {
+        type: 'Quote',
+        id: 'Q-08822',
+        cargo: 'clothing',
+        value: 7780,
+        status: { 
+          text: 'Expired (1 day ago)', 
+          color: 'bg-gray-100', 
+          dot: 'bg-gray-400', 
+          textColor: 'text-gray-600' 
+        },
+        date: 'Jan 19, 10:52 PM',
+        button: { 
+          text: 'View Details', 
+          variant: 'secondary' as const,
+          onClick: (row: any) => handleQuoteAction(row, { status: 'expired' })
+        },
+        dataType: 'quote'
+      },
+      {
+        type: 'Quote',
+        id: 'Q-00085',
+        cargo: 'machinery',
+        value: 84999.99,
+        status: { 
+          text: 'Rejected', 
+          color: 'bg-rose-50', 
+          dot: 'bg-rose-500', 
+          textColor: 'text-rose-700' 
+        },
+        date: 'Jan 19, 10:16 PM',
+        button: { 
+          text: 'View Details', 
+          variant: 'secondary' as const,
+          onClick: (row: any) => handleQuoteAction(row, { status: 'rejected' })
+        },
+        dataType: 'quote'
+      },
+      {
+        type: 'Quote',
+        id: 'Q-09400',
+        cargo: 'pharma',
+        value: 4499.99,
+        status: { 
+          text: 'Approved & Paid', 
+          color: 'bg-emerald-50', 
+          dot: 'bg-emerald-500', 
+          textColor: 'text-emerald-700' 
+        },
+        date: 'Jan 19, 10:06 PM',
+        button: { 
+          text: 'View Policy', 
+          variant: 'success' as const,
+          onClick: (row: any) => handleQuoteAction(row, { status: 'approved', payment_status: 'paid' })
+        },
+        dataType: 'quote'
+      },
+      {
+        type: 'Quote',
+        id: 'Q-07232',
+        cargo: 'electronics',
+        value: 12000,
+        status: { 
+          text: 'Pay to Activate', 
+          color: 'bg-amber-50', 
+          dot: 'bg-amber-500', 
+          textColor: 'text-amber-700' 
+        },
+        date: 'Jan 19, 10:05 PM',
+        button: { 
+          text: 'Pay Now', 
+          variant: 'primary' as const,
+          onClick: (row: any) => handleQuoteAction(row, { status: 'pay_to_activate' })
+        },
+        dataType: 'quote'
       }
-    ]
+    ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()); // Sort fallback data too
+  };
+
+  const handleQuoteAction = (row: any, quote: any) => {
+    const quoteId = row.rawData?.id || row.id;
+    const status = quote.status;
+    const paymentStatus = quote.payment_status;
+    const isExpired = quote.quote_expires_at && new Date(quote.quote_expires_at) < new Date();
+    
+    const checkPolicyAndRedirect = async () => {
+      try {
+        const { data: policy } = await supabase
+          .from('policies')
+          .select('*')
+          .eq('quote_id', quoteId)
+          .maybeSingle();
+        
+        if (policy?.status === 'active') {
+          router.push(`/shipments/${policy.id}`)
+          return true;
+        }
+        
+        return false;
+      } catch (error) {
+        console.error('Error checking policy:', error)
+        return false;
+      }
+    }
+    
+    switch (status) {
+      case 'draft':
+        router.push(`/quotes/new?quote_id=${quoteId}&continue=true`)
+        break
+      case 'submitted':
+      case 'under_review':
+      case 'waiting_for_review':
+      case 'documents_under_review':
+        router.push(`/quotes/${quoteId}`)
+        break
+      case 'approved':
+        if (paymentStatus === 'paid') {
+          checkPolicyAndRedirect().then((hasPolicy) => {
+            if (!hasPolicy) {
+              router.push(`/quotes/${quoteId}`)
+            }
+          })
+        } else {
+          router.push(`/quotes/${quoteId}`)
+        }
+        break
+      case 'rejected':
+      case 'fix_and_resubmit':
+        router.push(`/quotes/${quoteId}`)
+        break
+      case 'expired':
+        if (confirm('This quote has expired. Would you like to create a new one based on this?')) {
+          router.push(`/quotes/new?duplicate=${quoteId}`);
+        }
+        break
+      case 'pay_to_activate':
+        router.push(`/quotes/${quoteId}`)
+        break
+      default:
+        router.push(`/quotes/${quoteId}`)
+    }
+  };
+
+  const handlePolicyAction = (row: any, policy: any) => {
+    const policyId = row.rawData?.id || row.id;
+    
+    if (policy.status === 'active') {
+      router.push(`/shipments/${policyId}`)
+    } else {
+      router.push(`/quotes/${policy.quote_id}`)
+    }
   };
 
   useEffect(() => {
@@ -819,39 +978,46 @@ const formatCombinedData = (quotes: any[], policies: any[]) => {
               />
             </div>
 
-            <UniversalTable
-              title="Recent Activity"
-              showMobileHeader={false}
-              rows={dashboardRows.length > 0 ? dashboardRows : getFallbackData()}
-              columns={dashboardColumns}
-              filterConfig={{
-                showActivityFilter: true,
-                showTimeframeFilter: true,
-                showSortFilter: true,
-                activityOptions: [
-                  'All Activity', 
-                  'Quotes', 
-                  'Policies',
-                  'Draft', 
-                  'Submitted', 
-                  'Under Review', 
-                  'Approved', 
-                  'Rejected',
-                  'Active'
-                ],
-                timeframeOptions: ['Last 7 days', 'Last 30 days', 'Last 3 months', 'All time'],
-                sortOptions: ['Type', 'Status', 'Date', 'Value']
-              }}
-              mobileDesign={{
-                showType: true,
-                showCargoIcon: true,
-                showDateIcon: true,
-                dateLabel: 'Created',
-                buttonWidth: '47%'
-              }}
-              mobileDesignType="dashboard"
-              desktopGridCols="0.5fr 0.5fr 0.7fr 0.7fr 1.3fr 0.2fr 1fr"
-            />
+      <UniversalTable
+  title="Recent Activity"
+  showMobileHeader={false}
+  rows={sortedRows} // Օգտագործել արդեն sort արված տվյալները
+  columns={dashboardColumns}
+  initialFilters={{
+    activity: 'All Activity',
+    timeframe: 'All time'
+  }}
+  filterConfig={{
+    showActivityFilter: true,
+    showTimeframeFilter: true,
+    showSortFilter: false, // Անջատել sort filter-ը
+    activityOptions: [
+      'All Activity', 
+      'Quotes',
+      'Policies',
+      'Draft', 
+      'Submitted', 
+      'Under Review', 
+      'Approved', 
+      'Rejected',
+      'Active'
+    ],
+    timeframeOptions: ['Last 7 days', 'Last 30 days', 'Last 3 months', 'All time']
+  }}
+  // Եթե ուզում եք արգելափակել sort-ի փոփոխությունը
+  onFilterChange={(filters) => {
+    // Այստեղ կարող եք վերահսկել, որ sort-ը միշտ լինի ըստ Date
+  }}
+  mobileDesign={{
+    showType: true,
+    showCargoIcon: true,
+    showDateIcon: true,
+    dateLabel: 'Created',
+    buttonWidth: '47%'
+  }}
+  mobileDesignType="dashboard"
+  desktopGridCols="0.5fr 0.5fr 0.7fr 0.7fr 1.3fr 0.2fr 1fr"
+/>
           </div>
 
           <div className="
