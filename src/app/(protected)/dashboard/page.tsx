@@ -983,10 +983,7 @@ const formatCombinedData = (quotes: any[], policies: any[]) => {
   showMobileHeader={false}
   rows={sortedRows} // Օգտագործել արդեն sort արված տվյալները
   columns={dashboardColumns}
-  initialFilters={{
-    activity: 'All Activity',
-    timeframe: 'All time'
-  }}
+
   filterConfig={{
     showActivityFilter: true,
     showTimeframeFilter: true,
