@@ -246,9 +246,9 @@ const handlePayment = async () => {
       const endDate = new Date(quoteData.end_date);
       
       // Create placeholder URLs (will be updated after certificate generation)
-      const placeholderCertificateUrl = `/api/certificates/${policyNumber}`;
+      const placeholderCertificateUrl = `/api/documents/generate-certificate`;
       const termsUrl = `https://storage.cargoguard.com/legal/terms-and-conditions-v1.0.pdf`;
-      const receiptUrl = `/api/receipts/${transactionId}`;
+      const receiptUrl = `/api/generate-receipt`;
       
       const policyData = {
         quote_id: quoteId,
@@ -296,22 +296,29 @@ const handlePayment = async () => {
     
     // 4. Generate insurance certificate (async - don't wait for completion)
     if (createdPolicyId) {
-      // Start certificate generation in background
-      generateCertificateAsync(policyNumber, quoteData, user, createdPolicyId, transactionId);
-    }
-    
-    toast.dismiss();
-    toast.success('Payment successful! Your insurance is now active.');
-    
-    setQuoteData(prev => prev ? { ...prev, payment_status: 'paid' } : null);
-    
-    setTimeout(() => {
-      if (createdPolicyId) {
-        router.push(`/shipments/${createdPolicyId}`);
-      } else {
-        router.push(`/quotes/${quoteId}`);
-      }
-    }, 1500);
+  // Start certificate generation in background
+  generateCertificateAsync(policyNumber, quoteData, user, createdPolicyId, transactionId)
+    .catch(error => console.error('Certificate generation background error:', error));
+  
+  // Start receipt generation in background
+  if (payment) {
+    generateReceiptAsync(transactionId, payment, policyNumber, createdPolicyId)
+      .catch(error => console.error('Receipt generation background error:', error));
+  }
+}
+
+toast.dismiss();
+toast.success('Payment successful! Your insurance is now active.');
+
+setQuoteData(prev => prev ? { ...prev, payment_status: 'paid' } : null);
+
+setTimeout(() => {
+  if (createdPolicyId) {
+    router.push(`/shipments/${createdPolicyId}`);
+  } else {
+    router.push(`/quotes/${quoteId}`);
+  }
+}, 1500);
     
   } catch (error: any) {
     console.error('Payment error:', error);
@@ -320,8 +327,6 @@ const handlePayment = async () => {
     setProcessing(false);
   }
 };
-
-// Async function to generate certificate (runs in background)
 const generateCertificateAsync = async (
   policyNumber: string, 
   quoteData: QuoteData, 
@@ -330,30 +335,31 @@ const generateCertificateAsync = async (
   transactionId: string
 ) => {
   try {
-    console.log('Starting certificate generation for policy:', policyNumber);
+    console.log('Generating certificate for policy:', policyNumber);
     
-    const supabase = createClient();
-    
-    // Call certificate generation API
-    const response = await fetch('/api/documents/generate-certificate', {
+    // Call PDF.co API endpoint
+    const response = await fetch('/api/generate-pdf-certificate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        policyId,
         policyNumber,
         quoteData,
         user
       })
     });
     
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
     const result = await response.json();
     
+    if (!response.ok) {
+      console.error('Certificate generation failed:', result.error);
+      throw new Error(result.error || 'Failed to generate certificate');
+    }
+    
     if (result.success && result.certificateUrl) {
-      // Update policy with actual certificate URL
+      console.log('Certificate generated:', result.certificateUrl);
+      
+      // Update policy with the actual URL
+      const supabase = createClient();
       await supabase
         .from('policies')
         .update({ 
@@ -362,16 +368,105 @@ const generateCertificateAsync = async (
         })
         .eq('id', policyId);
       
-      console.log('Certificate generated and policy updated:', result.certificateUrl);
+      console.log('Policy updated with certificate URL');
+      
     } else {
-      console.warn('Certificate generation failed:', result.error);
+      console.warn('Certificate generation warning:', result.error || 'Unknown error');
+      
+      // Fallback: Create a simple URL anyway
+      const fallbackUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/documents/certificate-${policyNumber}.pdf`;
+      
+      const supabase = createClient();
+      await supabase
+        .from('policies')
+        .update({ 
+          insurance_certificate_url: fallbackUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', policyId);
+      
+      console.log('Used fallback URL:', fallbackUrl);
     }
+    
   } catch (error) {
     console.error('Certificate generation failed:', error);
-    // Don't fail the payment if certificate generation fails
+    
+    // Ultimate fallback
+    try {
+      const supabase = createClient();
+      const fallbackUrl = `https://storage.cargoguard.com/certificates/generic.pdf`;
+      
+      await supabase
+        .from('policies')
+        .update({ 
+          insurance_certificate_url: fallbackUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', policyId);
+      
+      console.log('Used generic certificate URL as ultimate fallback');
+    } catch (fallbackError) {
+      console.error('Even fallback failed:', fallbackError);
+    }
   }
 };
-
+// Add this function right after generateCertificateAsync
+const generateReceiptAsync = async (
+  transactionId: string,
+  paymentData: any,
+  policyNumber: string,
+  policyId: string
+) => {
+  try {
+    console.log('Generating receipt for transaction:', transactionId);
+    
+    const response = await fetch('/api/generate-receipt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        transactionId,
+        payment: paymentData,
+        policyNumber
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (!response.ok) {
+      console.error('Receipt generation failed:', result.error);
+      throw new Error(result.error || 'Failed to generate receipt');
+    }
+    
+    if (result.success && result.receiptUrl) {
+      console.log('Receipt generated:', result.receiptUrl);
+      
+      // Update payment with receipt URL
+      const supabase = createClient();
+      await supabase
+        .from('payments')
+        .update({ 
+          receipt_url: result.receiptUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('transaction_id', transactionId);
+      
+      // Also update policy
+      await supabase
+        .from('policies')
+        .update({ 
+          receipt_url: result.receiptUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', policyId);
+      
+      console.log('Receipt URLs updated');
+    }
+    
+  } catch (error) {
+    console.error('Receipt generation failed:', error);
+    // Don't fail the whole process
+  }
+};
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',

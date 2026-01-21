@@ -1,161 +1,200 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/server';
 
 export async function POST(request: NextRequest) {
+  console.log('Certificate generation endpoint called');
+  
   try {
-    const { policyId, policyNumber, quoteData, user } = await request.json();
+    const body = await request.json();
+    console.log('Request body received:', { 
+      hasPolicyId: !!body.policyId,
+      hasPolicyNumber: !!body.policyNumber,
+      policyId: body.policyId,
+      policyNumber: body.policyNumber
+    });
     
-    // Create certificate HTML
-    const htmlContent = generateCertificateHTML(policyNumber, quoteData, user);
+    const { policyId, policyNumber, quoteData, user } = body;
     
-    // For now, we'll just create a URL and store it
-    // In production, you would use puppeteer to generate PDF
+    if (!policyId || !policyNumber) {
+      console.error('Missing required fields:', { policyId, policyNumber });
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Policy ID and Policy Number are required' 
+      }, { status: 400 });
+    }
     
-    // Create unique filename
-    const fileName = `certificate-${policyNumber}-${Date.now()}.pdf`;
-    const certificateUrl = `https://storage.cargoguard.com/certificates/${fileName}`;
+    const supabase = await createClient();
+    console.log('Supabase client created');
+    
+    // Check bucket access first
+    console.log('Checking bucket access...');
+    const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
+    
+    if (bucketsError) {
+      console.error('Bucket list error:', bucketsError);
+      return NextResponse.json({ 
+        success: false, 
+        error: `Storage error: ${bucketsError.message}` 
+      }, { status: 500 });
+    }
+    
+    console.log('Available buckets:', buckets?.map(b => b.name));
+    
+    if (!buckets?.some(b => b.name === 'documents')) {
+      console.error('Documents bucket not found');
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Documents bucket not found in storage' 
+      }, { status: 500 });
+    }
+    
+    // 1. Try to import PDFKit
+    console.log('Importing PDFKit...');
+    let PDFDocument;
+    try {
+      PDFDocument = require('pdfkit');
+      console.log('PDFKit imported successfully');
+    } catch (importError: any) {
+      console.error('PDFKit import error:', importError);
+      return NextResponse.json({ 
+        success: false, 
+        error: `PDFKit import failed: ${importError.message}` 
+      }, { status: 500 });
+    }
+    
+    // 2. Generate PDF
+    console.log('Generating PDF...');
+    const pdfBuffer = await new Promise<Buffer>((resolve, reject) => {
+      try {
+        const doc = new PDFDocument({
+          size: 'A4',
+          margin: 50
+        });
+        
+        const buffers: Buffer[] = [];
+        doc.on('data', (chunk: Buffer) => buffers.push(chunk));
+        doc.on('end', () => {
+          const buffer = Buffer.concat(buffers);
+          console.log(`PDF generated, size: ${buffer.length} bytes`);
+          resolve(buffer);
+        });
+        doc.on('error', (error: any) => {
+          console.error('PDF generation error:', error);
+          reject(error);
+        });
+        
+        // Add simple content
+        doc.fontSize(25).text('Insurance Certificate', 100, 100);
+        doc.fontSize(15).text(`Policy Number: ${policyNumber}`, 100, 150);
+        doc.fontSize(15).text(`Date: ${new Date().toLocaleDateString()}`, 100, 180);
+        doc.fontSize(12).text(`Generated for: ${user?.email || 'Customer'}`, 100, 210);
+        
+        doc.end();
+        
+      } catch (pdfError: any) {
+        console.error('PDF creation error:', pdfError);
+        reject(pdfError);
+      }
+    });
+    
+    // 3. Upload to storage
+    console.log('Uploading to storage...');
+    const timestamp = Date.now();
+    const fileName = `certificate-${policyNumber}-${timestamp}.pdf`;
+    
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('documents')
+      .upload(fileName, pdfBuffer, {
+        contentType: 'application/pdf',
+        cacheControl: '3600'
+      });
+    
+    if (uploadError) {
+      console.error('Upload error:', uploadError);
+      
+      // Try with a simpler filename
+      const simpleName = `certificate-${policyNumber}.pdf`;
+      console.log('Trying with simple name:', simpleName);
+      
+      const { data: retryData, error: retryError } = await supabase.storage
+        .from('documents')
+        .upload(simpleName, pdfBuffer, {
+          contentType: 'application/pdf',
+          cacheControl: '3600',
+          upsert: true
+        });
+      
+      if (retryError) {
+        console.error('Retry upload error:', retryError);
+        return NextResponse.json({ 
+          success: false, 
+          error: `Upload failed: ${retryError.message}` 
+        }, { status: 500 });
+      }
+      
+      // Get URL for simple name
+      const { data: { publicUrl } } = supabase.storage
+        .from('documents')
+        .getPublicUrl(simpleName);
+      
+      console.log('Upload successful (retry):', publicUrl);
+      
+      // Update policy
+      if (policyId) {
+        await supabase
+          .from('policies')
+          .update({ 
+            insurance_certificate_url: publicUrl,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', policyId);
+      }
+      
+      return NextResponse.json({ 
+        success: true, 
+        certificateUrl: publicUrl,
+        message: 'Certificate generated successfully'
+      });
+    }
+    
+    // 4. Get public URL
+    const { data: { publicUrl } } = supabase.storage
+      .from('documents')
+      .getPublicUrl(fileName);
+    
+    console.log('Upload successful:', publicUrl);
+    
+    // 5. Update policy
+    if (policyId) {
+      console.log('Updating policy with certificate URL...');
+      const { error: updateError } = await supabase
+        .from('policies')
+        .update({ 
+          insurance_certificate_url: publicUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', policyId);
+      
+      if (updateError) {
+        console.error('Policy update error:', updateError);
+        // Continue anyway
+      }
+    }
     
     return NextResponse.json({ 
       success: true, 
-      certificateUrl,
-      html: htmlContent // For preview
+      certificateUrl: publicUrl,
+      message: 'Certificate generated successfully'
     });
     
-  } catch (error) {
-    console.error('Certificate generation error:', error);
+  } catch (error: any) {
+    console.error('Certificate generation endpoint error:', error);
+    console.error('Stack trace:', error.stack);
+    
     return NextResponse.json({ 
       success: false, 
-      error: 'Failed to generate certificate'
+      error: error.message || 'Internal server error',
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     }, { status: 500 });
   }
-}
-
-function generateCertificateHTML(policyNumber: string, quoteData: any, user: any) {
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>Insurance Certificate - ${policyNumber}</title>
-      <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-        .certificate { border: 3px solid #1e40af; padding: 30px; max-width: 800px; margin: 0 auto; }
-        .header { text-align: center; margin-bottom: 30px; }
-        .company-name { color: #1e40af; font-size: 28px; font-weight: bold; }
-        .certificate-title { color: #1e40af; font-size: 22px; margin-top: 10px; }
-        .section { margin-bottom: 20px; }
-        .section-title { color: #111827; font-size: 16px; font-weight: bold; margin-bottom: 10px; border-bottom: 2px solid #1e40af; padding-bottom: 5px; }
-        .field { display: flex; margin-bottom: 8px; }
-        .field-label { min-width: 180px; font-weight: bold; color: #4b5563; }
-        .field-value { color: #111827; }
-        .signature { margin-top: 40px; text-align: right; }
-        .watermark { opacity: 0.1; position: absolute; font-size: 120px; transform: rotate(-45deg); top: 300px; left: 100px; color: #1e40af; }
-        .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }
-      </style>
-    </head>
-    <body>
-      <div class="certificate">
-        <div class="watermark">CARGO GUARD</div>
-        
-        <div class="header">
-          <div class="company-name">CARGO GUARD INSURANCE</div>
-          <div class="certificate-title">INSURANCE CERTIFICATE OF COVERAGE</div>
-        </div>
-        
-        <div class="section">
-          <div class="section-title">Policy Information</div>
-          <div class="field">
-            <div class="field-label">Policy Number:</div>
-            <div class="field-value">${policyNumber}</div>
-          </div>
-          <div class="field">
-            <div class="field-label">Date of Issue:</div>
-            <div class="field-value">${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
-          </div>
-          <div class="field">
-            <div class="field-label">Certificate ID:</div>
-            <div class="field-value">CERT-${Date.now().toString().slice(-8)}</div>
-          </div>
-        </div>
-        
-        <div class="section">
-          <div class="section-title">Insured Party</div>
-          <div class="field">
-            <div class="field-label">Name:</div>
-            <div class="field-value">${user?.email || 'Customer'}</div>
-          </div>
-          <div class="field">
-            <div class="field-label">Client ID:</div>
-            <div class="field-value">${user?.id?.substring(0, 8).toUpperCase() || 'N/A'}</div>
-          </div>
-        </div>
-        
-        <div class="section">
-          <div class="section-title">Cargo & Coverage Details</div>
-          <div class="field">
-            <div class="field-label">Cargo Type:</div>
-            <div class="field-value">${quoteData?.cargo_type || 'General Cargo'}</div>
-          </div>
-          <div class="field">
-            <div class="field-label">Coverage Amount:</div>
-            <div class="field-value">$${(quoteData?.shipment_value || 0).toLocaleString()}</div>
-          </div>
-          <div class="field">
-            <div class="field-label">Deductible:</div>
-            <div class="field-value">$${(quoteData?.deductible || 0).toLocaleString()}</div>
-          </div>
-          <div class="field">
-            <div class="field-label">Coverage Type:</div>
-            <div class="field-value">${quoteData?.selected_coverage || 'Standard'} Coverage</div>
-          </div>
-        </div>
-        
-        <div class="section">
-          <div class="section-title">Transportation Details</div>
-          <div class="field">
-            <div class="field-label">Origin:</div>
-            <div class="field-value">${quoteData?.origin?.city || 'Loading Point'}</div>
-          </div>
-          <div class="field">
-            <div class="field-label">Destination:</div>
-            <div class="field-value">${quoteData?.destination?.city || 'Delivery Point'}</div>
-          </div>
-          <div class="field">
-            <div class="field-label">Transport Mode:</div>
-            <div class="field-value">${quoteData?.transportation_mode || 'Road'} Transport</div>
-          </div>
-          <div class="field">
-            <div class="field-label">Coverage Period:</div>
-            <div class="field-value">${new Date(quoteData?.start_date).toLocaleDateString()} to ${new Date(quoteData?.end_date).toLocaleDateString()}</div>
-          </div>
-        </div>
-        
-        <div class="section">
-          <div class="section-title">Important Conditions</div>
-          <div style="font-size: 12px; line-height: 1.5;">
-            <p>1. This certificate confirms that the cargo described above is insured against all risks of physical loss or damage.</p>
-            <p>2. Coverage is subject to terms and conditions of the master policy.</p>
-            <p>3. Claims must be reported within 14 days of incident.</p>
-            <p>4. This certificate is valid only during the coverage period specified.</p>
-          </div>
-        </div>
-        
-        <div class="signature">
-          <div style="margin-bottom: 5px;"><strong>Digitally Signed by:</strong></div>
-          <div>Cargo Guard Insurance System</div>
-          <div>${new Date().toISOString()}</div>
-          <div style="margin-top: 10px;">
-            <img src="data:image/svg+xml;base64,${Buffer.from('<svg width="200" height="50" xmlns="http://www.w3.org/2000/svg"><text x="10" y="30" font-family="Arial" font-size="12" fill="blue">VERIFIED - DIGITAL SIGNATURE</text></svg>').toString('base64')}" alt="Signature" />
-          </div>
-        </div>
-        
-        <div class="footer">
-          <p>This is an electronically generated certificate. No physical copy required.</p>
-          <p>For verification: https://verify.cargoguard.com/${policyNumber}</p>
-          <p>Contact: claims@cargoguard.com | +1-800-CARGO-GUARD</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `;
 }
