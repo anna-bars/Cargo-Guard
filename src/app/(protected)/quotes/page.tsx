@@ -7,188 +7,539 @@ import { UniversalTable, renderStatus, renderButton } from '@/app/components/tab
 import QuotesExpirationCard from '@/app/components/charts/QuotesExpirationCard'
 import InfoWidget from '@/app/components/widgets/InfoWidget'
 import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import { useUser } from '@/app/context/UserContext';
 
-// Dashboard-ի տվյալներ - ԼՐԱՑՈՒՄ
-const quotesRows = [
-  {
-    id: 'Q-005',
-    cargo: 'Electronics',
-    shipmentValue: '$15,400.00',
-    premiumAmount: '$450.00',
-    expirationDate: `Oct 25 – Nov 5, '25`,
-    status: { 
-      text: 'Pending Approval', 
-      color: 'bg-[#cbd03c]/10', 
-      dot: 'bg-[#cbd03c]', 
-      textColor: 'text-[#cbd03c]' 
-    },
-    button: { 
-      text: 'Approve Quote', 
-      variant: 'primary' as const,
-      onClick: (row: any) => console.log('Approve Quote', row.id)
-    }
-  },
-  {
-    id: 'Q-021',
-    cargo: 'Furniture',
-    shipmentValue: '$20,000.00',
-    premiumAmount: '$255.00',
-    expirationDate: `Oct 20 – Nov 1, '25`,
-    status: { 
-      text: 'Approved', 
-      color: 'bg-[#16a34a]/10', 
-      dot: 'bg-[#16a34a]', 
-      textColor: 'text-[#16a34a]' 
-    },
-    button: { 
-      text: 'Approve Quote', 
-      variant: 'primary' as const,
-      onClick: (row: any) => console.log('Approve Quote', row.id)
-    }
-  },
-  {
-    id: 'Q-054',
-    cargo: 'Clothing',
-    shipmentValue: '$5,500.00',
-    premiumAmount: '$600.00',
-    expirationDate: `Oct 22 – Nov 3, '25`,
-    status: { 
-      text: 'Declined', 
-      color: 'bg-[#8ea0b0]/10', 
-      dot: 'bg-[#8ea0b0]', 
-      textColor: 'text-[#8ea0b0]' 
-    },
-    button: { 
-      text: 'View Reason', 
-      variant: 'secondary' as const,
-      onClick: (row: any) => console.log('View Reason', row.id)
-    }
-  },
-  {
-    id: 'Q-005-2',
-    cargo: 'Machinery',
-    shipmentValue: '$8,500.00',
-    premiumAmount: '$165.00',
-    expirationDate: `Oct 24 – Nov 4, '25`,
-    status: { 
-      text: 'Pending Approval', 
-      color: 'bg-[#cbd03c]/10', 
-      dot: 'bg-[#cbd03c]', 
-      textColor: 'text-[#cbd03c]' 
-    },
-    button: { 
-      text: 'Approve Quote', 
-      variant: 'primary' as const,
-      onClick: (row: any) => console.log('Approve Quote', row.id)
-    }
-  },
-  {
-    id: 'Q-014',
-    cargo: 'Chemicals',
-    shipmentValue: '$12,800.00',
-    premiumAmount: '$360.00',
-    expirationDate: `Oct 21 – Nov 2, '25`,
-    status: { 
-      text: 'Approved', 
-      color: 'bg-[#16a34a]/10', 
-      dot: 'bg-[#16a34a]', 
-      textColor: 'text-[#16a34a]' 
-    },
-    button: { 
-      text: 'Approve Quote', 
-      variant: 'primary' as const,
-      onClick: (row: any) => console.log('Approve Quote', row.id)
-    }
-  }
-]
-
-const quotesColumns = [
-  {
-    key: 'id',
-    label: 'Quote ID',
-    sortable: true,
-    renderDesktop: (value: string) => (
-      <span className="font-poppins text-sm text-[#2563eb] underline hover:text-[#1d4ed8] transition-colors duration-300 cursor-pointer">
-        {value}
-      </span>
-    )
-  },
-  {
-    key: 'cargo',
-    label: 'Cargo',
-    sortable: true
-  },
-  {
-    key: 'shipmentValue',
-    label: 'Value',
-    sortable: true
-  },
-  {
-    key: 'premiumAmount',
-    label: 'Premium',
-    sortable: true
-  },
-  {
-    key: 'expirationDate',
-    label: 'Expiration Date',
-    sortable: true
-  },
-  {
-    key: 'status',
-    label: 'Status',
-    sortable: true,
-    renderDesktop: (status: any) => renderStatus(status)
-  },
-  {
-    key: 'button',
-    label: 'Action',
-    renderDesktop: (button: any, row: any) => renderButton(button, row),
-    className: 'flex justify-end'
-  }
-];
- 
 export default function QuotesPage() {
   const router = useRouter()
+  const [loading, setLoading] = useState(true)
+  const [quotesRows, setQuotesRows] = useState<any[]>([])
+  const [activeTab, setActiveTab] = useState('This Week')
+  const [isMobile, setIsMobile] = useState(false)
+  const { user } = useUser()
+  const supabase = createClient()
 
   const handleGetNewQuote = () => {
-    // Սկսել quote ստեղծման flow
     router.push('/quotes/new/shipping')
   }
-  const quotesData = {
-    'Upcoming Expirations & Conversions': { 
-      approved: 17,  // Pending Approval
-      declined: 2,   // Declined
-      expired: 18    // Converted This Month
+
+  // Dashboard-ից վերցված helper ֆունկցիաներ
+  const getStatusConfig = (quote: any) => {
+    const calculateDaysText = (expirationTime: string) => {
+      if (!expirationTime) return '';
+      
+      const now = new Date();
+      const expiration = new Date(expirationTime);
+      const diffTime = expiration.getTime() - now.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays > 0) {
+        return ` (${diffDays} day${diffDays !== 1 ? 's' : ''} left)`;
+      } else if (diffDays < 0) {
+        const daysAgo = Math.abs(diffDays);
+        return ` (${daysAgo} day${daysAgo !== 1 ? 's' : ''} ago)`;
+      } else {
+        return ' (Today)';
+      }
+    };
+
+    const isPaid = quote.payment_status === 'paid';
+    const isExpired = quote.quote_expires_at && new Date(quote.quote_expires_at) < new Date();
+    const daysText = quote.quote_expires_at ? calculateDaysText(quote.quote_expires_at) : '';
+
+    // Եթե quote-ը արդեն approved և paid է, ապա հաշվի չառնել expiration-ը
+    const isApprovedAndPaid = quote.status === 'approved' && isPaid;
+    
+    const statusMap: Record<string, any> = {
+      'draft': { 
+        text: 'Continue Quote', 
+        color: 'bg-gray-100', 
+        dot: 'bg-gray-500', 
+        textColor: 'text-gray-700',
+        buttonText: 'Continue Quote',
+        buttonVariant: 'primary' as const
+      },
+      'submitted': { 
+        text: 'Waiting for review', 
+        color: 'bg-blue-50', 
+        dot: 'bg-blue-500', 
+        textColor: 'text-blue-700',
+        buttonText: 'View Details',
+        buttonVariant: 'secondary' as const
+      },
+      'under_review': { 
+        text: 'Documents under review', 
+        color: 'bg-amber-50', 
+        dot: 'bg-amber-500', 
+        textColor: 'text-amber-700',
+        buttonText: 'View Details',
+        buttonVariant: 'secondary' as const
+      },
+      'approved': { 
+        text: isPaid ? 'Approved & Paid' : 'Pay to Activate', 
+        color: isPaid ? 'bg-emerald-50' : 'bg-amber-50', 
+        dot: isPaid ? 'bg-emerald-500' : 'bg-amber-500', 
+        textColor: isPaid ? 'text-emerald-700' : 'text-amber-700',
+        buttonText: isPaid ? 'View Policy' : 'Pay Now',
+        buttonVariant: isPaid ? 'success' as const : 'primary' as const
+      },
+      'rejected': { 
+        text: 'Rejected', 
+        color: 'bg-rose-50', 
+        dot: 'bg-rose-500', 
+        textColor: 'text-rose-700',
+        buttonText: 'View Details',
+        buttonVariant: 'secondary' as const
+      },
+      'expired': { 
+        text: 'Expired', 
+        color: 'bg-gray-100', 
+        dot: 'bg-gray-400', 
+        textColor: 'text-gray-600',
+        buttonText: 'View Details',
+        buttonVariant: 'secondary' as const
+      },
+      'converted': { 
+        text: 'Converted to Policy', 
+        color: 'bg-emerald-50', 
+        dot: 'bg-emerald-500', 
+        textColor: 'text-emerald-700',
+        buttonText: 'View Policy',
+        buttonVariant: 'success' as const
+      },
+      'waiting_for_docs': { 
+        text: 'Waiting for Documents', 
+        color: 'bg-cyan-50', 
+        dot: 'bg-cyan-500', 
+        textColor: 'text-cyan-700',
+        buttonText: 'View Details',
+        buttonVariant: 'secondary' as const
+      }
+    };
+
+    // 1. Ստուգենք, արդյոք quote-ն expired է
+    if (isExpired) {
+      return {
+        text: 'Expired' + daysText,
+        color: 'bg-gray-100',
+        dot: 'bg-gray-400',
+        textColor: 'text-gray-600',
+        buttonText: 'View Details',
+        buttonVariant: 'secondary' as const,
+        isActuallyExpired: true
+      };
+    }
+
+    // 2. Եթե արդեն approved և paid է, ապա պարզապես ցույց տալ "Approved & Paid"
+    if (isApprovedAndPaid) {
+      return {
+        text: 'Approved & Paid',
+        color: 'bg-emerald-50',
+        dot: 'bg-emerald-500',
+        textColor: 'text-emerald-700',
+        buttonText: 'View Policy',
+        buttonVariant: 'success' as const
+      };
+    }
+
+    const baseConfig = statusMap[quote.status] || statusMap['draft'];
+    
+    // 3. Մնացած դեպքերում ավելացնել ժամանակ, եթե կա
+    if (['approved', 'pay_to_activate', 'submitted'].includes(quote.status) && quote.quote_expires_at && !isApprovedAndPaid) {
+      return {
+        ...baseConfig,
+        text: baseConfig.text + daysText
+      };
+    }
+    
+    return baseConfig;
+  };
+
+  const formatQuoteId = (id: string, quoteNumber?: string) => {
+    if (quoteNumber) {
+      return quoteNumber;
+    }
+    if (id.startsWith('Q-')) {
+      return id;
+    }
+    if (id.startsWith('temp-')) {
+      const randomNum = Math.floor(Math.random() * 10000).toString().padStart(5, '0');
+      return `Q-${randomNum}`;
+    }
+    return `Q-${id.slice(-5)}`;
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  };
+
+  const formatExpirationDate = (startDate: string, endDate: string) => {
+    if (!startDate || !endDate) return 'N/A';
+    
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    return `${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })}`;
+  };
+
+  const formatQuotesData = (quotes: any[]) => {
+    const formattedData: any[] = []
+
+    quotes.forEach(quote => {
+      const statusConfig = getStatusConfig(quote)
+      
+      const buttonAction = { 
+        text: statusConfig.buttonText, 
+        variant: statusConfig.buttonVariant,
+        onClick: (row: any) => handleQuoteAction(row, quote)
+      }
+      
+      formattedData.push({
+        id: formatQuoteId(quote.id, quote.quote_number),
+        cargo: quote.cargo_type || 'Unknown',
+        shipmentValue: `$${(quote.shipment_value || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+        premiumAmount: `$${(quote.premium_amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+        expirationDate: formatExpirationDate(quote.coverage_start_date || quote.created_at, quote.coverage_end_date || quote.quote_expires_at),
+        status: {
+          text: statusConfig.text,
+          color: statusConfig.color,
+          dot: statusConfig.dot,
+          textColor: statusConfig.textColor
+        },
+        button: buttonAction,
+        rawData: quote,
+        quoteStatus: quote.status,
+        paymentStatus: quote.payment_status
+      })
+    })
+
+    return formattedData.sort((a, b) => new Date(b.rawData.created_at).getTime() - new Date(a.rawData.created_at).getTime())
+  };
+
+  const handleQuoteAction = (row: any, quote: any) => {
+    const quoteId = row.rawData?.id || row.id;
+    const status = quote.status;
+    const paymentStatus = quote.payment_status;
+    const isExpired = quote.quote_expires_at && new Date(quote.quote_expires_at) < new Date();
+    
+    const checkPolicyAndRedirect = async () => {
+      try {
+        const { data: policy } = await supabase
+          .from('policies')
+          .select('*')
+          .eq('quote_id', quoteId)
+          .maybeSingle();
+        
+        if (policy?.status === 'active') {
+          router.push(`/shipments/${policy.id}`)
+          return true;
+        }
+        
+        return false;
+      } catch (error) {
+        console.error('Error checking policy:', error)
+        return false;
+      }
+    }
+    
+    switch (status) {
+      case 'draft':
+        router.push(`/quotes/new?quote_id=${quoteId}&continue=true`)
+        break
+      case 'submitted':
+      case 'under_review':
+      case 'waiting_for_review':
+      case 'documents_under_review':
+        router.push(`/quotes/${quoteId}`)
+        break
+      case 'approved':
+        if (paymentStatus === 'paid') {
+          checkPolicyAndRedirect().then((hasPolicy) => {
+            if (!hasPolicy) {
+              router.push(`/quotes/${quoteId}`)
+            }
+          })
+        } else {
+          router.push(`/quotes/${quoteId}`)
+        }
+        break
+      case 'rejected':
+      case 'fix_and_resubmit':
+        router.push(`/quotes/${quoteId}`)
+        break
+      case 'expired':
+        if (confirm('This quote has expired. Would you like to create a new one based on this?')) {
+          router.push(`/quotes/new?duplicate=${quoteId}`);
+        }
+        break
+      case 'pay_to_activate':
+        router.push(`/quotes/${quoteId}`)
+        break
+      default:
+        router.push(`/quotes/${quoteId}`)
     }
   };
-  const quotesData2 = {
-    'This Week': { totalQuotes: 22, expiringQuotes: 7, expiringRate: 32 },
-    'Next Week': { totalQuotes: 18, expiringQuotes: 12, expiringRate: 67 },
-    'In 2–4 Weeks': { totalQuotes: 35, expiringQuotes: 4, expiringRate: 11 },
-    'Next Month': { totalQuotes: 42, expiringQuotes: 38, expiringRate: 90 }
-  }
-  
+
+  // Ստանալ quotes տվյալները Supabase-ից
+  useEffect(() => {
+    const loadQuotesData = async () => {
+      if (!user) return
+      
+      try {
+        // Ստանալ բոլոր quotes-ը օգտատիրոջ համար
+        const { data: quotes, error: quotesError } = await supabase
+          .from('quotes')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(50)
+
+        if (quotesError) {
+          console.error('Error loading quotes:', quotesError)
+          // Օգտագործել fallback տվյալները
+          setQuotesRows(getFallbackData())
+          return
+        }
+
+        if (quotes && quotes.length > 0) {
+          const formattedData = formatQuotesData(quotes)
+          setQuotesRows(formattedData)
+        } else {
+          // Օգտագործել fallback տվյալները, եթե quotes չկան
+          setQuotesRows(getFallbackData())
+        }
+
+      } catch (error) {
+        console.error('Error loading quotes data:', error)
+        setQuotesRows(getFallbackData())
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadQuotesData()
+  }, [user])
+
+  // Fallback տվյալներ եթե Supabase-ից տվյալներ չկան
+  const getFallbackData = () => {
+    return [
+      {
+        id: 'Q-005',
+        cargo: 'Electronics',
+        shipmentValue: '$15,400.00',
+        premiumAmount: '$450.00',
+        expirationDate: `Oct 25 – Nov 5, '25`,
+        status: { 
+          text: 'Pending Approval', 
+          color: 'bg-[#cbd03c]/10', 
+          dot: 'bg-[#cbd03c]', 
+          textColor: 'text-[#cbd03c]' 
+        },
+        button: { 
+          text: 'Approve Quote', 
+          variant: 'primary' as const,
+          onClick: (row: any) => handleQuoteAction(row, { status: 'submitted' })
+        },
+        quoteStatus: 'submitted'
+      },
+      {
+        id: 'Q-021',
+        cargo: 'Furniture',
+        shipmentValue: '$20,000.00',
+        premiumAmount: '$255.00',
+        expirationDate: `Oct 20 – Nov 1, '25`,
+        status: { 
+          text: 'Approved', 
+          color: 'bg-[#16a34a]/10', 
+          dot: 'bg-[#16a34a]', 
+          textColor: 'text-[#16a34a]' 
+        },
+        button: { 
+          text: 'Approve Quote', 
+          variant: 'primary' as const,
+          onClick: (row: any) => handleQuoteAction(row, { status: 'approved', payment_status: 'paid' })
+        },
+        quoteStatus: 'approved'
+      },
+      {
+        id: 'Q-054',
+        cargo: 'Clothing',
+        shipmentValue: '$5,500.00',
+        premiumAmount: '$600.00',
+        expirationDate: `Oct 22 – Nov 3, '25`,
+        status: { 
+          text: 'Declined', 
+          color: 'bg-[#8ea0b0]/10', 
+          dot: 'bg-[#8ea0b0]', 
+          textColor: 'text-[#8ea0b0]' 
+        },
+        button: { 
+          text: 'View Reason', 
+          variant: 'secondary' as const,
+          onClick: (row: any) => handleQuoteAction(row, { status: 'rejected' })
+        },
+        quoteStatus: 'rejected'
+      },
+      {
+        id: 'Q-005-2',
+        cargo: 'Machinery',
+        shipmentValue: '$8,500.00',
+        premiumAmount: '$165.00',
+        expirationDate: `Oct 24 – Nov 4, '25`,
+        status: { 
+          text: 'Pending Approval', 
+          color: 'bg-[#cbd03c]/10', 
+          dot: 'bg-[#cbd03c]', 
+          textColor: 'text-[#cbd03c]' 
+        },
+        button: { 
+          text: 'Approve Quote', 
+          variant: 'primary' as const,
+          onClick: (row: any) => handleQuoteAction(row, { status: 'submitted' })
+        },
+        quoteStatus: 'submitted'
+      },
+      {
+        id: 'Q-014',
+        cargo: 'Chemicals',
+        shipmentValue: '$12,800.00',
+        premiumAmount: '$360.00',
+        expirationDate: `Oct 21 – Nov 2, '25`,
+        status: { 
+          text: 'Approved', 
+          color: 'bg-[#16a34a]/10', 
+          dot: 'bg-[#16a34a]', 
+          textColor: 'text-[#16a34a]' 
+        },
+        button: { 
+          text: 'Approve Quote', 
+          variant: 'primary' as const,
+          onClick: (row: any) => handleQuoteAction(row, { status: 'approved', payment_status: 'paid' })
+        },
+        quoteStatus: 'approved'
+      }
+    ]
+  };
+
   // Quotes էջի հատուկ լեյբլները
   const quotesTypeLabels = {
     approved: 'Pending',
     declined: 'Declined',
     expired: 'Converted'
   };
-  const [activeTab, setActiveTab] = useState('This Week')
-  const [loading, setLoading] = useState(true)
-  const [isMobile, setIsMobile] = useState(false)
+
+  // Quotes տվյալները chart-ների համար
+  const quotesData = {
+    'Upcoming Expirations & Conversions': { 
+      approved: quotesRows.filter(q => q.quoteStatus === 'submitted' || q.quoteStatus === 'under_review').length,
+      declined: quotesRows.filter(q => q.quoteStatus === 'rejected').length,
+      expired: quotesRows.filter(q => q.quoteStatus === 'approved' && q.paymentStatus === 'paid').length
+    }
+  };
+
+  const quotesData2 = {
+    'This Week': { 
+      totalQuotes: quotesRows.length, 
+      expiringQuotes: quotesRows.filter(q => {
+        // Ստուգել expiration date-ը
+        if (q.rawData?.quote_expires_at) {
+          const expiresAt = new Date(q.rawData.quote_expires_at);
+          const now = new Date();
+          const diffTime = expiresAt.getTime() - now.getTime();
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          return diffDays <= 7 && diffDays >= 0;
+        }
+        return false;
+      }).length, 
+      expiringRate: Math.round((quotesRows.filter(q => {
+        if (q.rawData?.quote_expires_at) {
+          const expiresAt = new Date(q.rawData.quote_expires_at);
+          const now = new Date();
+          const diffTime = expiresAt.getTime() - now.getTime();
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          return diffDays <= 7 && diffDays >= 0;
+        }
+        return false;
+      }).length / quotesRows.length) * 100) || 0 
+    },
+    'Next Week': { 
+      totalQuotes: quotesRows.length, 
+      expiringQuotes: quotesRows.filter(q => {
+        if (q.rawData?.quote_expires_at) {
+          const expiresAt = new Date(q.rawData.quote_expires_at);
+          const now = new Date();
+          const diffTime = expiresAt.getTime() - now.getTime();
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          return diffDays <= 14 && diffDays > 7;
+        }
+        return false;
+      }).length, 
+      expiringRate: Math.round((quotesRows.filter(q => {
+        if (q.rawData?.quote_expires_at) {
+          const expiresAt = new Date(q.rawData.quote_expires_at);
+          const now = new Date();
+          const diffTime = expiresAt.getTime() - now.getTime();
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          return diffDays <= 14 && diffDays > 7;
+        }
+        return false;
+      }).length / quotesRows.length) * 100) || 0 
+    },
+    'In 2–4 Weeks': { 
+      totalQuotes: quotesRows.length, 
+      expiringQuotes: quotesRows.filter(q => {
+        if (q.rawData?.quote_expires_at) {
+          const expiresAt = new Date(q.rawData.quote_expires_at);
+          const now = new Date();
+          const diffTime = expiresAt.getTime() - now.getTime();
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          return diffDays <= 28 && diffDays > 14;
+        }
+        return false;
+      }).length, 
+      expiringRate: Math.round((quotesRows.filter(q => {
+        if (q.rawData?.quote_expires_at) {
+          const expiresAt = new Date(q.rawData.quote_expires_at);
+          const now = new Date();
+          const diffTime = expiresAt.getTime() - now.getTime();
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          return diffDays <= 28 && diffDays > 14;
+        }
+        return false;
+      }).length / quotesRows.length) * 100) || 0 
+    },
+    'Next Month': { 
+      totalQuotes: quotesRows.length, 
+      expiringQuotes: quotesRows.filter(q => {
+        if (q.rawData?.quote_expires_at) {
+          const expiresAt = new Date(q.rawData.quote_expires_at);
+          const now = new Date();
+          const diffTime = expiresAt.getTime() - now.getTime();
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          return diffDays > 28;
+        }
+        return false;
+      }).length, 
+      expiringRate: Math.round((quotesRows.filter(q => {
+        if (q.rawData?.quote_expires_at) {
+          const expiresAt = new Date(q.rawData.quote_expires_at);
+          const now = new Date();
+          const diffTime = expiresAt.getTime() - now.getTime();
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          return diffDays > 28;
+        }
+        return false;
+      }).length / quotesRows.length) * 100) || 0 
+    }
+  };
 
   useEffect(() => {
-    // Simulate loading data
-    const timer = setTimeout(() => {
-      setLoading(false)
-    }, 1000)
-    
-    return () => clearTimeout(timer)
-  }, [])
-
-  useEffect(() => {
-    // Check screen size for mobile
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth <= 768)
     }
@@ -197,10 +548,52 @@ export default function QuotesPage() {
     window.addEventListener('resize', checkScreenSize)
     
     return () => window.removeEventListener('resize', checkScreenSize)
-  }, [])
+  }, []);
 
-
- 
+  const quotesColumns = [
+    {
+      key: 'id',
+      label: 'Quote ID',
+      sortable: true,
+      renderDesktop: (value: string) => (
+        <span className="font-poppins text-sm text-[#2563eb] underline hover:text-[#1d4ed8] transition-colors duration-300 cursor-pointer">
+          {value}
+        </span>
+      )
+    },
+    {
+      key: 'cargo',
+      label: 'Cargo',
+      sortable: true
+    },
+    {
+      key: 'shipmentValue',
+      label: 'Value',
+      sortable: true
+    },
+    {
+      key: 'premiumAmount',
+      label: 'Premium',
+      sortable: true
+    },
+    {
+      key: 'expirationDate',
+      label: 'Expiration Date',
+      sortable: true
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      sortable: true,
+      renderDesktop: (status: any) => renderStatus(status)
+    },
+    {
+      key: 'button',
+      label: 'Action',
+      renderDesktop: (button: any, row: any) => renderButton(button, row),
+      className: 'flex justify-end'
+    }
+  ];
 
   if (loading) {
     return (
@@ -213,9 +606,6 @@ export default function QuotesPage() {
   return (
     <DashboardLayout>
       <div className="min-w-[96%] max-w-[95.5%] !sm:min-w-[90.5%] mx-auto">
-        {/* Mobile Header for Activity Section */}
-       
-
         {/* Main Content Grid */}
         <div className="
           grid grid-cols-1 xl:grid-cols-[76.5%_23%] gap-2 
@@ -231,52 +621,64 @@ export default function QuotesPage() {
             max-[1280px]:min-h-auto max-[1280px]:max-h-none max-[1280px]:row-start-2
             max-[1024px]:min-h-auto max-[1024px]:max-h-none
           ">
-             
-
-                <div className="flex items-center gap-3 mt-4 mb-2 sm:mt-0">
-                  <img
-                    src="/quotes/header-ic.svg"
-                    alt=""
-                    className="w-[22px] h-[22px] sm:w-6 sm:h-6"
-                  />
-                  <h2 className="font-normal text-[18px] sm:text-[26px]">Quotes</h2>
-                   
-                </div> 
+            <div className="flex items-center gap-3 mt-4 mb-2 sm:mt-0">
+              <img
+                src="/quotes/header-ic.svg"
+                alt=""
+                className="w-[22px] h-[22px] sm:w-6 sm:h-6"
+              />
+              <h2 className="font-normal text-[18px] sm:text-[26px]">Quotes</h2>
+            </div>
 
             <div className="block md:hidden">
               <ConversionChart 
                 title="Upcoming Expirations & Conversions"
                 data={quotesData}
                 defaultActiveTime="Upcoming Expirations & Conversions"
-                showTimeDropdown={false} // Քանի որ միայն մեկ ժամանակահատված կա
+                showTimeDropdown={false}
                 typeLabels={quotesTypeLabels}
               />
             </div>
             <div className="block md:hidden">
               <QuotesExpirationCard 
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        data={quotesData2}
-      />
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                data={quotesData2}
+              />
             </div>
 
             {/* Universal Table for Recent Activity */}
             <div className='max-h-[85%'>
-            <UniversalTable
-              title="Quotes Overview"
-              showMobileHeader={true}
-              rows={quotesRows}
-              columns={quotesColumns}
-              mobileDesign={{
-                showType: false,
-                showCargoIcon: true,
-                showDateIcon: true,
-                dateLabel: 'Expires',
-                buttonWidth: '47%'
-              }}
-              mobileDesignType="quotes" // ավելացնել
-              desktopGridCols="0.6fr 0.8fr  0.8fr 0.7fr 1.1fr 0.9fr 1fr" // ավելացնել
-            />
+              <UniversalTable
+                title="Quotes Overview"
+                showMobileHeader={true}
+                rows={quotesRows}
+                columns={quotesColumns}
+                filterConfig={{
+                  showActivityFilter: true,
+                  showTimeframeFilter: true,
+                  showSortFilter: true,
+                  activityOptions: [
+                    'All Activity', 
+                    'Draft', 
+                    'Submitted', 
+                    'Under Review', 
+                    'Approved', 
+                    'Rejected'
+                  ],
+                  timeframeOptions: ['Last 7 days', 'Last 30 days', 'Last 3 months', 'All time'],
+                  sortOptions: ['Status', 'Date', 'Value', 'Type']
+                }}
+                mobileDesign={{
+                  showType: false,
+                  showCargoIcon: true,
+                  showDateIcon: true,
+                  dateLabel: 'Expires',
+                  buttonWidth: '47%'
+                }}
+                mobileDesignType="quotes"
+                desktopGridCols="0.6fr 0.8fr 0.8fr 0.7fr 1.1fr 0.9fr 1fr"
+              />
             </div>
           </div>
 
@@ -288,55 +690,57 @@ export default function QuotesPage() {
             max-[1280px]:hidden
           ">
             <div className="flex justify-end items-center gap-3 !h-[39px]">
-                  <button
-                    className="inline-flex items-center justify-center gap-[10px] px-4 py-2 h-[35.68px] bg-[#f8fbff] border border-[#ffffff30] rounded-[6px] font-poppins text-base font-normal text-black cursor-pointer whitespace-nowrap"
-                  >
-                    <img
-                      src="/quotes/download.svg"
-                      alt=""
-                      className="w-3 h-3 object-cover"
-                    />
-                    Download
-                  </button>
-                  <button 
-                  onClick={handleGetNewQuote}
-                  className="inline-flex items-center justify-center gap-[10px] px-4 py-2 h-[35.68px] bg-[#0b0b0b] border-0 rounded-[6px] font-poppins text-base font-normal text-white cursor-pointer whitespace-nowrap">
-                    + Get New Quote
-                  </button>
-                </div>
+              <button
+                className="inline-flex items-center justify-center gap-[10px] px-4 py-2 h-[35.68px] bg-[#f8fbff] border border-[#ffffff30] rounded-[6px] font-poppins text-base font-normal text-black cursor-pointer whitespace-nowrap"
+                onClick={() => {
+                  // Download functionality
+                  console.log('Download quotes data')
+                }}
+              >
+                <img
+                  src="/quotes/download.svg"
+                  alt=""
+                  className="w-3 h-3 object-cover"
+                />
+                Download
+              </button>
+              <button 
+                onClick={handleGetNewQuote}
+                className="inline-flex items-center justify-center gap-[10px] px-4 py-2 h-[35.68px] bg-[#0b0b0b] border-0 rounded-[6px] font-poppins text-base font-normal text-white cursor-pointer whitespace-nowrap"
+              >
+                + Get New Quote
+              </button>
+            </div>
 
-                {/* Improve Your Quote Rate Card */}
-              <InfoWidget 
-                title="Improve Your Quote Rate"
-                rateValue={72}
-                description={
-                  <>
-                    Your Quotes are often Declined due to 
-                    <strong className="font-medium tracking-[0.03px]"> Inaccurate Cargo Value</strong>
-                  </>
-                }
-              />
-           
+            {/* Improve Your Quote Rate Card */}
+            <InfoWidget 
+              title="Improve Your Quote Rate"
+              rateValue={72}
+              description={
+                <>
+                  Your Quotes are often Declined due to 
+                  <strong className="font-medium tracking-[0.03px]"> Inaccurate Cargo Value</strong>
+                </>
+              }
+            />
 
             {/* Quote Conversion Rate */}
             <div className="flex-grow min-h-[calc(31%-4px)] xl:flex-[0_0_31%] xl:min-h-auto xl:h-auto">
-             <ConversionChart 
+              <ConversionChart 
                 title="Upcoming Expirations & Conversions"
                 data={quotesData}
                 defaultActiveTime="Upcoming Expirations & Conversions"
-                showTimeDropdown={false} // Քանի որ միայն մեկ ժամանակահատված կա
+                showTimeDropdown={false}
                 typeLabels={quotesTypeLabels}
               />
             </div>
 
             {/* Quotes Expiration Card */}
             <QuotesExpirationCard 
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        data={quotesData2}
-      />
-
-
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              data={quotesData2}
+            />
           </div>
 
           {/* Tablet View (768px - 1279px) - Three Widgets Side by Side */}
@@ -347,8 +751,7 @@ export default function QuotesPage() {
             max-[1280px]:mb-2
           ">
             <div className="grid grid-cols-3 gap-2 w-full">
-            
-             {/* Improve Your Quote Rate Card */}
+              {/* Improve Your Quote Rate Card */}
               <InfoWidget 
                 title="Improve Your Quote Rate"
                 rateValue={72}
@@ -359,28 +762,26 @@ export default function QuotesPage() {
                   </>
                 }
               />
-           
 
-            {/* Quote Conversion Rate */}
-            <div className="flex-grow min-h-[calc(31%-4px)] xl:flex-[0_0_31%] xl:min-h-auto xl:h-auto">
-              <ConversionChart 
-                title="Upcoming Expirations & Conversions"
-                data={quotesData}
-                defaultActiveTime="Upcoming Expirations & Conversions"
-                showTimeDropdown={false} // Քանի որ միայն մեկ ժամանակահատված կա
-                typeLabels={quotesTypeLabels}
-              />
-            </div>
+              {/* Quote Conversion Rate */}
+              <div className="w-full">
+                <ConversionChart 
+                  title="Upcoming Expirations & Conversions"
+                  data={quotesData}
+                  defaultActiveTime="Upcoming Expirations & Conversions"
+                  showTimeDropdown={false}
+                  typeLabels={quotesTypeLabels}
+                />
+              </div>
 
-            {/* Quotes Expiration Card */}
-            <div className="w-full h-[100%]">
-              <QuotesExpirationCard 
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        data={quotesData2}
-      />
-            </div>
-            
+              {/* Quotes Expiration Card */}
+              <div className="w-full">
+                <QuotesExpirationCard 
+                  activeTab={activeTab}
+                  onTabChange={setActiveTab}
+                  data={quotesData2}
+                />
+              </div>
             </div>
           </div>
         </div>
