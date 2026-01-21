@@ -10,8 +10,9 @@ import { UniversalTable, renderStatus, renderButton } from '@/app/components/tab
 import { createClient } from '@/lib/supabase/client';
 import { useUser } from '@/app/context/UserContext';
 import { useRouter } from 'next/navigation';
+import { Package, DollarSign, Calendar, MapPin, Shield, FileText, CheckCircle, XCircle, Clock } from 'lucide-react';
 
-// Dashboard-ի columns
+// Dashboard-ի columns - թարմացված
 const dashboardColumns = [
   {
     key: 'id',
@@ -21,6 +22,18 @@ const dashboardColumns = [
       <span className="font-poppins text-sm text-[#2563eb] underline hover:text-[#1d4ed8] transition-colors duration-300 cursor-pointer">
         {value}
       </span>
+    )
+  },
+  {
+    key: 'type',
+    label: 'Type',
+    sortable: true,
+    renderDesktop: (type: string) => (
+      <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+        type === 'Quote' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+      }`}>
+        {type}
+      </div>
     )
   },
   {
@@ -162,26 +175,25 @@ export default function DashboardPage() {
       return quoteDate >= startDate && quoteDate <= endDate;
     });
 
-    // Հաշվել վիճակագրությունները
-    // Հաշվել վիճակագրությունները
-const approvedCount = filteredQuotes.filter(q => 
-  q.status === 'approved' && q.payment_status === 'paid'
-).length;
+    const approvedCount = filteredQuotes.filter(q => 
+      q.status === 'approved' && q.payment_status === 'paid'
+    ).length;
 
-const declinedCount = filteredQuotes.filter(q => 
-  q.status === 'rejected'
-).length;  // Հեռացրել fix_and_resubmit-ը
+    const declinedCount = filteredQuotes.filter(q => 
+      q.status === 'rejected'
+    ).length;
 
-const expiredCount = filteredQuotes.filter(q => {
-  if (q.status === 'expired') return true;
-  
-  if (q.quote_expires_at) {  // Փոխել expiration_time-ը quote_expires_at-ի
-    const expirationDate = new Date(q.quote_expires_at);
-    return expirationDate < now;
-  }
-  
-  return false;
-}).length;
+    const expiredCount = filteredQuotes.filter(q => {
+      if (q.status === 'expired') return true;
+      
+      if (q.quote_expires_at) {
+        const expirationDate = new Date(q.quote_expires_at);
+        return expirationDate < now;
+      }
+      
+      return false;
+    }).length;
+
     return {
       approved: approvedCount,
       declined: declinedCount,
@@ -203,7 +215,7 @@ const expiredCount = filteredQuotes.filter(q => {
       if (!user) return
       
       try {
-        // Ստանալ օգտատիրոջ տվյալները profiles աղյուսակից
+        // Ստանալ օգտատիրոջ տվյալները
         const { data: userProfile, error: profileError } = await supabase
           .from('profiles')
           .select('full_name, email')
@@ -222,7 +234,7 @@ const expiredCount = filteredQuotes.filter(q => {
           setUserName(emailName.charAt(0).toUpperCase() + emailName.slice(1))
         }
 
-        // Ստանալ quote_requests-ները
+        // Ստանալ բոլոր quotes-ը
         const { data: quotes, error: quotesError } = await supabase
           .from('quotes')
           .select('*')
@@ -232,7 +244,18 @@ const expiredCount = filteredQuotes.filter(q => {
 
         if (quotesError) throw quotesError
 
-        const formattedData = formatDashboardData(quotes || [])
+        // Ստանալ բոլոր policies-ը
+        const { data: policies, error: policiesError } = await supabase
+          .from('policies')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(50)
+
+        if (policiesError) throw policiesError
+
+        // Միավորել quotes և policies տվյալները
+        const formattedData = formatCombinedData(quotes || [], policies || [])
         setDashboardRows(formattedData)
 
         // Հաշվել conversion data բոլոր ժամանակահատվածների համար
@@ -246,16 +269,15 @@ const expiredCount = filteredQuotes.filter(q => {
         setConversionData(newConversionData);
 
         // Հաշվել ավելի ճշգրիտ performance metrics
-        const totalInsuredAmount = quotes?.filter(q => q.status === 'approved')
-          .reduce((sum, item) => sum + (item.shipment_value || 0), 0) || 0;
+        const totalInsuredAmount = (policies || []).reduce((sum, policy) => 
+          sum + (parseFloat(policy.coverage_amount) || 0), 0);
         
-        const approvedQuotesCount = quotes?.filter(q => q.status === 'approved').length || 0;
-        const submittedQuotesCount = quotes?.filter(q => q.status === 'submitted').length || 0;
-        const underReviewCount = quotes?.filter(q => q.status === 'under_review').length || 0;
-        const draftQuotesCount = quotes?.filter(q => q.status === 'draft').length || 0;
-        const totalQuotes = quotes?.length || 1;
+        const activePoliciesCount = (policies || []).filter(p => p.status === 'active').length;
+        const submittedQuotesCount = (quotes || []).filter(q => q.status === 'submitted').length;
+        const underReviewCount = (quotes || []).filter(q => q.status === 'under_review').length;
+        const draftQuotesCount = (quotes || []).filter(q => q.status === 'draft').length;
+        const totalItems = (quotes?.length || 0) + (policies?.length || 0) || 1;
 
-        // Ավելի ճշգրիտ հաշվարկներ
         const totalInsuredInK = Math.floor(totalInsuredAmount / 1000);
         const decimalPart = Math.round((totalInsuredAmount % 1000) / 10);
         
@@ -266,20 +288,20 @@ const expiredCount = filteredQuotes.filter(q => {
             total: totalInsuredAmount 
           },
           activePolicies: { 
-            count: approvedQuotesCount, 
-            percentage: Math.round((approvedQuotesCount / totalQuotes) * 100) || 47
+            count: activePoliciesCount, 
+            percentage: Math.round((activePoliciesCount / totalItems) * 100) || 47
           },
           quotesAwaiting: { 
             count: submittedQuotesCount, 
-            percentage: Math.round((submittedQuotesCount / totalQuotes) * 100) || 25
+            percentage: Math.round((submittedQuotesCount / totalItems) * 100) || 25
           },
           underReview: { 
             count: underReviewCount, 
-            percentage: Math.round((underReviewCount / totalQuotes) * 100)
+            percentage: Math.round((underReviewCount / totalItems) * 100)
           },
           readyToPay: { 
             count: draftQuotesCount, 
-            percentage: Math.round((draftQuotesCount / totalQuotes) * 100) || 17
+            percentage: Math.round((draftQuotesCount / totalItems) * 100) || 17
           }
         });
 
@@ -294,151 +316,157 @@ const expiredCount = filteredQuotes.filter(q => {
     loadDashboardData()
   }, [user])
 
-  // Status config ֆունկցիա
-const getStatusConfig = (quote: any) => {
-  const calculateDaysText = (expirationTime: string) => {
-    if (!expirationTime) return '';
-    
-    const now = new Date();
-    const expiration = new Date(expirationTime);
-    const diffTime = expiration.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays > 0) {
-      return ` (${diffDays} day${diffDays !== 1 ? 's' : ''} left)`;
-    } else if (diffDays < 0) {
-      const daysAgo = Math.abs(diffDays);
-      return ` (${daysAgo} day${daysAgo !== 1 ? 's' : ''} ago)`;
-    } else {
-      return ' (Today)';
-    }
+  // Policy-ի համար status config
+  const getPolicyStatusConfig = (policy: any) => {
+    const statusMap: Record<string, any> = {
+      'active': { 
+        text: 'Active', 
+        color: 'bg-emerald-50', 
+        dot: 'bg-emerald-500', 
+        textColor: 'text-emerald-700',
+        buttonText: 'View Shipment',
+        buttonVariant: 'success' as const
+      },
+      'pending': { 
+        text: 'Pending Activation', 
+        color: 'bg-blue-50', 
+        dot: 'bg-blue-500', 
+        textColor: 'text-blue-700',
+        buttonText: 'View Details',
+        buttonVariant: 'secondary' as const
+      },
+      'expired': { 
+        text: 'Expired', 
+        color: 'bg-gray-100', 
+        dot: 'bg-gray-400', 
+        textColor: 'text-gray-600',
+        buttonText: 'View Details',
+        buttonVariant: 'secondary' as const
+      },
+      'cancelled': { 
+        text: 'Cancelled', 
+        color: 'bg-rose-50', 
+        dot: 'bg-rose-500', 
+        textColor: 'text-rose-700',
+        buttonText: 'View Details',
+        buttonVariant: 'secondary' as const
+      }
+    };
+
+    return statusMap[policy.status] || statusMap['pending'];
   };
 
-  const isPaid = quote.payment_status === 'paid';
-  const isExpired = quote.quote_expires_at && new Date(quote.quote_expires_at) < new Date();
-  const daysText = quote.expiration_time ? calculateDaysText(quote.expiration_time) : '';
-
-  // Եթե quote-ը արդեն approved և paid է, ապա հաշվի չառնել expiration-ը
-  const isApprovedAndPaid = quote.status === 'approved' && isPaid;
-  
-  const statusMap: Record<string, any> = {
-  'draft': { 
-    text: 'Continue Quote', 
-    color: 'bg-gray-100', 
-    dot: 'bg-gray-500', 
-    textColor: 'text-gray-700',
-    buttonText: 'Continue Quote',
-    buttonVariant: 'primary' as const
-  },
-  'submitted': { 
-    text: 'Waiting for review', 
-    color: 'bg-blue-50', 
-    dot: 'bg-blue-500', 
-    textColor: 'text-blue-700',
-    buttonText: 'View Details',
-    buttonVariant: 'secondary' as const
-  },
-  'under_review': { 
-    text: 'Documents under review', 
-    color: 'bg-amber-50', 
-    dot: 'bg-amber-500', 
-    textColor: 'text-amber-700',
-    buttonText: 'View Details',
-    buttonVariant: 'secondary' as const
-  },
-  'approved': { 
-    text: isPaid ? 'Approved & Paid' : 'Pay to Activate', 
-    color: isPaid ? 'bg-emerald-50' : 'bg-amber-50', 
-    dot: isPaid ? 'bg-emerald-500' : 'bg-amber-500', 
-    textColor: isPaid ? 'text-emerald-700' : 'text-amber-700',
-    buttonText: isPaid ? 'View Policy' : 'Pay Now',
-    buttonVariant: isPaid ? 'success' as const : 'primary' as const
-  },
-  'rejected': { 
-    text: 'Rejected', 
-    color: 'bg-rose-50', 
-    dot: 'bg-rose-500', 
-    textColor: 'text-rose-700',
-    buttonText: 'View Details',
-    buttonVariant: 'secondary' as const
-  },
-  'expired': { 
-    text: 'Expired', 
-    color: 'bg-gray-100', 
-    dot: 'bg-gray-400', 
-    textColor: 'text-gray-600',
-    buttonText: 'View Details',
-    buttonVariant: 'secondary' as const
-  },
-  'converted': { 
-    text: 'Converted to Policy', 
-    color: 'bg-emerald-50', 
-    dot: 'bg-emerald-500', 
-    textColor: 'text-emerald-700',
-    buttonText: 'View Policy',
-    buttonVariant: 'success' as const
-  },
-  'waiting_for_docs': { 
-    text: 'Waiting for Documents', 
-    color: 'bg-cyan-50', 
-    dot: 'bg-cyan-500', 
-    textColor: 'text-cyan-700',
-    buttonText: 'View Details',
-    buttonVariant: 'secondary' as const
-  }
-};
-
-  // 1. Ստուգենք, արդյոք quote-ն expired է
-  if (isExpired) {
-    return {
-      text: 'Expired' + daysText,
-      color: 'bg-gray-100',
-      dot: 'bg-gray-400',
-      textColor: 'text-gray-600',
-      buttonText: 'View Details',
-      buttonVariant: 'secondary' as const,
-      isActuallyExpired: true
+  // Quote-ի համար status config
+  const getQuoteStatusConfig = (quote: any) => {
+    const calculateDaysText = (expirationTime: string) => {
+      if (!expirationTime) return '';
+      
+      const now = new Date();
+      const expiration = new Date(expirationTime);
+      const diffTime = expiration.getTime() - now.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays > 0) {
+        return ` (${diffDays} day${diffDays !== 1 ? 's' : ''} left)`;
+      } else if (diffDays < 0) {
+        const daysAgo = Math.abs(diffDays);
+        return ` (${daysAgo} day${daysAgo !== 1 ? 's' : ''} ago)`;
+      } else {
+        return ' (Today)';
+      }
     };
-  }
 
-  // 2. Եթե արդեն approved և paid է, ապա պարզապես ցույց տալ "Approved & Paid"
-  if (isApprovedAndPaid) {
-    return {
-      text: 'Approved & Paid',
-      color: 'bg-emerald-50',
-      dot: 'bg-emerald-500',
-      textColor: 'text-emerald-700',
-      buttonText: 'View Policy',
-      buttonVariant: 'success' as const
+    const isPaid = quote.payment_status === 'paid';
+    const isExpired = quote.quote_expires_at && new Date(quote.quote_expires_at) < new Date();
+    const daysText = quote.expiration_time ? calculateDaysText(quote.expiration_time) : '';
+    const isApprovedAndPaid = quote.status === 'approved' && isPaid;
+    
+    const statusMap: Record<string, any> = {
+      'draft': { 
+        text: 'Continue Quote', 
+        color: 'bg-gray-100', 
+        dot: 'bg-gray-500', 
+        textColor: 'text-gray-700',
+        buttonText: 'Continue Quote',
+        buttonVariant: 'primary' as const
+      },
+      'submitted': { 
+        text: 'Waiting for review', 
+        color: 'bg-blue-50', 
+        dot: 'bg-blue-500', 
+        textColor: 'text-blue-700',
+        buttonText: 'View Details',
+        buttonVariant: 'secondary' as const
+      },
+      'under_review': { 
+        text: 'Documents under review', 
+        color: 'bg-amber-50', 
+        dot: 'bg-amber-500', 
+        textColor: 'text-amber-700',
+        buttonText: 'View Details',
+        buttonVariant: 'secondary' as const
+      },
+      'approved': { 
+        text: isPaid ? 'Approved & Paid' : 'Pay to Activate', 
+        color: isPaid ? 'bg-emerald-50' : 'bg-amber-50', 
+        dot: isPaid ? 'bg-emerald-500' : 'bg-amber-500', 
+        textColor: isPaid ? 'text-emerald-700' : 'text-amber-700',
+        buttonText: isPaid ? 'View Policy' : 'Pay Now',
+        buttonVariant: isPaid ? 'success' as const : 'primary' as const
+      },
+      'rejected': { 
+        text: 'Rejected', 
+        color: 'bg-rose-50', 
+        dot: 'bg-rose-500', 
+        textColor: 'text-rose-700',
+        buttonText: 'View Details',
+        buttonVariant: 'secondary' as const
+      },
+      'expired': { 
+        text: 'Expired', 
+        color: 'bg-gray-100', 
+        dot: 'bg-gray-400', 
+        textColor: 'text-gray-600',
+        buttonText: 'View Details',
+        buttonVariant: 'secondary' as const
+      }
     };
-  }
 
-  const baseConfig = statusMap[quote.status] || statusMap['draft'];
-  
-  // 3. Մնացած դեպքերում ավելացնել ժամանակ, եթե կա
-  if (['approved', 'pay_to_activate', 'submitted'].includes(quote.status) && quote.expiration_time && !isApprovedAndPaid) {
-    return {
-      ...baseConfig,
-      text: baseConfig.text + daysText
-    };
-  }
-  
-  return baseConfig;
-};
+    if (isExpired) {
+      return {
+        text: 'Expired' + daysText,
+        color: 'bg-gray-100',
+        dot: 'bg-gray-400',
+        textColor: 'text-gray-600',
+        buttonText: 'View Details',
+        buttonVariant: 'secondary' as const,
+        isActuallyExpired: true
+      };
+    }
 
-const formatQuoteId = (id: string) => {
-  if (id.startsWith('Q-')) {
-    return id;
-  }
-  // Քանի որ quotes աղյուսակում արդեն ունենք quote_number սյունակ
-  if (id.startsWith('temp-')) {
-    const randomNum = Math.floor(Math.random() * 10000).toString().padStart(5, '0');
-    return `Q-${randomNum}`;
-  }
-  // Եթե id-ն uuid է, ապա օգտագործենք quote_number սյունակի տվյալները
-  // Սա կսահմանվի formatDashboardData ֆունկցիայում
-  return `Q-${id.slice(-5)}`;
-};
+    if (isApprovedAndPaid) {
+      return {
+        text: 'Approved & Paid',
+        color: 'bg-emerald-50',
+        dot: 'bg-emerald-500',
+        textColor: 'text-emerald-700',
+        buttonText: 'View Policy',
+        buttonVariant: 'success' as const
+      };
+    }
+
+    const baseConfig = statusMap[quote.status] || statusMap['draft'];
+    
+    if (['approved', 'pay_to_activate', 'submitted'].includes(quote.status) && quote.expiration_time && !isApprovedAndPaid) {
+      return {
+        ...baseConfig,
+        text: baseConfig.text + daysText
+      };
+    }
+    
+    return baseConfig;
+  };
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('en-US', {
@@ -449,11 +477,13 @@ const formatQuoteId = (id: string) => {
     })
   };
 
-const formatDashboardData = (quotes: any[]) => {
-  const formattedData: any[] = []
+// Միավորել quotes և policies տվյալները՝ նորերը վերևում
+const formatCombinedData = (quotes: any[], policies: any[]) => {
+  const combinedData: any[] = []
 
+  // Ավելացնել quotes
   quotes.forEach(quote => {
-    const statusConfig = getStatusConfig(quote)
+    const statusConfig = getQuoteStatusConfig(quote)
     
     const buttonAction = { 
       text: statusConfig.buttonText, 
@@ -461,10 +491,9 @@ const formatDashboardData = (quotes: any[]) => {
       onClick: (row: any) => handleQuoteAction(row, quote)
     }
     
-    formattedData.push({
+    combinedData.push({
       type: 'Quote',
-      // Օգտագործել quote_number-ը, եթե կա
-      id: quote.quote_number || formatQuoteId(quote.id),
+      id: quote.quote_number || `Q-${quote.id.slice(-5)}`,
       cargo: quote.cargo_type || 'Unknown',
       value: quote.shipment_value || 0,
       status: {
@@ -473,20 +502,143 @@ const formatDashboardData = (quotes: any[]) => {
         dot: statusConfig.dot,
         textColor: statusConfig.textColor
       },
-      date: formatDate(quote.created_at),
-      // Նոր աղյուսակում quote_expires_at-ն է
-      expirationDate: quote.quote_expires_at ? formatDate(quote.quote_expires_at) : null,
+      date: formatDate(quote.created_at), // Այստեղ արդեն ֆորմատավորված
       button: buttonAction,
       rawData: quote,
+      dataType: 'quote',
       quoteStatus: quote.status,
-      paymentStatus: quote.payment_status
+      paymentStatus: quote.payment_status,
+      sortDate: new Date(quote.created_at).getTime() // Համեմատության համար
     })
   })
 
-  return formattedData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  // Ավելացնել policies
+  policies.forEach(policy => {
+    const statusConfig = getPolicyStatusConfig(policy)
+    
+    const buttonAction = { 
+      text: statusConfig.buttonText, 
+      variant: statusConfig.buttonVariant,
+      onClick: (row: any) => handlePolicyAction(row, policy)
+    }
+    
+    combinedData.push({
+      type: 'Policy',
+      id: policy.policy_number,
+      cargo: policy.cargo_type || 'Unknown',
+      value: parseFloat(policy.coverage_amount) || 0,
+      status: {
+        text: statusConfig.text,
+        color: statusConfig.color,
+        dot: statusConfig.dot,
+        textColor: statusConfig.textColor
+      },
+      date: formatDate(policy.created_at), // Այստեղ արդեն ֆորմատավորված
+      button: buttonAction,
+      rawData: policy,
+      dataType: 'policy',
+      policyStatus: policy.status,
+      coverageStart: policy.coverage_start,
+      coverageEnd: policy.coverage_end,
+      sortDate: new Date(policy.created_at).getTime() // Համեմատության համար
+    })
+  })
+
+  // Դասակարգել ըստ ամսաթվի՝ նորերը վերևում
+  return combinedData.sort((a, b) => b.sortDate - a.sortDate)
 }
+  const handleQuoteAction = (row: any, quote: any) => {
+    const quoteId = row.rawData?.id || row.id;
+    const status = quote.status;
+    const paymentStatus = quote.payment_status;
+    const isExpired = quote.quote_expires_at && new Date(quote.quote_expires_at) < new Date();
+    
+    const checkPolicyAndRedirect = async () => {
+      try {
+        const { data: policy } = await supabase
+          .from('policies')
+          .select('*')
+          .eq('quote_id', quoteId)
+          .maybeSingle();
+        
+        if (policy?.status === 'active') {
+          router.push(`/shipments/${policy.id}`)
+          return true;
+        }
+        
+        return false;
+      } catch (error) {
+        console.error('Error checking policy:', error)
+        return false;
+      }
+    }
+    
+    switch (status) {
+      case 'draft':
+        router.push(`/quotes/new?quote_id=${quoteId}&continue=true`)
+        break
+      case 'submitted':
+      case 'under_review':
+        router.push(`/quotes/${quoteId}`)
+        break
+      case 'approved':
+        if (paymentStatus === 'paid') {
+          checkPolicyAndRedirect().then((hasPolicy) => {
+            if (!hasPolicy) {
+              router.push(`/quotes/${quoteId}`)
+            }
+          })
+        } else {
+          router.push(`/quotes/${quoteId}`)
+        }
+        break
+      case 'rejected':
+        router.push(`/quotes/${quoteId}`)
+        break
+      case 'expired':
+        if (confirm('This quote has expired. Would you like to create a new one based on this?')) {
+          router.push(`/quotes/new?duplicate=${quoteId}`);
+        }
+        break
+      case 'pay_to_activate':
+        router.push(`/quotes/${quoteId}`)
+        break
+      default:
+        router.push(`/quotes/${quoteId}`)
+    }
+  };
+
+  const handlePolicyAction = (row: any, policy: any) => {
+    const policyId = row.rawData?.id || row.id;
+    
+    if (policy.status === 'active') {
+      router.push(`/shipments/${policyId}`)
+    } else {
+      router.push(`/quotes/${policy.quote_id}`)
+    }
+  };
+
   const getFallbackData = () => {
     return [
+      {
+        type: 'Policy',
+        id: 'POL-770756',
+        cargo: 'pharma',
+        value: 2219.99,
+        status: { 
+          text: 'Active', 
+          color: 'bg-emerald-50', 
+          dot: 'bg-emerald-500', 
+          textColor: 'text-emerald-700' 
+        },
+        date: 'Jan 20, 11:08 PM',
+        button: { 
+          text: 'View Shipment', 
+          variant: 'success' as const,
+          onClick: (row: any) => router.push('/shipments/c3f4cf07-eae0-4527-a795-6ec08ec590e7')
+        },
+        dataType: 'policy'
+      },
       {
         type: 'Quote',
         id: 'Q-00842',
@@ -504,170 +656,29 @@ const formatDashboardData = (quotes: any[]) => {
           variant: 'secondary' as const,
           onClick: (row: any) => handleQuoteAction(row, { status: 'submitted' })
         },
-        quoteStatus: 'submitted'
+        dataType: 'quote'
       },
       {
-        type: 'Quote',
-        id: 'Q-T-001',
-        cargo: 'Unknown',
-        value: 0,
-        status: { 
-          text: 'Expired (Today)', 
-          color: 'bg-gray-100', 
-          dot: 'bg-gray-400', 
-          textColor: 'text-gray-600' 
-        },
-        date: 'Jan 19, 11:30 PM',
-        button: { 
-          text: 'View Details', 
-          variant: 'secondary' as const,
-          onClick: (row: any) => handleQuoteAction(row, { status: 'expired' })
-        },
-        quoteStatus: 'expired'
-      },
-      {
-        type: 'Quote',
-        id: 'Q-08822',
-        cargo: 'clothing',
-        value: 7780,
-        status: { 
-          text: 'Expired (1 day ago)', 
-          color: 'bg-gray-100', 
-          dot: 'bg-gray-400', 
-          textColor: 'text-gray-600' 
-        },
-        date: 'Jan 19, 10:52 PM',
-        button: { 
-          text: 'View Details', 
-          variant: 'secondary' as const,
-          onClick: (row: any) => handleQuoteAction(row, { status: 'expired' })
-        },
-        quoteStatus: 'expired'
-      },
-      {
-        type: 'Quote',
-        id: 'Q-00085',
-        cargo: 'machinery',
-        value: 84999.99,
-        status: { 
-          text: 'Rejected', 
-          color: 'bg-rose-50', 
-          dot: 'bg-rose-500', 
-          textColor: 'text-rose-700' 
-        },
-        date: 'Jan 19, 10:16 PM',
-        button: { 
-          text: 'View Details', 
-          variant: 'secondary' as const,
-          onClick: (row: any) => handleQuoteAction(row, { status: 'rejected' })
-        },
-        quoteStatus: 'rejected'
-      },
-      {
-        type: 'Quote',
-        id: 'Q-09400',
+        type: 'Policy',
+        id: 'POL-663931',
         cargo: 'pharma',
-        value: 4499.99,
+        value: 2219.99,
         status: { 
-          text: 'Approved & Paid', 
+          text: 'Active', 
           color: 'bg-emerald-50', 
           dot: 'bg-emerald-500', 
           textColor: 'text-emerald-700' 
         },
-        date: 'Jan 19, 10:06 PM',
+        date: 'Jan 20, 10:50 PM',
         button: { 
-          text: 'View Policy', 
+          text: 'View Shipment', 
           variant: 'success' as const,
-          onClick: (row: any) => handleQuoteAction(row, { status: 'approved', payment_status: 'paid' })
+          onClick: (row: any) => router.push('/shipments/8973bd4b-d206-42fc-ac7c-b7f16c051509')
         },
-        quoteStatus: 'approved'
-      },
-      {
-        type: 'Quote',
-        id: 'Q-07232',
-        cargo: 'electronics',
-        value: 12000,
-        status: { 
-          text: 'Pay to Activate', 
-          color: 'bg-amber-50', 
-          dot: 'bg-amber-500', 
-          textColor: 'text-amber-700' 
-        },
-        date: 'Jan 19, 10:05 PM',
-        button: { 
-          text: 'Pay Now', 
-          variant: 'primary' as const,
-          onClick: (row: any) => handleQuoteAction(row, { status: 'pay_to_activate' })
-        },
-        quoteStatus: 'pay_to_activate'
+        dataType: 'policy'
       }
     ]
   };
-
-  const handleQuoteAction = (row: any, quote: any) => {
-    const quoteId = row.rawData?.id || row.id;
-    const status = quote.status;
-    const paymentStatus = quote.payment_status;
-    const isExpired = quote.quote_expires_at && new Date(quote.quote_expires_at) < new Date();
-    
-   
-    const checkPolicyAndRedirect = async () => {
-  try {
-    const { data: policy } = await supabase
-      .from('policies')
-      .select('*')
-      .eq('quote_id', quoteId)  // Փոխել quote_request_id-ը quote_id-ի
-      .maybeSingle();
-    
-    if (policy?.status === 'active') {
-      router.push(`/shipments/${policy.id}`)
-      return true;
-    }
-    
-    return false;
-  } catch (error) {
-    console.error('Error checking policy:', error)
-    return false;
-  }
-}
-    
-    switch (status) {
-      case 'draft':
-        router.push(`/quotes/new?quote_id=${quoteId}&continue=true`)
-        break
-      case 'submitted':
-      case 'under_review':
-      case 'waiting_for_review':
-      case 'documents_under_review':
-        router.push(`/quotes/${quoteId}`)
-        break
-      case 'approved':
-        if (paymentStatus === 'paid') {
-          checkPolicyAndRedirect().then((hasPolicy) => {
-            if (!hasPolicy) {
-              router.push(`/quotes/${quoteId}`)
-            }
-          })
-        } else {
-          router.push(`/quotes/${quoteId}`)
-        }
-        break
-      case 'rejected':
-      case 'fix_and_resubmit':
-        router.push(`/quotes/${quoteId}`)
-        break
-      case 'expired':
-        if (confirm('This quote has expired. Would you like to create a new one based on this?')) {
-          router.push(`/quotes/new?duplicate=${quoteId}`);
-        }
-        break
-      case 'pay_to_activate':
-        router.push(`/quotes/${quoteId}`)
-        break
-      default:
-        router.push(`/quotes/${quoteId}`)
-    }
-  }
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -819,14 +830,17 @@ const formatDashboardData = (quotes: any[]) => {
                 showSortFilter: true,
                 activityOptions: [
                   'All Activity', 
+                  'Quotes', 
+                  'Policies',
                   'Draft', 
                   'Submitted', 
                   'Under Review', 
                   'Approved', 
-                  'Rejected'
+                  'Rejected',
+                  'Active'
                 ],
                 timeframeOptions: ['Last 7 days', 'Last 30 days', 'Last 3 months', 'All time'],
-                sortOptions: ['Status', 'Date', 'Value', 'Type']
+                sortOptions: ['Type', 'Status', 'Date', 'Value']
               }}
               mobileDesign={{
                 showType: true,
@@ -836,7 +850,7 @@ const formatDashboardData = (quotes: any[]) => {
                 buttonWidth: '47%'
               }}
               mobileDesignType="dashboard"
-              desktopGridCols="0.7fr 1fr 0.7fr 1.3fr 0.2fr 1fr"
+              desktopGridCols="0.5fr 0.5fr 0.7fr 0.7fr 1.3fr 0.2fr 1fr"
             />
           </div>
 
